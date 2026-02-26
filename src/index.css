@@ -48,8 +48,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --tigreso: oklch(75.053% 0.17907 58.273);
-  --tigreso-foreground: oklch(100% 0.00011 271.152);
 }
 
 a {
@@ -59,14 +57,6 @@ a {
 }
 a:hover {
   color: #535bf2;
-}
-
-.caixa-botao {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5em;
-  align-items: center;
-  background-color: var(--card);
 }
 
 body {
@@ -89,7 +79,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--tigreso);
+  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -115,8 +105,6 @@ button:focus-visible {
 }
 
 @theme inline {
-  --color-tigreso: var(--tigreso);
-  --color-tigreso-foreground: var(--tigreso-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
