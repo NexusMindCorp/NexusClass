@@ -4,7 +4,7 @@ import { useGerenciador } from "@/hooks/useGerenciador";
 import { Mural } from "./Mural";
 
 export const GerenciadorTelas = () => {
-    const {usuario, mudarInscricao, marcarMural} = useGerenciador();
+    const {usuario, mudarInscricao, estaInscrito, marcarMural} = useGerenciador();
     const turmaSelecionada = listaEscolar.turmas[usuario.chaveMural];
 
     return (
@@ -20,8 +20,8 @@ export const GerenciadorTelas = () => {
                             fotoProfessor={turma.foto_professor}
                             sala={turma.sala}
                             turma={turma.turma}
-                            inscrito={usuario.inscrito}
-                            clickInscrito={mudarInscricao}
+                            inscrito={estaInscrito(key)}
+                            clickInscrito={() => mudarInscricao(key)}
                             clickMural={marcarMural}
                         />
                     ))}

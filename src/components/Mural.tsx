@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { Plus } from "lucide-react";
+
 type MuralProps = {
     materia: string;
     turma: TurmaProps;
@@ -18,7 +20,8 @@ type MuralProps = {
 
 export function Mural({ materia, turma }: MuralProps) {
     return (
-        <Card className="relative mx-auto w-full max-w-3xl overflow-hidden">
+        <div className="mx-auto w-full max-w-3xl space-y-1">
+        <Card className="relative w-full overflow-hidden">
       <img
         src={turma.banners}
         alt={`Banner da turma ${materia}`}
@@ -52,5 +55,8 @@ export function Mural({ materia, turma }: MuralProps) {
         </CardAction>
       </CardHeader>
     </Card>
+    
+    <Button className="ml-30 w-fit"><Plus />Postar no mural</Button>
+    </div>
     );
 }

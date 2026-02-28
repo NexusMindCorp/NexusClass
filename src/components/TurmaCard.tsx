@@ -63,7 +63,7 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
         </ButtonGroup>
         :
         <ButtonGroup>
-            <Button onClick={()=>clickInscrito?.()} size="sm">
+            <Button onClick={() => clickInscrito?.()} size="sm">
               Inscrever-se
             </Button>
         </ButtonGroup>
