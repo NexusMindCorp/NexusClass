@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { ButtonGroup, ButtonGroupSeparator } from "./ui/button-group";
 
 
 type TurmasProps = {
@@ -17,9 +18,11 @@ type TurmasProps = {
   fotoProfessor: string;
   sala: string;
   turma: string;
+  inscrito?: boolean;
+  clickInscrito?: () => void;
 }
 
-export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma }: TurmasProps) {
+export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, clickInscrito }: TurmasProps) {
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
       <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -48,7 +51,22 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
         </CardDescription>
       </CardHeader>
       <CardFooter>
-        <Button className="w-full">Entrar</Button>
+          {inscrito ? <ButtonGroup>
+            <Button onClick={()=>clickInscrito?.()} variant={"destructive"} size="sm">
+              Cancelar Inscrição
+            </Button>
+            <ButtonGroupSeparator />
+            <Button size="sm">
+              Entrar
+            </Button>
+        </ButtonGroup>
+        :
+        <ButtonGroup>
+            <Button onClick={()=>clickInscrito?.()} size="sm">
+              Inscrever-se
+            </Button>
+        </ButtonGroup>
+        }
       </CardFooter>
     </Card>
   )
