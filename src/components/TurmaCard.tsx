@@ -13,17 +13,18 @@ import {
 type TurmasProps = {
   materia: string;
   professor: string;
+  banners: string;
   fotoProfessor: string;
   sala: string;
   turma: string;
 }
 
-export function TurmaCard({ materia, professor, fotoProfessor, sala, turma }: TurmasProps) {
+export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma }: TurmasProps) {
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
       <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
       <img
-        src={fotoProfessor}
+        src={banners}
         alt="Event cover"
         className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
       />

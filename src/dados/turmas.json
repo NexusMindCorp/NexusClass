@@ -4,6 +4,7 @@
   "turmas": {
     "portugues": {
       "professor": "Phoenix Wright ",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
       "foto_professor": "https://translate.google.com/website?sl=en&tl=pt&hl=pt&client=srp&u=https://static.wikia.nocookie.net/aceattorney/images/9/95/Phoenix_Wright_Portrait_AJ_Trilogy.png/revision/latest?cb%3D20240620212543",
       "sala": "B-12",
@@ -11,13 +12,15 @@
     },
     "quimica": {
       "professor": "Walter White",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
-      "foto_professor": "https://static.wikia.nocookie.net/villains/images/6/65/Walter_White2.jpg/revision/latest?cb=20230109113855",
+      "foto_professor": "https://imagenes.elpais.com/resizer/v2/QB4I6VGKINYWS4AVFSTV5FWFYI.jpg?auth=e8bd312047bd47aac60cd3421b55d5fae4528cf0b93c78ca6269597c247c832c&width=1200",
       "sala": "B-12",
       "turma": "9º Ano A"
     },
     "matematica": {
       "professor": "Alan Garner",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Erick Ferreira", "Fernanda Lima", "Gabriel Costa"],
       "foto_professor": "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/26/10/the-hangover.jpg?width=1200",
       "sala": "C-05",
@@ -25,13 +28,15 @@
     },
     "geografia": {
       "professor": "Celso Portiolli",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Marcos Viana", "Patrícia Luz", "Renato Garcia"],
-      "foto_professor": "https://static.wikia.nocookie.net/tvpediabrasil/images/a/a0/Celsoportiolli.png/revision/latest?cb=20190423160111&path-prefix=pt-br",
+      "foto_professor": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuiU7qyb_BWQ5WrFfp3hewXebEY9TVKT6C-g&s",
       "sala": "D-01",
       "turma": "1º Ensino Médio"
     },
     "filosofia": {
       "professor": "Monark",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Thiago Ramos", "Ursula Lins", "Vitor Hugo"],
       "foto_professor": "https://istoedinheiro.com.br/wp-content/uploads/sites/17/2022/03/monark-e1648042874540.png",
       "sala": "Auditório A",
@@ -39,8 +44,9 @@
     },
     "ciências": {
       "professor": "Pedro Loos",
+      "banners": "https://i.imgur.com/7X8F2cJ.png",
       "alunos": ["Beatriz Dias", "Caio Castro", "Eduarda Nobre"],
-      "foto_professor": "https://www.tiktok.com/@cortespedroloos/photo/7262906447883816198",
+      "foto_professor": "https://pbs.twimg.com/media/F3kXMy4WwAARHA4.jpg",
       "sala": "Sala de Debates",
       "turma": "3º Ensino Médio"
     }
