@@ -20,9 +20,10 @@ type TurmasProps = {
   turma: string;
   inscrito?: boolean;
   clickInscrito?: () => void;
+  clickMural?: (materia: string) => void;
 }
 
-export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, clickInscrito }: TurmasProps) {
+export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false,clickMural, clickInscrito }: TurmasProps) {
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
       <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
@@ -56,7 +57,7 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
               Cancelar Inscrição
             </Button>
             <ButtonGroupSeparator />
-            <Button size="sm">
+            <Button onClick={() => clickMural?.(materia)} size="sm">
               Entrar
             </Button>
         </ButtonGroup>
