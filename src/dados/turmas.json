@@ -2,6 +2,14 @@
   "escola": "Escola Estadual de Nexus City",
   "ano_letivo": 2069,
   "turmas": {
+    "informática": {
+      "professor": "ET",
+      "banners": "https://preview.redd.it/afo77nn5l8401.jpg?auto=webp&s=5467bce7a0c54d2ce2f902bee58145f89dd074eb",
+      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "foto_professor": "https://preview.redd.it/cty39ctc10jg1.jpeg?width=640&crop=smart&auto=webp&s=7f6b489ec8ad14f18fc6b32f3385d5300cb0b93c",
+      "sala": "A-01",
+      "turma": "9º Ano A"
+    },
     "portugues": {
       "professor": "Phoenix Wright ",
       "banners": "https://www.clipartmax.com/png/middle/192-1926980_ace-attorney-man-cartoon-male-fictional-character-boy-phoenix-wright-objection-meme.png",
