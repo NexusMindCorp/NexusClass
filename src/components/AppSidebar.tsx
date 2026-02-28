@@ -78,6 +78,7 @@ const AppSidebar = () => {
                         <CollapsibleContent>
                             <SidebarContent>
                                 <SidebarMenu>
+                                    {/*Aqui vão entrar as materias selecionadas*/}
                                     <SidebarMenuItem>
                                         <SidebarMenuButton asChild>
                                             <a href="/aulas/matematica">

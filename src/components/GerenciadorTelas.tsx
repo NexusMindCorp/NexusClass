@@ -4,7 +4,7 @@ import { useGerenciador } from "@/hooks/useGerenciador";
 import { Mural } from "./Mural";
 
 export const GerenciadorTelas = () => {
-    const {usuario, mudarInscricao, estaInscrito, marcarMural} = useGerenciador();
+    const { usuario, mudarInscricao, estaInscrito, marcarMural } = useGerenciador();
     const turmaSelecionada = listaEscolar.turmas[usuario.chaveMural];
 
     return (
@@ -14,7 +14,7 @@ export const GerenciadorTelas = () => {
                     {listaEscolar.turmas && Object.entries(listaEscolar.turmas).map(([key, turma]) => (
                         <TurmaCard
                             key={key}
-                            materia={key}
+                            materia={turma.materia}
                             banners={turma.banners}
                             professor={turma.professor}
                             fotoProfessor={turma.foto_professor}

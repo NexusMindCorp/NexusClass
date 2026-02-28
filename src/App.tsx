@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar"
 import AppSidebar from "./components/AppSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { ThemeProvider } from "./components/provedores/ThemeProvider"
+import { GerenciadorTelas } from "./components/GerenciadorTelas"
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
         <main className="pagina-principal">
           <Navbar />
           <div className="pagina-conteudo">
-            <h1 className="text-2xl font-bold mt-4">Bem-vindo ao Classroom</h1>
+            <GerenciadorTelas />
           </div>
         </main>
       </SidebarProvider>

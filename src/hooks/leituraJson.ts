@@ -7,6 +7,7 @@ export type EscolaProps = {
 };
 
 export type TurmaProps = {
+  materia: string;
   professor: string;
   banners: string;
   alunos: string[];

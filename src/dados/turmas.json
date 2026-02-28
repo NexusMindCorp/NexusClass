@@ -3,57 +3,92 @@
   "ano_letivo": 2069,
   "turmas": {
     "informática": {
+      "materia": "Informática",
       "professor": "ET",
       "banners": "https://preview.redd.it/afo77nn5l8401.jpg?auto=webp&s=5467bce7a0c54d2ce2f902bee58145f89dd074eb",
-      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "alunos": [
+        "Ana Silva",
+        "Bruno Oliveira",
+        "Carlos Eduardo"
+      ],
       "foto_professor": "https://preview.redd.it/cty39ctc10jg1.jpeg?width=640&crop=smart&auto=webp&s=7f6b489ec8ad14f18fc6b32f3385d5300cb0b93c",
       "sala": "A-01",
       "turma": "9º Ano A"
     },
     "portugues": {
+      "materia": "Português",
       "professor": "Phoenix Wright ",
       "banners": "https://www.clipartmax.com/png/middle/192-1926980_ace-attorney-man-cartoon-male-fictional-character-boy-phoenix-wright-objection-meme.png",
-      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "alunos": [
+        "Ana Silva",
+        "Bruno Oliveira",
+        "Carlos Eduardo"
+      ],
       "foto_professor": "https://translate.google.com/website?sl=en&tl=pt&hl=pt&client=srp&u=https://static.wikia.nocookie.net/aceattorney/images/9/95/Phoenix_Wright_Portrait_AJ_Trilogy.png/revision/latest?cb%3D20240620212543",
       "sala": "B-12",
       "turma": "9º Ano A"
     },
     "quimica": {
+      "materia": "Química",
       "professor": "Walter White",
       "banners": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzSV1CyfcCHkqN4Zs1fxbbDfHzsCy0Lfq4rQ&s",
-      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "alunos": [
+        "Ana Silva",
+        "Bruno Oliveira",
+        "Carlos Eduardo"
+      ],
       "foto_professor": "https://imagenes.elpais.com/resizer/v2/QB4I6VGKINYWS4AVFSTV5FWFYI.jpg?auth=e8bd312047bd47aac60cd3421b55d5fae4528cf0b93c78ca6269597c247c832c&width=1200",
       "sala": "B-12",
       "turma": "9º Ano A"
     },
     "matematica": {
+      "materia": "Matemática",
       "professor": "Alan Garner",
       "banners": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTT1DgIRo9Te3ngmCpq0yv0HX_sToE02qSV9Q&s",
-      "alunos": ["Erick Ferreira", "Fernanda Lima", "Gabriel Costa"],
+      "alunos": [
+        "Erick Ferreira",
+        "Fernanda Lima",
+        "Gabriel Costa"
+      ],
       "foto_professor": "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/26/10/the-hangover.jpg?width=1200",
       "sala": "C-05",
       "turma": "9º Ano B"
     },
     "geografia": {
+      "materia": "Geografia",
       "professor": "Celso Portiolli",
       "banners": "https://www.dgabc.com.br/img/2023910184333.jpg",
-      "alunos": ["Marcos Viana", "Patrícia Luz", "Renato Garcia"],
+      "alunos": [
+        "Marcos Viana",
+        "Patrícia Luz",
+        "Renato Garcia"
+      ],
       "foto_professor": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuiU7qyb_BWQ5WrFfp3hewXebEY9TVKT6C-g&s",
       "sala": "D-01",
       "turma": "1º Ensino Médio"
     },
     "filosofia": {
+      "materia": "Filosofia",
       "professor": "Monark",
       "banners": "https://veja.abril.com.br/wp-content/uploads/2022/02/MONARK-FLOW-NAZISMO-2022-012.png.jpg?crop=1&resize=1212,909",
-      "alunos": ["Thiago Ramos", "Ursula Lins", "Vitor Hugo"],
+      "alunos": [
+        "Thiago Ramos",
+        "Ursula Lins",
+        "Vitor Hugo"
+      ],
       "foto_professor": "https://istoedinheiro.com.br/wp-content/uploads/sites/17/2022/03/monark-e1648042874540.png",
       "sala": "Auditório A",
       "turma": "2º Ensino Médio"
     },
     "ciências": {
+      "materia": "Ciências",
       "professor": "Pedro Loos",
       "banners": "https://cdn.discordapp.com/attachments/1241887340360892469/1477297922256277595/senta-na-pica-ou-no-bolo-v0-2mq9ibx38lxe1.png?ex=69a44067&is=69a2eee7&hm=53085fe22efb000203b4d42cb604f98dda96ecb42a10c2259df423350ebb86ff",
-      "alunos": ["Beatriz Dias", "Caio Castro", "Eduarda Nobre"],
+      "alunos": [
+        "Beatriz Dias",
+        "Caio Castro",
+        "Eduarda Nobre"
+      ],
       "foto_professor": "https://pbs.twimg.com/media/F3kXMy4WwAARHA4.jpg",
       "sala": "Sala de Debates",
       "turma": "3º Ensino Médio"
