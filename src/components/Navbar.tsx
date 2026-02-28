@@ -1,6 +1,6 @@
 "use client"
 
-import { LogOutIcon, Moon, Settings, Sun, User } from "lucide-react"
+import { LogOutIcon, Moon, Edit, Sun, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
     DropdownMenu,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "./ui/button"
 import { useTheme } from "./provedores/ThemeProvider"
+import { SidebarTrigger } from "./ui/sidebar"
 
 const Navbar = () => {
     const { setTheme } = useTheme()
@@ -19,10 +20,10 @@ const Navbar = () => {
     return (
         <nav className="barra-navegacao">
             {/*Esquerda*/}
-            Botão para minimizar o menu
+            <SidebarTrigger />
             {/*Direita*/}
             <div className="conteiner-navegacao">
-                <a href="/">Nexus Class</a>
+                <a href="/">Templete</a>
                 {/*Tema do Site*/}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -44,6 +45,7 @@ const Navbar = () => {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
                 {/* Menu Usuario*/}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -58,7 +60,8 @@ const Navbar = () => {
                         <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem> <User className="icones-minha-conta" /> Perfil</DropdownMenuItem>
-                        <DropdownMenuItem> <Settings className="icones-minha-conta" /> Configurações </DropdownMenuItem>
+                        <DropdownMenuItem> <Edit className="icones-minha-conta" /> Editar </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem variant="destructive"> <LogOutIcon className="icones-minha-conta" /> Sair</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

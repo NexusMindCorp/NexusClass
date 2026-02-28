@@ -147,11 +147,11 @@
 
 @layer Navbar {
   .barra-navegacao {
-    @apply p-4 flex items-center justify-between;
+    @apply bg-sidebar p-1  w-full flex items-center justify-between;
   }
 
   .conteiner-navegacao {
-    @apply flex items-center gap-4;
+    @apply flex items-center gap-4 mr-4;
   }
 
   .icones-minha-conta{
