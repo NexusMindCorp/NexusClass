@@ -23,22 +23,26 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
   return (
     <Card className="relative mx-auto w-full max-w-sm pt-0">
       <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+      {/* imagem do banner */ }
       <img
         src={banners}
-        alt="Event cover"
+        alt="Banner da turma"
         className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
       />
       <CardHeader>
         <CardAction>
           <Badge asChild variant="secondary" className="rounded-full">
+            {/* Imagem professor */}
             <img
               src={fotoProfessor}
-              alt="Event cover"
+              alt="Foto do professor"
               className="h-10 w-10 rounded-full object-cover"
             />
             </Badge>
         </CardAction>
+        {/* Título da matéria */ }
         <CardTitle>{materia}</CardTitle>
+        {/* Informações adicionais da turma */ }
         <CardDescription>
           Professor: {professor} | Sala: {sala} | Turma: {turma}
         </CardDescription>
