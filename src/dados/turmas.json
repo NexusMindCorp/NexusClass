@@ -1,0 +1,48 @@
+{
+  "escola": "Escola Estadual de Nexus City",
+  "ano_letivo": 2069,
+  "turmas": {
+    "portugues": {
+      "professor": "Phoenix Wright ",
+      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "foto_professor": "https://translate.google.com/website?sl=en&tl=pt&hl=pt&client=srp&u=https://static.wikia.nocookie.net/aceattorney/images/9/95/Phoenix_Wright_Portrait_AJ_Trilogy.png/revision/latest?cb%3D20240620212543",
+      "sala": "B-12",
+      "turma": "9º Ano A"
+    },
+    "quimica": {
+      "professor": "Walter White",
+      "alunos": ["Ana Silva", "Bruno Oliveira", "Carlos Eduardo"],
+      "foto_professor": "https://static.wikia.nocookie.net/villains/images/6/65/Walter_White2.jpg/revision/latest?cb=20230109113855",
+      "sala": "B-12",
+      "turma": "9º Ano A"
+    },
+    "matematica": {
+      "professor": "Alan Garner",
+      "alunos": ["Erick Ferreira", "Fernanda Lima", "Gabriel Costa"],
+      "foto_professor": "https://static.independent.co.uk/s3fs-public/thumbnails/image/2016/01/26/10/the-hangover.jpg?width=1200",
+      "sala": "C-05",
+      "turma": "9º Ano B"
+    },
+    "geografia": {
+      "professor": "Celso Portiolli",
+      "alunos": ["Marcos Viana", "Patrícia Luz", "Renato Garcia"],
+      "foto_professor": "https://static.wikia.nocookie.net/tvpediabrasil/images/a/a0/Celsoportiolli.png/revision/latest?cb=20190423160111&path-prefix=pt-br",
+      "sala": "D-01",
+      "turma": "1º Ensino Médio"
+    },
+    "filosofia": {
+      "professor": "Monark",
+      "alunos": ["Thiago Ramos", "Ursula Lins", "Vitor Hugo"],
+      "foto_professor": "https://istoedinheiro.com.br/wp-content/uploads/sites/17/2022/03/monark-e1648042874540.png",
+      "sala": "Auditório A",
+      "turma": "2º Ensino Médio"
+    },
+    "ciências": {
+      "professor": "Pedro Loos",
+      "alunos": ["Beatriz Dias", "Caio Castro", "Eduarda Nobre"],
+      "foto_professor": "https://www.tiktok.com/@cortespedroloos/photo/7262906447883816198",
+      "sala": "Sala de Debates",
+      "turma": "3º Ensino Médio"
+    }
+  }
+}
