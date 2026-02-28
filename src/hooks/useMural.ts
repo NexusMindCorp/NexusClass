@@ -7,9 +7,10 @@ export type Post = {
 };
 
 export function useMural() {
-    const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean }>({
+    const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar:"atividade"|"mural"|"contato" }>({
         posts: [],
         boxAberto: false,
+        tipoAmostar: "mural",
     });
     const [conteudo, setConteudo] = useState("");
 
@@ -29,12 +30,25 @@ export function useMural() {
             }));
             setConteudo("");
             mudarAberturaBox(false);
+            abrirMural();
         }
     };
 
     const handleCancelar = () => {
         setConteudo("");
         mudarAberturaBox(false);
+    };
+
+    const abrirMural = () => {
+        setPosts((anterior) => ({ ...anterior, tipoAmostar: "mural" }));
+    };
+
+    const abrirAtividades = () => {
+        setPosts((anterior) => ({ ...anterior, tipoAmostar: "atividade" }));
+    };
+
+    const abrirContato = () => {
+        setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato" }));
     };
 
     return {
@@ -44,5 +58,8 @@ export function useMural() {
         mudarAberturaBox,
         handlePublicar,
         handleCancelar,
+        abrirMural,
+        abrirAtividades,
+        abrirContato,
     };
 }
