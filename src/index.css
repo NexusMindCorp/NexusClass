@@ -134,3 +134,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer Navbar {
+  .barra-navegacao {
+    @apply p-4 flex items-center justify-between;
+  }
+
+  .conteiner-navegacao {
+    @apply flex items-center gap-4;
+  }
+
+  .icones-minha-conta{
+    @apply h-[1.2rem] w-[1.2rem] mr-2;
+  }
+}
