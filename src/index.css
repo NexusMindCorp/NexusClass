@@ -135,6 +135,16 @@
   }
 }
 
+@layer App{
+  .pagina-principal{
+    @apply w-full flex-1 flex flex-col;
+  }
+
+  .pagina-conteudo{
+    @apply flex-1 p-4;
+  }
+}
+
 @layer Navbar {
   .barra-navegacao {
     @apply p-4 flex items-center justify-between;

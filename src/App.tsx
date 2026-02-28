@@ -9,9 +9,9 @@ function App() {
       <SidebarProvider>
         <AppSidebar />
 
-        <main className="w-full flex-1 flex flex-col">
+        <main className="pagina-principal">
           <Navbar />
-          <div className="px-4 flex-1">
+          <div className="pagina-conteudo">
             <h1 className="text-2xl font-bold mt-4">Bem-vindo ao Classroom</h1>
           </div>
         </main>
