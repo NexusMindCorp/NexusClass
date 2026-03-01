@@ -1,7 +1,7 @@
-import { Home, Inbox, Calendar, Search, Settings, Plus, ChevronDown } from "lucide-react"
+import { Home, Inbox, Calendar, Search, Plus, ChevronDown } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
-
+import { Configuracoes } from "./Configuracoes"
 const items = [
     {
         title: "Inicio",
@@ -120,12 +120,7 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <a href="/configuracoes">
-                                <Settings />
-                                <span>Configurações</span>
-                            </a>
-                        </SidebarMenuButton>
+                        <Configuracoes />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
