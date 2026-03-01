@@ -7,7 +7,7 @@ export type Post = {
 };
 
 export function useMural() {
-    const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar:"atividade"|"mural"|"contato" }>({
+    const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar:"atividade"|"mural"|"contato"|"alunos" }>({
         posts: [],
         boxAberto: false,
         tipoAmostar: "mural",
@@ -61,6 +61,10 @@ export function useMural() {
         abrirMural();
     }
 
+    const abrirAlunos = () => {
+        setPosts((anterior) => ({ ...anterior, tipoAmostar: "alunos" }));
+    }
+
 
     return {
         posts,
@@ -75,5 +79,6 @@ export function useMural() {
         abrirAtividades,
         abrirContato,
         abrirMensagemContato,
+        abrirAlunos,
     };
 }

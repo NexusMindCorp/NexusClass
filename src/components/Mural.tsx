@@ -12,6 +12,7 @@ import { BoxMural } from "./BoxMural";
 import { Plus } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
+import { AlunosTurma } from "./AlunosTurma";
 
 type MuralProps = {
   materia: string;
@@ -32,6 +33,7 @@ export function Mural({ materia, turma }: MuralProps) {
     abrirAtividades,
     abrirContato,
     abrirMensagemContato,
+    abrirAlunos,
   } = useMural();
 
   return (
@@ -66,6 +68,9 @@ export function Mural({ materia, turma }: MuralProps) {
                 </Button>
                 <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
                   Entrar em contato
+                </Button>
+                <Button onClick={() => abrirAlunos()} className="text-white" variant="link" size="sm">
+                  Alunos
                 </Button>
               </ButtonGroup>
             </div>
@@ -126,6 +131,9 @@ export function Mural({ materia, turma }: MuralProps) {
             setMensagem={setConteudo}
             onEnviar={abrirMensagemContato}
           />
+        )}
+        {posts.tipoAmostar === "alunos" && (
+          <AlunosTurma turma={turma} />
         )}
       </div>
     </div>
