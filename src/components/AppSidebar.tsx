@@ -26,7 +26,7 @@ const items = [
 ]
 
 type AppSidebarProps = {
-    navegarPara: (tela: "mural" | "calendario" | "principal") => void;
+    navegarPara: (tela: "mural" | "calendario" | "principal" | "pesquisar") => void;
 }
 
 const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
@@ -61,6 +61,14 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                                 if (item.title === "Inicio") {
                                                     e.preventDefault();
                                                     navegarPara("principal");
+                                                }
+                                                if (item.title === "Calendario") {
+                                                    e.preventDefault();
+                                                    navegarPara("calendario");
+                                                }
+                                                if (item.title === "Pesquisar") {
+                                                    e.preventDefault();
+                                                    navegarPara("pesquisar");
                                                 }
                                                 {/*Os outros botões continuarão com o comportamento padrão por enquanto*/ }
                                             }}
