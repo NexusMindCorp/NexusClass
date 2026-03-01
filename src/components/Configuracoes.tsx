@@ -13,7 +13,6 @@ import { Switch } from "@/components/ui/switch"
 import { useConfiguracoes } from "@/hooks/useConfiguracoes"
 import { useEffect } from "react"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
-
 type ConfiguracoesProps = {
   navegarPara?: (tela: OpcoesTela) => void
 }
