@@ -39,6 +39,7 @@ export function useMural() {
         setConteudo("");
         setAssunto("");
         mudarAberturaBox(false);
+        abrirMural();
     };
 
     const abrirMural = () => {
@@ -57,6 +58,7 @@ export function useMural() {
         setConteudo("");
         setAssunto("");
         setPosts((anterior) => ({ ...anterior, boxAberto: false }));
+        abrirMural();
     }
 
 
