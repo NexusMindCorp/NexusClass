@@ -12,6 +12,7 @@ import { BoxMural } from "./BoxMural";
 import { Plus } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
+import { AlunosTurma } from "./AlunosTurma";
 
 type MuralProps = {
   materia: string;
@@ -130,6 +131,9 @@ export function Mural({ materia, turma }: MuralProps) {
             setMensagem={setConteudo}
             onEnviar={abrirMensagemContato}
           />
+        )}
+        {posts.tipoAmostar === "alunos" && (
+          <AlunosTurma turma={turma} />
         )}
       </div>
     </div>
