@@ -70,6 +70,10 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                                     e.preventDefault();
                                                     navegarPara("pesquisar");
                                                 }
+                                                if(item.title === "Mensagens"){
+                                                    e.preventDefault();
+                                                    navegarPara("mensagens");
+                                                }
                                                 {/*Os outros botões aqui*/ }
                                             }}
                                         >

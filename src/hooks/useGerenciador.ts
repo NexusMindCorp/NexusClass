@@ -1,9 +1,9 @@
 import { useState } from "react";
-
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar"|"mensagens";
 export function useGerenciador() {
     const [usuario, setUsuario] = useState({
         inscricoes: {} as Record<string, boolean>,
-        acessouOq: "principal" as "mural" | "calendario" | "principal" | "pesquisar",
+        acessouOq: "principal" as OpcoesTela,
         chaveMural: "",
     });
 
@@ -27,7 +27,7 @@ export function useGerenciador() {
         setUsuario((anterior) => ({ ...anterior, acessouOq: "calendario" }));
     };
 
-    const navegarPara = (tela: "mural" | "calendario" | "principal" | "pesquisar") => {
+    const navegarPara = (tela: OpcoesTela) => {
         setUsuario((anterior) => ({ ...anterior, acessouOq: tela }));
     };
 
