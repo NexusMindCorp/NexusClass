@@ -106,7 +106,7 @@ const AppSidebar = ({ navegarPara, inscricoes, marcarMural }: AppSidebarProps & 
                         <SidebarGroupLabel asChild>
                             <CollapsibleTrigger>
                                 Minhas Aulas
-                                <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
+                                <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                             </CollapsibleTrigger>
                         </SidebarGroupLabel>
                         <CollapsibleContent>
