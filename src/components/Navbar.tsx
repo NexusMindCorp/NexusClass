@@ -23,7 +23,7 @@ const Navbar = () => {
             <SidebarTrigger />
             {/*Direita*/}
             <div className="conteiner-navegacao">
-                <a href="/">Mural</a>
+                <a href="/">Notificações icone</a>
                 {/*Tema do Site*/}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

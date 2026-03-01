@@ -13,8 +13,9 @@ export function Calendario() {
   )
 
   return (
-    <Card className="w-full max-w-5xl mx-auto h-fit">
-      <CardContent className="p-4">
+    <Card className="w-full max-w-md mx-auto h-fit shadow-md">
+
+      <CardContent className="p-2 flex justify-center">
         <Calendar
           mode="single"
           selected={date}
@@ -22,22 +23,23 @@ export function Calendario() {
           month={currentMonth}
           onMonthChange={setCurrentMonth}
           fixedWeeks
-          className="p-0 w-full [&_table]:table-fixed [&_table]:w-full [&_td]:h-14 [&_td]:text-center [&_td_button]:text-base [&_td_button]:w-full [&_td_button]:h-full [&_th]:h-10 [&_th]:w-[14.28%] [&_th]:text-base [&_th]:text-center [&_.rdp-caption]:text-xl"
+          className="p-2"
         />
       </CardContent>
-      <CardFooter className="flex flex-wrap gap-2 border-t">
+
+      <CardFooter className="flex flex-wrap gap-2 border-t p-4">
         {[
           { label: "Hoje", value: 0 },
           { label: "Amanhã", value: 1 },
           { label: "Em 3 dias", value: 3 },
-          { label: "Em uma semana", value: 7 },
+          { label: "Em 1 semana", value: 7 },
           { label: "Em 2 semanas", value: 14 },
         ].map((preset) => (
           <Button
             key={preset.value}
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 min-w-[100px]"
             onClick={() => {
               const newDate = addDays(new Date(), preset.value)
               setDate(newDate)
