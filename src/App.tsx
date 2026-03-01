@@ -3,6 +3,7 @@ import AppSidebar from "./components/AppSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { ThemeProvider } from "./components/provedores/ThemeProvider"
 import { GerenciadorTelas } from "./components/GerenciadorTelas"
+import { Toaster } from "sonner"
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           </div>
         </main>
       </SidebarProvider>
+      <Toaster position="top-center" />
     </ThemeProvider>
   )
 }

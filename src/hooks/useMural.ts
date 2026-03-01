@@ -13,6 +13,7 @@ export function useMural() {
         tipoAmostar: "mural",
     });
     const [conteudo, setConteudo] = useState("");
+    const [assunto, setAssunto] = useState("");
 
     const mudarAberturaBox = (boxAberto: boolean) =>
         setPosts((anterior) => ({ ...anterior, boxAberto }));
@@ -36,6 +37,7 @@ export function useMural() {
 
     const handleCancelar = () => {
         setConteudo("");
+        setAssunto("");
         mudarAberturaBox(false);
     };
 
@@ -48,23 +50,28 @@ export function useMural() {
     };
 
     const abrirContato = () => {
-        setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato" }));
+        setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato", boxAberto: true }));
     };
 
-    const enviarMensagemContato = () => {
-        alert("Mensagem enviada para o professor!");
+    const abrirMensagemContato = () => {
+        setConteudo("");
+        setAssunto("");
+        setPosts((anterior) => ({ ...anterior, boxAberto: false }));
     }
+
 
     return {
         posts,
         conteudo,
         setConteudo,
+        assunto,
+        setAssunto,
         mudarAberturaBox,
         handlePublicar,
         handleCancelar,
         abrirMural,
         abrirAtividades,
         abrirContato,
-        enviarMensagemContato,
+        abrirMensagemContato,
     };
 }

@@ -23,13 +23,15 @@ export function Mural({ materia, turma }: MuralProps) {
     posts,
     conteudo,
     setConteudo,
+    assunto,
+    setAssunto,
     mudarAberturaBox,
     handlePublicar,
     handleCancelar,
     abrirMural,
     abrirAtividades,
     abrirContato,
-    enviarMensagemContato,
+    abrirMensagemContato,
   } = useMural();
 
   return (
@@ -114,7 +116,16 @@ export function Mural({ materia, turma }: MuralProps) {
             </div>
           </Card>
         ) : (
-          <AtendimentoContato onClick={() => enviarMensagemContato()} />
+          <AtendimentoContato
+            professorNome={turma.professor}
+            aberto={posts.boxAberto}
+            onClose={handleCancelar}
+            assunto={assunto}
+            setAssunto={setAssunto}
+            mensagem={conteudo}
+            setMensagem={setConteudo}
+            onEnviar={abrirMensagemContato}
+          />
         )}
       </div>
     </div>
