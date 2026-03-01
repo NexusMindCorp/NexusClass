@@ -4,6 +4,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/r
 import { Configuracoes } from "./Configuracoes"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
 import { listaEscolar } from "@/hooks/leituraJson"
+import { getCorMateria } from "@/lib/utils"
 
 const items = [
     {
@@ -132,8 +133,7 @@ const AppSidebar = ({ navegarPara, inscricoes, marcarMural }: AppSidebarProps & 
                                                                 onClick={() => marcarMural(key)}
                                                                 className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
                                                             >
-                                                                {/* O Ícone pode ser q mude de cor */}
-                                                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-[11px] font-bold text-orange-700 dark:bg-orange-900/50 dark:text-orange-400">
+                                                                <div className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${getCorMateria(turma.materia)}`}>
                                                                     {turma.materia.charAt(0).toUpperCase()}
                                                                 </div>
 
