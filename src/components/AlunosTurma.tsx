@@ -25,13 +25,13 @@ export function AlunosTurma({ turma }: AlunosTurmaProps) {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="hover:bg-transparent">
           <TableHead>Nome do Aluno</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {turma.alunos.map((aluno, index) => (
-          <TableRow key={index}>
+          <TableRow key={index} className="hover:bg-transparent">
             <TableCell className="font-medium">{aluno}</TableCell>
             <TableCell className="text-right">
             </TableCell>
