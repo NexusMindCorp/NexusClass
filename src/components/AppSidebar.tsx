@@ -70,7 +70,7 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                                     e.preventDefault();
                                                     navegarPara("pesquisar");
                                                 }
-                                                {/*Os outros botões continuarão com o comportamento padrão por enquanto*/ }
+                                                {/*Os outros botões aqui*/ }
                                             }}
                                         >
                                             <item.icon />

@@ -20,7 +20,7 @@ export function usePesquisa({ aoFecharPesquisa }: UsePesquisaProps) {
         if (!textoPesquisa.trim()) return []
 
         const consulta = textoPesquisa.toLowerCase()
-        return Object.entries(listaEscolar.turmas).filter(([chave, turma]) => {
+        return Object.entries(listaEscolar.turmas).filter(([_, turma]) => {
             return (
                 turma.materia.toLowerCase().includes(consulta) ||
                 turma.professor.toLowerCase().includes(consulta) ||

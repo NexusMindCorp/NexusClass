@@ -1,7 +1,6 @@
 
-import { Search } from "lucide-react"
+
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import {
     Sheet,
     SheetContent,
@@ -43,7 +42,7 @@ export function Pesquisar(props: PesquisarProps) {
                                 autoFocus
                             />
                         </div>
-                        
+
                         {/* Área de resultados */}
                         <div className="mt-6 space-y-4">
                             {textoPesquisa.trim() === "" ? (
@@ -55,13 +54,12 @@ export function Pesquisar(props: PesquisarProps) {
                                     <div className="text-sm text-muted-foreground mb-4">
                                         {turmasFiltradas.length} resultado{turmasFiltradas.length !== 1 ? 's' : ''} encontrado{turmasFiltradas.length !== 1 ? 's' : ''}
                                     </div>
-                                    <div className={`grid gap-4 ${
-                                        turmasFiltradas.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' :
+                                    <div className={`grid gap-4 ${turmasFiltradas.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' :
                                         turmasFiltradas.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                                        turmasFiltradas.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' :
-                                        turmasFiltradas.length === 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4' :
-                                        'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                                    }`}>
+                                            turmasFiltradas.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' :
+                                                turmasFiltradas.length === 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4' :
+                                                    'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                                        }`}>
                                         {turmasFiltradas.map(([key, turma]) => (
                                             <TurmaCard
                                                 key={key}
@@ -75,7 +73,7 @@ export function Pesquisar(props: PesquisarProps) {
                                                 clickInscrito={() => props.mudarInscricao(key)}
                                                 clickMural={() => {
                                                     props.marcarMural(key)
-                                                    setIsOpen(false)
+                                                    mudarAberturaSheet(false)
                                                 }}
                                             />
                                         ))}
