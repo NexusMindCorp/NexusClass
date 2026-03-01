@@ -47,7 +47,7 @@ export function Mural({ materia, turma }: MuralProps) {
         <div className="absolute inset-0 bg-black/50" />
         <CardHeader className="relative z-10 flex flex-col h-full justify-between">
           <div>
-            <CardTitle className="text-3xl text-white">{materia}</CardTitle>
+            <CardTitle className="text-3xl text-white">{turma.materia}</CardTitle>
             <CardDescription className="text-white/90">
               Professor: {turma.professor} | Sala: {turma.sala}
             </CardDescription>
@@ -61,7 +61,7 @@ export function Mural({ materia, turma }: MuralProps) {
               />
               <ButtonGroup>
                 <Button onClick={() => abrirMural()} className="text-white" variant="link" size="sm">
-                    Mural
+                  Mural
                 </Button>
                 <Button onClick={() => abrirAtividades()} className="text-white" variant="link" size="sm">
                   Atividades
