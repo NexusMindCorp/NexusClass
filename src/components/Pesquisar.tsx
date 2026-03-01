@@ -69,7 +69,6 @@ export function Pesquisar(props: PesquisarProps) {
                                             clickInscrito={() => props.mudarInscricao(key)}
                                             clickMural={() => {
                                                 props.marcarMural(key)
-                                                mudarAberturaSheet(false)
                                             }}
                                         />
                                     ))}

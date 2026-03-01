@@ -62,6 +62,7 @@ const Navbar = () => {
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
                 {/*Tema do Site*/}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

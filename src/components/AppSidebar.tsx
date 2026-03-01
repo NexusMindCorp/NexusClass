@@ -3,6 +3,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
+
 const items = [
     {
         title: "Inicio",
@@ -71,11 +72,11 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                                     e.preventDefault();
                                                     navegarPara("pesquisar");
                                                 }
-                                                if(item.title === "Mensagens"){
+                                                if (item.title === "Mensagens") {
                                                     e.preventDefault();
                                                     navegarPara("mensagens");
                                                 }
-                                                if(item.title === "Suporte"){
+                                                if (item.title === "Suporte") {
                                                     e.preventDefault();
                                                     navegarPara("suporte");
                                                 }
@@ -87,7 +88,7 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                         </a>
                                     </SidebarMenuButton>
                                     {item.title === "Mensagens" && (
-                                        <SidebarMenuBadge>2</SidebarMenuBadge>
+                                        <SidebarMenuBadge>0</SidebarMenuBadge>
                                     )}
                                 </SidebarMenuItem>
                             ))}
