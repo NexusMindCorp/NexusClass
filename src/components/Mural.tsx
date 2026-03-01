@@ -11,6 +11,7 @@ import {
 import { BoxMural } from "./BoxMural";
 import { Plus } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
+import { AtendimentoContato } from "./AtendimentoContato";
 
 type MuralProps = {
   materia: string;
@@ -55,7 +56,7 @@ export function Mural({ materia, turma }: MuralProps) {
               />
               <ButtonGroup>
                 <Button onClick={() => abrirMural()} className="text-white" variant="link" size="sm">
-                  Mural
+                    Mural
                 </Button>
                 <Button onClick={() => abrirAtividades()} className="text-white" variant="link" size="sm">
                   Atividades
@@ -86,7 +87,7 @@ export function Mural({ materia, turma }: MuralProps) {
       <div className="mt-4 space-y-4">
         {posts.tipoAmostar === "mural" ? (
           posts.posts.length > 0 ? (
-            posts.posts.map((post: any) => (
+            posts.posts.map((post) => (
               <Card key={post.id} className="p-4">
                 <p className="mb-2 text-sm text-muted-foreground">{post.data}</p>
                 <p className="whitespace-pre-wrap">{post.conteudo}</p>
@@ -112,14 +113,7 @@ export function Mural({ materia, turma }: MuralProps) {
             </div>
           </Card>
         ) : (
-          <Card className="overflow-hidden p-4">
-            <div className="flex gap-1 items-center justify-center">
-              <img src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png" alt="Não encontrado imagem" className="h-40 w-40 object-cover rounded" />
-              <p className="text-muted-foreground">
-                Nenhum contato ainda.
-              </p>
-            </div>
-          </Card>
+          <AtendimentoContato />
         )}
       </div>
     </div>
