@@ -1,8 +1,9 @@
-import { Home, Inbox, Calendar, Search, Plus, ChevronDown } from "lucide-react"
+import { Home, Inbox, Calendar, Search, ChevronDown } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
+import { Card } from "./ui/card"
 
 const items = [
     {
@@ -29,9 +30,11 @@ const items = [
 
 type AppSidebarProps = {
     navegarPara: (tela: OpcoesTela) => void;
+    inscricoes: Record<string, boolean>;
+    marcarMural: (key: string) => void;
 }
 
-const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
+const AppSidebar = ({ navegarPara, inscricoes, marcarMural }: AppSidebarProps & { inscricoes: Record<string, boolean>, marcarMural: (key: string) => void }) => {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
@@ -111,12 +114,15 @@ const AppSidebar = ({ navegarPara }: AppSidebarProps) => {
                                 <SidebarMenu>
                                     {/*Aqui vão entrar as materias selecionadas*/}
                                     <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href="/aulas/matematica">
-                                                <Plus />
-                                                <span>Matemática</span>
-                                            </a>
-                                        </SidebarMenuButton>
+                                        {Object.entries(inscricoes).filter(([_, inscrito]) => inscrito).length === 0 ? (
+                                            <span className="text-sm text-muted-foreground">Nenhuma aula inscrita</span>
+                                        ) : (
+                                            Object.entries(inscricoes).filter(([_, inscrito]) => inscrito).map(([key, _]) => (
+                                                <Card key={key} className="p-2 mb-2 cursor-pointer" onClick={() => marcarMural(key)}>
+                                                    {key}
+                                                </Card>
+                                            ))
+                                        )}
                                     </SidebarMenuItem>
                                 </SidebarMenu>
                             </SidebarContent>

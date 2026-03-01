@@ -1,6 +1,9 @@
 import { useState } from "react";
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar"|"mensagens" | "suporte";
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte";
+
+
 export function useGerenciador() {
+
     const [usuario, setUsuario] = useState({
         inscricoes: {} as Record<string, boolean>,
         acessouOq: "principal" as OpcoesTela,

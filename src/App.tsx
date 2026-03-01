@@ -12,7 +12,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <SidebarProvider>
-        <AppSidebar navegarPara={navegarPara} />
+        <AppSidebar navegarPara={navegarPara} inscricoes={usuario.inscricoes} marcarMural={marcarMural} />
 
         <main className="pagina-principal">
           <Navbar />
