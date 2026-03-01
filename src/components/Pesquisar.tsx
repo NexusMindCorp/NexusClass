@@ -1,5 +1,3 @@
-
-
 import { Input } from "@/components/ui/input"
 import {
     Sheet,
@@ -17,6 +15,7 @@ type PesquisarProps = {
     marcarMural: (key: string) => void
     voltarPrincipal: () => void
 }
+
 export function Pesquisar(props: PesquisarProps) {
     const { textoPesquisa, setTextoPesquisa, aberto, mudarAberturaSheet, turmasFiltradas } = usePesquisa({
         aoFecharPesquisa: props.voltarPrincipal
@@ -25,66 +24,62 @@ export function Pesquisar(props: PesquisarProps) {
     return (
         <div className="w-full h-full flex items-center justify-center p-4">
             <Sheet open={aberto} onOpenChange={mudarAberturaSheet}>
-                <SheetContent side="top" className="h-[80vh] overflow-y-auto">
-                    <SheetHeader>
-                        <SheetTitle>Pesquisar classrons</SheetTitle>
-                        <SheetDescription>
-                            Digite para pesquisar turmas, professores ou matérias
+                <SheetContent side="right" className="w-full sm:w-[400px] lg:w-[450px] flex flex-col p-5">
+
+                    <SheetHeader className="space-y-1 p-0" >
+                        <SheetTitle>Pesquisar Salas</SheetTitle>
+                        <SheetDescription className="text-xs">
+                            Digite para pesquisar turmas, professores ou matérias:
                         </SheetDescription>
                     </SheetHeader>
-                    <div className="mt-6 space-y-4">
-                        <div className="flex gap-2">
-                            <Input
-                                placeholder="Digite sua pesquisa..."
-                                value={textoPesquisa}
-                                onChange={(e) => setTextoPesquisa(e.target.value)}
-                                className="flex-1"
-                                autoFocus
-                            />
-                        </div>
 
-                        {/* Área de resultados */}
-                        <div className="mt-6 space-y-4">
-                            {textoPesquisa.trim() === "" ? (
-                                <div className="text-sm text-muted-foreground text-center py-8">
-                                    Digite algo para começar a pesquisa
+                    <div className="mt-3 flex flex-col">
+                        <Input
+                            placeholder="Digite sua pesquisa..."
+                            value={textoPesquisa}
+                            onChange={(e) => setTextoPesquisa(e.target.value)}
+                            className="w-full h-9 text-sm"
+                            autoFocus
+                        />
+                    </div>
+
+                    <div className="mt-3 flex-1 overflow-y-auto pr-2 pb-6 space-y-2">
+                        {textoPesquisa.trim() === "" ? (
+                            <div className="text-sm text-muted-foreground text-center py-8">
+                                Digite algo para começar a pesquisa
+                            </div>
+                        ) : turmasFiltradas.length > 0 ? (
+                            <>
+                                <div className="text-xs text-muted-foreground mb-2">
+                                    {turmasFiltradas.length} resultado{turmasFiltradas.length !== 1 ? 's' : ''}
                                 </div>
-                            ) : turmasFiltradas.length > 0 ? (
-                                <>
-                                    <div className="text-sm text-muted-foreground mb-4">
-                                        {turmasFiltradas.length} resultado{turmasFiltradas.length !== 1 ? 's' : ''} encontrado{turmasFiltradas.length !== 1 ? 's' : ''}
-                                    </div>
-                                    <div className={`grid gap-4 ${turmasFiltradas.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' :
-                                        turmasFiltradas.length === 2 ? 'grid-cols-1 md:grid-cols-2' :
-                                            turmasFiltradas.length === 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' :
-                                                turmasFiltradas.length === 4 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4' :
-                                                    'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                                        }`}>
-                                        {turmasFiltradas.map(([key, turma]) => (
-                                            <TurmaCard
-                                                key={key}
-                                                materia={turma.materia}
-                                                banners={turma.banners}
-                                                professor={turma.professor}
-                                                fotoProfessor={turma.foto_professor}
-                                                sala={turma.sala}
-                                                turma={turma.turma}
-                                                inscrito={props.estaInscrito(key)}
-                                                clickInscrito={() => props.mudarInscricao(key)}
-                                                clickMural={() => {
-                                                    props.marcarMural(key)
-                                                    mudarAberturaSheet(false)
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="text-sm text-muted-foreground text-center py-2">
-                                    Nenhum resultado encontrado para "{textoPesquisa}"
+
+                                <div className="flex flex-col gap-2">
+                                    {turmasFiltradas.map(([key, turma]) => (
+                                        <TurmaCard
+                                            key={key}
+                                            compacto={true}
+                                            materia={turma.materia}
+                                            banners={turma.banners}
+                                            professor={turma.professor}
+                                            fotoProfessor={turma.foto_professor}
+                                            sala={turma.sala}
+                                            turma={turma.turma}
+                                            inscrito={props.estaInscrito(key)}
+                                            clickInscrito={() => props.mudarInscricao(key)}
+                                            clickMural={() => {
+                                                props.marcarMural(key)
+                                                mudarAberturaSheet(false)
+                                            }}
+                                        />
+                                    ))}
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        ) : (
+                            <div className="text-sm text-muted-foreground text-center py-8">
+                                Nenhum resultado encontrado para "{textoPesquisa}"
+                            </div>
+                        )}
                     </div>
                 </SheetContent>
             </Sheet>

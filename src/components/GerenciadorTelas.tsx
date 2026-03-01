@@ -17,7 +17,7 @@ export const GerenciadorTelas = (props: GerenciadorTelasProps) => {
 
     return (
         <>
-            {props.usuario.acessouOq === "principal" && (
+            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
                 <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {listaEscolar.turmas && Object.entries(listaEscolar.turmas).map(([key, turma]) => (
                         <TurmaCard
@@ -34,7 +34,8 @@ export const GerenciadorTelas = (props: GerenciadorTelasProps) => {
                         />
                     ))}
                 </div>
-            )} {props.usuario.acessouOq === "mural" && (
+            )}
+            {props.usuario.acessouOq === "mural" && (
                 <div>
                     {turmaSelecionada && <Mural materia={props.usuario.chaveMural} turma={turmaSelecionada} />}
                 </div>
@@ -43,6 +44,7 @@ export const GerenciadorTelas = (props: GerenciadorTelasProps) => {
                 <div className="w-full flex items-center justify-center p-4">
                     <Calendario />
                 </div>}
+
             {props.usuario.acessouOq === "pesquisar" &&
                 <div className="w-full flex items-center justify-center p-4">
                     <Pesquisar mudarInscricao={props.mudarInscricao} estaInscrito={props.estaInscrito} marcarMural={props.marcarMural} voltarPrincipal={() => props.navegarPara("principal")} />
