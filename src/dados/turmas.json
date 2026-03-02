@@ -15,10 +15,10 @@
       "sala": "A-01",
       "turma": "9º Ano A"
     },
-    "portugues": {
-      "materia": "Português",
+    "filosofia": {
+      "materia": "Filosofia",
       "professor": "Phoenix Wright ",
-      "banners": "https://www.clipartmax.com/png/middle/192-1926980_ace-attorney-man-cartoon-male-fictional-character-boy-phoenix-wright-objection-meme.png",
+      "banners": "https://dubai-teachmeet.com/wp-content/uploads/2014/03/picture7.jpg",
       "alunos": [
         "Ana Silva",
         "Bruno Oliveira",
@@ -57,7 +57,7 @@
     "geografia": {
       "materia": "Geografia",
       "professor": "Celso Portiolli",
-      "banners": "https://www.dgabc.com.br/img/2023910184333.jpg",
+      "banners": "https://wallpaperaccess.com/full/4420933.jpg",
       "alunos": [
         "Marcos Viana",
         "Patrícia Luz",
@@ -67,16 +67,16 @@
       "sala": "D-01",
       "turma": "1º Ensino Médio"
     },
-    "filosofia": {
-      "materia": "Filosofia",
-      "professor": "Monark",
-      "banners": "https://veja.abril.com.br/wp-content/uploads/2022/02/MONARK-FLOW-NAZISMO-2022-012.png.jpg?crop=1&resize=1212,909",
+    "portugues": {
+      "materia": "Português",
+      "professor": "Raimundo",
+      "banners": "https://www.fundacaotelefonicavivo.org.br/wp-content/uploads/2021/05/lingua-portuguesa-1200px-facebook.jpg",
       "alunos": [
         "Thiago Ramos",
         "Ursula Lins",
         "Vitor Hugo"
       ],
-      "foto_professor": "https://istoedinheiro.com.br/wp-content/uploads/sites/17/2022/03/monark-e1648042874540.png",
+      "foto_professor": "https://th.bing.com/th?q=Professor+Raimundo+Chico+Anysio&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&dpr=1.3&pid=InlineBlock&rm=3&mkt=pt-BR&cc=BR&setlang=pt-br&adlt=moderate&t=1&mw=247",
       "sala": "Auditório A",
       "turma": "2º Ensino Médio"
     },
