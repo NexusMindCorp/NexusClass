@@ -3,8 +3,8 @@
 > Um projeto educativo para aprender sobre **shadcn/ui**, seus componentes, estilização com **Tailwind CSS** e boas práticas de desenvolvimento com **React** e **TypeScript**.
 
 ---
-## Página de Visualização
- [Link da aplicação hospedada]("https://gianluccapaiva.github.io/ProjetoPilotoShadcn/")
+## 🌐 Página de Visualização
+ [🔗 Acesse a aplicação hospedada](https://gianluccapaiva.github.io/ProjetoPilotoShadcn/)
 
 ---
 ## 📖 Sumário
