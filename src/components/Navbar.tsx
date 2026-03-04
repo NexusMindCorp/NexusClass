@@ -1,5 +1,3 @@
-"use client"
-
 import { LogOutIcon, Moon, Edit, Sun, User, Mail, Bell, AlertCircle } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
