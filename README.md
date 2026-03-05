@@ -21,6 +21,7 @@
 10. [Scripts Disponíveis](#scripts-disponíveis)
 11. [Exemplos de Uso](#exemplos-de-uso)
 12. [Recursos Adicionais](#recursos-adicionais)
+13. [Conteúdos complementares](#conteudos-complementares)
 
 ---
 
@@ -774,6 +775,14 @@ npx shadcn-ui@latest add [componente]
 ## 📄 Licença
 
 Este é um projeto **estritamente educativo e não comercial**. Sinta-se livre para usar, modificar e compartilhar para fins de aprendizado.
+
+---
+
+## Conteudos Complementares
+
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Video explicativo](https://youtu.be/SjsQdfvxjL8?si=4AFkvBoYP9aNvJ0_)
 
 ---
 
