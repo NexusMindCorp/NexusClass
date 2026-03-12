@@ -4,7 +4,7 @@
 
 ---
 ## 🌐 Página de Visualização
- [🔗 Acesse a aplicação hospedada](https://gianluccapaiva.github.io/ProjetoPilotoShadcn/)
+ [🔗 Acesse a aplicação hospedada](https://gabriellineker.github.io/NexusClassWeb/)
 
 ---
 ## 📖 Sumário
