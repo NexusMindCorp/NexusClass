@@ -5,6 +5,7 @@ import { ThemeProvider } from "./components/provedores/ThemeProvider"
 import { GerenciadorTelas } from "./components/GerenciadorTelas"
 import { Toaster } from "sonner"
 import { useGerenciador } from "./hooks/useGerenciador"
+import { ChatBot } from "./components/chatBot"
 
 function App() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador();
@@ -26,6 +27,7 @@ function App() {
             />
           </div>
         </main>
+        <ChatBot />
       </SidebarProvider>
       <Toaster position="top-center" />
     </ThemeProvider>
