@@ -42,17 +42,21 @@ export function ChatBot(){
               </div>
             )}
             
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-indigo-600 text-white rounded-br-none' 
-                    : 'bg-white text-gray-700 border border-gray-200 rounded-bl-none'
-                }`}>
-                  {msg.text}
+            {messages.map((msg, idx) => {
+              const respostaLonga = msg.role === 'model' && msg.text.length > 220;
+
+              return (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`w-fit p-3 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
+                    msg.role === 'user'
+                      ? 'max-w-[82%] bg-indigo-600 text-white rounded-br-none'
+                      : `${respostaLonga ? 'max-w-[95%]' : 'max-w-[78%]'} bg-white text-gray-700 border border-gray-200 rounded-bl-none`
+                  }`}>
+                    {msg.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             
             {loading && (
               <div className="flex items-center gap-1 bg-gray-200 w-12 h-6 justify-center rounded-full animate-pulse">
