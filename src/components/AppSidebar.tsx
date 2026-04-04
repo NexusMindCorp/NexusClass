@@ -84,7 +84,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural }: AppSidebarP
                                                     e.preventDefault();
                                                     navegarPara("suporte");
                                                 }
-                                                {/*Os outros botões aqui*/ }
+                                                // Os outros botões aqui
                                             }}
                                         >
                                             <item.icon />
@@ -160,6 +160,6 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural }: AppSidebarP
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     )
 }
