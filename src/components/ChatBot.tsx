@@ -1,11 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
-import { useGeminiChat } from '../hooks/useChatBot';
+import { useChatBox } from '../hooks/useChatBox';
 
 export function ChatBot(){
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const { messages, loading, sendMessage } = useGeminiChat();
+  const { isOpen, setIsOpen, input, setInput, handleSend, messages, loading } = useChatBox();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -13,13 +11,6 @@ export function ChatBot(){
       scrollRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, loading]);
-
-  const handleSend = () => {
-    if (input.trim()) {
-      sendMessage(input);
-      setInput('');
-    }
-  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
@@ -40,9 +31,6 @@ export function ChatBot(){
                 </p>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="hover:rotate-90 transition-transform duration-200">
-              <X size={20} />
-            </button>
           </div>
 
           {/* Área de Mensagens */}
