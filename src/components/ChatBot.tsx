@@ -16,7 +16,7 @@ export function ChatBot(){
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
       {/* Janela de Chat */}
       {isOpen && (
-        <div className="w-[350px] h-[500px] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] mb-4 flex flex-col border border-gray-100 overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+        <div className="w-[350px] h-[500px] max-h-[calc(100vh-7rem)] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] mb-4 flex flex-col border border-gray-100 overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           
           {/* Header Customizado */}
           <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-4 text-white flex justify-between items-center">
@@ -34,7 +34,7 @@ export function ChatBot(){
           </div>
 
           {/* Área de Mensagens */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-slate-50">
             {messages.length === 0 && (
               <div className="text-center mt-10">
                 <Sparkles className="mx-auto text-indigo-300 mb-2" size={32} />
@@ -44,7 +44,7 @@ export function ChatBot(){
             
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-2xl text-[13px] shadow-sm ${
+                <div className={`max-w-[85%] p-3 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
                   msg.role === 'user' 
                     ? 'bg-indigo-600 text-white rounded-br-none' 
                     : 'bg-white text-gray-700 border border-gray-200 rounded-bl-none'
