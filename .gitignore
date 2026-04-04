@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 # GitHub Pages
 .gh-pages/
+.env
