@@ -17,8 +17,9 @@ type BoxAgendamentoProps = {
   salvandoEvento: boolean;
   erroBanco: string | null;
   adicionarEvento: () => void;
+    cancelaAgendamento: () => void;
 }
-export function BoxAgendamento( {usaSupabase, date, titulo, setTitulo, descricao, setDescricao, horario, setHorario, salvandoEvento, erroBanco, adicionarEvento}: BoxAgendamentoProps) {
+export function BoxAgendamento( {cancelaAgendamento, usaSupabase, date, titulo, setTitulo, descricao, setDescricao, horario, setHorario, salvandoEvento, erroBanco, adicionarEvento }: BoxAgendamentoProps) {
   const textoDataEvento = date ? format(date, "dd/MM/yyyy") : "data nao selecionada"
 
   return (
@@ -68,6 +69,12 @@ export function BoxAgendamento( {usaSupabase, date, titulo, setTitulo, descricao
               />
             </div>
 
+            <Button
+                onClick={cancelaAgendamento}
+                variant="outline"
+              >
+                Cancelar
+              </Button>
             <Button
               onClick={adicionarEvento}
               disabled={!titulo.trim() || salvandoEvento || !usaSupabase}

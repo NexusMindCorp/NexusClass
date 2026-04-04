@@ -9,7 +9,9 @@ export function Calendario() {
   const {
     usaSupabase,
     date,
-    setDate,
+    selecionarDataCalendario,
+    mostrarBoxAgendamento,
+    cancelarAgendamento,
     currentMonth,
     setCurrentMonth,
     titulo,
@@ -36,7 +38,7 @@ export function Calendario() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={selecionarDataCalendario}
           month={currentMonth}
           onMonthChange={setCurrentMonth}
           modifiers={{ comEvento: datasComEvento }}
@@ -49,12 +51,13 @@ export function Calendario() {
         />
         </div>
 
-        {!date ? (
+        {!mostrarBoxAgendamento ? (
           <p className="text-sm text-muted-foreground text-center">
             Selecione um dia no calendario para adicionar um evento.
           </p>
         ) : (
           <BoxAgendamento
+            cancelaAgendamento={cancelarAgendamento}
             usaSupabase={usaSupabase}
             date={date}
             titulo={titulo}

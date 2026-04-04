@@ -61,7 +61,8 @@ function formatarErroSupabase(erro: ErroSupabase, acao: string) {
 
 export function useCalendario() {
   const usaSupabase = Boolean(supabase && hasSupabaseConfig)
-  const [date, setDate] = React.useState<Date | undefined>(undefined)
+  const [date, setDateState] = React.useState<Date>(hojeLocal())
+  const [mostrarBoxAgendamento, setMostrarBoxAgendamento] = React.useState(false)
   const [eventos, setEventos] = React.useState<EventoCalendario[]>([])
   const [titulo, setTitulo] = React.useState("")
   const [descricao, setDescricao] = React.useState("")
@@ -128,8 +129,7 @@ export function useCalendario() {
   }, [eventos])
 
   const eventosDoDia = React.useMemo(() => {
-    const dataBase = date ?? hojeLocal()
-    const chaveDataSelecionada = paraChaveData(dataBase)
+    const chaveDataSelecionada = paraChaveData(date)
     return eventos
       .filter((evento) => evento.data === chaveDataSelecionada)
       .sort((a, b) => {
@@ -197,7 +197,8 @@ export function useCalendario() {
       setTitulo("")
       setDescricao("")
       setHorario("")
-      setDate(undefined)
+      setDateState(hojeLocal())
+      setMostrarBoxAgendamento(false)
     } catch {
       setErroBanco(
         "Falha ao salvar evento no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
@@ -228,14 +229,33 @@ export function useCalendario() {
 
   const selecionarDataRelativa = (dias: number) => {
     const novaData = addDays(hojeLocal(), dias)
-    setDate(novaData)
+    setDateState(novaData)
     setCurrentMonth(new Date(novaData.getFullYear(), novaData.getMonth(), 1))
+  }
+
+  const selecionarDataCalendario = (novaData: Date | undefined) => {
+    setDateState(novaData ?? hojeLocal())
+    setMostrarBoxAgendamento(Boolean(novaData))
+
+    if (novaData) {
+      setCurrentMonth(new Date(novaData.getFullYear(), novaData.getMonth(), 1))
+    }
+  }
+
+  const cancelarAgendamento = () => {
+    setTitulo("")
+    setDescricao("")
+    setHorario("")
+    setDateState(hojeLocal())
+    setMostrarBoxAgendamento(false)
   }
 
   return {
     usaSupabase,
     date,
-    setDate,
+    selecionarDataCalendario,
+    mostrarBoxAgendamento,
+    cancelarAgendamento,
     currentMonth,
     setCurrentMonth,
     titulo,
