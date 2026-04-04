@@ -42,7 +42,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural }: AppSidebarP
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <a href="/">
+                            <a href="/NexusClass/" className="flex items-center gap-2">
                                 <img src="Logos/Logo.png" alt="Logo da Escola Nexus" width={22} height={22} />
                                 <span className="text-gradient text-lg tracking-tight">NexusClass</span>
                             </a>
