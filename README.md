@@ -1,4 +1,4 @@
-# 📚 Projeto Piloto Shadcn - Educacional
+# 📚 Projeto Piloto Shadcn - Educacional(NexusClass)
 
 > Um projeto educativo para aprender sobre **shadcn/ui**, seus componentes, estilização com **Tailwind CSS** e boas práticas de desenvolvimento com **React** e **TypeScript**.
 
