@@ -1,11 +1,12 @@
-import { listaEscolar } from "@/hooks/leituraJson"
 import { useState, useMemo } from "react"
+import type { TurmaProps } from "@/hooks/leituraJson"
 
 type UsePesquisaProps = {
     aoFecharPesquisa: () => void
+    turmas: Record<string, TurmaProps>
 }
 
-export function usePesquisa({ aoFecharPesquisa }: UsePesquisaProps) {
+export function usePesquisa({ aoFecharPesquisa, turmas }: UsePesquisaProps) {
     const [textoPesquisa, setTextoPesquisa] = useState("")
     const [aberto, setAberto] = useState(true)
 
@@ -20,7 +21,7 @@ export function usePesquisa({ aoFecharPesquisa }: UsePesquisaProps) {
         if (!textoPesquisa.trim()) return []
 
         const consulta = textoPesquisa.toLowerCase()
-        return Object.entries(listaEscolar.turmas).filter(([_, turma]) => {
+        return Object.entries(turmas).filter(([_, turma]) => {
             return (
                 turma.materia.toLowerCase().includes(consulta) ||
                 turma.professor.toLowerCase().includes(consulta) ||
@@ -28,7 +29,7 @@ export function usePesquisa({ aoFecharPesquisa }: UsePesquisaProps) {
                 turma.turma.toLowerCase().includes(consulta)
             )
         })
-    }, [textoPesquisa])
+    }, [textoPesquisa, turmas])
 
     return {
         textoPesquisa,

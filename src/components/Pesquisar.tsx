@@ -8,17 +8,20 @@ import {
 } from "@/components/ui/sheet"
 import { TurmaCard } from "./TurmaCard"
 import { usePesquisa } from "@/hooks/usePesquisa"
+import type { TurmaProps } from "@/hooks/leituraJson"
 
 type PesquisarProps = {
     mudarInscricao: (materia: string) => void
     estaInscrito: (materia: string) => boolean
     marcarMural: (key: string) => void
     voltarPrincipal: () => void
+    turmas: Record<string, TurmaProps>
 }
 
 export function Pesquisar(props: PesquisarProps) {
     const { textoPesquisa, setTextoPesquisa, aberto, mudarAberturaSheet, turmasFiltradas } = usePesquisa({
-        aoFecharPesquisa: props.voltarPrincipal
+        aoFecharPesquisa: props.voltarPrincipal,
+        turmas: props.turmas,
     })
 
     return (

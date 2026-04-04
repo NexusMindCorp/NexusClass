@@ -1,4 +1,4 @@
-import { listaEscolar } from "@/hooks/leituraJson";
+import type { EscolaProps } from "@/hooks/leituraJson";
 import { TurmaCard } from "./TurmaCard";
 import { Mural } from "./Mural";
 import { Calendario } from "./Calendario";
@@ -14,16 +14,17 @@ type GerenciadorTelasProps = {
     estaInscrito: (key: string) => boolean;
     marcarMural: (key: string) => void;
     navegarPara: (tela: OpcoesTela) => void;
+    listaEscolar: EscolaProps;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
-    const turmaSelecionada = listaEscolar.turmas[props.usuario.chaveMural];
+    const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];
 
     return (
         <>
             {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
                 <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {listaEscolar.turmas && Object.entries(listaEscolar.turmas).map(([key, turma]) => (
+                    {props.listaEscolar.turmas && Object.entries(props.listaEscolar.turmas).map(([key, turma]) => (
                         <TurmaCard
                             key={key}
                             materia={turma.materia}
@@ -51,7 +52,13 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
 
             {props.usuario.acessouOq === "pesquisar" &&
                 <div className="w-full flex items-center justify-center p-4">
-                    <Pesquisar mudarInscricao={props.mudarInscricao} estaInscrito={props.estaInscrito} marcarMural={props.marcarMural} voltarPrincipal={() => props.navegarPara("principal")} />
+                    <Pesquisar
+                        mudarInscricao={props.mudarInscricao}
+                        estaInscrito={props.estaInscrito}
+                        marcarMural={props.marcarMural}
+                        voltarPrincipal={() => props.navegarPara("principal")}
+                        turmas={props.listaEscolar.turmas}
+                    />
                 </div>}
             {props.usuario.acessouOq === "mensagens" &&
                 <div className="w-full flex items-center justify-center p-4">

@@ -197,6 +197,7 @@ export function useCalendario() {
       setTitulo("")
       setDescricao("")
       setHorario("")
+      setDate(undefined)
     } catch {
       setErroBanco(
         "Falha ao salvar evento no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."

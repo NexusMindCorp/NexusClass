@@ -3,7 +3,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
-import { listaEscolar } from "@/hooks/leituraJson"
+import type { EscolaProps } from "@/hooks/leituraJson"
 import { getCorMateria } from "@/lib/utils"
 
 const items = [
@@ -33,9 +33,10 @@ type AppSidebarProps = {
     navegarPara: (tela: OpcoesTela) => void;
     inscricoes: Record<string, boolean>;
     marcarMural: (key: string) => void;
+    listaEscolar: EscolaProps;
 }
 
-export function AppSidebar({ navegarPara, inscricoes, marcarMural }: AppSidebarProps) {
+export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar }: AppSidebarProps) {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
