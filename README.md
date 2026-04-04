@@ -4,7 +4,7 @@
 
 ---
 ## 🌐 Página de Visualização
- [🔗 Acesse a aplicação hospedada](https://gabriellineker.github.io/NexusClassWeb/)
+ [🔗 Acesse a aplicação hospedada](https://nexusmindcorp.github.io/NexusClass/)
 
 ---
 ## 📖 Sumário
