@@ -8,7 +8,7 @@ import { useGerenciador } from "./hooks/useGerenciador"
 import { ChatBot } from "./components/ChatBot"
 
 function App() {
-  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador();
+  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, marcarPrivacidade } = useGerenciador();
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">

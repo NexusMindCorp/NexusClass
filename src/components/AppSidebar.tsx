@@ -88,6 +88,11 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural }: AppSidebarP
                                                     e.preventDefault();
                                                     navegarPara("suporte");
                                                 }
+                                                if (item.title === "Privacidade") {
+                                                    e.preventDefault();
+                                                    navegarPara("privacidade");
+                                                }
+
                                                 {/*Os outros botões aqui*/ }
                                             }}
                                         >

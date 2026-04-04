@@ -6,6 +6,7 @@ import { Pesquisar } from "./Pesquisar";
 import { Mensagens } from "./Mensagens";
 import type { OpcoesTela } from "@/hooks/useGerenciador";
 import { TigresoEXE } from "./TigresoEXE";
+import { AcordoPrivacidade } from "./AcordoPrivacidade";
 
 type GerenciadorTelasProps = {
     usuario: any;
@@ -61,6 +62,10 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                     <div>
                         <TigresoEXE navegarPara={props.navegarPara} />
                     </div>
+                </div>}
+            {props.usuario.acessouOq === "privacidade" &&
+                <div className="w-full flex items-center justify-center p-4">
+                    <AcordoPrivacidade />
                 </div>}
         </>
     )

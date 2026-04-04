@@ -20,16 +20,8 @@ export function AcordoPrivacidade() {
             </p>
             <h2 className="text-xl font-semibold mb-4">4. Modifica&ccedil;&atilde;o dos Termos</h2>
             <p className="mb-4">
-                No futuro, podemos modificar estes termos de uso de acordo com as leis e normas aplica&ccedil;veis. Voc&ecirc; ser&aacute; notificado sobre as modifica&ccedil;&otilde;es.
+                No futuro, podemos modificar estes termos de uso de acordo com as leis e normas aplicaveis. Voc&ecirc; ser&aacute; notificado sobre as modifica&ccedil;&otilde;es.
             </p>
-            <h2 className="text-xl font-semibold mb-4">5. Contato</h2>
-            <p className="mb-4">
-                Se voc&ecirc; tiver alguma d&uacute;vida sobre estes termos de uso, entre em contato conosco atrav&eacute;s dos e-mails abaixo:
-            </p>
-            <ul className="list-disc pl-6 mb-4">
-                <li>5L7wS@example.com</li>
-                <li>8O2tD@example.com</li>
-            </ul>
         </div>
     );
 }

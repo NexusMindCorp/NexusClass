@@ -1,5 +1,5 @@
 import { useState } from "react";
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte";
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte"| "privacidade";
 
 
 export function useGerenciador() {
@@ -38,5 +38,9 @@ export function useGerenciador() {
         setUsuario((anterior) => ({ ...anterior, acessouOq: "pesquisar" }));
     }
 
-    return { usuario, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa };
+    const marcarPrivacidade = () => {
+        setUsuario((anterior) => ({ ...anterior, acessouOq: "privacidade" }));
+    }
+
+    return { usuario, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
 }
