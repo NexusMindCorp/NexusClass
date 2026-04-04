@@ -36,6 +36,11 @@ function paraData(chaveData: string) {
   return new Date(ano, mes - 1, dia)
 }
 
+function hojeLocal() {
+  const agora = new Date()
+  return new Date(agora.getFullYear(), agora.getMonth(), agora.getDate())
+}
+
 function formatarErroSupabase(erro: ErroSupabase, acao: string) {
   if (erro.code === "PGRST205") {
     return `Falha ao ${acao}: PostgREST nao encontrou public.eventos_calendario no cache de schema. Rode o SQL em supabase/001_eventos_calendario.sql e recarregue o schema.`
@@ -76,28 +81,34 @@ export function useCalendario() {
     setCarregandoEventos(true)
     setErroBanco(null)
 
-    const { data, error } = await supabase
-      .from("eventos_calendario")
-      .select("id,titulo,descricao,data,horario")
-      .order("data", { ascending: true })
-      .order("horario", { ascending: true, nullsFirst: false })
+    try {
+      const { data, error } = await supabase
+        .from("eventos_calendario")
+        .select("id,titulo,descricao,data,horario")
+        .order("data", { ascending: true })
+        .order("horario", { ascending: true, nullsFirst: false })
 
-    if (error) {
-      setErroBanco(formatarErroSupabase(error, "carregar eventos"))
+      if (error) {
+        setErroBanco(formatarErroSupabase(error, "carregar eventos"))
+        return
+      }
+
+      const normalizados = (data as EventoCalendarioBanco[]).map((evento) => ({
+        id: evento.id,
+        titulo: evento.titulo,
+        descricao: evento.descricao,
+        data: evento.data,
+        horario: evento.horario ?? "",
+      }))
+
+      setEventos(normalizados)
+    } catch {
+      setErroBanco(
+        "Falha ao carregar eventos no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
+      )
+    } finally {
       setCarregandoEventos(false)
-      return
     }
-
-    const normalizados = (data as EventoCalendarioBanco[]).map((evento) => ({
-      id: evento.id,
-      titulo: evento.titulo,
-      descricao: evento.descricao,
-      data: evento.data,
-      horario: evento.horario ?? "",
-    }))
-
-    setEventos(normalizados)
-    setCarregandoEventos(false)
   }, [])
 
   React.useEffect(() => {
@@ -117,11 +128,8 @@ export function useCalendario() {
   }, [eventos])
 
   const eventosDoDia = React.useMemo(() => {
-    if (!date) {
-      return []
-    }
-
-    const chaveDataSelecionada = paraChaveData(date)
+    const dataBase = date ?? hojeLocal()
+    const chaveDataSelecionada = paraChaveData(dataBase)
     return eventos
       .filter((evento) => evento.data === chaveDataSelecionada)
       .sort((a, b) => {
@@ -157,39 +165,45 @@ export function useCalendario() {
     setSalvandoEvento(true)
     setErroBanco(null)
 
-    const { data, error } = await supabase
-      .from("eventos_calendario")
-      .insert({
-        titulo: tituloLimpo,
-        descricao: descricaoLimpa,
-        data: paraChaveData(date),
-        horario: horarioLimpo || null,
-      })
-      .select("id,titulo,descricao,data,horario")
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from("eventos_calendario")
+        .insert({
+          titulo: tituloLimpo,
+          descricao: descricaoLimpa,
+          data: paraChaveData(date),
+          horario: horarioLimpo || null,
+        })
+        .select("id,titulo,descricao,data,horario")
+        .single()
 
-    if (error) {
-      setErroBanco(formatarErroSupabase(error, "salvar evento"))
+      if (error) {
+        setErroBanco(formatarErroSupabase(error, "salvar evento"))
+        return
+      }
+
+      const eventoInserido = data as EventoCalendarioBanco
+      setEventos((anteriores) => [
+        ...anteriores,
+        {
+          id: eventoInserido.id,
+          titulo: eventoInserido.titulo,
+          descricao: eventoInserido.descricao,
+          data: eventoInserido.data,
+          horario: eventoInserido.horario ?? "",
+        },
+      ])
+
+      setTitulo("")
+      setDescricao("")
+      setHorario("")
+    } catch {
+      setErroBanco(
+        "Falha ao salvar evento no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
+      )
+    } finally {
       setSalvandoEvento(false)
-      return
     }
-
-    const eventoInserido = data as EventoCalendarioBanco
-    setEventos((anteriores) => [
-      ...anteriores,
-      {
-        id: eventoInserido.id,
-        titulo: eventoInserido.titulo,
-        descricao: eventoInserido.descricao,
-        data: eventoInserido.data,
-        horario: eventoInserido.horario ?? "",
-      },
-    ])
-
-    setTitulo("")
-    setDescricao("")
-    setHorario("")
-    setSalvandoEvento(false)
   }
 
   const removerEvento = async (id: string) => {
@@ -212,7 +226,7 @@ export function useCalendario() {
   }
 
   const selecionarDataRelativa = (dias: number) => {
-    const novaData = addDays(new Date(), dias)
+    const novaData = addDays(hojeLocal(), dias)
     setDate(novaData)
     setCurrentMonth(new Date(novaData.getFullYear(), novaData.getMonth(), 1))
   }

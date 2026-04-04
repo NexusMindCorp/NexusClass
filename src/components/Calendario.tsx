@@ -117,7 +117,7 @@ export function Calendario() {
             <p className="text-sm font-semibold">
               {date
                 ? `Eventos de ${format(date, "dd/MM/yyyy")}`
-                : "Eventos do dia"}
+                : `Eventos de ${format(new Date(), "dd/MM/yyyy")}`}
             </p>
             <Badge variant="outline">{eventosDoDia.length}</Badge>
           </div>
