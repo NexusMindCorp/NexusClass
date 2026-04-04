@@ -5,7 +5,7 @@ import { ThemeProvider } from "./components/provedores/ThemeProvider"
 import { GerenciadorTelas } from "./components/GerenciadorTelas"
 import { Toaster } from "sonner"
 import { useGerenciador } from "./hooks/useGerenciador"
-import { ChatBot } from "./components/chatBot"
+import { ChatBot } from "./components/ChatBot"
 
 function App() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador();
