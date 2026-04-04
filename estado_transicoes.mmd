@@ -1,73 +1,63 @@
 stateDiagram-v2
-    %% NexusClass - Diagrama de Transição de Estados
     [*] --> Principal: App Inicializa
-    
-    %% ==================== ESTADO: PRINCIPAL ====================
+
     state Principal {
         [*] --> ListandoTurmas
         ListandoTurmas --> TurmaCardSelecionada: clica card
         TurmaCardSelecionada --> [*]
     }
-    
-    %% ==================== ESTADO: MURAL ====================
+
     state Mural {
         [*] --> VisualizandoMural
         VisualizandoMural --> CriarPost: clica Postar
-        CriarPost --> VisualizandoMural: publica/cancela
-        VisualizandoMural --> AbaMural: Mural (default)
-        VisualizandoMural --> AbaAtividades: clica Atividades
-        VisualizandoMural --> AbaAlunos: clica Alunos
-        VisualizandoMural --> AbaContato: clica Contato
+        CriarPost --> VisualizandoMural: publica ou cancela
+        VisualizandoMural --> AbaMural: aba mural
+        VisualizandoMural --> AbaAtividades: aba atividades
+        VisualizandoMural --> AbaAlunos: aba alunos
+        VisualizandoMural --> AbaContato: aba contato
         AbaMural --> [*]
         AbaAtividades --> [*]
         AbaAlunos --> [*]
         AbaContato --> [*]
     }
-    
-    %% ==================== ESTADO: PESQUISAR ====================
+
     state Pesquisar {
         [*] --> BuscandoTurmas
-        BuscandoTurmas --> ResultadosPesquisa: busca OK
+        BuscandoTurmas --> ResultadosPesquisa: busca ok
         ResultadosPesquisa --> [*]
     }
-    
-    %% ==================== ESTADO: CALENDARIO ====================
+
     state Calendario {
         [*] --> ExibindoCalendario
-        ExibindoCalendario --> VisualizandoEvento: seleciona
+        ExibindoCalendario --> VisualizandoEvento: seleciona evento
         VisualizandoEvento --> [*]
     }
-    
-    %% ==================== ESTADO: MENSAGENS ====================
+
     state Mensagens {
         [*] --> ListaMensagens
-        ListaMensagens --> ConversaAberta: clica
+        ListaMensagens --> ConversaAberta: clica conversa
         ConversaAberta --> EnviandoMensagem: envia
         EnviandoMensagem --> [*]
     }
-    
-    %% ==================== ESTADO: SUPORTE ====================
+
     state Suporte {
         [*] --> TigresoEXE
         TigresoEXE --> ChatTigreso: interage
         ChatTigreso --> [*]
     }
-    
-    %% ==================== NAVEGAÇÃO PRINCIPAL ====================
-    Principal --> Pesquisar: navegarPara('pesquisar')
-    Principal --> Calendario: navegarPara('calendario')
-    Principal --> Mensagens: navegarPara('mensagens')
-    Principal --> Suporte: navegarPara('suporte')
-    Principal --> Mural: marcarMural(key)
-    
-    %% ==================== RETORNOS PARA PRINCIPAL ====================
-    Pesquisar --> Principal: voltarPrincipal()
+
+    Principal --> Pesquisar: navegarPara pesquisar
+    Principal --> Calendario: navegarPara calendario
+    Principal --> Mensagens: navegarPara mensagens
+    Principal --> Suporte: navegarPara suporte
+    Principal --> Mural: marcarMural key
+
+    Pesquisar --> Principal: voltarPrincipal
     Calendario --> Principal: voltar
     Mensagens --> Principal: voltar
     Suporte --> Principal: voltar
-    Mural --> Principal: voltar/sair
-    
-    %% ==================== ATALHOS (SEM PASSAR POR PRINCIPAL) ====================
+    Mural --> Principal: voltar ou sair
+
     Pesquisar --> Mural: clica card
-    Calendario --> Mensagens: navegarPara('mensagens')
-    Mensagens --> Suporte: navegarPara('suporte')
+    Calendario --> Mensagens: navegarPara mensagens
+    Mensagens --> Suporte: navegarPara suporte
