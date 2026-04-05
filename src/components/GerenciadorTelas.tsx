@@ -5,7 +5,7 @@ import { Calendario } from "./Calendario";
 import { Pesquisar } from "./Pesquisar";
 import { Mensagens } from "./Mensagens";
 import type { OpcoesTela } from "@/hooks/useGerenciador";
-import { TigresoEXE } from "./TigresoEXE";
+
 import { AcordoPrivacidade } from "./AcordoPrivacidade";
 import { Suporte } from "./Suporte";
 
