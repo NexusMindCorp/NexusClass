@@ -21,6 +21,13 @@ type EventoCalendarioNotificacao = {
     horario: string
 }
 
+export type UsuarioProps = {
+    inscricoes: Record<string, boolean>
+    acessouOq: OpcoesTela
+    chaveMural: string
+    listaDosInscritos: Array<string>
+}
+
 function formatarDataLocal(data: Date) {
     const ano = data.getFullYear()
     const mes = String(data.getMonth() + 1).padStart(2, "0")
@@ -38,20 +45,26 @@ export function useGerenciador() {
 
     const alertasEnviadosRef = useRef<Set<string>>(new Set())
 
-    const [usuario, setUsuario] = useState({
+    const [usuario, setUsuario] = useState<UsuarioProps>({
         inscricoes: {} as Record<string, boolean>,
         acessouOq: "principal" as OpcoesTela,
         chaveMural: "",
+        listaDosInscritos: [],
     });
 
     const mudarInscricao = (materia: string) => {
-        setUsuario((anterior) => ({
-            ...anterior,
-            inscricoes: {
+        setUsuario((anterior) => {
+            const proximasInscricoes = {
                 ...anterior.inscricoes,
                 [materia]: !anterior.inscricoes[materia],
-            },
-        }));
+            }
+
+            return {
+                ...anterior,
+                inscricoes: proximasInscricoes,
+                listaDosInscritos: Object.keys(proximasInscricoes).filter((nomeMateria) => proximasInscricoes[nomeMateria]),
+            }
+        });
     };
 
     const estaInscrito = (materia: string) => Boolean(usuario.inscricoes[materia]);

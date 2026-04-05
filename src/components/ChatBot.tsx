@@ -1,9 +1,14 @@
 import { useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
 import { useChatBox } from '../hooks/useChatBox';
+import type { UsuarioProps } from '@/hooks/useGerenciador';
 
-export function ChatBot(){
-  const { isOpen, setIsOpen, input, setInput, handleSend, messages, loading } = useChatBox();
+type ChatBotProps = {
+  usuario: UsuarioProps
+}
+
+export function ChatBot({ usuario }: ChatBotProps) {
+  const { isOpen, setIsOpen, input, setInput, handleSend, messages, loading } = useChatBox(usuario);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -35,7 +35,7 @@ function App() {
             />
           </div>
         </main>
-        <ChatBot />
+        <ChatBot usuario={usuario} />
       </SidebarProvider>
       <Toaster position="top-center" />
     </ThemeProvider>
