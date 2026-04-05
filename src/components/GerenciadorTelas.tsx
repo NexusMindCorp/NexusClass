@@ -15,6 +15,7 @@ type GerenciadorTelasProps = {
     marcarMural: (key: string) => void;
     navegarPara: (tela: OpcoesTela) => void;
     listaEscolar: EscolaProps;
+    abrirChatComAjuda: () => void;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
@@ -72,7 +73,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                 </div>}
             {props.usuario.acessouOq === "privacidade" &&
                 <div className="w-full flex items-center justify-center p-4">
-                    <AcordoPrivacidade />
+                    <AcordoPrivacidade acionarAjuda={props.abrirChatComAjuda} />
                 </div>}
         </>
     )

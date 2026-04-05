@@ -7,10 +7,16 @@ import { Toaster } from "sonner"
 import { useGerenciador } from "./hooks/useGerenciador"
 import { ChatBot } from "./components/ChatBot"
 import { useEscolaDados } from "./hooks/useEscolaDados"
+import { useRef, useCallback } from "react"
 
 function App() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador()
   const { listaEscolar } = useEscolaDados()
+  const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
+
+  const abrirChatComAjuda = useCallback(() => {
+    chatBotRef.current?.abrirComAjuda()
+  }, [])
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
@@ -32,10 +38,11 @@ function App() {
               marcarMural={marcarMural}
               navegarPara={navegarPara}
               listaEscolar={listaEscolar}
+              abrirChatComAjuda={abrirChatComAjuda}
             />
           </div>
         </main>
-        <ChatBot usuario={usuario} />
+        <ChatBot ref={chatBotRef} usuario={usuario} />
       </SidebarProvider>
       <Toaster position="top-center" />
     </ThemeProvider>

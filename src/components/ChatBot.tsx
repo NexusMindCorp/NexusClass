@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
 import { useChatBox } from '../hooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
@@ -7,10 +7,18 @@ type ChatBotProps = {
   usuario: UsuarioProps
 }
 
-export function ChatBot({ usuario }: ChatBotProps) {
-  const { isOpen, setIsOpen, input, setInput, handleSend, messages, loading } = useChatBox(usuario);
+export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, ref) {
+  const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox({ ...usuario, pedirAjuda: () => {} });
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Expor função de abrir com modo ajuda
+  useImperativeHandle(ref, () => ({
+    abrirComAjuda: () => {
+      setIsHelpMode(true);
+      setIsOpen(true);
+    }
+  }), [setIsHelpMode, setIsOpen]);
+  
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -97,7 +105,13 @@ export function ChatBot({ usuario }: ChatBotProps) {
 
       {/* Botão de Abrir/Fechar */}
       <button 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (isOpen) {
+            closeChat(); // Usa closeChat para retomar instrução principal
+          } else {
+            setIsOpen(true);
+          }
+        }}
         className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 ${
           isOpen ? 'bg-gray-900 rotate-180' : 'bg-indigo-600'
         }`}
@@ -106,4 +120,4 @@ export function ChatBot({ usuario }: ChatBotProps) {
       </button>
     </div>
   );
-};
+});

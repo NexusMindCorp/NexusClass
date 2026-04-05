@@ -1,5 +1,10 @@
+import { Button } from "./ui/button";
 
-export function AcordoPrivacidade() {
+type AcordoPrivacidadeProps = {
+    acionarAjuda: () => void;
+}
+
+export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
     return (
         <div className="max-w-2xl mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Termos de Uso</h1>
@@ -22,6 +27,9 @@ export function AcordoPrivacidade() {
             <p className="mb-4">
                 No futuro, podemos modificar estes termos de uso de acordo com as leis e normas aplicaveis. Voc&ecirc; ser&aacute; notificado sobre as modifica&ccedil;&otilde;es.
             </p>
+            <Button variant={"link"} onClick={acionarAjuda} asChild>
+                <p >Dúvidas sobre os termos de uso</p>
+            </Button>
         </div>
     );
 }

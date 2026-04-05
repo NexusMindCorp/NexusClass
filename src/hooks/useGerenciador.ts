@@ -44,6 +44,8 @@ function montarDataEvento(data: string, horario: string) {
 export function useGerenciador() {
 
     const alertasEnviadosRef = useRef<Set<string>>(new Set())
+    const [pedirAjuda, setPedirAjuda] = useState(false);
+    const acionarAjuda = () => setPedirAjuda(true);
 
     const [usuario, setUsuario] = useState<UsuarioProps>({
         inscricoes: {} as Record<string, boolean>,
@@ -194,5 +196,5 @@ export function useGerenciador() {
         }
     }, [])
 
-    return { usuario, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
+    return { usuario, pedirAjuda, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
 }
