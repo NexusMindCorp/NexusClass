@@ -1,7 +1,7 @@
-import * as React from "react"
+import { useState, useCallback, useEffect, useMemo} from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-
+//usememo para operacoes custosas como filtrar eventos do dia ou extrair datas unicas, evitando recalculos desnecessarios
 type EventoCalendario = {
   id: string
   titulo: string
@@ -61,25 +61,42 @@ function formatarErroSupabase(erro: ErroSupabase, acao: string) {
 
 export function useCalendario() {
   const usaSupabase = Boolean(supabase && hasSupabaseConfig)
-  const [date, setDateState] = React.useState<Date>(hojeLocal())
-  const [mostrarBoxAgendamento, setMostrarBoxAgendamento] = React.useState(false)
-  const [eventos, setEventos] = React.useState<EventoCalendario[]>([])
-  const [titulo, setTitulo] = React.useState("")
-  const [descricao, setDescricao] = React.useState("")
-  const [horario, setHorario] = React.useState("")
-  const [carregandoEventos, setCarregandoEventos] = React.useState(false)
-  const [salvandoEvento, setSalvandoEvento] = React.useState(false)
-  const [erroBanco, setErroBanco] = React.useState<string | null>(null)
-  const [currentMonth, setCurrentMonth] = React.useState<Date>(
+  const [date, setDateState] = useState<Date>(hojeLocal())
+  const [mostrarBoxAgendamento, setMostrarBoxAgendamento] = useState(false)
+  const [eventos, setEventos] = useState<EventoCalendario[]>([])
+  const [sobreEvento, setSobreEvento] = useState({titulo: "", descricao: "", horario: ""})
+  const[processamentoEvento, setProcessamentoEvento] = useState({carregandoEventos: false, salvandoEvento: false})
+  const [erroBanco, setErroBanco] = useState<string | null>(null)
+  const [currentMonth, setCurrentMonth] = useState<Date>(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   )
 
-  const carregarEventosSupabase = React.useCallback(async () => {
+  const removerEventosPassados = async () => {
+    const hoje = hojeLocal()
+    const hojeChave = paraChaveData(hoje)
+
+    if (supabase) {
+      const { error } = await supabase
+        .from("eventos_calendario")
+        .delete()
+        .lt("data", hojeChave)
+
+      if (error) {
+        setErroBanco(formatarErroSupabase(error, "remover eventos passados"))
+      }
+    }
+
+    setEventos((anteriores) =>
+      anteriores.filter((evento) => paraData(evento.data) >= hoje)
+    )
+  }
+
+  const carregarEventosSupabase = useCallback(async () => {
     if (!supabase) {
       return
     }
-
-    setCarregandoEventos(true)
+    await removerEventosPassados()
+    setProcessamentoEvento((anterior) => ({ ...anterior, carregandoEventos: true }))
     setErroBanco(null)
 
     try {
@@ -108,11 +125,11 @@ export function useCalendario() {
         "Falha ao carregar eventos no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
       )
     } finally {
-      setCarregandoEventos(false)
+      setProcessamentoEvento((anterior) => ({ ...anterior, carregandoEventos: false }))
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!usaSupabase) {
       setErroBanco(
         "Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env."
@@ -123,12 +140,12 @@ export function useCalendario() {
     void carregarEventosSupabase()
   }, [carregarEventosSupabase, usaSupabase])
 
-  const datasComEvento = React.useMemo(() => {
+  const datasComEvento = useMemo(() => {
     const unicas = new Set(eventos.map((evento) => evento.data))
     return Array.from(unicas).map(paraData)
   }, [eventos])
 
-  const eventosDoDia = React.useMemo(() => {
+  const eventosDoDia = useMemo(() => {
     const chaveDataSelecionada = paraChaveData(date)
     return eventos
       .filter((evento) => evento.data === chaveDataSelecionada)
@@ -147,13 +164,13 @@ export function useCalendario() {
   }, [date, eventos])
 
   const adicionarEvento = async () => {
-    if (!date || !titulo.trim()) {
+    if (!date || !sobreEvento.titulo.trim()) {
       return
     }
 
-    const tituloLimpo = titulo.trim()
-    const descricaoLimpa = descricao.trim()
-    const horarioLimpo = horario.trim()
+    const tituloLimpo = sobreEvento.titulo.trim()
+    const descricaoLimpa = sobreEvento.descricao.trim()
+    const horarioLimpo = sobreEvento.horario.trim()
 
     if (!usaSupabase || !supabase) {
       setErroBanco(
@@ -162,7 +179,7 @@ export function useCalendario() {
       return
     }
 
-    setSalvandoEvento(true)
+    setProcessamentoEvento((anterior) => ({ ...anterior, salvandoEvento: true }))
     setErroBanco(null)
 
     try {
@@ -194,9 +211,7 @@ export function useCalendario() {
         },
       ])
 
-      setTitulo("")
-      setDescricao("")
-      setHorario("")
+      setSobreEvento({titulo: "", descricao: "", horario: ""})
       setDateState(hojeLocal())
       setMostrarBoxAgendamento(false)
     } catch {
@@ -204,7 +219,7 @@ export function useCalendario() {
         "Falha ao salvar evento no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
       )
     } finally {
-      setSalvandoEvento(false)
+      setProcessamentoEvento((anterior) => ({ ...anterior, salvandoEvento: false }))
     }
   }
 
@@ -243,13 +258,11 @@ export function useCalendario() {
   }
 
   const cancelarAgendamento = () => {
-    setTitulo("")
-    setDescricao("")
-    setHorario("")
+    setSobreEvento({titulo: "", descricao: "", horario: ""})
     setDateState(hojeLocal())
     setMostrarBoxAgendamento(false)
   }
-
+  
   return {
     usaSupabase,
     date,
@@ -258,14 +271,9 @@ export function useCalendario() {
     cancelarAgendamento,
     currentMonth,
     setCurrentMonth,
-    titulo,
-    setTitulo,
-    descricao,
-    setDescricao,
-    horario,
-    setHorario,
-    carregandoEventos,
-    salvandoEvento,
+    sobreEvento,
+    setSobreEvento,
+    processamentoEvento,
     erroBanco,
     datasComEvento,
     eventosDoDia,

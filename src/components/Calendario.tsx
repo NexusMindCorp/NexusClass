@@ -14,14 +14,9 @@ export function Calendario() {
     cancelarAgendamento,
     currentMonth,
     setCurrentMonth,
-    titulo,
-    setTitulo,
-    descricao,
-    setDescricao,
-    horario,
-    setHorario,
-    carregandoEventos,
-    salvandoEvento,
+    sobreEvento,
+    setSobreEvento,
+    processamentoEvento,
     erroBanco,
     datasComEvento,
     eventosDoDia,
@@ -60,13 +55,19 @@ export function Calendario() {
             cancelaAgendamento={cancelarAgendamento}
             usaSupabase={usaSupabase}
             date={date}
-            titulo={titulo}
-            setTitulo={setTitulo}
-            descricao={descricao}
-            setDescricao={setDescricao}
-            horario={horario}
-            setHorario={setHorario}
-            salvandoEvento={salvandoEvento}
+            titulo={sobreEvento.titulo}
+            setTitulo={(titulo) =>
+              setSobreEvento((anterior) => ({ ...anterior, titulo }))
+            }
+            descricao={sobreEvento.descricao}
+            setDescricao={(descricao) =>
+              setSobreEvento((anterior) => ({ ...anterior, descricao }))
+            }
+            horario={sobreEvento.horario}
+            setHorario={(horario) =>
+              setSobreEvento((anterior) => ({ ...anterior, horario }))
+            }
+            salvandoEvento={processamentoEvento.salvandoEvento}
             erroBanco={erroBanco}
             adicionarEvento={adicionarEvento}
             />
@@ -74,7 +75,7 @@ export function Calendario() {
 
         <BoxAgendados
           date={date}
-          carregandoEventos={carregandoEventos}
+          carregandoEventos={processamentoEvento.carregandoEventos}
           eventosDoDia={eventosDoDia}
           removerEvento={removerEvento}
         />
