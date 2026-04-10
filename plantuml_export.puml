@@ -1,0 +1,73 @@
+@startuml
+' Configurações de layout
+left to right direction
+skinparam packageStyle rectangle
+skinparam nodesep 40
+skinparam ranksep 100
+
+' Estilização
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+}
+skinparam usecase {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+}
+
+' Definição dos Atores
+actor "Usuário (Base)" as User << Abstract >>
+actor "Aluno" as Aluno
+actor "Professor" as Professor
+actor "Corpo Docente\n(Direção e Adm)" as CD
+
+' Hierarquia de Atores: Mantida para as funções comuns
+Aluno -up-|> User
+Professor -up-|> User
+CD -up-|> User
+
+package "Nexus Class System" {
+    
+    ' Funcionalidades Comuns (Ligadas à Abstração Base)
+    usecase "RF1 - Alternar Temas" as UC1
+    usecase "RF2 - Visualizar Turmas" as UC2
+    usecase "RF4 - Acessar Mural (Leitura)" as UC4
+    usecase "RF5 - Interagir com Calendário" as UC5
+    usecase "RF6 - Pesquisar Conteúdo" as UC6
+    usecase "RF7 - Central de Mensagens" as UC7
+    usecase "RF9 - Gerenciamento e cadastro da Conta\n(Perfil, Editar e Sair)" as UC9
+    usecase "RF10 - Postar no Mural" as UC10
+    
+    ' Funcionalidades Específicas e de Gestão
+    usecase "RF11 - Adicionar/Enviar Atividades" as UC11
+    usecase "RF3 - Gerenciar Inscrição\n(Exclusivo Aluno)" as UC3
+    usecase "RF8 - Gerenciar Mural\n(Exclusivo Professor)" as UC8
+    
+    ' Organização visual interna
+    UC1 -[hidden]down- UC2
+    UC2 -[hidden]down- UC9
+    UC9 -[hidden]down- UC10
+    UC10 -[hidden]down- UC4
+    UC8 -[hidden]down- UC11
+    UC11 -[hidden]down- UC3
+}
+
+' Conexões via Abstração (Funcionalidades de todos)
+User --> UC1
+User --> UC2
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC9
+User --> UC10
+
+' Conexões Diretas (Sem abstração intermediária para estas)
+Professor --> UC11
+CD --> UC11
+
+' Conexões Restritas
+Aluno --> UC3
+Professor --> UC8
+
+@enduml
