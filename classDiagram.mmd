@@ -1,14 +1,8 @@
 classDiagram
     %% ============================================
-    %% BLOCO: TIPOS E INTERFACES DE DADOS
+    %% BLOCO 1: ESTRUTURAS DE DADOS (INTERFACES)
     %% ============================================
-    
-    class OpcoesTela {
-        <<type>>
-        "mural" | "calendario" | "principal" 
-        | "pesquisar" | "mensagens" | "suporte"
-    }
-    
+
     class TurmaProps {
         <<interface>>
         + materia: string
@@ -19,381 +13,190 @@ classDiagram
         + sala: string
         + turma: string
     }
-    
+
     class EscolaProps {
         <<interface>>
         + escola: string
-        + ano_letivo: number
+        + ano_letivo: int
         + turmas: Record~string, TurmaProps~
     }
-    
+
     class Post {
         <<interface>>
         + id: string
         + conteudo: string
         + data: string
     }
-    
-    class PostsState {
-        <<interface>>
-        + posts: Post[]
-        + boxAberto: boolean
-        + tipoAmostar: "atividade" | "mural" | "contato" | "alunos"
-    }
-    
+
     class UsuarioState {
         <<interface>>
         + inscricoes: Record~string, boolean~
         + acessouOq: OpcoesTela
         + chaveMural: string
     }
-    
-    class TurmasProps {
+
+    class PostsState {
         <<interface>>
-        + materia: string
-        + professor: string
-        + banners: string
-        + fotoProfessor: string
-        + sala: string
-        + turma: string
-        + inscrito?: boolean
-        + compacto?: boolean
-        + clickInscrito?: () => void
-        + clickMural?: (materia: string) => void
+        + posts: Post[]
+        + boxAberto: boolean
+        + tipoAmostar: string
     }
-    
-    class GerenciadorTelasProps {
-        <<interface>>
-        + usuario: UsuarioState
-        + mudarInscricao: (key: string) => void
-        + estaInscrito: (key: string) => boolean
-        + marcarMural: (key: string) => void
-        + navegarPara: (tela: OpcoesTela) => void
-    }
-    
-    class MuralProps {
-        <<interface>>
-        + materia: string
-        + turma: TurmaProps
-    }
-    
+
     %% ============================================
-    %% BLOCO: HOOKS (LÓGICA)
+    %% BLOCO 2: LÓGICA DE NEGÓCIO (HOOKS)
     %% ============================================
-    
+
     class useGerenciador {
         <<hook>>
         - usuario: UsuarioState
-        - setUsuario: setState
-        + usuario: UsuarioState
         + mudarInscricao(materia: string): void
         + estaInscrito(materia: string): boolean
         + marcarMural(key: string): void
-        + marcarCalendario(): void
         + navegarPara(tela: OpcoesTela): void
+        + marcarCalendario(): void
         + marcarPesquisa(): void
     }
-    
+
     class useMural {
         <<hook>>
         - posts: PostsState
-        - setPosts: setState
         - conteudo: string
-        - setConteudo: setState
         - assunto: string
-        - setAssunto: setState
-        + posts: PostsState
-        + conteudo: string
-        + setConteudo: (value: string) => void
-        + assunto: string
-        + setAssunto: (value: string) => void
         + mudarAberturaBox(aberto: boolean): void
         + handlePublicar(): void
         + handleCancelar(): void
         + abrirMural(): void
         + abrirAtividades(): void
         + abrirContato(): void
-        + abrirMensagemContato(): void
         + abrirAlunos(): void
     }
-    
-    class leituraJson {
-        <<hook>>
-        + listaEscolar: EscolaProps
-    }
-    
-    class useConfiguracoes {
-        <<hook>>
-        Gerencia configurações da aplicação
-    }
-    
-    class usePesquisa {
-        <<hook>>
-        Gerencia lógica de busca
-    }
-    
-    class useTigreso {
-        <<hook>>
-        Gerencia suporte/assistente
-    }
-    
+
     %% ============================================
-    %% BLOCO: COMPONENTES PRINCIPAIS
+    %% BLOCO 3: COMPONENTES PRINCIPAIS E UI
     %% ============================================
-    
+
     class App {
         <<component>>
         - usuario: UsuarioState
-        - mudarInscricao: func
-        - estaInscrito: func
-        - marcarMural: func
-        - navegarPara: func
-        + render(): JSX.Element
+        + render(): JSX_Element
     }
-    
-    class GerenciadorTelas {
-        <<component>>
-        - props: GerenciadorTelasProps
-        - turmaSelecionada: TurmaProps
-        + renderiza telas condicionais
-        + exibe Principal/Pesquisar
-        + exibe Mural
-        + exibe Calendario
-        + exibe Mensagens
-        + exibe TigresoEXE
-    }
-    
+
     class AppSidebar {
         <<component>>
-        - navegarPara: func
-        - inscricoes: Record~string, boolean~
-        - marcarMural: func
-        + items: MenuItem[]
-        + renderiza navegação lateral
+        - items: MenuItem[]
+        + navegarPara: function
+        + marcarMural: function
+        + render(): JSX_Element
     }
-    
+
     class Navbar {
         <<component>>
-        + renderiza barra superior
+        - notifications: Record~string, boolean~
+        + setTheme(theme: string): void
+        + render(): JSX_Element
     }
-    
-    %% ============================================
-    %% BLOCO: COMPONENTES DE EXIBIÇÃO (VIEW)
-    %% ============================================
-    
-    class TurmaCard {
+
+    class GerenciadorTelas {
         <<component>>
-        - props: TurmasProps
-        + exibe informações da turma
-        + botão inscrição/cancelamento
-        + botão entrar no mural
+        - turmaSelecionada: TurmaProps
+        + render(): JSX_Element
     }
-    
+
     class Mural {
         <<component>>
-        - props: MuralProps
-        - posts: PostsState
-        - conteudo: string
-        + renderiza header turma
-        + renderiza posts/atividades
-        + permite criar novo post
-        + navegação abas (Mural/Atividades/Contato/Alunos)
+        - materia: string
+        - turma: TurmaProps
+        + render(): JSX_Element
     }
-    
-    class BoxMural {
-        <<component>>
-        + formulário para criar post
-        + textarea conteúdo
-        + botões publicar/cancelar
-    }
-    
+
     class Calendario {
         <<component>>
-        + exibe calendário eventos
-        + gerencia datas importantes
+        + render(): JSX_Element
     }
-    
-    class Pesquisar {
-        <<component>>
-        - mudarInscricao: func
-        - estaInscrito: func
-        - marcarMural: func
-        - voltarPrincipal: func
-        + busca/filtra turmas
-        + resultados pesquisa
-    }
-    
+
     class Mensagens {
         <<component>>
-        + central de mensagens
-        + lista conversas
+        + render(): JSX_Element
     }
-    
-    class TigresoEXE {
+
+    class Suporte {
         <<component>>
-        - navegarPara: func
-        + assistente/suporte
-        + interface chat
+        + render(): JSX_Element
     }
-    
+
+    class TurmaCard {
+        <<component>>
+        + materia: string
+        + inscrito: boolean
+        + compacto: boolean
+        + clickInscrito(): void
+        + clickMural(materia: string): void
+        + render(): JSX_Element
+    }
+
+    class Pesquisar {
+        <<component>>
+        - textoPesquisa: string
+        - turmasFiltradas: TurmaProps[]
+        + render(): JSX_Element
+    }
+
+    class BoxMural {
+        <<component>>
+        + materia: string
+        + aberto: boolean
+        + onPublicar(): void
+        + onClose(): void
+        + render(): JSX_Element
+    }
+
     class AtendimentoContato {
         <<component>>
-        + formulário contato professor
-        + envia mensagem direto
+        + professorNome: string
+        + mensagem: string
+        + onEnviar(): void
+        + render(): JSX_Element
     }
-    
+
     class AlunosTurma {
         <<component>>
-        + lista alunos turma
-        + perfis alunos
+        + turma: TurmaProps
+        + render(): JSX_Element
     }
-    
+
     %% ============================================
-    %% BLOCO: COMPONENTES UI (shadcn)
+    %% RELACIONAMENTOS (REGRAS FORMAIS UML)
     %% ============================================
+
+    %% Relações de Agregação e Composição de Dados
+    EscolaProps "1" o-- "0..*" TurmaProps : agrega
+    PostsState "1" o-- "0..*" Post : contém
     
-    class Button {
-        <<component-ui>>
-        Componente de botão reutilizável
-    }
+    %% Dependências de Hooks (Gerenciamento de Estado)
+    useGerenciador ..> UsuarioState : gerencia
+    useMural ..> PostsState : gerencia
     
-    class Card {
-        <<component-ui>>
-        Componente de card container
-    }
-    
-    class Sidebar {
-        <<component-ui>>
-        Componente de sidebar container
-    }
-    
-    class Input {
-        <<component-ui>>
-        Componente de input
-    }
-    
-    class Textarea {
-        <<component-ui>>
-        Componente de textarea
-    }
-    
-    class ButtonGroup {
-        <<component-ui>>
-        Agrupa múltiplos botões
-    }
-    
-    %% ============================================
-    %% BLOCO: PROVIDERS
-    %% ============================================
-    
-    class ThemeProvider {
-        <<provider>>
-        - defaultTheme: "system" | "dark" | "light"
-        - storageKey: string
-        + gerencia tema aplicação
-        + suporta tema escuro/claro
-    }
-    
-    class SidebarProvider {
-        <<provider>>
-        + gerencia estado sidebar
-    }
-    
-    class Toaster {
-        <<component>>
-        + sistema notificações
-        + toast messages
-    }
-    
-    %% ============================================
-    %% BLOCO: UTILITÁRIOS
-    %% ============================================
-    
-    class Utils {
-        <<utility>>
-        + cn(*inputs: ClassValue[]): string
-        + getCorMateria(nome: string): string
-    }
-    
-    class AssetPath {
-        <<utility>>
-        Gerencia caminhos assets
-    }
-    
-    %% ============================================
-    %% RELACIONAMENTOS: DATA FLOW
-    %% ============================================
-    
-    %% App estrutura
-    App ..> ThemeProvider : wraps
-    App ..> SidebarProvider : wraps
-    App --> AppSidebar : renderiza
-    App --> Navbar : renderiza
-    App --> GerenciadorTelas : renderiza
-    App ..> useGerenciador : usa hook
-    
-    %% GerenciadorTelas distribui
-    GerenciadorTelas --> TurmaCard : renderiza (principal)
-    GerenciadorTelas --> Mural : renderiza (mural)
-    GerenciadorTelas --> Calendario : renderiza (calendario)
-    GerenciadorTelas --> Pesquisar : renderiza (pesquisar)
-    GerenciadorTelas --> Mensagens : renderiza (mensagens)
-    GerenciadorTelas --> TigresoEXE : renderiza (suporte)
-    GerenciadorTelas ..> leituraJson : usa dados
-    
-    %% Mural composição
-    Mural --> BoxMural : renderiza
-    Mural --> AtendimentoContato : renderiza seção
-    Mural --> AlunosTurma : renderiza seção
-    Mural ..> useMural : usa hook
-    
-    %% AppSidebar
-    AppSidebar --> Button : usa
-    AppSidebar --> Card : usa
-    Sidebar --> AppSidebar : provider
-    
-    %% TurmaCard UI
-    TurmaCard --> Button : usa
-    TurmaCard --> Card : usa
-    TurmaCard --> ButtonGroup : usa
-    
-    %% BoxMural e Contato
-    BoxMural --> Button : usa
-    BoxMural --> Textarea : usa
-    BoxMural --> Card : usa
-    AtendimentoContato --> Input : usa
-    AtendimentoContato --> Button : usa
-    AtendimentoContato --> Textarea : usa
-    
-    %% Pesquisar
-    Pesquisar --> Input : usa
-    Pesquisar --> TurmaCard : renderiza resultados
-    
-    %% State/Props flow
-    GerenciadorTelasProps --> UsuarioState : contém
-    GerenciadorTelasProps --> OpcoesTela : referencia
-    MuralProps --> TurmaProps : contém
-    TurmasProps --> TurmaProps : baseado em
-    PostsState --> Post : contém
-    PostsState --> OpcoesTela : referencia
-    
-    %% Hooks dependencies
-    useGerenciador --> UsuarioState : manage
-    useGerenciador --> OpcoesTela : utiliza
-    useMural --> PostsState : manage
-    leituraJson --> EscolaProps : carrega
-    
-    %% Utils
-    Utils ..> TurmaCard : getCorMateria
-    Utils ..> TurmaCard : cn merge classes
-    Utils ..> Mural : getCorMateria
-    
-    %% Notificações
-    App --> Toaster : renderiza
-    
-    %% ============================================
-    %% LEGENDA
-    %% Diagrama de Classes - NexusClass Frontend
-    %% Tipos/Interfaces, Componentes, Hooks, UI
-    %% Estado: useGerenciador, useMural, leituraJson
-    %% ============================================
+    %% Estrutura do App (Composição Forte)
+    App *-- Navbar : contém
+    App *-- AppSidebar : contém
+    App *-- GerenciadorTelas : contém
+    App ..> useGerenciador : utiliza hook
+
+    %% Fluxo do Gerenciador de Telas
+    GerenciadorTelas "1" --> "0..*" TurmaCard : instancia
+    GerenciadorTelas "1" --> "0..1" Mural : exibe
+    GerenciadorTelas "1" --> "0..1" Pesquisar : exibe
+    GerenciadorTelas "1" --> "0..1" Calendario : exibe
+    GerenciadorTelas "1" --> "0..1" Mensagens : exibe
+    GerenciadorTelas "1" --> "0..1" Suporte : exibe
+    GerenciadorTelas ..> EscolaProps : consome dados
+
+    %% Composição do Mural
+    Mural *-- BoxMural : possui
+    Mural *-- AtendimentoContato : possui
+    Mural *-- AlunosTurma : possui
+    Mural ..> useMural : utiliza hook
+
+    %% Associações de Navegação e Pesquisa
+    Pesquisar "1" --> "0..*" TurmaCard : filtra e renderiza
+    AppSidebar ..> TurmaProps : referencia para lista inscritas
