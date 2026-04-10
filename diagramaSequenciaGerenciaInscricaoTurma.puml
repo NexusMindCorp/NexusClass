@@ -1,0 +1,35 @@
+@startuml
+title Diagrama de Sequência: Gerenciar Inscrição em Turma (RF3)
+
+autonumber
+skinparam style strictuml
+
+actor "Aluno" as Actor
+box "Camada de Visão (Interface)" #LightBlue
+    participant "TurmaCard" as CardView <<Component>>
+end box
+
+box "Camada de Modelo/Lógica (Entity & Logic)" #LightYellow
+    participant "useGerenciador" as Hook <<Hook/Controller>>
+    participant "UsuarioState" as UserEntity <<Entity>>
+end box
+
+Actor -> CardView : clica em "Inscrever-se" ou "Cancelar"
+CardView -> Hook : mudarInscricao(materia)
+
+activate Hook
+Hook -> UserEntity : recupera inscricoes atuais
+note right: Acessa o estado da entidade de usuário
+
+alt Se não inscrito
+    Hook -> UserEntity : define [materia] = true
+else Se já inscrito
+    Hook -> UserEntity : define [materia] = false
+end
+
+Hook -> Hook : setUsuario(novoEstado)
+deactivate Hook
+
+Hook --> CardView : retorna novo estado de inscrição
+CardView -> CardView : atualiza botões (Entrar/Sair)
+@enduml
