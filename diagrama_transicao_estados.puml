@@ -1,0 +1,69 @@
+@startuml
+title Diagrama de Transição de Estados - NexusClass
+
+' Forçando a orientação vertical
+top to bottom direction
+
+' Estado Inicial
+[*] --> Principal
+
+' --- ESTADO PRINCIPAL ---
+state Principal {
+    [*] --> GerenciadorDeTelas
+    GerenciadorDeTelas : Exibe TurmaCard para cada item em turmas.json
+}
+
+' Navegação do Principal para os demais estados (Descendo)
+Principal --down--> Mural : marcarMural(key) / setChaveMural
+Principal --down--> Pesquisar : marcarPesquisa()
+Principal --down--> Calendario : marcarCalendario()
+Principal --down--> Mensagens : navegarPara("mensagens")
+Principal --down--> Suporte : navegarPara("suporte")
+
+' --- ESTADO MURAL ---
+state Mural {
+    [*] --> AbaMural
+    
+    state AbaMural : Exibe posts da turma selecionada
+    state AbaAtividades : Exibe lista de tarefas
+    state AbaContato : Exibe formulário AtendimentoContato
+    state AbaAlunos : Exibe lista AlunosTurma
+
+    ' Transições internas verticais
+    AbaMural --down--> AbaAtividades : abrirAtividades()
+    AbaMural --down--> AbaAlunos : abrirAlunos()
+    AbaMural --down--> AbaContato : abrirContato()
+    
+    AbaAtividades --up--> AbaMural : abrirMural()
+    AbaAlunos --up--> AbaMural : abrirMural()
+    AbaContato --up--> AbaMural : handleCancelar()
+
+    ' Transição de Criação de Post (Mantida lateral para não alongar demais)
+    state "Caixa de Texto Aberta" as Postando
+    AbaMural -right-> Postando : mudarAberturaBox(true)
+    Postando -left-> AbaMural : handlePublicar() / handleCancelar()
+}
+
+' --- ESTADO DE PESQUISA ---
+state Pesquisar {
+    [*] --> SheetFechado
+    SheetFechado --down--> PesquisaAtiva : mudarAberturaSheet(true)
+    PesquisaAtiva : filtra turmas via usePesquisa
+    PesquisaAtiva --up--> SheetFechado : aoFecharPesquisa / navegarPara("principal")
+}
+
+' --- ESTADOS SIMPLES ---
+state Calendario : Exibe calendário de eventos
+state Mensagens : Central de mensagens do usuário
+state Suporte : Interface de Suporte
+
+' Retornos para o Principal (Subindo)
+Mural --up--> Principal : navegarPara("principal")
+Pesquisar --up--> Principal : navegarPara("principal")
+Calendario --up--> Principal : navegarPara("principal")
+Mensagens --up--> Principal : navegarPara("principal")
+Suporte --up--> Principal : navegarPara("principal")
+
+' Finalização
+Principal --down--> [*] : Logout / Fechar aplicação
+@enduml
