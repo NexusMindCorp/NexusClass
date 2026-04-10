@@ -1,0 +1,36 @@
+@startuml
+title Diagrama de Sequência: Publicação no Mural (RF8/RF10)
+
+autonumber
+skinparam style strictuml
+
+actor "Usuário (Professor/Aluno)" as Actor
+box "Camada de Visão (Interface)" #LightBlue
+    participant "Mural" as MuralView <<Component>>
+    participant "BoxMural" as BoxView <<Component>>
+end box
+
+box "Camada de Modelo/Lógica (Entity & Logic)" #LightYellow
+    participant "useMural" as Hook <<Hook/Controller>>
+    participant "Post" as PostEntity <<Entity>>
+end box
+
+Actor -> MuralView : clica em "Postar no mural"
+MuralView -> Hook : mudarAberturaBox(true)
+Hook --> BoxView : exibe formulário (aberto=true)
+
+Actor -> BoxView : insere conteúdo e clica em "Publicar"
+BoxView -> Hook : handlePublicar()
+
+activate Hook
+Hook -> Hook : valida conteúdo (conteudo.trim())
+create PostEntity
+Hook -> PostEntity : new Post(id, conteudo, data)
+note right: Entidade Post é instanciada
+Hook -> Hook : setPosts(anterior + novoPost)
+Hook -> Hook : mudarAberturaBox(false)
+deactivate Hook
+
+Hook --> BoxView : fecha formulário
+Hook --> MuralView : renderiza nova lista de posts
+@enduml
