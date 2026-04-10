@@ -11,21 +11,13 @@ import { Settings } from "lucide-react"
 import { SidebarMenuButton } from "./ui/sidebar"
 import { Switch } from "@/components/ui/switch"
 import { useConfiguracoes } from "@/hooks/useConfiguracoes"
-import { useEffect } from "react"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
 type ConfiguracoesProps = {
   navegarPara?: (tela: OpcoesTela) => void
 }
 
 export function Configuracoes({ navegarPara }: ConfiguracoesProps) {
-  const { notificacoes, clickarNotificacoes, contagemSuporte, clicarSuporte, resetarContador } = useConfiguracoes();
-  
-  useEffect(() => {
-    if (contagemSuporte === 5 && navegarPara) {
-      navegarPara("suporte")
-      resetarContador()
-    }
-  }, [contagemSuporte, navegarPara, resetarContador])
+  const { notificacoes, clickarNotificacoes } = useConfiguracoes();
 
   return (
     <DropdownMenu>
@@ -52,7 +44,7 @@ export function Configuracoes({ navegarPara }: ConfiguracoesProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Configurações avançadas</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => clicarSuporte()}>Suporte</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navegarPara?.("suporte")}>Suporte</DropdownMenuItem>
         <DropdownMenuItem>Sobre acordo de privacidade</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
