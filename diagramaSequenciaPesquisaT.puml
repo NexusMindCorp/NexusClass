@@ -1,0 +1,41 @@
+@startuml
+title Diagrama de Sequência: Pesquisa de Turmas (RF6)
+
+autonumber
+skinparam style strictuml
+
+actor "Usuário" as Actor
+box "Camada de Visão (Interface)" #LightBlue
+    participant "Pesquisar" as SearchView <<Component>>
+    participant "TurmaCard" as CardView <<Component>>
+end box
+
+box "Camada de Modelo/Lógica (Entity & Logic)" #LightYellow
+    participant "usePesquisa" as Hook <<Hook/Controller>>
+    participant "listaEscolar" as Data <<Entity/JSON>>
+end box
+
+Actor -> SearchView : digita termo de busca no Input
+SearchView -> Hook : setTextoPesquisa(valor)
+
+activate Hook
+Hook -> Data : consulta lista de turmas (turmasJson)
+note right: Recupera dados brutos do modelo
+
+Hook -> Hook : filtrarTurmas(texto)
+note over Hook: Compara texto com materia,\nprofessor ou sala
+
+Hook -> Hook : setTurmasFiltradas(resultados)
+deactivate Hook
+
+Hook --> SearchView : retorna turmasFiltradas
+activate SearchView
+
+loop Para cada turma encontrada
+    SearchView -> CardView : renderiza com compacto={true}
+end
+
+SearchView --> Actor : exibe resultados na tela
+deactivate SearchView
+
+@enduml
