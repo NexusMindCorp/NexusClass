@@ -107,7 +107,7 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
       <button 
         onClick={() => {
           if (isOpen) {
-            closeChat(); // Usa closeChat para retomar instrução principal
+            closeChat();
           } else {
             setIsOpen(true);
           }

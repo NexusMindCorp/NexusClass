@@ -5,7 +5,7 @@ import { FieldGroup, FieldSet } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { useSuporte } from "@/hooks/useSuporte"
 import { AnexoArquivo } from "@/components/AnexoArquivo"
-import { InputsAcordo } from "@/components/InputsAcordo"
+import { InputsEntrada} from "@/components/InputsEntrada"
 import { BoxAuxiliarSugestao } from "@/components/BoxAuxiliarSugestao"
 export function Suporte() {
 	const {
@@ -46,7 +46,7 @@ export function Suporte() {
 							<FieldSet>
 								<FieldGroup className="gap-5">
 									{formFields.map((field) => (
-										<InputsAcordo
+										<InputsEntrada
 											key={field.key}
 											titulo={field.titulo}
 											id={field.id}

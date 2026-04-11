@@ -23,64 +23,74 @@ export function BoxAgendamento( {cancelaAgendamento, usaSupabase, date, titulo, 
   const textoDataEvento = date ? format(date, "dd/MM/yyyy") : "data nao selecionada"
 
   return (
-    <div className="rounded-md border p-3 space-y-3">
-            {!usaSupabase ? (
-              <p className="text-xs text-muted-foreground">
-                Supabase nao configurado. O calendario nao salva sem backend.
-              </p>
-            ) : null}
+    <div className="space-y-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-semibold">Novo evento</p>
+        <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-xs text-muted-foreground">
+          {textoDataEvento}
+        </span>
+      </div>
 
-            {erroBanco ? (
-              <p className="text-xs text-destructive">{erroBanco}</p>
-            ) : null}
+      {!usaSupabase ? (
+        <p className="rounded-md border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+          Supabase nao configurado. O calendario nao salva sem backend.
+        </p>
+      ) : null}
 
-            <p className="text-sm font-semibold">
-              {`Novo evento em ${textoDataEvento}`}
-            </p>
+      {erroBanco ? (
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {erroBanco}
+        </p>
+      ) : null}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="titulo-evento">Titulo do evento</Label>
-              <Input
-                id="titulo-evento"
-                placeholder="Ex.: Prova de Matematica"
-                value={titulo}
-                onChange={(event) => setTitulo(event.target.value)}
-              />
-            </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="titulo-evento">Titulo do evento</Label>
+        <Input
+          id="titulo-evento"
+          placeholder="Ex.: Prova de Matematica"
+          value={titulo}
+          onChange={(event) => setTitulo(event.target.value)}
+        />
+      </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="horario-evento">Horario (opcional)</Label>
-              <Input
-                id="horario-evento"
-                type="time"
-                value={horario}
-                onChange={(event) => setHorario(event.target.value)}
-              />
-            </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="horario-evento">Horario (opcional)</Label>
+          <Input
+            id="horario-evento"
+            type="time"
+            value={horario}
+            onChange={(event) => setHorario(event.target.value)}
+          />
+        </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="descricao-evento">Descricao (opcional)</Label>
-              <Textarea
-                id="descricao-evento"
-                placeholder="Detalhes do evento"
-                value={descricao}
-                onChange={(event) => setDescricao(event.target.value)}
-                rows={3}
-              />
-            </div>
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label htmlFor="descricao-evento">Descricao (opcional)</Label>
+          <Textarea
+            id="descricao-evento"
+            placeholder="Detalhes do evento"
+            value={descricao}
+            onChange={(event) => setDescricao(event.target.value)}
+            rows={3}
+          />
+        </div>
+      </div>
 
-            <Button
-                onClick={cancelaAgendamento}
-                variant="outline"
-              >
-                Cancelar
-              </Button>
-            <Button
-              onClick={adicionarEvento}
-              disabled={!titulo.trim() || salvandoEvento || !usaSupabase}
-            >
-              {salvandoEvento ? "Salvando..." : "Marcar evento"}
-            </Button>
-          </div>
+      <div className="flex flex-wrap justify-end gap-2 pt-1">
+        <Button
+          onClick={cancelaAgendamento}
+          variant="outline"
+          className="border-white/20 bg-transparent"
+        >
+          Cancelar
+        </Button>
+        <Button
+          onClick={adicionarEvento}
+          disabled={!titulo.trim() || salvandoEvento || !usaSupabase}
+        >
+          {salvandoEvento ? "Salvando..." : "Marcar evento"}
+        </Button>
+      </div>
+    </div>
   )
 }

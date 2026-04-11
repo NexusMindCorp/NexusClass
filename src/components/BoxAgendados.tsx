@@ -24,14 +24,16 @@ export function BoxAgendados({
 	removerEvento,
 }: BoxAgendadosProps) {
 	return (
-		<div className="rounded-md border p-3 space-y-3">
+		<div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
 			<div className="flex items-center justify-between">
 				<p className="text-sm font-semibold">
 					{date
 						? `Eventos de ${format(date, "dd/MM/yyyy")}`
 						: `Eventos de ${format(new Date(), "dd/MM/yyyy")}`}
 				</p>
-				<Badge variant="outline">{eventosDoDia.length}</Badge>
+				<Badge variant="outline" className="border-white/20 bg-white/5">
+					{eventosDoDia.length}
+				</Badge>
 			</div>
 
 			{carregandoEventos ? (
@@ -47,7 +49,7 @@ export function BoxAgendados({
 					{eventosDoDia.map((evento) => (
 						<div
 							key={evento.id}
-							className="rounded-md border p-2 flex items-start justify-between gap-3"
+							className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3"
 						>
 							<div className="space-y-1">
 								<p className="text-sm font-medium">{evento.titulo}</p>
@@ -57,7 +59,7 @@ export function BoxAgendados({
 									</p>
 								) : null}
 								{evento.descricao ? (
-									<p className="text-sm text-muted-foreground whitespace-pre-wrap">
+									<p className="whitespace-pre-wrap text-sm text-muted-foreground">
 										{evento.descricao}
 									</p>
 								) : null}
@@ -65,6 +67,7 @@ export function BoxAgendados({
 							<Button
 								variant="outline"
 								size="sm"
+								className="border-white/20 bg-transparent"
 								onClick={() => removerEvento(evento.id)}
 							>
 								Remover

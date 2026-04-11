@@ -16,7 +16,7 @@ type InputsAcordoProps = {
 	}>
 }
 
-export function InputsAcordo({
+export function InputsEntrada({
 	titulo,
 	id,
 	nome,

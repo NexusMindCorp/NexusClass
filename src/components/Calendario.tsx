@@ -26,62 +26,67 @@ export function Calendario() {
   } = useCalendario()
 
   return (
-    <Card className="w-full max-w-2xl mx-auto h-fit shadow-md">
-
-      <CardContent className="p-4 space-y-4">
-        <div className="flex justify-center">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={selecionarDataCalendario}
-          month={currentMonth}
-          onMonthChange={setCurrentMonth}
-          modifiers={{ comEvento: datasComEvento }}
-          modifiersClassNames={{
-            comEvento:
-              "bg-primary/15 rounded-md [&_button]:border [&_button]:border-primary/40",
-          }}
-          fixedWeeks
-          className="p-2"
-        />
-        </div>
-
-        {!mostrarBoxAgendamento ? (
-          <p className="text-sm text-muted-foreground text-center">
-            Selecione um dia no calendario para adicionar um evento.
-          </p>
-        ) : (
-          <BoxAgendamento
-            cancelaAgendamento={cancelarAgendamento}
-            usaSupabase={usaSupabase}
-            date={date}
-            titulo={sobreEvento.titulo}
-            setTitulo={(titulo) =>
-              setSobreEvento((anterior) => ({ ...anterior, titulo }))
-            }
-            descricao={sobreEvento.descricao}
-            setDescricao={(descricao) =>
-              setSobreEvento((anterior) => ({ ...anterior, descricao }))
-            }
-            horario={sobreEvento.horario}
-            setHorario={(horario) =>
-              setSobreEvento((anterior) => ({ ...anterior, horario }))
-            }
-            salvandoEvento={processamentoEvento.salvandoEvento}
-            erroBanco={erroBanco}
-            adicionarEvento={adicionarEvento}
+    <Card className="mx-auto h-fit w-full max-w-5xl border-white/10 bg-white/5 shadow-xl backdrop-blur-sm">
+      <CardContent className="space-y-5 p-4 md:p-5">
+        <div className="grid gap-4 xl:grid-cols-[auto_1fr] xl:items-start">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-2 md:p-3">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={selecionarDataCalendario}
+              month={currentMonth}
+              onMonthChange={setCurrentMonth}
+              modifiers={{ comEvento: datasComEvento }}
+              modifiersClassNames={{
+                comEvento:
+                  "bg-primary/15 rounded-md [&_button]:border [&_button]:border-primary/40",
+              }}
+              fixedWeeks
+              className="p-2 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(11)]"
             />
-        )}
+          </div>
 
-        <BoxAgendados
-          date={date}
-          carregandoEventos={processamentoEvento.carregandoEventos}
-          eventosDoDia={eventosDoDia}
-          removerEvento={removerEvento}
-        />
+          <div className="space-y-4">
+            {!mostrarBoxAgendamento ? (
+              <div className="rounded-xl border border-dashed border-white/20 bg-white/[0.03] p-4">
+                <p className="text-sm text-muted-foreground">
+                  Selecione um dia no calendario para adicionar um evento.
+                </p>
+              </div>
+            ) : (
+              <BoxAgendamento
+                cancelaAgendamento={cancelarAgendamento}
+                usaSupabase={usaSupabase}
+                date={date}
+                titulo={sobreEvento.titulo}
+                setTitulo={(titulo) =>
+                  setSobreEvento((anterior) => ({ ...anterior, titulo }))
+                }
+                descricao={sobreEvento.descricao}
+                setDescricao={(descricao) =>
+                  setSobreEvento((anterior) => ({ ...anterior, descricao }))
+                }
+                horario={sobreEvento.horario}
+                setHorario={(horario) =>
+                  setSobreEvento((anterior) => ({ ...anterior, horario }))
+                }
+                salvandoEvento={processamentoEvento.salvandoEvento}
+                erroBanco={erroBanco}
+                adicionarEvento={adicionarEvento}
+              />
+            )}
+
+            <BoxAgendados
+              date={date}
+              carregandoEventos={processamentoEvento.carregandoEventos}
+              eventosDoDia={eventosDoDia}
+              removerEvento={removerEvento}
+            />
+          </div>
+        </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 border-t p-4">
+      <CardFooter className="flex flex-wrap gap-2 border-t border-white/10 p-4 md:p-5">
         {[
           { label: "Hoje", value: 0 },
           { label: "Amanhã", value: 1 },
@@ -93,7 +98,7 @@ export function Calendario() {
             key={preset.value}
             variant="outline"
             size="sm"
-            className="flex-1 min-w-[100px]"
+            className="min-w-[100px] flex-1 border-white/15 bg-white/5 hover:bg-white/10"
             onClick={() => selecionarDataRelativa(preset.value)}
           >
             {preset.label}
