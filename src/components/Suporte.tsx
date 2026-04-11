@@ -1,46 +1,22 @@
-import { useRef, useState } from "react"
-import type { ChangeEvent, FormEvent } from "react"
 import { Mail, PhoneCall, Send, ShieldCheck, Sparkles } from "lucide-react"
-import { toast } from "sonner"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { FieldGroup, FieldSet } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
-import { sendContactEmail } from "@/hooks/useSuporte"
+import { useSuporte } from "@/hooks/useSuporte"
 import { AnexoArquivo } from "@/components/AnexoArquivo"
+import { InputsAcordo } from "@/components/InputsAcordo"
 
 export function Suporte() {
-	const formRef = useRef<HTMLFormElement | null>(null)
-	const fileInputRef = useRef<HTMLInputElement | null>(null)
-	const [sending, setSending] = useState(false)
-	const [attachedFiles, setAttachedFiles] = useState<File[]>([])
-
-	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setAttachedFiles(Array.from(event.target.files ?? []))
-	}
-
-	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-
-		if (!formRef.current) return
-
-		setSending(true)
-
-		try {
-			await sendContactEmail(formRef.current)
-			toast.success("Mensagem enviada com sucesso.")
-			formRef.current.reset()
-			setAttachedFiles([])
-			if (fileInputRef.current) fileInputRef.current.value = ""
-		} catch (error) {
-			console.error(error)
-			toast.error("Não foi possível enviar sua mensagem. Tente novamente.")
-		} finally {
-			setSending(false)
-		}
-	}
+	const {
+		formRef,
+		fileInputRef,
+		sending,
+		attachedFiles,
+		handleFileChange,
+		handleSubmit,
+		formFields,
+	} = useSuporte()
 
 	return (
 		<div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 lg:px-8">
@@ -69,83 +45,25 @@ export function Suporte() {
 						<form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
 							<FieldSet>
 								<FieldGroup className="gap-5">
-									<Field>
-										<FieldLabel htmlFor="from_name" className="text-white">
-											Seu nome
-										</FieldLabel>
-										<Input
-											id="from_name"
-											name="from_name"
-											type="text"
-											placeholder="Ex: Maria Souza"
-											className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
-											required
+									{formFields.map((field) => (
+										<InputsAcordo
+											key={field.key}
+											titulo={field.titulo}
+											id={field.id}
+											nome={field.nome}
+											escritoNoInputbox={field.escritoNoInputbox}
+											decricao={field.decricao}
+											tipo={field.tipo}
+											textArea={field.textArea}
+											required={field.required}
 										/>
-										<FieldDescription className="text-white/65">
-											Nome de quem está solicitando o suporte.
-										</FieldDescription>
-									</Field>
+									))}
 
-									<Field>
-										<FieldLabel htmlFor="from_email" className="text-white">
-											E-mail
-										</FieldLabel>
-										<Input
-											id="from_email"
-											name="from_email"
-											type="email"
-											placeholder="voce@exemplo.com"
-											className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
-											required
-										/>
-										<FieldDescription className="text-white/65">
-											Usado para retorno da equipe.
-										</FieldDescription>
-									</Field>
-
-									<Field>
-										<FieldLabel htmlFor="subject" className="text-white">
-											Assunto
-										</FieldLabel>
-										<Input
-											id="subject"
-											name="subject"
-											type="text"
-											placeholder="Ex: Erro ao abrir o chat"
-											className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
-											required
-										/>
-										<FieldDescription className="text-white/65">
-											Seja direto para facilitar a triagem.
-										</FieldDescription>
-									</Field>
-
-									<Field>
-										<FieldLabel htmlFor="message" className="text-white">
-											Mensagem
-										</FieldLabel>
-										<Textarea
-											id="message"
-											name="message"
-											placeholder="Descreva o problema, passos para reproduzir e o que você esperava acontecer."
-											rows={6}
-											className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
-											required
-										/>
-										<input
-											ref={fileInputRef}
-											id="attachments"
-											name="attachments"
-											type="file"
-											multiple
-											onChange={handleFileChange}
-											className="hidden"
-										/>
-										<AnexoArquivo fileInputRef={fileInputRef} attachedFiles={attachedFiles} />
-										<FieldDescription className="text-white/65">
-											Inclua prints, tela afetada e horário, se possível.
-										</FieldDescription>
-									</Field>
+									<AnexoArquivo
+										fileInputRef={fileInputRef}
+										attachedFiles={attachedFiles}
+										onFileChange={handleFileChange}
+									/>
 								</FieldGroup>
 							</FieldSet>
 
