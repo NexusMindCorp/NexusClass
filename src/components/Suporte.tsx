@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import type { FormEvent } from "react"
+import type { ChangeEvent, FormEvent } from "react"
 import { Mail, PhoneCall, Send, ShieldCheck, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 
@@ -9,10 +9,17 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { sendContactEmail } from "@/hooks/useSuporte"
+import { AnexoArquivo } from "@/components/AnexoArquivo"
 
 export function Suporte() {
 	const formRef = useRef<HTMLFormElement | null>(null)
+	const fileInputRef = useRef<HTMLInputElement | null>(null)
 	const [sending, setSending] = useState(false)
+	const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setAttachedFiles(Array.from(event.target.files ?? []))
+	}
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -25,6 +32,8 @@ export function Suporte() {
 			await sendContactEmail(formRef.current)
 			toast.success("Mensagem enviada com sucesso.")
 			formRef.current.reset()
+			setAttachedFiles([])
+			if (fileInputRef.current) fileInputRef.current.value = ""
 		} catch (error) {
 			console.error(error)
 			toast.error("Não foi possível enviar sua mensagem. Tente novamente.")
@@ -123,6 +132,16 @@ export function Suporte() {
 											className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
 											required
 										/>
+										<input
+											ref={fileInputRef}
+											id="attachments"
+											name="attachments"
+											type="file"
+											multiple
+											onChange={handleFileChange}
+											className="hidden"
+										/>
+										<AnexoArquivo fileInputRef={fileInputRef} attachedFiles={attachedFiles} />
 										<FieldDescription className="text-white/65">
 											Inclua prints, tela afetada e horário, se possível.
 										</FieldDescription>
