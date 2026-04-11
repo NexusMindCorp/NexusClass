@@ -12,6 +12,10 @@ export type FormField = {
   tipo?: string
   textArea?: boolean
   required?: boolean
+  inputOption?: Array<{
+    label: string
+    value: string
+  }>
 }
 
 export const formFields: FormField[] = [
@@ -39,8 +43,19 @@ export const formFields: FormField[] = [
     titulo: "Assunto",
     id: "subject",
     nome: "subject",
-    escritoNoInputbox: "Ex: Erro ao abrir o chat",
-    decricao: "Seja direto para facilitar a triagem.",
+    escritoNoInputbox: "Selecione o assunto",
+    decricao: "Selecione o assunto que melhor descreve o problema.",
+    inputOption: [
+      { label: "Dúvida geral sobre o site", value: "duvida-geral" },
+      { label: "Erro técnico no site", value: "erro-tecnico" },
+      { label: "Solicitação de recurso ou melhoria", value: "solicitacao-recurso" },
+      { label: "Erro de visualização do mural", value: "erro-visualizacao-mural" },
+      { label: "Erro de visualização do perfil", value: "erro-visualizacao-perfil" },
+      { label: "Erro de visualização do calendário", value: "erro-visualizacao-calendario" },
+      { label: "Erro de comunicação com o chatbot", value: "erro-comunicacao-chatbot" },
+      { label: "Acesso à conta", value: "acesso-conta" },
+      { label: "Atendimento urgente", value: "atendimento-urgente" },
+    ],
     required: true,
   },
   {

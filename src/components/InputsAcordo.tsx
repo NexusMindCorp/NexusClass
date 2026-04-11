@@ -9,7 +9,11 @@ type InputsAcordoProps = {
 	tipo?: string
 	decricao?: string
 	required?: boolean
-    textArea?:boolean
+	textArea?: boolean
+	inputOption?: Array<{
+		label: string
+		value: string
+	}>
 }
 
 export function InputsAcordo({
@@ -20,14 +24,32 @@ export function InputsAcordo({
 	tipo = "text",
 	decricao,
 	required = false,
-	textArea = false
+	textArea = false,
+	inputOption,
 }: InputsAcordoProps) {
 	return (
 		<Field>
 			<FieldLabel htmlFor={id} className="text-white">
 				{titulo}
 			</FieldLabel>
-			{textArea ? (
+			{inputOption ? (
+				<select
+					id={id}
+					name={nome}
+					defaultValue=""
+					className="border-white/15 bg-white/10 text-white placeholder:text-white/45 h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-white/30 focus-visible:ring-white/20 focus-visible:ring-[3px] md:text-sm"
+					required={required}
+				>
+					<option value="" disabled>
+						{escritoNoInputbox}
+					</option>
+					{inputOption.map((option) => (
+						<option key={option.value} value={option.value} className="bg-slate-950 text-white">
+							{option.label}
+						</option>
+					))}
+				</select>
+			) : textArea ? (
 				<textarea
 					id={id}
 					name={nome}

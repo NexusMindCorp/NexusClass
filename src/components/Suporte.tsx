@@ -55,6 +55,7 @@ export function Suporte() {
 											decricao={field.decricao}
 											tipo={field.tipo}
 											textArea={field.textArea}
+											inputOption={field.inputOption}
 											required={field.required}
 										/>
 									))}
