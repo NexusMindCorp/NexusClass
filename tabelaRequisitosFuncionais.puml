@@ -1,0 +1,125 @@
+@startuml
+title Levantamento de Requisitos Funcionais (Verticalizado) - Nexus Class
+
+' RF1
+label RF1 [
+|= Campo |= Descrição |
+| **Número e nome** | RF1 - Alternar Temas |
+| **Objetivo** | Permitir ao utilizador alternar entre os temas Claro, Escuro e do Sistema. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador acede ao menu na Navbar\n2. O utilizador seleciona o tema desejado\n3. O ThemeProvider aplica as novas cores globalmente |
+| **Fluxo alt. 1** | 1. O utilizador seleciona "Sistema"\n2. A aplicação deteta a preferência do SO\n3. O tema é ajustado automaticamente |
+]
+
+' RF2
+label RF2 [
+|= Campo |= Descrição |
+| **Número e nome** | RF2 - Visualizar Lista de Turmas |
+| **Objetivo** | Exibir as turmas disponíveis carregadas a partir de dados centrais. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema / Ficheiro JSON |
+| **Fluxo principal** | 1. O sistema inicia a leitura do ficheiro JSON\n2. O GerenciadorTelas mapeia os dados recebidos\n3. Os cards das turmas são renderizados na Dashboard |
+| **Fluxo alt. 1** | 1. O sistema deteta erro na leitura do JSON\n2. A listagem permanece vazia ou exibe erro\n3. O utilizador é notificado da falha |
+]
+
+' RF3
+label RF3 [
+|= Campo |= Descrição |
+| **Número e nome** | RF3 - Gerenciar Inscrição em Turmas |
+| **Objetivo** | Permitir ao aluno inscrever-se ou cancelar inscrição em turmas específicas. |
+| **Ator principal** | Aluno |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O aluno localiza a turma no Dashboard ou Pesquisa\n2. O aluno clica no botão "Inscrever-se"\n3. O sistema atualiza o estado global de inscrições\n4. A turma aparece na lista lateral "Minhas Aulas" |
+| **Fluxo alt. 1** | 1. O aluno clica em "Cancelar Inscrição"\n2. O sistema remove a marcação de inscrito\n3. A interface atualiza o card para o estado inicial |
+]
+
+' RF4
+label RF4 [
+|= Campo |= Descrição |
+| **Número e nome** | RF4 - Acessar Mural Dinâmico (Leitura) |
+| **Objetivo** | Visualizar o mural específico de uma turma para ler avisos. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador acede à turma através do botão "Entrar"\n2. O sistema identifica a chaveMural correspondente\n3. O conteúdo de posts da turma é carregado e exibido |
+| **Fluxo alt. 1** | 1. O sistema verifica que não existem posts na turma\n2. Uma mensagem de "Nenhum post disponível" é exibida |
+]
+
+' RF5
+label RF5 [
+|= Campo |= Descrição |
+| **Número e nome** | RF5 - Interagir com Calendário |
+| **Objetivo** | Visualizar datas e eventos académicos num calendário integrado. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador seleciona "Calendário" na barra lateral\n2. O sistema altera o estado da tela ativa\n3. O calendário interativo é renderizado no centro do ecrã |
+| **Fluxo alt. 1** | 1. O utilizador clica em uma data específica\n2. O sistema exibe os detalhes do evento para aquele dia |
+]
+
+' RF6
+label RF6 [
+|= Campo |= Descrição |
+| **Número e nome** | RF6 - Pesquisar Conteúdo |
+| **Objetivo** | Localizar turmas, matérias ou professores via filtros de texto. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema / Hook usePesquisa |
+| **Fluxo principal** | 1. O utilizador abre o painel de pesquisa\n2. O utilizador digita um termo de busca no input\n3. O sistema filtra as turmas dinamicamente\n4. Os resultados são exibidos em formato de lista compacta |
+| **Fluxo alt. 1** | 1. O termo digitado não corresponde a nenhum dado\n2. O sistema exibe o aviso "Nenhum resultado encontrado" |
+]
+
+' RF7
+label RF7 [
+|= Campo |= Descrição |
+| **Número e nome** | RF7 - Central de Mensagens |
+| **Objetivo** | Permitir a comunicação interna e suporte entre os utilizadores. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador navega até a seção de "Mensagens"\n2. O sistema carrega as conversas ativas do perfil\n3. O utilizador seleciona um contacto e lê as mensagens |
+| **Fluxo alt. 1** | 1. O utilizador envia uma nova mensagem\n2. O sistema regista o envio e atualiza o histórico do chat |
+]
+
+' RF8
+label RF8 [
+|= Campo |= Descrição |
+| **Número e nome** | RF8 - Gerenciar Mural (Administração) |
+| **Objetivo** | Moderar, editar ou excluir conteúdos no mural da turma. |
+| **Ator principal** | Professor |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O professor acede ao mural de uma turma sob sua gestão\n2. O professor seleciona a opção de gerir num post\n3. O professor executa a exclusão ou alteração do post\n4. O sistema atualiza o mural para todos os utilizadores |
+| **Fluxo alt. 1** | 1. O professor edita o conteúdo de um post\n2. O sistema guarda as alterações e exibe o texto atualizado |
+]
+
+' RF9
+label RF9 [
+|= Campo |= Descrição |
+| **Número e nome** | RF9 - Gerenciamento e Cadastro da Conta |
+| **Objetivo** | Administrar dados de perfil, configurações e acesso. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador clica no avatar na barra de navegação\n2. O utilizador seleciona a opção "Perfil" ou "Editar"\n3. O utilizador altera os dados e clica em salvar\n4. O sistema atualiza os dados persistidos no perfil |
+| **Fluxo alt. 1** | 1. O utilizador seleciona a opção "Sair"\n2. O sistema limpa o estado da sessão e redireciona para o login |
+]
+
+' RF10
+label RF10 [
+|= Campo |= Descrição |
+| **Número e nome** | RF10 - Postar no Mural |
+| **Objetivo** | Permitir aos utilizadores criarem novas publicações no mural. |
+| **Ator principal** | Usuário (Base) |
+| **Ator secundário** | Sistema |
+| **Fluxo principal** | 1. O utilizador clica em "Postar no mural" dentro de uma turma\n2. O utilizador escreve o texto na caixa de entrada\n3. O utilizador clica em "Publicar"\n4. O post aparece imediatamente no topo do mural da turma |
+| **Fluxo alt. 1** | 1. O utilizador digita um texto mas clica em "Cancelar"\n2. O sistema descarta o texto e fecha a caixa de entrada |
+]
+
+' RF11
+label RF11 [
+|= Campo |= Descrição |
+| **Número e nome** | RF11 - Adicionar/Enviar Atividades |
+| **Objetivo** | Disponibilizar tarefas e conteúdos didáticos para os alunos. |
+| **Ator principal** | Professor / Corpo Docente |
+| **Ator secundário** | Sistema / Alunos |
+| **Fluxo principal** | 1. O docente acede à aba "Atividades" da turma\n2. O docente preenche o formulário de nova atividade\n3. O docente confirma o envio para os alunos\n4. A atividade é listada para todos os alunos inscritos |
+| **Fluxo alt. 1** | 1. O docente anexa um ficheiro ou link à atividade\n2. O sistema processa o anexo e disponibiliza para download |
+]
+
+@enduml
