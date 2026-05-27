@@ -2,6 +2,9 @@ import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
 import { useChatBox } from '../hooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
+import { getAssetPath } from '@/lib/assetPath';
+
+const perfilBot = getAssetPath('perfilBot/perfilBot.jpg');
 
 type ChatBotProps = {
   usuario: UsuarioProps
@@ -10,7 +13,6 @@ type ChatBotProps = {
 export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, ref) {
   const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox({ ...usuario, pedirAjuda: () => {} });
   const scrollRef = useRef<HTMLDivElement>(null);
-
   // Expor função de abrir com modo ajuda
   useImperativeHandle(ref, () => ({
     abrirComAjuda: () => {
@@ -35,7 +37,7 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
           <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-4 text-white flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-lg">
-                <Bot size={20} />
+                {perfilBot ? <img src={perfilBot} alt="Perfil do Bot" className="w-10 h-10" /> : <Bot size={20} />}
               </div>
               <div>
                 <p className="text-sm font-bold leading-none">Tigreso</p>
