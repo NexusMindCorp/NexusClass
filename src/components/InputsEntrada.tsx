@@ -1,5 +1,12 @@
 import { Field, FieldDescription, FieldLabel } from "./ui/field"
 import { Input } from "./ui/input"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./ui/select"
 
 type InputsAcordoProps = {
 	titulo: string
@@ -33,29 +40,25 @@ export function InputsEntrada({
 				{titulo}
 			</FieldLabel>
 			{inputOption ? (
-				<select
-					id={id}
-					name={nome}
-					defaultValue=""
-					className="border-white/15 bg-white/10 text-white placeholder:text-white/45 h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-white/30 focus-visible:ring-white/20 focus-visible:ring-[3px] md:text-sm"
-					required={required}
-				>
-					<option value="" disabled>
-						{escritoNoInputbox}
-					</option>
-					{inputOption.map((option) => (
-						<option key={option.value} value={option.value} className="bg-slate-950 text-white">
-							{option.label}
-						</option>
-					))}
-				</select>
+				<Select name={nome} required={required} defaultValue="">
+					<SelectTrigger id={id}>
+						<SelectValue placeholder={escritoNoInputbox} />
+					</SelectTrigger>
+					<SelectContent>
+						{inputOption.map((option) => (
+							<SelectItem key={option.value} value={option.value}>
+								{option.label}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			) : textArea ? (
 				<textarea
 					id={id}
 					name={nome}
 					placeholder={escritoNoInputbox}
 					rows={6}
-					className="rounded-xl border-white/15 bg-white/10 text-white placeholder:text-white/45"
+					className="min-h-[160px] w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 outline-none transition-[color,box-shadow] focus-visible:border-white/30 focus-visible:ring-[3px] focus-visible:ring-white/20"
 					required={required}
 				/>
 			) : (
@@ -64,7 +67,7 @@ export function InputsEntrada({
 					name={nome}
 					type={tipo}
 					placeholder={escritoNoInputbox}
-					className="border-white/15 bg-white/10 text-white placeholder:text-white/45"
+					className="h-11 border-white/15 bg-white/10 px-4 text-white placeholder:text-white/45"
 					required={required}
 				/>
 			)}
