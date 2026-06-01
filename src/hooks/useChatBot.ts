@@ -44,6 +44,7 @@ interface JsonInstruction {
     easterEgg?: string;
   };
   context?: {
+    easterEgg?: string;
     enrollmentSummary?: string;
     usageAgreementSummary?: string;
     calendarEventsSummary?: string;
@@ -218,6 +219,7 @@ export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }
           easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
         },
         context: {
+          easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
           enrollmentSummary: stringDeInscricoes,
           calendarEventsSummary: resumoEventosCalendario,
         },
