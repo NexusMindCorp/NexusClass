@@ -41,6 +41,7 @@ interface JsonInstruction {
     finishCompleteSentence: boolean;
     expandWhenAsked: boolean;
     fallbackWhenUnsure: string;
+    easterEgg?: string;
   };
   context?: {
     enrollmentSummary?: string;
@@ -203,7 +204,7 @@ export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }
           },
         },
         scope: {
-          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns"],
+          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso"],
           deniedTopicsBehavior: "Explique que só pode ajudar com temas escolares da plataforma e sugira suporte.",
         },
         safety: {
@@ -214,6 +215,7 @@ export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }
           finishCompleteSentence: true,
           expandWhenAsked: true,
           fallbackWhenUnsure: "Se não souber, oriente o usuário a contatar o suporte.",
+          easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
         },
         context: {
           enrollmentSummary: stringDeInscricoes,
