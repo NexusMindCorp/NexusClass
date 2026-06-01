@@ -66,18 +66,21 @@ const SelectContent = React.forwardRef<
         <SelectPrimitive.Content
             ref={ref}
             className={cn(
-                "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-slate-200 bg-white text-slate-900 shadow-lg backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 dark:border-white/15 dark:bg-slate-950/95 dark:text-white",
+                "relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-900 shadow-2xl shadow-slate-900/10 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 dark:border-white/10 dark:bg-white/5 dark:text-white dark:shadow-black/20",
                 position === "popper" &&
                 "data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1",
                 className
             )}
             position={position}
+            sideOffset={6}
+            collisionPadding={12}
+            avoidCollisions
             {...props}
         >
             <SelectScrollUpButton />
             <SelectPrimitive.Viewport
                 className={cn(
-                    "p-1",
+                    "max-h-[min(16rem,calc(100vh-14rem))] overflow-y-auto p-1",
                     position === "popper" &&
                     "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
                 )}
@@ -96,7 +99,7 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <SelectPrimitive.Label
         ref={ref}
-        className={cn("px-2 py-1.5 text-sm font-semibold text-slate-700 dark:text-white/75", className)}
+        className={cn("px-2 py-1.5 text-sm font-semibold text-slate-700 dark:text-white/70", className)}
         {...props}
     />
 ))
@@ -109,7 +112,7 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.Item
         ref={ref}
         className={cn(
-            "relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none transition-colors text-slate-900 focus:bg-slate-100 focus:text-slate-900 dark:focus:bg-white/10 dark:focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+            "relative flex w-full cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2 text-sm outline-none transition-colors text-slate-900 hover:bg-slate-100 focus:bg-slate-100 focus:text-slate-900 data-[highlighted]:bg-slate-100 data-[highlighted]:text-slate-900 data-[state=checked]:font-medium dark:text-white dark:hover:bg-white/10 dark:focus:bg-white/10 dark:focus:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
             className
         )}
         {...props}

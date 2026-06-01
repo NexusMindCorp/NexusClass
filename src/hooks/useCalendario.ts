@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect, useMemo} from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-//usememo para operacoes custosas como filtrar eventos do dia ou extrair datas unicas, evitando recalculos desnecessarios
+
 type EventoCalendario = {
   id: string
   titulo: string
@@ -64,8 +64,8 @@ export function useCalendario() {
   const [date, setDateState] = useState<Date>(hojeLocal())
   const [mostrarBoxAgendamento, setMostrarBoxAgendamento] = useState(false)
   const [eventos, setEventos] = useState<EventoCalendario[]>([])
-  const [sobreEvento, setSobreEvento] = useState({titulo: "", descricao: "", horario: ""})
-  const[processamentoEvento, setProcessamentoEvento] = useState({carregandoEventos: false, salvandoEvento: false})
+  const [sobreEvento, setSobreEvento] = useState({ titulo: "", descricao: "", horario: "" })
+  const [processamentoEvento, setProcessamentoEvento] = useState({ carregandoEventos: false, salvandoEvento: false })
   const [erroBanco, setErroBanco] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState<Date>(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -211,7 +211,7 @@ export function useCalendario() {
         },
       ])
 
-      setSobreEvento({titulo: "", descricao: "", horario: ""})
+      setSobreEvento({ titulo: "", descricao: "", horario: "" })
       setDateState(hojeLocal())
       setMostrarBoxAgendamento(false)
     } catch {
@@ -258,11 +258,11 @@ export function useCalendario() {
   }
 
   const cancelarAgendamento = () => {
-    setSobreEvento({titulo: "", descricao: "", horario: ""})
+    setSobreEvento({ titulo: "", descricao: "", horario: "" })
     setDateState(hojeLocal())
     setMostrarBoxAgendamento(false)
   }
-  
+
   return {
     usaSupabase,
     date,
