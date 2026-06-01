@@ -30,11 +30,12 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
+
       {/* Janela de Chat */}
       {isOpen && (
-        <div className="w-[350px] h-[500px] max-h-[calc(100vh-7rem)] bg-card text-card-foreground rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] mb-4 flex flex-col border border-border overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
+        <div className="w-[350px] h-[480px] max-h-[calc(100vh-6rem)] bg-card text-card-foreground rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col border border-border overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
 
-          {/* Header Customizado com a cor fixa de hover */}
+          {/* Lugar Sagrado do Tigreso */}
           <div
             className="p-4 text-primary-foreground flex justify-between items-center"
             style={{ backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' }}
@@ -50,6 +51,15 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
                 </p>
               </div>
             </div>
+
+            {/* Botão de fechar */}
+            <button
+              onClick={closeChat}
+              className="p-4 -mr-2 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-foreground"
+              title="Fechar chat"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* Área de Mensagens */}
@@ -100,11 +110,10 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               />
-              {/* Botão de Enviar com opacidade fixa em 80% */}
               <button
                 onClick={handleSend}
                 disabled={loading || !input.trim()}
-                className="absolute right-2 p-2 cursor-pointer text-primary opacity-80 disabled:cursor-not-allowed disabled:text-muted-foreground transition-all hover:opacity-100"
+                className="absolute right-2 p-2 cursor-pointer text-primary opacity-80 disabled:cursor-not-allowed disabled:text-muted-foreground transition-all"
                 type="button"
               >
                 <Send size={18} />
@@ -114,21 +123,16 @@ export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, re
         </div>
       )}
 
-      {/* Botão de Abrir/Fechar sem hover:scale e com cor de fundo fixa (quando fechado) */}
-      <button
-        onClick={() => {
-          if (isOpen) {
-            closeChat();
-          } else {
-            setIsOpen(true);
-          }
-        }}
-        className={`w-14 h-14 rounded-full flex cursor-pointer items-center justify-center shadow-2xl transition-all duration-300 ${isOpen ? 'bg-destructive text-destructive-foreground rotate-180' : 'text-white'
-          }`}
-        style={!isOpen ? { backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' } : undefined}
-      >
-        {isOpen ? <X size={24} /> : <MessageCircle size={28} />}
-      </button>
+      {/* Botão de Abrir */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-14 h-14 rounded-full flex cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white"
+          style={{ backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' }}
+        >
+          <MessageCircle size={28} />
+        </button>
+      )}
     </div>
   );
 });
