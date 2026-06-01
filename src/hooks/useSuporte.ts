@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabaseClient"
 import { useRef, useState } from "react"
 import type { ChangeEvent, FormEvent } from "react"
 import { toast } from "sonner"
@@ -71,7 +72,7 @@ export const formFields: FormField[] = [
   },
 ]
 
-export const sendContactEmail = async (formElement: HTMLFormElement): Promise<void> => {
+export const sendContactEmail = async (formElement: HTMLFormElement, files: File[]): Promise<void> => {
   const formData = new FormData(formElement);
   const nome = String(formData.get("from_name") ?? "").trim();
   const email = String(formData.get("from_email") ?? formData.get("reply_to") ?? "").trim();
@@ -82,8 +83,50 @@ export const sendContactEmail = async (formElement: HTMLFormElement): Promise<vo
     throw new Error("Preencha todos os campos antes de confirmar o envio.");
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 250));
-  console.log("Confirmação local de e-mail registrada:", { nome, email, assunto });
+  const urlsAnexos: string[] = [];
+
+  // 1. Lógica de Upload de Imagens
+  if (files.length > 0) {
+    for (const file of files) {
+      // Gera um nome único para o arquivo não sobrescrever outro
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      // Faz o upload para o bucket 'anexos_suporte'
+      const { error: uploadError } = await supabase.storage
+        .from('anexos_suporte')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        throw new Error("Erro ao fazer upload do anexo: " + uploadError.message);
+      }
+
+      // Pega a URL pública da imagem recém-upada
+      const { data: publicUrlData } = supabase.storage
+        .from('anexos_suporte')
+        .getPublicUrl(fileName);
+
+      urlsAnexos.push(publicUrlData.publicUrl);
+    }
+  }
+
+  // 2. Insere os dados + URLs das imagens na tabela 'suporte'
+  const { error } = await supabase
+    .from('suporte')
+    .insert([
+      { 
+        nome,
+        email,
+        assunto,
+        mensagem,
+        anexos_urls: urlsAnexos, // Nova coluna recebendo o array de links
+        status: 'pendente'
+      }
+    ]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
 };
 
 export function useSuporte() {
@@ -98,20 +141,22 @@ export function useSuporte() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
     if (!formRef.current) return
 
     setSending(true)
 
     try {
-      await sendContactEmail(formRef.current)
+      // ATUALIZADO: Passa o array de arquivos (attachedFiles) para a função
+      await sendContactEmail(formRef.current, attachedFiles)
       toast.success("Mensagem enviada com sucesso.")
+      
       formRef.current.reset()
       setAttachedFiles([])
       if (fileInputRef.current) fileInputRef.current.value = ""
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error(error)
-      toast.error("Não foi possível enviar sua mensagem. Tente novamente.")
+      toast.error(error.message || "Não foi possível enviar sua mensagem. Tente novamente.")
     } finally {
       setSending(false)
     }
