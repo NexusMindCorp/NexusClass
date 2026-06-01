@@ -8,14 +8,16 @@ type AcordoPrivacidadeProps = {
 export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
     return (
         <div className="max-w-4xl mx-auto p-4">
-            <Card className="border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-white/10 dark:bg-slate-950/40 dark:text-white">
+            <Card className="bg-card text-card-foreground border-border shadow-2xl">
                 <CardHeader>
-                    <CardTitle className="text-3xl">Termos de Uso e Política de Privacidade</CardTitle>
-                    <CardDescription className="text-sm text-slate-600 dark:text-white/60 italic">Última atualização: {new Date().toLocaleDateString('pt-BR')}</CardDescription>
+                    <CardTitle className="text-3xl font-bold">Termos de Uso e Política de Privacidade</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground italic">
+                        Última atualização: {new Date().toLocaleDateString('pt-BR')}
+                    </CardDescription>
                 </CardHeader>
 
                 <CardContent>
-                    <div className="space-y-6 text-slate-700 dark:text-white leading-relaxed">
+                    <div className="space-y-6 text-foreground/90 leading-relaxed">
                         <section>
                             <p className="mb-2">
                                 Bem-vindo à plataforma de ensino NexusClass. Ao utilizar nossos serviços, você concorda em cumprir estes termos de uso. Leia atentamente antes de prosseguir.
@@ -23,7 +25,7 @@ export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">1. Criação e Responsabilidade da Conta</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">1. Criação e Responsabilidade da Conta</h2>
                             <p className="mb-3">
                                 Para utilizar a plataforma, é necessário criar uma conta com informações precisas e completas. Você concorda em:
                             </p>
@@ -36,7 +38,7 @@ export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">2. Uso Aceitável</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">2. Uso Aceitável</h2>
                             <p className="mb-3">
                                 Você se compromete a utilizar a plataforma de maneira responsável e ética. É proibido:
                             </p>
@@ -50,14 +52,14 @@ export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">3. Propriedade Intelectual</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">3. Propriedade Intelectual</h2>
                             <p>
                                 Todo o conteúdo disponibilizado na plataforma, incluindo materiais didáticos, vídeos e exercícios, é protegido por direitos autorais. O uso é permitido para fins educacionais pessoais, mas a reprodução, distribuição ou publicação requer autorização prévia.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">4. Privacidade e Proteção de Dados</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">4. Privacidade e Proteção de Dados</h2>
                             <p className="mb-3">
                                 Seus dados pessoais são tratados de acordo com a Lei Geral de Proteção de Dados (LGPD):
                             </p>
@@ -70,39 +72,39 @@ export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">5. Limitação de Responsabilidade</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">5. Limitação de Responsabilidade</h2>
                             <p>
                                 A plataforma é fornecida "no estado em que se encontra". NexusClass não se responsabiliza por perdas indiretas, interrupções temporárias ou danos decorrentes do uso ou da indisponibilidade do serviço.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">6. Modificações nos Termos</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">6. Modificações nos Termos</h2>
                             <p>
                                 Reservamo-nos o direito de atualizar estes termos a qualquer momento. Notificaremos os usuários sobre mudanças significativas. O uso contínuo da plataforma após a notificação implica aceitação dos novos termos.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">7. Suspensão de Conta</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">7. Suspensão de Conta</h2>
                             <p>
                                 Podemos suspender ou encerrar contas que violarem estes termos. Sempre que possível, os usuários serão notificados previamente, exceto em casos de violação grave.
                             </p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">8. Contato e Suporte</h2>
+                            <h2 className="text-xl font-semibold mb-3 text-foreground">8. Contato e Suporte</h2>
                             <p>
                                 Se você tiver dúvidas sobre estes termos ou nossa política de privacidade, utilize o chat de suporte ou entre em contato pelo canal oficial. Estamos à disposição para esclarecer.
                             </p>
                         </section>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
+                    <div className="mt-8 pt-6 border-t border-border">
                         <Button
                             variant="link"
                             onClick={acionarAjuda}
-                            className="text-indigo-600 dark:text-indigo-400"
+                            className="text-primary hover:text-primary/80 cursor-pointer p-0 h-auto font-medium transition-colors"
                         >
                             Dúvidas sobre os termos de uso
                         </Button>

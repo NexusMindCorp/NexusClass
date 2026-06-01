@@ -26,10 +26,10 @@ export function Calendario() {
   } = useCalendario()
 
   return (
-    <Card className="mx-auto h-fit w-full max-w-5xl border-slate-200 bg-white shadow-2xl backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+    <Card className="mx-auto h-fit w-full max-w-5xl border-border bg-card text-card-foreground shadow-2xl backdrop-blur-sm">
       <CardContent className="space-y-5 p-4 md:p-5">
         <div className="grid gap-4 xl:grid-cols-[auto_1fr] xl:items-start">
-          <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-sm md:p-3 dark:border-white/10 dark:bg-white/5">
+          <div className="rounded-xl border border-border bg-background p-2 shadow-sm md:p-3">
             <Calendar
               mode="single"
               selected={date}
@@ -48,9 +48,9 @@ export function Calendario() {
 
           <div className="space-y-4">
             {!mostrarBoxAgendamento ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 dark:border-white/20 dark:bg-white/[0.03]">
-                <p className="text-sm text-slate-600 dark:text-muted-foreground">
-                  Selecione um dia no calendario para adicionar um evento.
+              <div className="rounded-xl border border-dashed border-border bg-muted/50 p-4">
+                <p className="text-sm text-muted-foreground">
+                  Selecione um dia no calendário para adicionar um evento.
                 </p>
               </div>
             ) : (
@@ -86,7 +86,7 @@ export function Calendario() {
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 border-t border-slate-200 p-4 md:p-5 dark:border-white/10">
+      <CardFooter className="flex flex-wrap gap-2 border-t border-border p-4 md:p-5">
         {[
           { label: "Hoje", value: 0 },
           { label: "Amanhã", value: 1 },
@@ -98,7 +98,7 @@ export function Calendario() {
             key={preset.value}
             variant="outline"
             size="sm"
-            className="min-w-[100px] flex-1 border-slate-200 bg-white text-slate-900 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+            className="min-w-[100px] flex-1 border-border bg-background text-foreground hover:bg-muted transition-colors cursor-pointer"
             onClick={() => selecionarDataRelativa(preset.value)}
           >
             {preset.label}
