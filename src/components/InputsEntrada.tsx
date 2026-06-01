@@ -36,7 +36,7 @@ export function InputsEntrada({
 }: InputsAcordoProps) {
 	return (
 		<Field>
-			<FieldLabel htmlFor={id} className="text-white">
+			<FieldLabel htmlFor={id} className="text-slate-900 dark:text-white">
 				{titulo}
 			</FieldLabel>
 			{inputOption ? (
@@ -58,7 +58,7 @@ export function InputsEntrada({
 					name={nome}
 					placeholder={escritoNoInputbox}
 					rows={6}
-					className="min-h-[160px] w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder:text-white/45 outline-none transition-[color,box-shadow] focus-visible:border-white/30 focus-visible:ring-[3px] focus-visible:ring-white/20"
+					className="min-h-[160px] w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none transition-[color,box-shadow] focus-visible:border-slate-300 focus-visible:ring-[3px] focus-visible:ring-indigo-500/20 dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder:text-white/45 dark:focus-visible:border-white/30 dark:focus-visible:ring-white/20"
 					required={required}
 				/>
 			) : (
@@ -67,12 +67,12 @@ export function InputsEntrada({
 					name={nome}
 					type={tipo}
 					placeholder={escritoNoInputbox}
-					className="h-11 border-white/15 bg-white/10 px-4 text-white placeholder:text-white/45"
+					className="h-11 border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 dark:border-white/15 dark:bg-white/10 dark:text-white dark:placeholder:text-white/45"
 					required={required}
 				/>
 			)}
 			{decricao && (
-				<FieldDescription className="text-white/65">
+				<FieldDescription className="text-slate-600 dark:text-white/65">
 					{decricao}
 				</FieldDescription>
 			)}
