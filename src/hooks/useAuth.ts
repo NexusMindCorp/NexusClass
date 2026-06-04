@@ -44,6 +44,7 @@ export function useAuth() {
             return
         }
 
+       
         supabase.auth.getSession().then(async ({ data: { session }, error }) => {
             if (error) {
                 toast.error("Erro ao obter sessão", {
@@ -55,15 +56,16 @@ export function useAuth() {
                     await fetchPerfil(session.user.id)
                 }
             }
-            setLoading(false)
+            setLoading(false) // Libera o spinner após buscar tudo a primeira vez
         })
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setSession(session)
-            if (session?.user) {
-                setLoading(true)
-                await fetchPerfil(session.user.id)
-                setLoading(false)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
+            setSession(sessionAtualizada)
+            
+            if (sessionAtualizada?.user) {
+                if (event === 'SIGNED_IN') {
+                    await fetchPerfil(sessionAtualizada.user.id)
+                }
             } else {
                 setPerfil(null)
                 setLoading(false)
@@ -74,5 +76,6 @@ export function useAuth() {
             subscription?.unsubscribe()
         }
     }, [])
+
     return { session, loading, perfil }
 }
