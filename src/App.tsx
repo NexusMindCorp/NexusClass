@@ -4,6 +4,7 @@ import { Toaster } from "sonner"
 import { Login } from "./components/Login"
 import { ProtectedRoute } from "./components/ProtectedRoute"
 import { LayoutPrincipal } from "./Layout/LayoutPrincipal"
+import { NotFound } from "./Layout/NotFound"
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
           </Route>
 
           {/* Fallback para rotas inexistentes */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
       {/* Toaster global para notificações dentro do sistema */}
