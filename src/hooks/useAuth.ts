@@ -75,7 +75,7 @@ export function useAuth() {
             const { data: turmas, error: turmasError } = await supabase
                 .from("turmas_escolares")
                 .select("*")
-                .in("id", turmaIds) // 🔥 A CORREÇÃO ESTÁ AQUI: Mudou de "materia" para "id"
+                .in("id", turmaIds)
 
             if (turmasError) {
                 throw turmasError
