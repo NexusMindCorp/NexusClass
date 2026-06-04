@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
 import type { UsuarioProps } from './useGerenciador';
+import type { PerfilUsuario } from './useAuth';
 import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
 
 
@@ -48,6 +49,7 @@ interface JsonInstruction {
     enrollmentSummary?: string;
     usageAgreementSummary?: string;
     calendarEventsSummary?: string;
+    userProfileSummary?: string;
   };
 }
 
@@ -71,16 +73,37 @@ const hojeChaveLocal = () => {
   return `${ano}-${mes}-${dia}`;
 };
 
-export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }, isHelpMode: boolean = false) => {
+export const useGeminiChat = (
+  usuario: UsuarioProps & { perfil?: PerfilUsuario | null },
+  isHelpMode: boolean = false
+) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [resumoEventosCalendario, setResumoEventosCalendario] = useState<string>('Eventos do calendário ainda não carregados.');
   const chatRef = useRef<ChatSession | null>(null);
+  const resumoPerfilUsuario = usuario.perfil
+    ? `Nome do usuário: ${usuario.perfil.nome}. Papel: ${usuario.perfil.role}. Use esse nome para personalizar o atendimento.`
+    : 'Perfil do usuário não carregado. Atenda de forma genérica até o perfil estar disponível.';
 
-  const stringDeInscricoes = usuario.listaDosInscritos.length > 0
-    ? `O usuário está inscrito nas seguintes matérias: ${usuario.listaDosInscritos.join(", ")} foque nessas matérias no auxílio.`
-    : "O usuário não está inscrito em nenhuma matéria avise que para receber ajuda personalizada ele deve se inscrever em pelo menos uma matéria.";
+  const stringDeInscricoes = (() => {
+    const role = usuario.perfil?.role;
+    if (role === 'aluno') {
+      if (usuario.listaDosInscritos.length > 0) {
+        return `O usuário está inscrito nas seguintes matérias: ${usuario.listaDosInscritos.join(', ')}. Foque nessas matérias no auxílio.`;
+      }
+      return 'O usuário não está inscrito em nenhuma matéria; avise que para receber ajuda personalizada ele deve se inscrever em pelo menos uma matéria.';
+    }
 
+    if (role === 'professor') {
+      return 'O usuário é professor. Foque em sugerir atividades, estruturar questões para alunos e em gerenciar conteúdos da disciplina.';
+    }
+
+    if (role === 'master') {
+      return 'O usuário é administrador da plataforma. Forneça informações sobre configuração, permissões e uso administrativo.';
+    }
+
+    return 'Informações de inscrição/papel não disponíveis. Atenda de forma genérica.';
+  })();
   const resumoAcordoUso =
     "Aqui está o resumo do Acordo de Uso da Plataforma: O Acordo de Uso da Plataforma inclui: 1) Privacidade: Respeitamos seus dados, mas coletamos informações básicas para personalizar a experiência. 2) Segurança de Conta: Você é responsável por manter sua senha segura e não compartilhar sua conta. 3) Responsabilidades do Usuário: Proibido usar a plataforma para atividades ilegais, assédio ou violação de direitos autorais. 4) Modificações nos Termos: Podemos atualizar os termos, notificando os usuários sobre mudanças significativas. 5) Uso Aceitável: Evite conteúdo ofensivo, spam ou comportamento disruptivo. Para dúvidas específicas, contate o suporte.";
 
@@ -186,6 +209,7 @@ export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }
         context: {
           usageAgreementSummary: resumoAcordoUso,
           calendarEventsSummary: resumoEventosCalendario,
+          userProfileSummary: resumoPerfilUsuario,
         },
       }
     : {
@@ -222,6 +246,7 @@ export const useGeminiChat = (usuario: UsuarioProps & { pedirAjuda: () => void }
           easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
           enrollmentSummary: stringDeInscricoes,
           calendarEventsSummary: resumoEventosCalendario,
+          userProfileSummary: resumoPerfilUsuario,
         },
       };
 

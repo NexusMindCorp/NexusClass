@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useGeminiChat } from './useChatBot';
 import type { UsuarioProps } from './useGerenciador';
-export function useChatBox(usuario:UsuarioProps & { pedirAjuda: () => void }) {
+import type { PerfilUsuario } from './useAuth';
+
+export function useChatBox(usuario: UsuarioProps, perfil?: PerfilUsuario | null) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHelpMode, setIsHelpMode] = useState(false);
   const [input, setInput] = useState('');
-  const { messages, loading, sendMessage } = useGeminiChat(usuario, isHelpMode);
+  const { messages, loading, sendMessage } = useGeminiChat({ ...usuario, perfil }, isHelpMode);
   
   // Fechar chat e retomar instrução principal
   const closeChat = useCallback(() => {

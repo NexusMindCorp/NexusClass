@@ -1,7 +1,9 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import { useChatBox } from '../hooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
+import type { PerfilUsuario } from '@/hooks/useAuth';
 import { getAssetPath } from '@/lib/assetPath';
 
 const perfilBot = getAssetPath('perfilBot/perfilBot.jpg');
@@ -11,7 +13,8 @@ type ChatBotProps = {
 }
 
 export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, ref) {
-  const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox({ ...usuario, pedirAjuda: () => { } });
+  const { perfil } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null }>()
+  const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox(usuario, perfil);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Expor função de abrir com modo ajuda
