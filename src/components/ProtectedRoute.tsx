@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
 export function ProtectedRoute() {
-  const { session, loading, perfil } = useAuth()
+  const { session, loading, perfil, materiasProfessorNomes } = useAuth()
 
   // Mantém a tela de carregamento centralizada enquanto verifica a sessão
   if (loading) {
@@ -21,5 +21,6 @@ export function ProtectedRoute() {
   // Se houver sessão, renderiza os componentes filhos. 
   // Passamos o 'perfil' e a 'session' via context do Outlet para que qualquer 
   // rota filha consiga resgatar esses dados facilmente com useOutletContext()
-  return <Outlet context={{ session, perfil }} />
+  // Expor como `materiasProfessor` (string[]) para manter compatibilidade com ChatBot
+  return <Outlet context={{ session, perfil, materiasProfessor: materiasProfessorNomes }} />
 }

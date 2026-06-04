@@ -74,7 +74,7 @@ const hojeChaveLocal = () => {
 };
 
 export const useGeminiChat = (
-  usuario: UsuarioProps & { perfil?: PerfilUsuario | null },
+  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] },
   isHelpMode: boolean = false
 ) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -95,6 +95,9 @@ export const useGeminiChat = (
     }
 
     if (role === 'professor') {
+      if (usuario.materiasProfessor && usuario.materiasProfessor.length > 0) {
+        return `O usuário é professor. Foque em sugerir atividades, estruturar questões para alunos e em gerenciar conteúdos das seguintes matérias: ${usuario.materiasProfessor.join(', ')}.`;
+      }
       return 'O usuário é professor. Foque em sugerir atividades, estruturar questões para alunos e em gerenciar conteúdos da disciplina.';
     }
 
