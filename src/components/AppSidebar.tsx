@@ -4,6 +4,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/r
 import { Configuracoes } from "./Configuracoes"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
 import type { EscolaProps } from "@/hooks/leituraJson"
+import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
 
 const items = [
@@ -48,7 +49,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar 
                                     e.preventDefault();
                                     navegarPara("principal");
                                 }} className="flex items-center gap-2">
-                                <img src="Logos/Logo.png" alt="Logo da Escola Nexus" width={22} height={22} />
+                                <img src={getAssetPath("Logos/Logo.png")} alt="Logo da Escola Nexus" width={22} height={22} />
                                 <span className="text-gradient text-lg tracking-tight">NexusClass</span>
                             </a>
                         </SidebarMenuButton>
