@@ -8,6 +8,7 @@ import { InputsEntrada } from "@/components/InputsEntrada"
 import { BoxAuxiliarSugestao } from "@/components/BoxAuxiliarSugestao"
 
 export function Suporte() {
+
 	const {
 		formRef,
 		fileInputRef,
@@ -16,6 +17,7 @@ export function Suporte() {
 		handleFileChange,
 		handleSubmit,
 		formFields,
+		perfil
 	} = useSuporte()
 
 	return (
@@ -29,7 +31,7 @@ export function Suporte() {
 					Fale com a equipe de suporte
 				</h1>
 				<p className="max-w-2xl text-sm text-muted-foreground md:text-base">
-					Envie sua dúvida, problema técnico ou solicitação. Use o formulário abaixo para registrar o contato com mais contexto.
+					Envie sua dúvida, problema técnico ou solicitação. Use o formulário abaixo para registrar o contato com mais contexto. Seu nome e email serão do seu perfil cadastrado  para que possamos responder. Quanto mais detalhes, melhor!
 				</p>
 			</div>
 
@@ -44,21 +46,31 @@ export function Suporte() {
 					<CardContent>
 						<form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
 							<FieldSet>
-								<FieldGroup className="gap-5">
-									{formFields.map((field) => (
-										<InputsEntrada
-											key={field.key}
-											titulo={field.titulo}
-											id={field.id}
-											nome={field.nome}
-											escritoNoInputbox={field.escritoNoInputbox}
-											decricao={field.decricao}
-											tipo={field.tipo}
-											textArea={field.textArea}
-											inputOption={field.inputOption}
-											required={field.required}
-										/>
-									))}
+												<FieldGroup className="gap-5">
+																		{/* If we have a logged-in profile, show name/email and skip rendering those inputs */}
+																		{perfil && (
+																			<div className="space-y-1">
+																				<div className="text-sm text-muted-foreground">Nome</div>
+																				<div className="text-foreground font-medium">{perfil.nome}</div>
+																				<div className="text-sm text-muted-foreground mt-2">Email</div>
+																				<div className="text-foreground font-medium">{perfil.email}</div>
+																			</div>
+																		)}
+
+																		{formFields.filter((f) => f.key !== 'name' && f.key !== 'email').map((field) => (
+																				<InputsEntrada
+																						key={field.key}
+																						titulo={field.titulo}
+																						id={field.id}
+																						nome={field.nome}
+																						escritoNoInputbox={field.escritoNoInputbox}
+																						decricao={field.decricao}
+																						tipo={field.tipo}
+																						textArea={field.textArea}
+																						inputOption={field.inputOption}
+																						required={field.required}
+																				/>
+																		))}
 
 									<AnexoArquivo
 										fileInputRef={fileInputRef}

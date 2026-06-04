@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabaseClient"
 import { useRef, useState } from "react"
 import type { ChangeEvent, FormEvent } from "react"
 import { toast } from "sonner"
+import { useOutletContext } from 'react-router-dom'
+import type { PerfilUsuario } from '@/hooks/useAuth'
 
 export type FormField = {
   key: string
@@ -72,10 +74,12 @@ export const formFields: FormField[] = [
   },
 ]
 
-export const sendContactEmail = async (formElement: HTMLFormElement, files: File[]): Promise<void> => {
+export const sendContactEmail = async (formElement: HTMLFormElement, files: File[], perfil?: { nome: string; email: string } | null): Promise<void> => {
   const formData = new FormData(formElement);
-  const nome = String(formData.get("from_name") ?? "").trim();
-  const email = String(formData.get("from_email") ?? formData.get("reply_to") ?? "").trim();
+  const nomeFromForm = String(formData.get("from_name") ?? "").trim();
+  const emailFromForm = String(formData.get("from_email") ?? formData.get("reply_to") ?? "").trim();
+  const nome = nomeFromForm || perfil?.nome || "";
+  const email = emailFromForm || perfil?.email || "";
   const assunto = String(formData.get("subject") ?? "").trim();
   const mensagem = String(formData.get("message") ?? "").trim();
 
@@ -85,10 +89,10 @@ export const sendContactEmail = async (formElement: HTMLFormElement, files: File
 
   const urlsAnexos: string[] = [];
 
-  // 1. Lógica de Upload de Imagens
+  
   if (files.length > 0) {
     for (const file of files) {
-      // Gera um nome único para o arquivo não sobrescrever outro
+    
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       
@@ -110,7 +114,7 @@ export const sendContactEmail = async (formElement: HTMLFormElement, files: File
     }
   }
 
-  // 2. Insere os dados + URLs das imagens na tabela 'suporte'
+  
   const { error } = await supabase
     .from('suporte')
     .insert([
@@ -119,7 +123,7 @@ export const sendContactEmail = async (formElement: HTMLFormElement, files: File
         email,
         assunto,
         mensagem,
-        anexos_urls: urlsAnexos, // Nova coluna recebendo o array de links
+        anexos_urls: urlsAnexos, 
         status: 'pendente'
       }
     ]);
@@ -129,11 +133,13 @@ export const sendContactEmail = async (formElement: HTMLFormElement, files: File
   }
 };
 
-export function useSuporte() {
+export function useSuporte(perfilArg?: { nome: string; email: string } | null) {
+
   const formRef = useRef<HTMLFormElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [sending, setSending] = useState(false)
   const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const { perfil } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null }>()
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setAttachedFiles(Array.from(event.target.files ?? []))
@@ -146,8 +152,8 @@ export function useSuporte() {
     setSending(true)
 
     try {
-      // ATUALIZADO: Passa o array de arquivos (attachedFiles) para a função
-      await sendContactEmail(formRef.current, attachedFiles)
+     
+      await sendContactEmail(formRef.current, attachedFiles, perfil)
       toast.success("Mensagem enviada com sucesso.")
       
       formRef.current.reset()
@@ -170,5 +176,6 @@ export function useSuporte() {
     handleFileChange,
     handleSubmit,
     formFields,
+    perfil
   }
 }
