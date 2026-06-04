@@ -7,19 +7,26 @@ import { Toaster } from "sonner"
 import { useGerenciador } from "./hooks/useGerenciador"
 import { ChatBot } from "./components/ChatBot"
 import { useEscolaDados } from "./hooks/useEscolaDados"
-import { useRef, useCallback } from "react"
+import { useRef, useCallback, useEffect } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { Login } from "./components/Login"
 
 function App() {
-  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador()
+  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, limparEstado } = useGerenciador()
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
-  const { session, loading } = useAuth()
+  {/* O perfil será passado pros componentes filhos depois pra fazer as permissoes de acesso nos componentes */ }
+  const { session, loading, perfil } = useAuth()
 
   const abrirChatComAjuda = useCallback(() => {
     chatBotRef.current?.abrirComAjuda()
   }, [])
+
+  useEffect(() => {
+    if (!session) {
+      limparEstado();
+    }
+  }, [session, limparEstado])
 
   if (loading) {
     return (

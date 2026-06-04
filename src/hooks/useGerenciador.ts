@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
+import { toast } from "sonner"
 
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte"| "privacidade";
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade";
 
 type PayloadAlertaCalendario = {
     id: string
@@ -28,6 +28,13 @@ export type UsuarioProps = {
     listaDosInscritos: Array<string>
 }
 
+const ESTADO_INICIAL_USUARIO: UsuarioProps = {
+    inscricoes: {} as Record<string, boolean>,
+    acessouOq: "principal" as OpcoesTela,
+    chaveMural: "",
+    listaDosInscritos: [],
+}
+
 function formatarDataLocal(data: Date) {
     const ano = data.getFullYear()
     const mes = String(data.getMonth() + 1).padStart(2, "0")
@@ -40,19 +47,19 @@ function montarDataEvento(data: string, horario: string) {
     return Number.isNaN(dataEvento.getTime()) ? null : dataEvento
 }
 
-
 export function useGerenciador() {
 
     const alertasEnviadosRef = useRef<Set<string>>(new Set())
     const [pedirAjuda, setPedirAjuda] = useState(false);
-    const acionarAjuda = () => setPedirAjuda(true);
+    const [usuario, setUsuario] = useState<UsuarioProps>(ESTADO_INICIAL_USUARIO);
 
-    const [usuario, setUsuario] = useState<UsuarioProps>({
-        inscricoes: {} as Record<string, boolean>,
-        acessouOq: "principal" as OpcoesTela,
-        chaveMural: "",
-        listaDosInscritos: [],
-    });
+    const limparEstado = () => {
+        setUsuario(ESTADO_INICIAL_USUARIO);
+        setPedirAjuda(false);
+        alertasEnviadosRef.current.clear();
+    }
+
+    const acionarAjuda = () => setPedirAjuda(true);
 
     const mudarInscricao = (materia: string) => {
         setUsuario((anterior) => {
@@ -196,5 +203,5 @@ export function useGerenciador() {
         }
     }, [])
 
-    return { usuario, pedirAjuda, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
+    return { usuario, pedirAjuda, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
 }
