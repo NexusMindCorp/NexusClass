@@ -17,12 +17,12 @@ export function LayoutPrincipal() {
     chatBotRef.current?.abrirComAjuda()
   }, [])
 
-  useEffect(() => {
+ /* useEffect(() => {
     return () => {
       limparEstado()
     }
   }, [limparEstado])
-
+*/
   return (
     <SidebarProvider>
       <AppSidebar
