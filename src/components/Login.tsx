@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useNavigate } from "react-router-dom"; 
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -9,6 +10,8 @@ import { toast } from "sonner";
 import { getAssetPath } from "@/lib/assetPath";
 
 export function Login() {
+    const navigate = useNavigate(); 
+
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -24,9 +27,13 @@ export function Login() {
             if (isLogin) {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
+                
+                navigate("/", { replace: true }); 
             } else {
                 const { error } = await supabase.auth.signUp({ email, password, options: { data: { nome } } });
                 if (error) throw error;
+                
+                navigate("/", { replace: true }); 
             }
         } catch (error: any) {
             let mensagem = error instanceof Error ? error.message : "Ocorreu um erro ao tentar acessar a conta.";
@@ -50,7 +57,6 @@ export function Login() {
     const visualizarSenha = () => {
         setShowPassword(!showPassword);
     }
-
     return (
         <div className="min-h-screen flex items-center justify-center p-4 md:p-6 w-full bg-[#080311] relative overflow-hidden">
             {/* Gradientes de fundo */}
