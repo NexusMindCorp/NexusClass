@@ -116,7 +116,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar 
                     <SidebarGroup>
                         <SidebarGroupLabel asChild>
                             <CollapsibleTrigger>
-                                Minhas Aulas
+                                Minhas Turmas
                                 <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                             </CollapsibleTrigger>
                         </SidebarGroupLabel>

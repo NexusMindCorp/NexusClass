@@ -8,15 +8,35 @@ import { useGerenciador } from "./hooks/useGerenciador"
 import { ChatBot } from "./components/ChatBot"
 import { useEscolaDados } from "./hooks/useEscolaDados"
 import { useRef, useCallback } from "react"
+import { useAuth } from "@/hooks/useAuth"
+import { Login } from "./components/Login"
 
 function App() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara } = useGerenciador()
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
+  const { session, loading } = useAuth()
 
   const abrirChatComAjuda = useCallback(() => {
     chatBotRef.current?.abrirComAjuda()
   }, [])
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-[#09090b] flex items-center justify-center text-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return (
+      <>
+        <Login />
+        <Toaster position="top-center" richColors theme="dark" />
+      </>
+    )
+  }
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">

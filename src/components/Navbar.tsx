@@ -1,3 +1,4 @@
+import React from "react"
 import { LogOutIcon, Moon, Edit, Sun, User, Mail, Bell, AlertCircle } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
@@ -13,7 +14,8 @@ import {
 import { Button } from "./ui/button"
 import { useTheme } from "./provedores/ThemeProvider"
 import { SidebarTrigger } from "./ui/sidebar"
-import React from "react"
+import { supabase } from "@/lib/supabaseClient"
+import { toast } from "sonner"
 
 export function Navbar() {
     const { setTheme } = useTheme()
@@ -21,6 +23,27 @@ export function Navbar() {
         email: true,
         alert: true,
     })
+    const [saindo, setSaindo] = React.useState(false)
+
+    const handleSair = async () => {
+        if (saindo) {
+            return
+        }
+        setSaindo(true)
+        try {
+            const { error } = await supabase.auth.signOut()
+
+            if (error) {
+                throw error
+            }
+        } catch (error: any) {
+            toast.error("Erro ao sair", {
+                description: "Ocorreu um erro inesperado ao tentar sair da conta. Por favor, tente novamente.",
+            })
+        } finally {
+            setSaindo(false)
+        }
+    }
 
     return (
         <nav className="barra-navegacao">
@@ -98,7 +121,14 @@ export function Navbar() {
                         <DropdownMenuItem> <User className="icones-minha-conta" /> Perfil</DropdownMenuItem>
                         <DropdownMenuItem> <Edit className="icones-minha-conta" /> Editar </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive"> <LogOutIcon className="icones-minha-conta" /> Sair</DropdownMenuItem>
+                        <DropdownMenuItem
+                            variant="destructive"
+                            onClick={handleSair}
+                            disabled={saindo}
+                            className="cursor-pointer"
+                        >
+                            <LogOutIcon className="icones-minha-conta" /> {saindo ? "Saindo..." : "Sair"}
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
