@@ -3,7 +3,7 @@ import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 
-export interface PerfilUsuario {
+export type PerfilUsuario = {
     id: string;
     nome: string;
     email: string;
@@ -51,9 +51,9 @@ export function useAuth() {
         }
     }
 
-   const fetchMateriasProfessor = async (userId: string) => {
+    const fetchMateriasProfessor = async (userId: string) => {
         try {
-            
+
             // 1. Busca os IDs das turmas vinculadas a este professor
             const { data: relacoes, error: relacoesError } = await supabase
                 .from("professor_turma")
@@ -83,7 +83,7 @@ export function useAuth() {
 
             const turmasEncontradas = (turmas ?? []) as TurmaProfessor[]
             setMateriasProfessor(turmasEncontradas)
-            
+
             return turmasEncontradas
         } catch (error: any) {
             toast.error("Erro ao carregar matérias do professor", {
@@ -100,7 +100,7 @@ export function useAuth() {
             return
         }
 
-       
+
         supabase.auth.getSession().then(async ({ data: { session }, error }) => {
             if (error) {
                 toast.error("Erro ao obter sessão", {
@@ -120,7 +120,7 @@ export function useAuth() {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
             setSession(sessionAtualizada)
-            
+
             if (sessionAtualizada?.user) {
                 if (event === 'SIGNED_IN') {
                     const perfilCarregado = await fetchPerfil(sessionAtualizada.user.id)

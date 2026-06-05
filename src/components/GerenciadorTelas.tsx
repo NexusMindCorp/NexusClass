@@ -1,13 +1,14 @@
 import type { EscolaProps } from "@/hooks/leituraJson";
 import { TurmaCard } from "./TurmaCard";
+import { BoasVindas } from "./BoasVindas"
 import { Mural } from "./Mural";
 import { Calendario } from "./Calendario";
 import { Pesquisar } from "./Pesquisar";
 import { Mensagens } from "./Mensagens";
 import type { OpcoesTela } from "@/hooks/useGerenciador";
-
 import { AcordoPrivacidade } from "./AcordoPrivacidade";
 import { Suporte } from "./Suporte";
+import type { PerfilUsuario } from "@/hooks/useAuth";
 
 type GerenciadorTelasProps = {
     usuario: any;
@@ -17,13 +18,18 @@ type GerenciadorTelasProps = {
     navegarPara: (tela: OpcoesTela) => void;
     listaEscolar: EscolaProps;
     abrirChatComAjuda: () => void;
+    perfil: PerfilUsuario;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
     const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];
+    const isNovoUsuario = Object.keys(props.usuario.inscricoes).length === 0;
 
     return (
         <>
+            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && isNovoUsuario && (
+                <BoasVindas perfil={props.perfil} acionarExplorar={() => props.navegarPara("pesquisar")} />
+            )}
             {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
                 <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {props.listaEscolar.turmas && Object.entries(props.listaEscolar.turmas).map(([key, turma]) => (
@@ -60,6 +66,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                         marcarMural={props.marcarMural}
                         voltarPrincipal={() => props.navegarPara("principal")}
                         turmas={props.listaEscolar.turmas}
+                        perfil={props.perfil}
                     />
                 </div>}
             {props.usuario.acessouOq === "mensagens" &&
@@ -69,7 +76,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             {props.usuario.acessouOq === "suporte" &&
                 <div className="w-full flex items-center justify-center p-4">
                     <div>
-                        <Suporte/>
+                        <Suporte />
                     </div>
                 </div>}
             {props.usuario.acessouOq === "privacidade" &&

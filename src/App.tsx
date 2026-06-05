@@ -8,7 +8,7 @@ import { NotFound } from "./Layout/NotFound"
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           {/* Rota Pública de Autenticação */}

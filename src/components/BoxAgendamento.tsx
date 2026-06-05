@@ -78,7 +78,7 @@ export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, 
                   setHorario(`${novaHora}:${minutoFinal}`)
                 }}
               >
-                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer">
+                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
                   <SelectValue placeholder="Hora" />
                 </SelectTrigger>
                 <SelectContent side="bottom" align="start" sideOffset={4} collisionPadding={16} avoidCollisions className="w-[4.5rem] max-h-56 overflow-hidden rounded-xl border border-border bg-popover/95 text-popover-foreground shadow-xl backdrop-blur">
@@ -101,7 +101,7 @@ export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, 
                   setHorario(`${horaFinal}:${novoMinuto}`)
                 }}
               >
-                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer">
+                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
                   <SelectValue placeholder="Min" />
                 </SelectTrigger>
                 <SelectContent side="bottom" align="start" sideOffset={4} collisionPadding={16} avoidCollisions className="w-[4.5rem] max-h-56 overflow-hidden rounded-xl border border-border bg-popover/95 text-popover-foreground shadow-xl backdrop-blur">

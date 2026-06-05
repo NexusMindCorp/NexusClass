@@ -18,11 +18,12 @@ type TurmasProps = {
   turma: string;
   inscrito?: boolean;
   compacto?: boolean;
+  modoPesquisa?: boolean;
   clickInscrito?: () => void;
   clickMural?: (materia: string) => void;
 }
 
-export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, compacto = false, clickMural, clickInscrito }: TurmasProps) {
+export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, compacto = false, modoPesquisa, clickMural, clickInscrito }: TurmasProps) {
   return (
     <Card className={`relative mx-auto w-full pt-0 overflow-hidden ${compacto ? '' : 'max-w-sm'}`}>
       <div className={`absolute inset-0 z-30 bg-black/35 ${compacto ? 'h-24' : 'aspect-video'}`} />
@@ -51,16 +52,21 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
 
       <CardFooter className={compacto ? "p-4 pb-1 pt-0" : ""}>
         {inscrito ? (
-          <ButtonGroup>
-            <Button onClick={() => clickInscrito?.()} variant={"destructive"} size="sm">
-              {compacto ? "Sair" : "Cancelar Inscrição"}
-            </Button>
-            <ButtonGroupSeparator />
+          modoPesquisa ? (
             <Button onClick={() => clickMural?.(materia)} size="sm">
               Entrar
             </Button>
-          </ButtonGroup>
-        ) : (
+          ) : (
+            <ButtonGroup>
+              <Button onClick={() => clickInscrito?.()} variant={"destructive"} size="sm">
+                {compacto ? "Sair" : "Cancelar Inscrição"}
+              </Button>
+              <ButtonGroupSeparator />
+              <Button onClick={() => clickMural?.(materia)} size="sm">
+                Entrar
+              </Button>
+            </ButtonGroup>
+          )) : (
           <ButtonGroup className={compacto ? "w-full" : ""}>
             <Button onClick={() => clickInscrito?.()} size="sm" className="w-full">
               Inscrever-se

@@ -1,43 +1,39 @@
-import { Home, Inbox, Calendar, Search, ChevronDown } from "lucide-react"
+import { Home, Inbox, Calendar, Search, ChevronDown, Compass } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
+import { Button } from "./ui/button"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
 import type { EscolaProps } from "@/hooks/leituraJson"
+import type { PerfilUsuario } from "@/hooks/useAuth"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
 
-const items = [
-    {
-        title: "Inicio",
-        url: "/",
-        icon: Home,
-    },
-    {
-        title: "Pesquisar",
-        url: "#",
-        icon: Search,
-    },
-    {
-        title: "Mensagens",
-        url: "#",
-        icon: Inbox,
-    },
-    {
-        title: "Calendario",
-        url: "#",
-        icon: Calendar,
-    },
-]
+const itens = [
+    { title: "Inicio", id: "principal", icon: Home },
+    { title: "Pesquisar", id: "pesquisar", icon: Search },
+    { title: "Mensagens", id: "mensagens", icon: Inbox },
+    { title: "Calendario", id: "calendario", icon: Calendar },
+];
 
 type AppSidebarProps = {
     navegarPara: (tela: OpcoesTela) => void;
     inscricoes: Record<string, boolean>;
     marcarMural: (key: string) => void;
     listaEscolar: EscolaProps;
+    perfil: PerfilUsuario;
 }
 
-export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar }: AppSidebarProps) {
+export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
+    const isMaster = perfil?.role === "master";
+    const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
+
+    const turmasParaExibir = isMaster
+        ? Object.entries(listaEscolar.turmas)
+        : Object.entries(listaEscolar.turmas).filter(([key]) => inscricoes[key]);
+
+    const isNovoAluno = perfil?.role === "aluno" && turmasParaExibir.length === 0;
+
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
@@ -64,38 +60,14 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar 
                     <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
                     <SidebarContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {itens.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
                                         <a
-                                            href={item.url}
+                                            href="#"
                                             onClick={(e) => {
-                                                if (item.title === "Inicio") {
-                                                    e.preventDefault();
-                                                    navegarPara("principal");
-                                                }
-                                                if (item.title === "Calendario") {
-                                                    e.preventDefault();
-                                                    navegarPara("calendario");
-                                                }
-                                                if (item.title === "Pesquisar") {
-                                                    e.preventDefault();
-                                                    navegarPara("pesquisar");
-                                                }
-                                                if (item.title === "Mensagens") {
-                                                    e.preventDefault();
-                                                    navegarPara("mensagens");
-                                                }
-                                                if (item.title === "Suporte") {
-                                                    e.preventDefault();
-                                                    navegarPara("suporte");
-                                                }
-                                                if (item.title === "Privacidade") {
-                                                    e.preventDefault();
-                                                    navegarPara("privacidade");
-                                                }
-
-                                                {/*Os outros botões aqui*/ }
+                                                e.preventDefault();
+                                                navegarPara(item.id as OpcoesTela);
                                             }}
                                         >
                                             <item.icon />
@@ -117,50 +89,50 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar 
                     <SidebarGroup>
                         <SidebarGroupLabel asChild>
                             <CollapsibleTrigger>
-                                Minhas Turmas
-                                <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                                {tituloTurmas}
+                                <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180 cursor-pointer" />
                             </CollapsibleTrigger>
                         </SidebarGroupLabel>
                         <CollapsibleContent>
                             <SidebarContent>
                                 <SidebarMenu>
                                     {/*Materias selecionadas*/}
-                                    <SidebarMenu>
-                                        {Object.entries(inscricoes).filter(([_, inscrito]) => inscrito).length === 0 ? (
-                                            <div className="px-4 py-2 text-sm text-muted-foreground">
-                                                Nenhuma aula inscrita
-                                            </div>
-                                        ) : (
-                                            Object.entries(inscricoes)
-                                                .filter(([_, inscrito]) => inscrito)
-                                                .map(([key, _]) => {
+                                    {isNovoAluno ? (
+                                        <div className="px-4 py-4 flex flex-col items-center gap-3 text-center">
+                                            <span className="text-sm text-muted-foreground">Você ainda não está em nenhuma turma.</span>
+                                            <Button variant="secondary" size="sm" className="w-full cursor-pointer" onClick={() => navegarPara("pesquisar")}>
+                                                <Compass className="w-4 h-4 mr-2" /> Explorar Turmas
+                                            </Button>
+                                        </div>
+                                    ) : turmasParaExibir.length === 0 ? (
+                                        <div className="px-4 py-2 text-sm text-muted-foreground">
+                                            Nenhuma turma alocada.
+                                        </div>
+                                    ) : (
+                                        turmasParaExibir.map((key) => {
+                                            const turma = listaEscolar.turmas[key[0]];
+                                            if (!turma) return null;
 
-                                                    const turma = listaEscolar.turmas[key];
-                                                    if (!turma) return null;
-
-                                                    return (
-                                                        <SidebarMenuItem key={key}>
-                                                            <SidebarMenuButton
-                                                                onClick={() => marcarMural(key)}
-                                                                className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
-                                                            >
-                                                                <div className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${getCorMateria(turma.materia)}`}>
-                                                                    {turma.materia.charAt(0).toUpperCase()}
-                                                                </div>
-
-                                                                <span className="truncate">{turma.materia} - {turma.turma}</span>
-                                                            </SidebarMenuButton>
-                                                        </SidebarMenuItem>
-                                                    );
-                                                })
-                                        )}
-                                    </SidebarMenu>
+                                            return (
+                                                <SidebarMenuItem key={key[0]}>
+                                                    <SidebarMenuButton
+                                                        onClick={() => marcarMural(key[0])}
+                                                        className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
+                                                    >
+                                                        <div className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${getCorMateria(turma.materia)}`}>
+                                                            {turma.materia.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <span className="truncate">{turma.materia} - {turma.turma}</span>
+                                                    </SidebarMenuButton>
+                                                </SidebarMenuItem>
+                                            );
+                                        }))}
                                 </SidebarMenu>
                             </SidebarContent>
                         </CollapsibleContent>
                     </SidebarGroup>
                 </Collapsible>
-            </SidebarContent>
+            </SidebarContent >
 
             <SidebarSeparator className="mx-0 w-full" />
 
@@ -171,6 +143,6 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar 
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     )
 }
