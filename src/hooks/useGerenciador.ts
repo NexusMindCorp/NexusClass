@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade";
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas";
 
 type PayloadAlertaCalendario = {
     id: string

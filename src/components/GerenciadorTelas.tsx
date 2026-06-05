@@ -9,6 +9,7 @@ import type { OpcoesTela } from "@/hooks/useGerenciador";
 import { AcordoPrivacidade } from "./AcordoPrivacidade";
 import { Suporte } from "./Suporte";
 import type { PerfilUsuario } from "@/hooks/useAuth";
+import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 
 type GerenciadorTelasProps = {
     usuario: any;
@@ -83,6 +84,14 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                 <div className="w-full flex items-center justify-center p-4">
                     <AcordoPrivacidade acionarAjuda={props.abrirChatComAjuda} />
                 </div>}
+
+            {props.usuario.acessouOq === "configuracoesAvancadas" && (
+                <div className="w-full flex items-center justify-center p-4">
+                    <div className="w-full max-w-3xl">
+                        <ConfiguracoesAvancadas />
+                    </div>
+                </div>
+            )}
         </>
     )
 }
