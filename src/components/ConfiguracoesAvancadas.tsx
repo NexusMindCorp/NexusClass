@@ -27,7 +27,7 @@ export function ConfiguracoesAvancadas() {
           <div className="flex-grow space-y-6">
             <div>
               <h2 className="text-2xl font-bold text-white">Configurações Avançadas</h2>
-              <p className="text-gray-400 mt-1">Gerencie as preferências e detalhes da sua conta.</p>
+              <p className="text-gray-400 mt-1">Gerencie camada mais perigosa da sua conta.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#2d2d32]">
