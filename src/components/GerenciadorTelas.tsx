@@ -56,7 +56,11 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             )}
             {props.usuario.acessouOq === "calendario" &&
                 <div className="w-full flex items-center justify-center p-4">
-                    <Calendario />
+                    <Calendario
+                        perfil={props.perfil}
+                        inscricoes={props.usuario.inscricoes}
+                        turmasGlobais={props.listaEscolar.turmas}
+                    />
                 </div>}
 
             {props.usuario.acessouOq === "pesquisar" &&

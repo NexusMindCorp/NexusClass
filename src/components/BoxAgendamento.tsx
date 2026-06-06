@@ -11,8 +11,15 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
+import type { PerfilUsuario } from "@/hooks/useAuth";
 
 type BoxAgendamentoProps = {
+  perfil: PerfilUsuario;
+  turmasDisponiveis: { id: string; nome: string }[];
+  tipo: "pessoal" | "turma";
+  setTipo: (tipo: "pessoal" | "turma") => void;
+  turmaSelecionada: string;
+  setTurmaSelecionada: (id: string) => void;
   usaSupabase: boolean;
   date: Date | null;
   titulo: string;
@@ -27,7 +34,7 @@ type BoxAgendamentoProps = {
   cancelaAgendamento: () => void;
 }
 
-export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, setTitulo, descricao, setDescricao, horario, setHorario, salvandoEvento, erroBanco, adicionarEvento }: BoxAgendamentoProps) {
+export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, setTitulo, descricao, setDescricao, horario, setHorario, salvandoEvento, erroBanco, adicionarEvento, perfil, turmasDisponiveis, tipo, setTipo, turmaSelecionada, setTurmaSelecionada }: BoxAgendamentoProps) {
   const textoDataEvento = date ? format(date, "dd/MM/yyyy") : "data nao selecionada"
   const [horaInicial = "", minutoInicial = ""] = horario.split(":")
   const horas = Array.from({ length: 24 }, (_, indice) => String(indice).padStart(2, "0"))
@@ -63,6 +70,40 @@ export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, 
           onChange={(event) => setTitulo(event.target.value)}
           className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring focus-visible:ring-2 transition-colors"
         />
+        {perfil.role !== "aluno" && (
+          <div className="grid gap-3 sm:grid-cols-2 mt-2">
+            <div className="space-y-1.5">
+              <Label className="text-foreground">Tipo de Evento</Label>
+              <Select value={tipo} onValueChange={setTipo}>
+                <SelectTrigger className="border-input bg-background text-foreground">
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pessoal">Evento Pessoal</SelectItem>
+                  <SelectItem value="turma">Evento para Turma</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {tipo === "turma" && (
+              <div className="space-y-1.5">
+                <Label className="text-foreground">Qual Turma?</Label>
+                <Select value={turmaSelecionada} onValueChange={setTurmaSelecionada}>
+                  <SelectTrigger className="border-input bg-background text-foreground">
+                    <SelectValue placeholder="Selecione a turma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {turmasDisponiveis.map((turma) => (
+                      <SelectItem key={turma.id} value={turma.id}>
+                        {turma.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

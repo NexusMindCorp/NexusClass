@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
+import type { TurmaProps } from "./leituraJson"
+import type { PerfilUsuario } from "./useAuth"
 
 type EventoCalendario = {
   id: string
@@ -8,6 +10,9 @@ type EventoCalendario = {
   descricao: string
   data: string
   horario: string
+  tipo: "pessoal" | "turma"
+  turma_id: string | null
+  autor_id: string
 }
 
 type EventoCalendarioBanco = {
@@ -16,12 +21,21 @@ type EventoCalendarioBanco = {
   descricao: string
   data: string
   horario: string | null
+  tipo: "pessoal" | "turma"
+  turma_id: string | null
+  autor_id: string
 }
 
 type ErroSupabase = {
   code?: string
   message?: string
   details?: string
+}
+
+type UseCalendarioProps = {
+  perfil: PerfilUsuario;
+  inscricoes: Record<string, boolean>;
+  turmasGlobais: Record<string, TurmaProps>;
 }
 
 function paraChaveData(data: Date) {
@@ -59,12 +73,12 @@ function formatarErroSupabase(erro: ErroSupabase, acao: string) {
   return `Falha ao ${acao} no Supabase.${mensagem}`
 }
 
-export function useCalendario() {
+export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendarioProps) {
   const usaSupabase = Boolean(supabase && hasSupabaseConfig)
   const [date, setDateState] = useState<Date>(hojeLocal())
   const [mostrarBoxAgendamento, setMostrarBoxAgendamento] = useState(false)
   const [eventos, setEventos] = useState<EventoCalendario[]>([])
-  const [sobreEvento, setSobreEvento] = useState({ titulo: "", descricao: "", horario: "" })
+  const [sobreEvento, setSobreEvento] = useState({ titulo: "", descricao: "", horario: "", tipo: "pessoal" as EventoCalendario["tipo"], turmaSelecionada: "" })
   const [processamentoEvento, setProcessamentoEvento] = useState({ carregandoEventos: false, salvandoEvento: false })
   const [erroBanco, setErroBanco] = useState<string | null>(null)
   const [currentMonth, setCurrentMonth] = useState<Date>(
@@ -117,6 +131,9 @@ export function useCalendario() {
         descricao: evento.descricao,
         data: evento.data,
         horario: evento.horario ?? "",
+        tipo: evento.tipo,
+        turma_id: evento.turma_id,
+        autor_id: evento.autor_id,
       }))
 
       setEventos(normalizados)
@@ -182,6 +199,9 @@ export function useCalendario() {
     setProcessamentoEvento((anterior) => ({ ...anterior, salvandoEvento: true }))
     setErroBanco(null)
 
+    const tipoFinal = perfil.role === "aluno" ? "pessoal" : sobreEvento.tipo
+    const turmaIdFinal = tipoFinal === "pessoal" ? null : (sobreEvento.turmaSelecionada || null)
+
     try {
       const { data, error } = await supabase
         .from("eventos_calendario")
@@ -190,8 +210,11 @@ export function useCalendario() {
           descricao: descricaoLimpa,
           data: paraChaveData(date),
           horario: horarioLimpo || null,
+          tipo: tipoFinal,
+          turma_id: turmaIdFinal,
+          autor_id: perfil.id,
         })
-        .select("id,titulo,descricao,data,horario")
+        .select("id,titulo,descricao,data,horario,tipo,turma_id,autor_id")
         .single()
 
       if (error) {
@@ -208,10 +231,13 @@ export function useCalendario() {
           descricao: eventoInserido.descricao,
           data: eventoInserido.data,
           horario: eventoInserido.horario ?? "",
+          tipo: eventoInserido.tipo,
+          turma_id: eventoInserido.turma_id,
+          autor_id: eventoInserido.autor_id,
         },
       ])
 
-      setSobreEvento({ titulo: "", descricao: "", horario: "" })
+      setSobreEvento({ titulo: "", descricao: "", horario: "", tipo: "pessoal", turmaSelecionada: "" })
       setDateState(hojeLocal())
       setMostrarBoxAgendamento(false)
     } catch {
@@ -258,12 +284,15 @@ export function useCalendario() {
   }
 
   const cancelarAgendamento = () => {
-    setSobreEvento({ titulo: "", descricao: "", horario: "" })
+    setSobreEvento({ titulo: "", descricao: "", horario: "", tipo: "pessoal", turmaSelecionada: "" })
     setDateState(hojeLocal())
     setMostrarBoxAgendamento(false)
   }
 
   return {
+    perfil,
+    inscricoes,
+    turmasGlobais,
     usaSupabase,
     date,
     selecionarDataCalendario,

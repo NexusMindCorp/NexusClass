@@ -4,8 +4,16 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { useCalendario } from "@/hooks/useCalendario"
 import { BoxAgendamento } from "./BoxAgendamento"
 import { BoxAgendados } from "./BoxAgendados"
+import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { TurmaProps } from "@/hooks/leituraJson"
 
-export function Calendario() {
+type CalendarioProps = {
+  perfil: PerfilUsuario;
+  inscricoes: Record<string, boolean>;
+  turmasGlobais: Record<string, TurmaProps>;
+};
+
+export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProps) {
   const {
     usaSupabase,
     date,
@@ -23,7 +31,12 @@ export function Calendario() {
     adicionarEvento,
     removerEvento,
     selecionarDataRelativa,
-  } = useCalendario()
+  } = useCalendario({ perfil, inscricoes, turmasGlobais })
+
+  const turmasDisponiveis = Object.keys(inscricoes).map(key => ({
+    id: key,
+    nome: turmasGlobais[key]?.materia || key,
+  }))
 
   return (
     <Card className="mx-auto h-fit w-full max-w-5xl border-border bg-card text-card-foreground shadow-2xl backdrop-blur-sm">
@@ -55,6 +68,12 @@ export function Calendario() {
               </div>
             ) : (
               <BoxAgendamento
+                perfil={perfil}
+                turmasDisponiveis={turmasDisponiveis}
+                tipo={sobreEvento.tipo}
+                setTipo={(tipo) => setSobreEvento((ant) => ({ ...ant, tipo }))}
+                turmaSelecionada={sobreEvento.turmaSelecionada}
+                setTurmaSelecionada={(turmaSelecionada) => setSobreEvento((ant) => ({ ...ant, turmaSelecionada }))}
                 cancelaAgendamento={cancelarAgendamento}
                 usaSupabase={usaSupabase}
                 date={date}
@@ -77,6 +96,7 @@ export function Calendario() {
             )}
 
             <BoxAgendados
+              perfil={perfil}
               date={date}
               carregandoEventos={processamentoEvento.carregandoEventos}
               eventosDoDia={eventosDoDia}

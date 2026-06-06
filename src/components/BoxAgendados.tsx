@@ -1,6 +1,7 @@
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import type { PerfilUsuario } from "@/hooks/useAuth"
 
 type EventoCalendario = {
 	id: string
@@ -8,9 +9,13 @@ type EventoCalendario = {
 	descricao: string
 	data: string
 	horario: string
+	tipo: "pessoal" | "turma"
+	turma_id: string | null
+	autor_id: string
 }
 
 type BoxAgendadosProps = {
+	perfil: PerfilUsuario
 	date: Date | undefined
 	carregandoEventos: boolean
 	eventosDoDia: EventoCalendario[]
@@ -18,6 +23,7 @@ type BoxAgendadosProps = {
 }
 
 export function BoxAgendados({
+	perfil,
 	date,
 	carregandoEventos,
 	eventosDoDia,
@@ -46,34 +52,54 @@ export function BoxAgendados({
 				</p>
 			) : (
 				<div className="space-y-2">
-					{eventosDoDia.map((evento) => (
-						<div
-							key={evento.id}
-							className="flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/30 p-3 shadow-sm transition-colors"
-						>
-							<div className="space-y-1">
-								<p className="text-sm font-medium text-foreground">{evento.titulo}</p>
-								{evento.horario ? (
-									<p className="text-xs text-muted-foreground">
-										Horário: {evento.horario}
-									</p>
-								) : null}
-								{evento.descricao ? (
-									<p className="whitespace-pre-wrap text-sm text-muted-foreground">
-										{evento.descricao}
-									</p>
-								) : null}
-							</div>
-							<Button
-								variant="outline"
-								size="sm"
-								className="border-border bg-background text-foreground hover:bg-destructive hover:text-destructive-foreground cursor-pointer transition-colors"
-								onClick={() => removerEvento(evento.id)}
+					{eventosDoDia.map((evento) => {
+						const ehEventoTurma = evento.tipo === "turma";
+						const podeRemover = evento.tipo === "pessoal" || perfil.role !== "aluno";
+
+						return (
+							<div
+								key={evento.id}
+								className={`flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/30 p-3 shadow-sm transition-colors border-l-4 ${ehEventoTurma ? "border-l-purple-500" : "border-l-emerald-500"
+									}`}
 							>
-								Remover
-							</Button>
-						</div>
-					))}
+								<div className="space-y-1.5 w-full">
+									<div className="flex items-center gap-2 flex-wrap">
+										<p className="text-sm font-bold text-foreground">{evento.titulo}</p>
+										<Badge variant="outline" className={
+											ehEventoTurma
+												? "bg-purple-500/10 text-purple-500 border-purple-500/20 text-[10px] py-0 h-4"
+												: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] py-0 h-4"
+										}>
+											{ehEventoTurma ? "Turma" : "Pessoal"}
+										</Badge>
+									</div>
+
+									{evento.horario ? (
+										<p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+											Horário: {evento.horario.slice(0, 5)}
+										</p>
+									) : null}
+
+									{evento.descricao ? (
+										<p className="whitespace-pre-wrap text-xs text-muted-foreground/80 mt-1">
+											{evento.descricao}
+										</p>
+									) : null}
+								</div>
+
+								{podeRemover && (
+									<Button
+										variant="outline"
+										size="sm"
+										className="border-border bg-background text-foreground hover:bg-destructive hover:text-destructive-foreground cursor-pointer transition-colors"
+										onClick={() => removerEvento(evento.id)}
+									>
+										Remover
+									</Button>
+								)}
+							</div>
+						)
+					})}
 				</div>
 			)}
 		</div>
