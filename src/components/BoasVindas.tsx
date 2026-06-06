@@ -32,11 +32,13 @@ export function BoasVindas({ perfil, acionarExplorar }: BoasVindasProps) {
                             <>
                                 Olá, Prof. {nomeUsuario}! Seu ambiente virtual de ensino está pronto.
                                 Aqui você pode gerenciar suas turmas, disponibilizar materiais e acompanhar o progresso dos seus alunos.
+                                Além disso, temos a tecnologia de Inteligência Artificial para ajudar vocês ser mais produtivo.
                             </>
                         ) : isAluno ? (
                             <>
                                 Olá, {nomeUsuario}! Seu ambiente virtual de aprendizagem está pronto.
                                 Aqui você pode acompanhar suas disciplinas, acessar seus materiais e interagir com suas turmas.
+                                Além disso, temos a tecnologia de Inteligência Artificial para ajudar vocês a aprender mais eficientemente.
                             </>
                         ) : (
                             <>
