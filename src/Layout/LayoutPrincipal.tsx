@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from "react"
+import { useRef, useCallback } from "react"
 import { useOutletContext } from "react-router-dom"
 import { Navbar } from "@/components//Navbar"
 import { AppSidebar } from "@/components//AppSidebar"
@@ -30,7 +30,8 @@ export function LayoutPrincipal() {
       />
 
       <main className="pagina-principal">
-        <Navbar />
+        <Navbar perfil={perfil} />
+
         <div className="pagina-conteudo">
           <GerenciadorTelas
             usuario={usuario}
