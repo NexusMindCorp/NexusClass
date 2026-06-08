@@ -2,59 +2,13 @@ import * as React from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { EscolaProps, TurmaProps } from "@/hooks/leituraJson"
 
-type EscolaBanco = {
-  id: string
-  nome: string
-  ano_letivo: number
-}
-
 type TurmaBanco = {
   id: string
   chave: string
   materia: string
-  professor: string
   banner_url: string
-  foto_professor_url: string
   sala: string
   turma: string
-}
-
-type AlunoBanco = {
-  turma_id: string
-  nome: string
-}
-
-function montarListaEscolar(
-  escola: EscolaBanco,
-  turmas: TurmaBanco[],
-  alunos: AlunoBanco[]
-): EscolaProps {
-  const alunosPorTurma = new Map<string, string[]>()
-
-  for (const aluno of alunos) {
-    const listaAtual = alunosPorTurma.get(aluno.turma_id) ?? []
-    listaAtual.push(aluno.nome)
-    alunosPorTurma.set(aluno.turma_id, listaAtual)
-  }
-
-  const turmasMap: Record<string, TurmaProps> = {}
-  for (const turma of turmas) {
-    turmasMap[turma.chave] = {
-      materia: turma.materia,
-      professor: turma.professor,
-      banners: turma.banner_url,
-      alunos: alunosPorTurma.get(turma.id) ?? [],
-      foto_professor: turma.foto_professor_url,
-      sala: turma.sala,
-      turma: turma.turma,
-    }
-  }
-
-  return {
-    escola: escola.nome,
-    ano_letivo: escola.ano_letivo,
-    turmas: turmasMap,
-  }
 }
 
 export function useEscolaDados() {
@@ -68,7 +22,7 @@ export function useEscolaDados() {
 
   const carregar = React.useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
-      setErroEscola("Supabase nao configurado para carregar turmas.")
+      setErroEscola("Supabase não configurado para carregar turmas.")
       return
     }
 
@@ -84,44 +38,84 @@ export function useEscolaDados() {
         .maybeSingle()
 
       if (escolaError || !escolaData) {
-        setErroEscola("Nao foi possivel carregar escolas no Supabase.")
+        setErroEscola("Não foi possível carregar escolas no Supabase.")
         return
       }
 
-      const escola = escolaData as EscolaBanco
-
       const { data: turmasData, error: turmasError } = await supabase
         .from("turmas_escolares")
-        .select("id,chave,materia,professor,banner_url,foto_professor_url,sala,turma")
-        .eq("escola_id", escola.id)
+        .select("id,chave,materia,banner_url,sala,turma")
+        .eq("escola_id", escolaData.id)
 
       if (turmasError || !turmasData) {
-        setErroEscola("Nao foi possivel carregar turmas no Supabase.")
+        setErroEscola("Não foi possível carregar turmas no Supabase.")
         return
       }
 
       const turmas = turmasData as TurmaBanco[]
-      const turmaIds = turmas.map((turma) => turma.id)
+      const turmasId = turmas.map((turma) => turma.id)
 
-      let alunos: AlunoBanco[] = []
-      if (turmaIds.length > 0) {
-        const { data: alunosData, error: alunosError } = await supabase
-          .from("turma_alunos")
-          .select("turma_id,nome")
-          .in("turma_id", turmaIds)
-          .order("nome", { ascending: true })
+      const alunosPorTurma = new Map<string, string[]>()
+      const professoresPorTurma = new Map<string, { nome: string; foto_url: string | null }>()
 
-        if (alunosError) {
-          setErroEscola("Nao foi possivel carregar alunos no Supabase.")
-          return
+      if (turmasId.length > 0) {
+        const { data: profData } = await supabase
+          .from("professor_turma")
+          .select("turma_id,perfis(nome,foto_url)")
+          .in("turma_id", turmasId)
+
+        if (profData) {
+          (profData as any[]).forEach((item: any) => {
+            const perfil = Array.isArray(item.perfis) ? item.perfis[0] : item.perfis;
+            if (perfil) {
+              professoresPorTurma.set(item.turma_id, {
+                nome: perfil.nome || '',
+                foto_url: perfil.foto_url || null
+              })
+            }
+          })
         }
 
-        alunos = (alunosData ?? []) as AlunoBanco[]
+        const { data: alunoData } = await supabase
+          .from("aluno_turma")
+          .select("turma_id,perfis(nome)")
+          .in("turma_id", turmasId)
+
+        if (alunoData) {
+          (alunoData as any[]).forEach((item: any) => {
+            const perfil = Array.isArray(item.perfis) ? item.perfis[0] : item.perfis;
+
+            if (perfil?.nome) {
+              const listaAtual = alunosPorTurma.get(item.turma_id) || []
+              listaAtual.push(perfil.nome)
+              alunosPorTurma.set(item.turma_id, listaAtual)
+            }
+          })
+        }
       }
 
-      setListaEscolar(montarListaEscolar(escola, turmas, alunos))
-    } catch {
-      setErroEscola("Falha de conexao ao carregar dados do Supabase.")
+      const turmasFormatadas: Record<string, TurmaProps> = {}
+      for (const turma of turmas) {
+        const prof = professoresPorTurma.get(turma.id)
+
+        turmasFormatadas[turma.id] = {
+          materia: turma.materia || "",
+          professor: prof?.nome || "Anônimo",
+          banners: turma.banner_url || "",
+          alunos: alunosPorTurma.get(turma.id) || [],
+          foto_professor: prof?.foto_url || "",
+          sala: turma.sala || "",
+          turma: turma.turma || "",
+        }
+      }
+
+      setListaEscolar({
+        escola: escolaData.nome,
+        ano_letivo: escolaData.ano_letivo,
+        turmas: turmasFormatadas,
+      })
+    } catch (error) {
+      setErroEscola("Ocorreu um erro inesperado ao carregar os dados escolares.")
     } finally {
       setCarregandoEscola(false)
     }
@@ -131,9 +125,5 @@ export function useEscolaDados() {
     void carregar()
   }, [carregar])
 
-  return {
-    listaEscolar,
-    carregandoEscola,
-    erroEscola,
-  }
+  return { listaEscolar, carregandoEscola, erroEscola }
 }

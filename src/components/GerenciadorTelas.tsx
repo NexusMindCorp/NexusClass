@@ -33,20 +33,23 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             )}
             {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
                 <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {props.listaEscolar.turmas && Object.entries(props.listaEscolar.turmas).map(([key, turma]) => (
-                        <TurmaCard
-                            key={key}
-                            materia={turma.materia}
-                            banners={turma.banners}
-                            professor={turma.professor}
-                            fotoProfessor={turma.foto_professor}
-                            sala={turma.sala}
-                            turma={turma.turma}
-                            inscrito={props.estaInscrito(key)}
-                            clickInscrito={() => props.mudarInscricao(key)}
-                            clickMural={() => props.marcarMural(key)}
-                        />
-                    ))}
+                    {props.listaEscolar.turmas && Object.entries(props.listaEscolar.turmas)
+                        .filter(([key]) => props.estaInscrito(key) || props.perfil.role === "master")
+                        .sort((a, b) => a[1].materia.localeCompare(b[1].materia))
+                        .map(([key, turma]) => (
+                            <TurmaCard
+                                key={key}
+                                materia={turma.materia}
+                                banners={turma.banners}
+                                professor={turma.professor}
+                                fotoProfessor={turma.foto_professor}
+                                sala={turma.sala}
+                                turma={turma.turma}
+                                inscrito={props.estaInscrito(key)}
+                                clickInscrito={() => props.mudarInscricao(key)}
+                                clickMural={() => props.marcarMural(key)}
+                            />
+                        ))}
                 </div>
             )}
             {props.usuario.acessouOq === "mural" && (

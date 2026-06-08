@@ -10,10 +10,10 @@ import { ChatBot } from "@/components/ChatBot"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 
 export function LayoutPrincipal() {
-  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, } = useGerenciador()
+  const { perfil } = useOutletContext<{ perfil: PerfilUsuario }>()
+  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
-  const { perfil } = useOutletContext<{ perfil: PerfilUsuario }>()
 
   const abrirChatComAjuda = useCallback(() => {
     chatBotRef.current?.abrirComAjuda()

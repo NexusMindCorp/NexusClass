@@ -23,7 +23,7 @@ type PesquisarProps = {
 }
 
 export function Pesquisar(props: PesquisarProps) {
-    const [abaAtiva, setAbaAtiva] = useState("Todas")
+    const [abaAtiva, setAbaAtiva] = useState("minhas")
     const { textoPesquisa, setTextoPesquisa, aberto, mudarAberturaSheet, turmasFiltradas } = usePesquisa({
         aoFecharPesquisa: props.voltarPrincipal,
         turmas: props.turmas,
@@ -32,7 +32,9 @@ export function Pesquisar(props: PesquisarProps) {
     const isAluno = props.perfil?.role === "aluno";
     const isProfessor = props.perfil?.role === "professor";
 
-    const turmasBase = textoPesquisa.trim() === "" ? Object.entries(props.turmas) : turmasFiltradas;
+    const turmasBase = textoPesquisa.trim() === ""
+        ? Object.entries(props.turmas).sort((a, b) => a[1].materia.localeCompare(b[1].materia))
+        : turmasFiltradas;
 
     const turmasParaExibir = turmasBase.filter(([key, _]) => {
         const inscrito = props.estaInscrito(key);
@@ -40,10 +42,19 @@ export function Pesquisar(props: PesquisarProps) {
         if (isProfessor && !inscrito) return false;
 
         if (isAluno) {
-            if (abaAtiva === "Minhas" && !inscrito) return false;
+            if (abaAtiva === "minhas" && !inscrito) return false;
             if (abaAtiva === "disponiveis" && inscrito) return false;
         }
         return true;
+    });
+
+    const turmasOrdenadas = turmasParaExibir.sort(([keyA,], [keyB,]) => {
+        const inscritoA = props.estaInscrito(keyA);
+        const inscritoB = props.estaInscrito(keyB);
+
+        if (inscritoA && !inscritoB) return -1;
+        if (!inscritoA && inscritoB) return 1;
+        return 0;
     });
 
     return (
@@ -71,16 +82,16 @@ export function Pesquisar(props: PesquisarProps) {
                             <Tabs value={abaAtiva} onValueChange={setAbaAtiva} className="w-full">
                                 <TabsList className="grid w-full grid-cols-3 p-0 bg-muted rounded-xl overflow-hidden h-auto border-1 border-black border-border">
                                     <TabsTrigger
-                                        value="todas"
-                                        className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
-                                    >
-                                        Todas
-                                    </TabsTrigger>
-                                    <TabsTrigger
                                         value="minhas"
                                         className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
                                     >
                                         Inscritas
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="todas"
+                                        className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
+                                    >
+                                        Todas
                                     </TabsTrigger>
                                     <TabsTrigger
                                         value="disponiveis"
@@ -94,14 +105,14 @@ export function Pesquisar(props: PesquisarProps) {
                     </div>
 
                     <div className="mt-2 flex-1 overflow-y-auto pr-2 pb-6 space-y-2">
-                        {turmasParaExibir.length > 0 ? (
+                        {turmasOrdenadas.length > 0 ? (
                             <>
                                 <div className="text-xs text-muted-foreground mb-2">
-                                    {turmasParaExibir.length} resultado{turmasParaExibir.length !== 1 ? 's' : ''}
+                                    {turmasOrdenadas.length} resultado{turmasOrdenadas.length !== 1 ? 's' : ''}
                                 </div>
 
                                 <div className="flex flex-col gap-2">
-                                    {turmasParaExibir.map(([key, turma]) => (
+                                    {turmasOrdenadas.map(([key, turma]) => (
                                         <TurmaCard
                                             key={key}
                                             compacto={true}
