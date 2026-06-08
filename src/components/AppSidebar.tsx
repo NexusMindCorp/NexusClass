@@ -139,7 +139,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <Configuracoes navegarPara={navegarPara} />
+                        <Configuracoes navegarPara={navegarPara}/>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

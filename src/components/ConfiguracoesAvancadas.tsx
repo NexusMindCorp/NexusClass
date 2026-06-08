@@ -4,7 +4,7 @@ import { ListagemConteudosInscritos } from "./ListagemConteudosInscritos";
 import { useConfiguracoesAvancadas } from "@/hooks/useConfiguracoesAvancadas";
 import { BoxRestrito } from "./BoxRestrito";
 
-export function ConfiguracoesAvancadas() {
+export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {
     const { perfil, senhaDoInput, setSenhaDoInput, areaSensivel, setAreaSensivel, carregando, handleAlterarSenha, handleDeletarConta } = useConfiguracoesAvancadas();
     return perfil?.role === "aluno" || perfil?.role === "master" ? (
     <div className="w-full max-w-4xl mx-auto space-y-8 pb-10">
@@ -84,7 +84,7 @@ export function ConfiguracoesAvancadas() {
 
   
       <div className="w-full">
-        <ListagemConteudosInscritos />
+        <ListagemConteudosInscritos usuario={usuario} listaEscolar={listaEscolar} cancelarInscricao={cancelarInscricao} estaInscrito={estaInscrito}/>
       </div>
 
     

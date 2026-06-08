@@ -10,9 +10,10 @@ import type { OpcoesTela } from "@/hooks/useGerenciador"
 
 type ConfiguracoesProps = {
   navegarPara?: (tela: OpcoesTela) => void
+
 }
 
-export function Configuracoes({ navegarPara }: ConfiguracoesProps) {
+export function Configuracoes({ navegarPara}: ConfiguracoesProps) {
   return (
     <DropdownMenu>
       <SidebarMenuButton asChild>

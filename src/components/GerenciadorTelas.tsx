@@ -95,7 +95,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             {props.usuario.acessouOq === "configuracoesAvancadas" && (
                 <div className="w-full flex items-center justify-center p-4">
                     <div className="w-full max-w-3xl">
-                        <ConfiguracoesAvancadas />
+                        <ConfiguracoesAvancadas  estaInscrito = {props.estaInscrito} usuario={props.usuario} listaEscolar={props.listaEscolar} cancelarInscricao={props.mudarInscricao} />
                     </div>
                 </div>
             )}
