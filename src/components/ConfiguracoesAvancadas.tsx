@@ -3,6 +3,8 @@ import { BoxAlertaDeletaConta } from "./BoxAlertaDeletaConta";
 import { ListagemConteudosInscritos } from "./ListagemConteudosInscritos";
 import { useConfiguracoesAvancadas } from "@/hooks/useConfiguracoesAvancadas";
 import { BoxRestrito } from "./BoxRestrito";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import { getCorNomeUsuario } from "@/lib/utils";
 
 export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {
     const { perfil, senhaDoInput, setSenhaDoInput, areaSensivel, setAreaSensivel, carregando, handleAlterarSenha, handleDeletarConta } = useConfiguracoesAvancadas();
@@ -16,11 +18,15 @@ export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscrica
        
           <div className="flex-shrink-0">
             <div className="relative group">
-              <img 
-                src={perfil?.foto_url || "/Logos/avatar-padrao.png"} 
-                alt="Foto do perfil" 
-                className="w-24 h-24 rounded-full object-cover border-4 border-[#2d2d32] transition-transform group-hover:scale-105" 
-              />
+              <Avatar className="h-24 w-24 border-2 border-primary rounded-full">
+                                {!perfil?.foto_url ? (
+                                    <div className={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorNomeUsuario(perfil?.nome || "U")}`}>
+                                        {(perfil?.nome || "U").charAt(0).toUpperCase()}
+                                    </div>
+                                ) : (
+                                    <AvatarImage src={perfil.foto_url} alt="Foto do Perfil" className="object-cover" />
+                                )}
+                            </Avatar>
             </div>
           </div>
 
