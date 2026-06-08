@@ -22,13 +22,7 @@ type BoxAgendadosProps = {
 	removerEvento: (id: string) => void
 }
 
-export function BoxAgendados({
-	perfil,
-	date,
-	carregandoEventos,
-	eventosDoDia,
-	removerEvento,
-}: BoxAgendadosProps) {
+export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, removerEvento, }: BoxAgendadosProps) {
 	return (
 		<div className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
 			<div className="flex items-center justify-between">
