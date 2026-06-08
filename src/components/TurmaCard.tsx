@@ -29,7 +29,7 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
       <div className={`absolute inset-0 z-30 bg-black/35 ${compacto ? 'h-24' : 'aspect-video'}`} />
 
       <img
-        src={banners}
+        src={banners || undefined}
         alt="Banner da turma"
         className={`relative z-20 w-full object-cover brightness-70 ${compacto ? 'h-24' : 'aspect-video'}`}
       />
@@ -37,7 +37,7 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
       <CardHeader className={compacto ? "p-4 pb-1 pt-0" : ""}>
         <CardAction className="relative z-40 h-11 w-11">
           <img
-            src={fotoProfessor}
+            src={fotoProfessor || undefined}
             alt="Foto do professor"
             className={`rounded-full object-cover border-2 border-background shadow-sm ${compacto ? 'h-10 w-10' : 'h-14 w-14'}`}
           />

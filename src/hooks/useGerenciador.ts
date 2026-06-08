@@ -213,6 +213,8 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
+    
+
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase) {
             return
@@ -279,5 +281,5 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
-    return { usuario, pedirAjuda, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
+    return { usuario, pedirAjuda,  setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
 }

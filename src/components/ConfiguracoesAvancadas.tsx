@@ -5,7 +5,7 @@ import { useConfiguracoesAvancadas } from "@/hooks/useConfiguracoesAvancadas";
 import { BoxRestrito } from "./BoxRestrito";
 
 export function ConfiguracoesAvancadas() {
-    const { perfil, senhaDoInput, setSenhaDoInput, areaSensivel, setAreaSensivel, carregando, setCarregando, handleAlterarSenha, handleDeletarConta } = useConfiguracoesAvancadas();
+    const { perfil, senhaDoInput, setSenhaDoInput, areaSensivel, setAreaSensivel, carregando, handleAlterarSenha, handleDeletarConta } = useConfiguracoesAvancadas();
     return perfil?.role === "aluno" || perfil?.role === "master" ? (
     <div className="w-full max-w-4xl mx-auto space-y-8 pb-10">
       
