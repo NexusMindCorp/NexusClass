@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from "react"
+import { useCallback, useEffect, useState } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
@@ -28,13 +28,15 @@ export function useAuth() {
     const [perfil, setPerfil] = useState<PerfilUsuario | null>(null)
     const [materiasProfessor, setMateriasProfessor] = useState<TurmaProfessor[]>([])
     const materiasProfessorNomes = materiasProfessor.map((item) => item.materia)
-    const loadingUserRef = useRef<string | null>(null)
+
 
     const atualizarPerfilLocal = useCallback((perfilAtualizado: PerfilUsuario) => {
+
         setPerfil(perfilAtualizado)
     }, [])
 
     const fetchPerfil = async (userId: string) => {
+       
         try {
             const { data, error } = await supabase
                 .from("perfis")
@@ -43,12 +45,14 @@ export function useAuth() {
                 .single()
 
             if (error) {
+                console.error("[useAuth] fetchPerfil - Erro retornado do Supabase:", error)
                 throw error
             }
 
             setPerfil(data)
             return data as PerfilUsuario
         } catch (error: any) {
+            console.error("[useAuth] fetchPerfil - Captura de erro no catch:", error)
             toast.error("Erro ao carregar perfil", {
                 description: "Não conseguimos buscar os dados da sua conta. Tente recarregar a página.",
             })
@@ -57,8 +61,8 @@ export function useAuth() {
     }
 
     const fetchMateriasProfessor = async (userId: string) => {
+        
         try {
-
             // 1. Busca os IDs das turmas vinculadas a este professor
             const { data: relacoes, error: relacoesError } = await supabase
                 .from("professor_turma")
@@ -66,10 +70,12 @@ export function useAuth() {
                 .eq("professor_id", userId)
 
             if (relacoesError) {
+                console.error("[useAuth] fetchMateriasProfessor - Erro ao buscar professor_turma:", relacoesError)
                 throw relacoesError
             }
 
             const turmaIds = (relacoes ?? []).map((item) => item.turma_id)
+           
 
             if (turmaIds.length === 0) {
                 setMateriasProfessor([])
@@ -83,6 +89,7 @@ export function useAuth() {
                 .in("id", turmaIds)
 
             if (turmasError) {
+                console.error("[useAuth] fetchMateriasProfessor - Erro ao buscar turmas_escolares:", turmasError)
                 throw turmasError
             }
 
@@ -106,63 +113,92 @@ export function useAuth() {
         }
 
         let isMounted = true
+        let isInitialLoad = true
 
-        const syncSession = async (currentSession: Session | null) => {
-            if (!isMounted) return
-
-            if (currentSession?.user) {
-                const userId = currentSession.user.id
-                if (loadingUserRef.current === userId) {
-                    setSession(currentSession)
+        const loadSessionAndData = async () => {
+            console.log("[useAuth] loadSessionAndData - Iniciando carregamento inicial...")
+            try {
+                const { data: { session: initialSession }, error } = await supabase.auth.getSession()
+                if (error) {
+                    console.error("[useAuth] loadSessionAndData - Erro ao obter sessão:", error)
+                    throw error
+                }
+                if (!isMounted) {
+     
                     return
                 }
-                loadingUserRef.current = userId
-                setLoading(true)
-                setSession(currentSession)
 
-                try {
-                    const perfilCarregado = await fetchPerfil(userId)
+               
+                if (initialSession?.user) {
+                    setSession(initialSession)
+                    const perfilCarregado = await fetchPerfil(initialSession.user.id)
                     if (perfilCarregado?.role === "professor" && isMounted) {
-                        await fetchMateriasProfessor(userId)
+                        await fetchMateriasProfessor(initialSession.user.id)
+                    }
+                } else {
+                    setSession(null)
+                    setPerfil(null)
+                    setMateriasProfessor([])
+                }
+            } catch (err) {
+                console.error("[useAuth] loadSessionAndData - Erro no fluxo inicial:", err)
+            } finally {
+                if (isMounted) {
+                    
+                    setLoading(false)
+                    isInitialLoad = false
+                } else {
+                    console.log("[useAuth] loadSessionAndData - Finalizado após desmontar. Ignorando finalização de estado.")
+                }
+            }
+        }
+
+        // Executa a carga inicial
+        loadSessionAndData()
+
+        // Escuta mudanças de estado de autenticação
+      
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
+            console.log("[useAuth] onAuthStateChange disparado. Evento:", event, "Session:", sessionAtualizada?.user?.id || "Nenhuma", "isInitialLoad:", isInitialLoad)
+            
+            // Ignora o primeiro disparo se for INITIAL_SESSION ou SIGNED_IN redundante com a carga inicial
+            if (isInitialLoad && (event === "INITIAL_SESSION" || event === "SIGNED_IN")) {
+                console.log("[useAuth] onAuthStateChange - Ignorando evento inicial redundante:", event)
+                return
+            }
+
+            if (!isMounted) {
+                console.log("[useAuth] onAuthStateChange - Componente desmontado. Ignorando evento.")
+                return
+            }
+
+            if (sessionAtualizada?.user) {
+                setSession(sessionAtualizada)
+                setLoading(true)
+                try {
+                    const perfilCarregado = await fetchPerfil(sessionAtualizada.user.id)
+                    if (perfilCarregado?.role === "professor" && isMounted) {
+                        await fetchMateriasProfessor(sessionAtualizada.user.id)
                     }
                 } catch (err) {
-                    console.error("Erro ao carregar dados do usuário:", err)
+                    console.error("[useAuth] onAuthStateChange - Erro no fluxo pós-evento:", err)
                 } finally {
                     if (isMounted) {
+                        console.log("[useAuth] onAuthStateChange - Finalizado pós-evento. Configurando loading para false.")
                         setLoading(false)
                     }
                 }
             } else {
-                loadingUserRef.current = null
+               
                 setSession(null)
                 setPerfil(null)
                 setMateriasProfessor([])
                 setLoading(false)
             }
-        }
-
-        // Busca a sessão inicial do Supabase
-        supabase.auth.getSession().then(({ data: { session: initialSession }, error }) => {
-            if (error) {
-                toast.error("Erro ao obter sessão", {
-                    description: "Não conseguimos obter informações da sua sessão. Tente recarregar a página.",
-                })
-                if (isMounted) setLoading(false)
-            } else {
-                syncSession(initialSession)
-            }
-        })
-
-        // Escuta mudanças de estado de autenticação
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, sessionAtualizada) => {
-            if (sessionAtualizada) {
-                await syncSession(sessionAtualizada)
-            } else {
-                await syncSession(null)
-            }
         })
 
         return () => {
+        
             isMounted = false
             subscription?.unsubscribe()
         }
