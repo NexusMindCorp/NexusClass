@@ -51,14 +51,14 @@ export function Navbar({ perfil }: NavbarProps) {
         setSaindo(true)
         try {
             const { error } = await supabase.auth.signOut()
-            if (error) throw error
-            navigate("/login", { replace: true })
+            if (error) {
+                console.warn("Erro ao tentar deslogar no Supabase, prosseguindo com a limpeza local:", error)
+            }
         } catch (error: any) {
-            toast.error("Erro ao sair", {
-                description: "Ocorreu um erro inesperado ao tentar sair da conta.",
-            })
+            console.error("Erro inesperado ao deslogar:", error)
         } finally {
             setSaindo(false)
+            navigate("/login", { replace: true })
         }
     }
 
