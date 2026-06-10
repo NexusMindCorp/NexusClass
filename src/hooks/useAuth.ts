@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
@@ -28,6 +28,7 @@ export function useAuth() {
     const [perfil, setPerfil] = useState<PerfilUsuario | null>(null)
     const [materiasProfessor, setMateriasProfessor] = useState<TurmaProfessor[]>([])
     const materiasProfessorNomes = materiasProfessor.map((item) => item.materia)
+    const loadingUserRef = useRef<string | null>(null)
 
     const fetchPerfil = async (userId: string) => {
         try {
@@ -100,43 +101,65 @@ export function useAuth() {
             return
         }
 
+        let isMounted = true
 
-        supabase.auth.getSession().then(async ({ data: { session }, error }) => {
-            if (error) {
-                toast.error("Erro ao obter sessão", {
-                    description: "Não conseguimos obter informações da sua sessão. Tente recarregar a página.",
-                })
-            } else {
-                setSession(session)
-                if (session?.user) {
-                    const perfilCarregado = await fetchPerfil(session.user.id)
-                    if (perfilCarregado?.role === "professor") {
-                        await fetchMateriasProfessor(session.user.id)
-                    }
+        const syncSession = async (currentSession: Session | null) => {
+            if (!isMounted) return
+
+            if (currentSession?.user) {
+                const userId = currentSession.user.id
+                if (loadingUserRef.current === userId) {
+                    setSession(currentSession)
+                    return
                 }
-            }
-            setLoading(false) // Libera o spinner após buscar tudo a primeira vez
-        })
+                loadingUserRef.current = userId
+                setLoading(true)
+                setSession(currentSession)
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
-            setSession(sessionAtualizada)
-
-            if (sessionAtualizada?.user) {
-                if (event === 'SIGNED_IN') {
-                    const perfilCarregado = await fetchPerfil(sessionAtualizada.user.id)
-                    if (perfilCarregado?.role === "professor") {
-                        console.log("useAuth -> SIGNED_IN professor, iniciando busca de matérias")
-                        await fetchMateriasProfessor(sessionAtualizada.user.id)
+                try {
+                    const perfilCarregado = await fetchPerfil(userId)
+                    if (perfilCarregado?.role === "professor" && isMounted) {
+                        await fetchMateriasProfessor(userId)
+                    }
+                } catch (err) {
+                    console.error("Erro ao carregar dados do usuário:", err)
+                } finally {
+                    if (isMounted) {
+                        setLoading(false)
                     }
                 }
             } else {
+                loadingUserRef.current = null
+                setSession(null)
                 setPerfil(null)
                 setMateriasProfessor([])
                 setLoading(false)
             }
+        }
+
+        // Busca a sessão inicial do Supabase
+        supabase.auth.getSession().then(({ data: { session: initialSession }, error }) => {
+            if (error) {
+                toast.error("Erro ao obter sessão", {
+                    description: "Não conseguimos obter informações da sua sessão. Tente recarregar a página.",
+                })
+                if (isMounted) setLoading(false)
+            } else {
+                syncSession(initialSession)
+            }
+        })
+
+        // Escuta mudanças de estado de autenticação
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, sessionAtualizada) => {
+            if (sessionAtualizada) {
+                await syncSession(sessionAtualizada)
+            } else {
+                await syncSession(null)
+            }
         })
 
         return () => {
+            isMounted = false
             subscription?.unsubscribe()
         }
     }, [])

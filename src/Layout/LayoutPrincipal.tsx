@@ -11,7 +11,7 @@ import type { PerfilUsuario } from "@/hooks/useAuth"
 
 export function LayoutPrincipal() {
   const { perfil } = useOutletContext<{ perfil: PerfilUsuario }>()
-  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, } = useGerenciador(perfil)
+  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
 
@@ -42,6 +42,7 @@ export function LayoutPrincipal() {
             listaEscolar={listaEscolar}
             abrirChatComAjuda={abrirChatComAjuda}
             perfil={perfil}
+            loadingInscricoes={loadingInscricoes}
           />
         </div>
       </main>

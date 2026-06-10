@@ -20,11 +20,12 @@ type GerenciadorTelasProps = {
     listaEscolar: EscolaProps;
     abrirChatComAjuda: () => void;
     perfil: PerfilUsuario;
+    loadingInscricoes: boolean;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
     const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];
-    const isNovoUsuario = Object.keys(props.usuario.inscricoes).length === 0;
+    const isNovoUsuario = !props.loadingInscricoes && Object.keys(props.usuario.inscricoes).length === 0;
 
     return (
         <>

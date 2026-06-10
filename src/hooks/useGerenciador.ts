@@ -52,21 +52,25 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
     const alertasEnviadosRef = useRef<Set<string>>(new Set())
     const [pedirAjuda, setPedirAjuda] = useState(false);
     const [usuario, setUsuario] = useState<UsuarioProps>(ESTADO_INICIAL_USUARIO);
+    const [loadingInscricoes, setLoadingInscricoes] = useState(true);
 
     const limparEstado = () => {
         setUsuario(ESTADO_INICIAL_USUARIO);
         setPedirAjuda(false);
         alertasEnviadosRef.current.clear();
+        setLoadingInscricoes(true);
     }
 
     const acionarAjuda = () => setPedirAjuda(true);
 
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+            setLoadingInscricoes(false);
             return;
         }
 
         const buscarMatriculasDoUsuario = async () => {
+            setLoadingInscricoes(true);
             const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
             const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
 
@@ -97,6 +101,8 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
                 toast.error("Erro ao carregar inscrições", {
                     description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
                 })
+            } finally {
+                setLoadingInscricoes(false);
             }
         }
 
@@ -281,5 +287,5 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
-    return { usuario, pedirAjuda,  setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade };
+    return { usuario, pedirAjuda,  setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade, loadingInscricoes };
 }

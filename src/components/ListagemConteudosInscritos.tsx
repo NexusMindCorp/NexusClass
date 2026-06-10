@@ -1,8 +1,4 @@
-import { useEscolaDados } from "@/hooks/useEscolaDados";
-import { useOutletContext } from "react-router-dom";
-import type { PerfilUsuario } from "@/hooks/useAuth";
-import { useMemo, useState, useEffect } from "react";
-import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {

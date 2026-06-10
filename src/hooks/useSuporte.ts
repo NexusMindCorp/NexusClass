@@ -133,7 +133,7 @@ export const sendContactEmail = async (formElement: HTMLFormElement, files: File
   }
 };
 
-export function useSuporte(perfilArg?: { nome: string; email: string } | null) {
+export function useSuporte() {
 
   const formRef = useRef<HTMLFormElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
