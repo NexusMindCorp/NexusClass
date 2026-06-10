@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
@@ -29,6 +29,10 @@ export function useAuth() {
     const [materiasProfessor, setMateriasProfessor] = useState<TurmaProfessor[]>([])
     const materiasProfessorNomes = materiasProfessor.map((item) => item.materia)
     const loadingUserRef = useRef<string | null>(null)
+
+    const atualizarPerfilLocal = useCallback((perfilAtualizado: PerfilUsuario) => {
+        setPerfil(perfilAtualizado)
+    }, [])
 
     const fetchPerfil = async (userId: string) => {
         try {
@@ -164,5 +168,5 @@ export function useAuth() {
         }
     }, [])
 
-    return { session, loading, perfil, materiasProfessor, materiasProfessorNomes }
+    return { session, loading, perfil, materiasProfessor, materiasProfessorNomes, atualizarPerfilLocal }
 }

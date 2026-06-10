@@ -33,9 +33,10 @@ import type { PerfilUsuario } from "@/hooks/useAuth"
 
 type NavbarProps = {
     perfil: PerfilUsuario;
+    atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void;
 }
 
-export function Navbar({ perfil }: NavbarProps) {
+export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
     const { setTheme } = useTheme()
     const navigate = useNavigate()
     const [notifications, setNotifications] = React.useState({ email: true, alert: true, })
@@ -45,6 +46,12 @@ export function Navbar({ perfil }: NavbarProps) {
     const [modalEditar, setModalEditar] = useState(false)
     const [fotoInput, setFotoInput] = useState(perfil?.foto_url || "")
     const [bioInput, setBioInput] = useState(perfil?.bio || "")
+
+    const abrirModalEditar = () => {
+        setFotoInput(perfil?.foto_url || "")
+        setBioInput(perfil?.bio || "")
+        setModalEditar(true)
+    }
 
     const handleSair = async () => {
         if (saindo) return
@@ -71,23 +78,22 @@ export function Navbar({ perfil }: NavbarProps) {
                 .from("perfis")
                 .update({ foto_url: fotoInput || null, bio: bioInput })
                 .eq("id", perfil.id)
-                .select();
+                .select()
+                .single();
 
             if (error) throw error;
 
-            if (!data || data.length === 0) {
+            if (!data) {
                 throw new Error("Não autorizado. Verifique sua sessão.");
             }
+
+            atualizarPerfilLocal(data as PerfilUsuario);
 
             toast.success("Perfil atualizado!", {
                 description: "Suas informações foram salvas com sucesso.",
             });
 
             setModalEditar(false);
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
 
         } catch (error: any) {
             toast.error("Erro ao salvar", {
@@ -159,7 +165,7 @@ export function Navbar({ perfil }: NavbarProps) {
                         <DropdownMenuItem onClick={() => setModalVisualizar(true)} className="cursor-pointer">
                             <User className="icones-minha-conta mr-2 h-4 w-4" /> Perfil
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setModalEditar(true)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={abrirModalEditar} className="cursor-pointer">
                             <Edit className="icones-minha-conta mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

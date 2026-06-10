@@ -10,7 +10,10 @@ import { ChatBot } from "@/components/ChatBot"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 
 export function LayoutPrincipal() {
-  const { perfil } = useOutletContext<{ perfil: PerfilUsuario }>()
+  const { perfil, atualizarPerfilLocal } = useOutletContext<{
+    perfil: PerfilUsuario
+    atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void
+  }>()
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
@@ -30,7 +33,7 @@ export function LayoutPrincipal() {
       />
 
       <main className="pagina-principal">
-        <Navbar perfil={perfil} />
+        <Navbar perfil={perfil} atualizarPerfilLocal={atualizarPerfilLocal} />
 
         <div className="pagina-conteudo">
           <GerenciadorTelas
