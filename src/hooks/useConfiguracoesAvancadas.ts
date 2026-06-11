@@ -10,6 +10,7 @@ export function useConfiguracoesAvancadas() {
   const [carregando, setCarregando] = useState(false);
 
   const handleAlterarSenha = async () => {
+    if (!senhaDoInput) return toast.error("A senha não pode ser vazia");
     if (senhaDoInput.length < 6) return toast.error("A senha deve ter pelo menos 6 caracteres");
     
     setCarregando(true);

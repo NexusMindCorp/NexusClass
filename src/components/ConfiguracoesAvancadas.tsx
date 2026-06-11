@@ -66,7 +66,7 @@ export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscrica
                     variant="default" 
                     size="sm" 
                     onClick={handleAlterarSenha} 
-                    disabled={carregando || senhaDoInput.length < 6}
+                    disabled={carregando || !senhaDoInput}
                   >
                     {carregando ? "Processando..." : "Alterar Senha"}
                   </Button>

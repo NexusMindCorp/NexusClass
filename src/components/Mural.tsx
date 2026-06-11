@@ -13,6 +13,8 @@ import { Plus } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import { getCorMateria, getCorNomeUsuario } from "@/lib/utils";
 
 type MuralProps = {
   materia: string;
@@ -54,11 +56,15 @@ export function Mural({ materia, turma }: MuralProps) {
           </div>
           <CardAction className="self-end">
             <div className="flex flex-col items-end gap-2">
-              <img
-                src={turma.foto_professor}
-                alt={`Foto do professor ${turma.professor}`}
-                className="h-20 w-20 rounded-full object-cover"
-              />
+              <Avatar className="h-20 w-20 rounded-full object-cover">
+                                {!turma.foto_professor ? (
+                                    <div className={` flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorMateria(turma.professor || "U")}`}>
+                                        {(turma.professor || "U").charAt(0).toUpperCase()}
+                                    </div>
+                                ) : (
+                                    <AvatarImage src={turma.foto_professor} alt="Foto do Professor" className="object-cover" />
+                                )}
+                            </Avatar>
               <ButtonGroup>
                 <Button onClick={() => abrirMural()} className="text-white" variant="link" size="sm">
                   Mural
