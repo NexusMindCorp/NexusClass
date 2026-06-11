@@ -49,7 +49,7 @@ export function LayoutPrincipal() {
           />
         </div>
       </main>
-      <ChatBot ref={chatBotRef} usuario={usuario} />
+      <ChatBot ref={chatBotRef} usuario={usuario} listaEscolar={listaEscolar.turmas} />
     </SidebarProvider>
   )
 }

@@ -74,7 +74,7 @@ const hojeChaveLocal = () => {
 };
 
 export const useGeminiChat = (
-  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] },
+  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any },
   isHelpMode: boolean = false
 ) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -88,8 +88,15 @@ export const useGeminiChat = (
   const stringDeInscricoes = (() => {
     const role = usuario.perfil?.role;
     if (role === 'aluno') {
-      if (usuario.listaDosInscritos.length > 0) {
-        return `O usuário está inscrito nas seguintes matérias: ${usuario.listaDosInscritos.join(', ')}. Foque nessas matérias no auxílio.`;
+      const idsInscritos = Object.keys(usuario.inscricoes || {}).filter(
+        (key) => usuario.inscricoes[key]
+      );
+      const materiasInscritas = idsInscritos
+        .map((id) => usuario.listaEscolar?.[id]?.materia)
+        .filter(Boolean) as string[];
+
+      if (materiasInscritas.length > 0) {
+        return `O usuário está inscrito nas seguintes matérias: ${materiasInscritas.join(', ')}. Foque nessas matérias no auxílio.`;
       }
       return 'O usuário não está inscrito em nenhuma matéria; avise que para receber ajuda personalizada ele deve se inscrever em pelo menos uma matéria.';
     }

@@ -3,15 +3,16 @@ import { useGeminiChat } from './useChatBot';
 import type { UsuarioProps } from './useGerenciador';
 import type { PerfilUsuario } from './useAuth';
 
-export function useChatBox(usuario: UsuarioProps, perfil?: PerfilUsuario | null, materiasProfessor: string[] = []) {
+export function useChatBox(usuario: UsuarioProps, perfil?: PerfilUsuario | null, materiasProfessor: string[] = [], listaEscolar?: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHelpMode, setIsHelpMode] = useState(false);
   const [input, setInput] = useState('');
-  const { messages, loading, sendMessage } = useGeminiChat({ ...usuario, perfil, materiasProfessor }, isHelpMode);
+  const { messages, loading, sendMessage } = useGeminiChat({ ...usuario, perfil, materiasProfessor , listaEscolar}, isHelpMode);
   
   // Fechar chat e retomar instrução principal
   const closeChat = useCallback(() => {
     setIsOpen(false);
+    console.log(materiasProfessor);
     setIsHelpMode(false);
   }, []);
     

@@ -5,17 +5,19 @@ import { useChatBox } from '../hooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
 import type { PerfilUsuario } from '@/hooks/useAuth';
 import { getAssetPath } from '@/lib/assetPath';
+import type { EscolaProps } from '@/hooks/leituraJson';
 
 const perfilBot = getAssetPath('perfilBot/perfilBot.jpg');
 
 type ChatBotProps = {
   usuario: UsuarioProps
+  listaEscolar: any;
 }
 
-export const ChatBot = forwardRef(function ChatBot({ usuario }: ChatBotProps, ref) {
+export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: ChatBotProps, ref) {
   const { perfil, materiasProfessor } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null; materiasProfessor: string[] }>()
   // Log for debugging end-to-end subject passing
-  const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox(usuario, perfil, materiasProfessor);
+  const { isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox(usuario, perfil, materiasProfessor, listaEscolar);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Expor função de abrir com modo ajuda
