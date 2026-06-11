@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
@@ -28,7 +28,9 @@ export function useAuth() {
     const [perfil, setPerfil] = useState<PerfilUsuario | null>(null)
     const [materiasProfessor, setMateriasProfessor] = useState<TurmaProfessor[]>([])
     const materiasProfessorNomes = materiasProfessor.map((item) => item.materia)
-
+    
+    // Control user id to avoid redundant fetches and loadings
+    const lastUserIdRef = useRef<string | null>(null)
 
     const atualizarPerfilLocal = useCallback((perfilAtualizado: PerfilUsuario) => {
 
@@ -130,12 +132,14 @@ export function useAuth() {
 
                
                 if (initialSession?.user) {
+                    lastUserIdRef.current = initialSession.user.id
                     setSession(initialSession)
                     const perfilCarregado = await fetchPerfil(initialSession.user.id)
                     if (perfilCarregado?.role === "professor" && isMounted) {
                         await fetchMateriasProfessor(initialSession.user.id)
                     }
                 } else {
+                    lastUserIdRef.current = null
                     setSession(null)
                     setPerfil(null)
                     setMateriasProfessor([])
@@ -172,28 +176,41 @@ export function useAuth() {
                 return
             }
 
-            if (sessionAtualizada?.user) {
-                setSession(sessionAtualizada)
-                setLoading(true)
-                try {
-                    const perfilCarregado = await fetchPerfil(sessionAtualizada.user.id)
-                    if (perfilCarregado?.role === "professor" && isMounted) {
-                        await fetchMateriasProfessor(sessionAtualizada.user.id)
+            const novoUserId = sessionAtualizada?.user?.id || null
+            const userIdAntigo = lastUserIdRef.current
+
+            if (novoUserId) {
+                if (novoUserId !== userIdAntigo) {
+                    console.log(`[useAuth] Usuário mudou de ${userIdAntigo} para ${novoUserId}. Carregando dados...`)
+                    lastUserIdRef.current = novoUserId
+                    setSession(sessionAtualizada)
+                    setLoading(true)
+                    try {
+                        const perfilCarregado = await fetchPerfil(novoUserId)
+                        if (perfilCarregado?.role === "professor" && isMounted) {
+                            await fetchMateriasProfessor(novoUserId)
+                        }
+                    } catch (err) {
+                        console.error("[useAuth] onAuthStateChange - Erro no fluxo pós-evento:", err)
+                    } finally {
+                        if (isMounted) {
+                            console.log("[useAuth] onAuthStateChange - Finalizado pós-evento. Configurando loading para false.")
+                            setLoading(false)
+                        }
                     }
-                } catch (err) {
-                    console.error("[useAuth] onAuthStateChange - Erro no fluxo pós-evento:", err)
-                } finally {
-                    if (isMounted) {
-                        console.log("[useAuth] onAuthStateChange - Finalizado pós-evento. Configurando loading para false.")
-                        setLoading(false)
-                    }
+                } else {
+                    console.log("[useAuth] Mesmo usuário. Apenas atualizando sessão (sem alterar loading ou buscar dados).")
+                    setSession(sessionAtualizada)
                 }
             } else {
-               
-                setSession(null)
-                setPerfil(null)
-                setMateriasProfessor([])
-                setLoading(false)
+                if (userIdAntigo !== null) {
+                    console.log("[useAuth] Usuário deslogou.")
+                    lastUserIdRef.current = null
+                    setSession(null)
+                    setPerfil(null)
+                    setMateriasProfessor([])
+                    setLoading(false)
+                }
             }
         })
 
