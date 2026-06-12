@@ -92,9 +92,9 @@ export function BoxAgendamento({ cancelaAgendamento, usaSupabase, date, titulo, 
                   <SelectTrigger className="border-input bg-background text-foreground">
                     <SelectValue placeholder="Selecione a turma" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" side="bottom" className="max-h-64 overflow-y-auto">
                     {turmasDisponiveis.map((turma) => (
-                      <SelectItem key={turma.id} value={turma.id}>
+                      <SelectItem key={turma.id} value={turma.id} className="cursor-pointer">
                         {turma.nome}
                       </SelectItem>
                     ))}

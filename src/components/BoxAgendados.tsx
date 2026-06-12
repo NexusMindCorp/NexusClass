@@ -2,6 +2,7 @@ import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { TurmaProps } from "@/hooks/leituraJson"
 
 type EventoCalendario = {
 	id: string
@@ -19,10 +20,11 @@ type BoxAgendadosProps = {
 	date: Date | undefined
 	carregandoEventos: boolean
 	eventosDoDia: EventoCalendario[]
+	turmasGlobais: Record<string, TurmaProps>
 	removerEvento: (id: string) => void
 }
 
-export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, removerEvento, }: BoxAgendadosProps) {
+export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, turmasGlobais, removerEvento, }: BoxAgendadosProps) {
 	return (
 		<div className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
 			<div className="flex items-center justify-between">
@@ -49,6 +51,8 @@ export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, re
 					{eventosDoDia.map((evento) => {
 						const ehEventoTurma = evento.tipo === "turma";
 						const podeRemover = evento.tipo === "pessoal" || perfil.role !== "aluno";
+						const nomeTurma = evento.turma_id ? turmasGlobais[evento.turma_id]?.materia : null;
+						const textoBadge = ehEventoTurma ? `Turma: ${nomeTurma || "Turma não encontrada"}` : "Pessoal";
 
 						return (
 							<div
@@ -64,7 +68,7 @@ export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, re
 												? "bg-purple-500/10 text-purple-500 border-purple-500/20 text-[10px] py-0 h-4"
 												: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] py-0 h-4"
 										}>
-											{ehEventoTurma ? "Turma" : "Pessoal"}
+											{textoBadge}
 										</Badge>
 									</div>
 

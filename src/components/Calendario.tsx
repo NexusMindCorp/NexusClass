@@ -33,10 +33,17 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
     selecionarDataRelativa,
   } = useCalendario({ perfil, inscricoes, turmasGlobais })
 
-  const turmasDisponiveis = Object.keys(inscricoes).map(key => ({
+  const turmasInscritas = Object.keys(inscricoes).map(key => ({
     id: key,
     nome: turmasGlobais[key]?.materia || key,
   }))
+
+  const todasTurmas = Object.keys(turmasGlobais).map(key => ({
+    id: key,
+    nome: turmasGlobais[key]?.materia || key,
+  }))
+
+  const isMaster = perfil?.role === "master";
 
   return (
     <Card className="mx-auto h-fit w-full max-w-5xl border-border bg-card text-card-foreground shadow-2xl backdrop-blur-sm">
@@ -69,7 +76,7 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
             ) : (
               <BoxAgendamento
                 perfil={perfil}
-                turmasDisponiveis={turmasDisponiveis}
+                turmasDisponiveis={isMaster ? todasTurmas : turmasInscritas}
                 tipo={sobreEvento.tipo}
                 setTipo={(tipo) => setSobreEvento((ant) => ({ ...ant, tipo }))}
                 turmaSelecionada={sobreEvento.turmaSelecionada}
@@ -100,6 +107,7 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
               date={date}
               carregandoEventos={processamentoEvento.carregandoEventos}
               eventosDoDia={eventosDoDia}
+              turmasGlobais={turmasGlobais}
               removerEvento={removerEvento}
             />
           </div>

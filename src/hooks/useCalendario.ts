@@ -106,7 +106,7 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
   }
 
   const carregarEventosSupabase = useCallback(async () => {
-    if (!supabase) {
+    if (!supabase || !perfil?.id) {
       return
     }
     await removerEventosPassados()
@@ -114,9 +114,20 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
     setErroBanco(null)
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("eventos_calendario")
-        .select("id,titulo,descricao,data,horario")
+        .select("id,titulo,descricao,data,horario,tipo,turma_id,autor_id")
+
+      if (perfil.role !== "master") {
+        const idsTurmas = Object.keys(inscricoes || {})
+        if (idsTurmas.length > 0) {
+          query = query.or(`and(tipo.eq.pessoal,autor_id.eq.${perfil.id}),and(tipo.eq.turma,turma_id.in.(${idsTurmas.join(",")}))`)
+        } else {
+          query = query.eq("tipo", "pessoal").eq("autor_id", perfil.id)
+        }
+      }
+
+      const { data, error } = await query
         .order("data", { ascending: true })
         .order("horario", { ascending: true, nullsFirst: false })
 
@@ -135,8 +146,8 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
         turma_id: evento.turma_id,
         autor_id: evento.autor_id,
       }))
-
       setEventos(normalizados)
+
     } catch {
       setErroBanco(
         "Falha ao carregar eventos no Supabase. Verifique sua conexao e as configuracoes de URL/chave no .env."
@@ -144,7 +155,7 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
     } finally {
       setProcessamentoEvento((anterior) => ({ ...anterior, carregandoEventos: false }))
     }
-  }, [])
+  }, [perfil.id, perfil.role, inscricoes])
 
   useEffect(() => {
     if (!usaSupabase) {
