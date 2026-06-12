@@ -10,6 +10,7 @@ import {
 import { ButtonGroup } from "./ui/button-group";
 import { PerfilAvatar } from "./PerfilAvatar";
 import type { PerfilUsuario } from "@/hooks/useAuth"
+import { Plus } from "lucide-react"
 
 type TurmasProps = {
   materia: string;
@@ -60,18 +61,21 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
       <CardFooter className={compacto ? "p-4 pb-1 pt-0" : ""}>
         {inscrito || isMaster ? (
           modoPesquisa ? (
-            <Button onClick={() => clickMural?.()} size="sm">
+            <Button onClick={() => clickMural?.()} size="sm" className="w-full">
               Entrar
             </Button>
           ) : (
-            <ButtonGroup>
-              <Button onClick={() => clickMural?.()} size="sm">
+            <ButtonGroup className='w-full'>
+              <Button onClick={() => clickMural?.()} size="sm" className="w-full">
                 Entrar
               </Button>
             </ButtonGroup>
           )) : (
           <ButtonGroup className={compacto ? "w-full" : ""}>
-            <Button onClick={() => clickInscrito?.()} size="sm" className="w-full">
+            <Button onClick={() => clickInscrito?.()}
+              size="sm"
+              className='w-full bg-ring hover:bg-ring/80 text-white border-0 hover:bg-ring/80 focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-ring/80'>
+              <Plus className="h-4 w-4" />
               Inscrever-se
             </Button>
           </ButtonGroup>
