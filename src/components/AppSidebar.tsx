@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, ChevronDown, Compass, MessageCircleQuestionMark, MessageCircleQuestion } from "lucide-react"
+import { Home, Inbox, Calendar, Search, ChevronDown, Compass, MessageCircleQuestionMark } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
@@ -31,7 +31,6 @@ type AppSidebarProps = {
 export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
     const { duvidas } = useDuvidas(perfil);
     const isMaster = perfil?.role === "master";
-    const isProfessor = perfil?.role === "professor";
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
     const turmasParaExibir = isMaster
         ? Object.entries(listaEscolar?.turmas || {})
