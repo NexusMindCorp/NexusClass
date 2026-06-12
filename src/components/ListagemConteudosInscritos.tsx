@@ -1,12 +1,23 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {
   const [carregandoAcao, setCarregandoAcao] = useState<string | null>(null);
+
   const handleSair = async (key: string) => {
     setCarregandoAcao(key);
     try {
       await cancelarInscricao(key);
+      toast.success("Você saiu da turma com sucesso.");
     } catch (err) {
       toast.error("Erro ao sair da turma.");
     } finally {
@@ -14,53 +25,58 @@ export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInsc
     }
   };
 
+  const turmasFiltradas = listaEscolar.turmas
+    ? Object.entries(listaEscolar.turmas)
+      .filter(([key]) => estaInscrito(key) || usuario.role === "master")
+      .sort((a, b) => (a[1] as any).materia.localeCompare((b[1] as any).materia))
+    : [];
+
   return (
-    <div className="bg-[#1a1a1e] border border-[#2d2d32] rounded-2xl p-6 shadow-xl h-full">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-white">Inscritos nos Murais</h2>
-        <p className="text-sm text-gray-400">Gerencie suas turmas e inscrições.</p>
+    <div className="bg-card border border-border rounded-xl p-6 shadow-sm h-full flex flex-col gap-4">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Inscritos nos Murais</h2>
+        <p className="text-sm text-muted-foreground">Gerencie suas turmas e inscrições.</p>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-gray-400">
-          <thead className="text-xs uppercase bg-[#2d2d32] text-gray-300">
-            <tr>
-              <th className="px-4 py-3 rounded-tl-lg">Matéria</th>
-              <th className="px-4 py-3 ">Turma</th>
-              <th className="px-4 py-3">Professor</th>
-              <th className="px-4 py-3 text-center rounded-tr-lg">Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {listaEscolar.turmas && Object.keys(listaEscolar.turmas).length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
-                  <p className="italic">Nenhuma inscrição encontrada.</p>
-                </td>
-              </tr>
+      <div className="rounded-md border border-border overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="font-semibold text-foreground">Matéria</TableHead>
+              <TableHead className="font-semibold text-foreground">Turma</TableHead>
+              <TableHead className="font-semibold text-foreground">Professor</TableHead>
+              <TableHead className="text-center font-semibold text-foreground">Ação</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {turmasFiltradas.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground italic">
+                  Nenhuma inscrição encontrada.
+                </TableCell>
+              </TableRow>
             ) : (
-              Object.entries(listaEscolar.turmas)
-                .filter(([key]) => estaInscrito(key) || usuario.role === "master")
-                .sort((a, b) => (a[1] as any).materia.localeCompare((b[1] as any).materia))
-                .map(([key, turma]: [string, any]) => (
-                <tr key={key} className="border-t border-[#2d2d32] hover:bg-[#2d2d32]/50 transition-colors">
-                  <td className="px-4 py-3 text-white font-medium">{turma.materia}</td>
-                  <td className="px-4 py-3 ">{turma.turma}</td>
-                  <td className="px-4 py-3">{turma.professor}</td>
-                  <td className="px-4 py-3 text-center">
-                    <button 
-                      className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-md hover:bg-red-500 hover:text-white transition-all text-xs font-semibold disabled:opacity-50"
+              turmasFiltradas.map(([key, turma]: [string, any]) => (
+                <TableRow key={key} className="hover:bg-transparent transition-colors">
+                  <TableCell className="font-medium text-foreground">{turma.materia}</TableCell>
+                  <TableCell className="text-muted-foreground">{turma.turma}</TableCell>
+                  <TableCell className="text-muted-foreground">{turma.professor}</TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-destructive/30 text-destructive  hover:text-destructive-foreground hover:scale-105 hover:shadow-md transition-all duration-200 h-8 cursor-pointer"
                       onClick={() => handleSair(key)}
                       disabled={carregandoAcao === key}
                     >
                       {carregandoAcao === key ? "Saindo..." : "Sair da Turma"}
-                    </button>
-                  </td>
-                </tr>
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
