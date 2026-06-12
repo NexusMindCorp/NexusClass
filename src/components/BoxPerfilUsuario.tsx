@@ -43,9 +43,6 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                             <p className="text-sm text-muted-foreground mt-1 mb-6">
                                 Verifique o nome ou tente novamente mais tarde.
                             </p>
-                            <Button onClick={onClose} variant="outline" className="px-6">
-                                Fechar
-                            </Button>
                         </div>
                     ) : perfilAlvo ? (
                         <div className="w-full flex flex-col items-center">
@@ -66,12 +63,23 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                             </h2>
 
                             {/* Indicador de perfil próprio (se aplicável) */}
-                            {(
+                            
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-4">
                                     <ShieldCheck className="h-3 w-3" />
-                                    {ehProprioUsuario? `Seu Perfil (${perfilAlvo.role})`:`Perfil (${perfilAlvo.role})`}
+                                    {ehProprioUsuario ? `Seu Perfil (${perfilAlvo.role})`: `Perfil de ${perfilAlvo.role}`}
                                 </span>
-                            )}
+                            {/* Rodapé com nota de rodapé e botão de Fechar */}
+                            <div className="w-full mt-1 pt-2 flex justify-end gap-1">
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                        <Calendar className="h-3.5 w-3.5 text-muted-foreground/80" />
+                                        Membro desde {perfilAlvo.created_at ? new Date(perfilAlvo.created_at).toLocaleDateString("pt-BR", {
+                                            day: "numeric",
+                                            month: "long",
+                                            year: "numeric"
+                                        }) : "Data não disponível"}
+                                    </span>
+                                </div>
+
 
                             {/* Separador */}
                             <div className="w-full border-t border-border/60 my-4" />
@@ -97,40 +105,6 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                                         </p>
                                     </div>
                                 </div>
-
-                                {/* Propriedades extras se for o próprio usuário */}
-                                {ehProprioUsuario && (
-                                    <>
-                                        <div className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors">
-                                            <ShieldCheck className="h-5 w-5 text-muted-foreground mt-0.5" />
-                                            <div>
-                                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Categoria</p>
-                                                <p className="text-sm font-medium text-foreground capitalize">{perfilAlvo.role}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors">
-                                            <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                                            <div>
-                                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Membro Desde</p>
-                                                <p className="text-sm font-medium text-foreground">
-                                                    {perfilAlvo.created_at ? new Date(perfilAlvo.created_at).toLocaleDateString("pt-BR", {
-                                                        day: "numeric",
-                                                        month: "long",
-                                                        year: "numeric"
-                                                    }) : "Data não disponível"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Rodapé com botão de Fechar */}
-                            <div className="w-full mt-6 flex justify-end">
-                                <Button onClick={onClose} variant="secondary" className="px-5 cursor-pointer">
-                                    Fechar
-                                </Button>
                             </div>
                         </div>
                     ) : null}
