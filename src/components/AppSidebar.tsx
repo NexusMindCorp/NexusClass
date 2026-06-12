@@ -8,7 +8,7 @@ import type { EscolaProps } from "@/hooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
-import { useOutletContext } from "react-router-dom"
+
 
 
 let itensMenu = [
