@@ -14,22 +14,24 @@ import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 
 type GerenciadorTelasProps = {
     usuario: any;
+    perfil: PerfilUsuario;
+    listaEscolar: EscolaProps;
+    loadingInscricoes: boolean;
     mudarInscricao: (key: string) => void;
     estaInscrito: (key: string) => boolean;
     marcarMural: (key: string) => void;
     navegarPara: (tela: OpcoesTela) => void;
-    listaEscolar: EscolaProps;
     abrirChatComAjuda: () => void;
-    perfil: PerfilUsuario;
-    loadingInscricoes: boolean;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
     const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];
     const isNovoUsuario = !props.loadingInscricoes && props.usuario.listaDosInscritos.length === 0;
+    const isMaster = props.perfil?.role === "master";
+
     return (
         <>
-            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && isNovoUsuario&& (
+            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && isNovoUsuario && !isMaster && (
                 <BoasVindas perfil={props.perfil} acionarExplorar={() => props.navegarPara("pesquisar")} />
             )}
             {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
@@ -49,6 +51,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                                 inscrito={props.estaInscrito(key)}
                                 clickInscrito={() => props.mudarInscricao(key)}
                                 clickMural={() => props.marcarMural(key)}
+                                perfil={props.perfil}
                             />
                         ))}
                 </div>
@@ -96,7 +99,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             {props.usuario.acessouOq === "configuracoesAvancadas" && (
                 <div className="w-full flex items-center justify-center p-4">
                     <div className="w-full max-w-3xl">
-                        <ConfiguracoesAvancadas  estaInscrito = {props.estaInscrito} usuario={props.usuario} listaEscolar={props.listaEscolar} cancelarInscricao={props.mudarInscricao} />
+                        <ConfiguracoesAvancadas estaInscrito={props.estaInscrito} usuario={props.usuario} listaEscolar={props.listaEscolar} cancelarInscricao={props.mudarInscricao} />
                     </div>
                 </div>
             )}

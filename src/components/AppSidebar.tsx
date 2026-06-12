@@ -29,8 +29,8 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
 
     const turmasParaExibir = isMaster
-        ? Object.entries(listaEscolar.turmas)
-        : Object.entries(listaEscolar.turmas).filter(([key]) => inscricoes[key]);
+        ? Object.entries(listaEscolar?.turmas || {})
+        : Object.entries(listaEscolar?.turmas || {}).filter(([id]) => inscricoes[id]);
 
     const isNovoAluno = perfil?.role === "aluno" && turmasParaExibir.length === 0;
 
@@ -96,7 +96,6 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                         <CollapsibleContent>
                             <SidebarContent>
                                 <SidebarMenu>
-                                    {/*Materias selecionadas*/}
                                     {isNovoAluno ? (
                                         <div className="px-4 py-4 flex flex-col items-center gap-3 text-center">
                                             <span className="text-sm text-muted-foreground">Você ainda não está em nenhuma turma.</span>
@@ -109,14 +108,13 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                                             Nenhuma turma alocada.
                                         </div>
                                     ) : (
-                                        turmasParaExibir.map((key) => {
-                                            const turma = listaEscolar.turmas[key[0]];
+                                        turmasParaExibir.map(([id, turma]) => {
                                             if (!turma) return null;
 
                                             return (
-                                                <SidebarMenuItem key={key[0]}>
+                                                <SidebarMenuItem key={id}>
                                                     <SidebarMenuButton
-                                                        onClick={() => marcarMural(key[0])}
+                                                        onClick={() => marcarMural(id)}
                                                         className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
                                                     >
                                                         <div className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${getCorMateria(turma.materia)}`}>
@@ -126,7 +124,8 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                                                     </SidebarMenuButton>
                                                 </SidebarMenuItem>
                                             );
-                                        }))}
+                                        })
+                                    )}
                                 </SidebarMenu>
                             </SidebarContent>
                         </CollapsibleContent>
@@ -139,7 +138,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <Configuracoes navegarPara={navegarPara}/>
+                        <Configuracoes navegarPara={navegarPara} />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

@@ -7,8 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ButtonGroup} from "./ui/button-group";
+import { ButtonGroup } from "./ui/button-group";
 import { PerfilAvatar } from "./PerfilAvatar";
+import type { PerfilUsuario } from "@/hooks/useAuth"
 
 type TurmasProps = {
   materia: string;
@@ -20,11 +21,14 @@ type TurmasProps = {
   inscrito?: boolean;
   compacto?: boolean;
   modoPesquisa?: boolean;
+  perfil: PerfilUsuario;
   clickInscrito?: () => void;
-  clickMural?: (materia: string) => void;
+  clickMural?: () => void;
 }
 
-export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, compacto = false, modoPesquisa, clickMural, clickInscrito }: TurmasProps) {
+export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, compacto = false, modoPesquisa, clickMural, clickInscrito, perfil }: TurmasProps) {
+  const isMaster = perfil?.role === "master";
+
   return (
     <Card className={`relative mx-auto w-full pt-0 overflow-hidden ${compacto ? '' : 'max-w-sm'}`}>
       <div className={`absolute inset-0 z-30 bg-black/35 ${compacto ? 'h-24' : 'aspect-video'}`} />
@@ -37,7 +41,7 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
 
       <CardHeader className={compacto ? "p-4 pb-1 pt-0" : ""}>
         <CardAction className="relative z-40 h-11 w-11">
-          <PerfilAvatar 
+          <PerfilAvatar
             classNameAvatar={`rounded-full object-cover border-2 border-background shadow-sm ${compacto ? 'h-10 w-10' : 'h-14 w-14'}`}
             classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl`}
             foto={fotoProfessor}
@@ -54,19 +58,14 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
       </CardHeader>
 
       <CardFooter className={compacto ? "p-4 pb-1 pt-0" : ""}>
-        {inscrito ? (
+        {inscrito || isMaster ? (
           modoPesquisa ? (
-            <Button onClick={() => clickMural?.(materia)} size="sm">
+            <Button onClick={() => clickMural?.()} size="sm">
               Entrar
             </Button>
           ) : (
             <ButtonGroup>
-              {/*<Button onClick={() => clickInscrito?.()} variant={"destructive"} size="sm">
-                {compacto ? "Sair" : "Cancelar Inscrição"}
-                </Button>
-                <ButtonGroupSeparator />
-                */}
-              <Button onClick={() => clickMural?.(materia)} size="sm">
+              <Button onClick={() => clickMural?.()} size="sm">
                 Entrar
               </Button>
             </ButtonGroup>

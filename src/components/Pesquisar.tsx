@@ -88,16 +88,16 @@ export function Pesquisar(props: PesquisarProps) {
                                         Inscritas
                                     </TabsTrigger>
                                     <TabsTrigger
-                                        value="todas"
-                                        className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
-                                    >
-                                        Todas
-                                    </TabsTrigger>
-                                    <TabsTrigger
                                         value="disponiveis"
                                         className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
                                     >
                                         Disponíveis
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="todas"
+                                        className="cursor-pointer h-full w-full py-2 text-sm font-medium text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-muted data-[state=active]:shadow-sm hover:text-foreground transition-all dark:data-[state=active]:bg-primary dark:data-[state=active]:text-foreground dark:data-[state=active]:shadow-sm dark:hover:text-foreground"
+                                    >
+                                        Todas
                                     </TabsTrigger>
                                 </TabsList>
                             </Tabs>
@@ -126,6 +126,7 @@ export function Pesquisar(props: PesquisarProps) {
                                             clickInscrito={() => props.mudarInscricao(key)}
                                             clickMural={() => { props.marcarMural(key) }}
                                             modoPesquisa={true}
+                                            perfil={props.perfil}
                                         />
                                     ))}
                                 </div>
