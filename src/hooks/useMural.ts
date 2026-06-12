@@ -220,13 +220,13 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
                 const fileExt = arquivo.name.split('.').pop();
                 const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
                 const { error: uploadError } = await supabase.storage
-                    .from('anexos_suporte')
+                    .from('anexos_atividades')
                     .upload(fileName, arquivo);
 
                 if (uploadError) throw uploadError;
 
                 const { data: publicUrlData } = supabase.storage
-                    .from('anexos_suporte')
+                    .from('anexos_atividades')
                     .getPublicUrl(fileName);
 
                 anexoUrl = publicUrlData.publicUrl;

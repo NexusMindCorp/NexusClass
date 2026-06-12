@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar } from "lucide-react";
+import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar, Pencil } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
@@ -114,8 +114,8 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
       )}
 
       {posts.tipoAmostar === "atividade" && (perfil.role === "professor" || perfil.role === "master") && (
-        <Button className=" w-fit bg-purple-600 hover:bg-purple-700 text-white cursor-pointer" onClick={() => setBoxAtividadeAberto(true)}>
-          <Plus />Postar Atividade
+        <Button onClick={() => setBoxAtividadeAberto(true)}>
+          <Pencil />Postar Atividade
         </Button>
       )}
 
