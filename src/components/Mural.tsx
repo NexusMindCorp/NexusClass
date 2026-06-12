@@ -45,7 +45,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
     abrirMural,
     abrirAtividades,
     abrirContato,
-    abrirMensagemContato,
+    enviarMensagemContato,
     abrirAlunos,
     deletarPost,
     publicarAtividade,
@@ -102,10 +102,10 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
                 </Button>
                 <Button onClick={() => abrirAtividades()} className="text-white" variant="link" size="sm">
                   Atividades
-                </Button>
+                </Button>{perfil.role === "aluno" &&
                 <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
                   Entrar em contato
-                </Button>
+                </Button>}
                 <Button onClick={() => abrirAlunos()} className="text-white" variant="link" size="sm">
                   Alunos
                 </Button>
@@ -289,11 +289,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
             professorNome={turma.professor}
             aberto={posts.boxAberto}
             onClose={handleCancelar}
-            assunto={assunto}
-            setAssunto={setAssunto}
-            mensagem={conteudo}
-            setMensagem={setConteudo}
-            onEnviar={abrirMensagemContato}
+            onEnviar={enviarMensagemContato}
           />
         )}
         {posts.tipoAmostar === "alunos" && (

@@ -23,6 +23,30 @@ export type Atividade = {
     professor_nome?: string;
 };
 
+function extrairUrlsAnexo(anexoUrl: string | null): string[] {
+    if (!anexoUrl) return [];
+    try {
+        if (anexoUrl.startsWith("[") && anexoUrl.endsWith("]")) {
+            const parsed = JSON.parse(anexoUrl);
+            if (Array.isArray(parsed)) return parsed;
+        }
+        return [anexoUrl];
+    } catch {
+        return [anexoUrl];
+    }
+}
+
+function obterNomeArquivoDoUrl(url: string): string {
+    try {
+        const decoded = decodeURIComponent(url);
+        const cleanUrl = decoded.split("?")[0];
+        const parts = cleanUrl.split("/");
+        return parts[parts.length - 1];
+    } catch {
+        return "";
+    }
+}
+
 export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar: "atividade" | "mural" | "contato" | "alunos" }>({
         posts: [],
@@ -293,6 +317,26 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         if (!hasSupabaseConfig || !supabase) return;
 
         try {
+            // Deletar os arquivos vinculados a esta atividade do storage
+            const atividadeExistente = atividades.find((a) => a.id === atividadeId);
+            if (atividadeExistente) {
+                const urlsOriginais = extrairUrlsAnexo(atividadeExistente.anexo_url);
+                if (urlsOriginais.length > 0) {
+                    const caminhosParaDeletar = urlsOriginais.map(obterNomeArquivoDoUrl).filter(Boolean);
+                    if (caminhosParaDeletar.length > 0) {
+                        const { error: deleteStorageError } = await supabase.storage
+                            .from('anexos_atividades')
+                            .remove(caminhosParaDeletar);
+                        if (deleteStorageError) {
+                            console.error("Erro ao deletar arquivos do storage:", deleteStorageError);
+                            toast.error("Erro ao remover arquivos do storage", {
+                                description: deleteStorageError.message
+                            });
+                        }
+                    }
+                }
+            }
+
             const { error } = await supabase
                 .from("atividades")
                 .delete()
@@ -321,6 +365,28 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         if (!hasSupabaseConfig || !supabase) return;
 
         try {
+            // Obter arquivos que foram removidos pelo usuário na edição
+            const atividadeExistente = atividades.find((a) => a.id === atividadeId);
+            if (atividadeExistente) {
+                const urlsOriginais = extrairUrlsAnexo(atividadeExistente.anexo_url);
+                const urlsRemovidas = urlsOriginais.filter((url) => !urlsMantidas.includes(url));
+                
+                if (urlsRemovidas.length > 0) {
+                    const caminhosParaDeletar = urlsRemovidas.map(obterNomeArquivoDoUrl).filter(Boolean);
+                    if (caminhosParaDeletar.length > 0) {
+                        const { error: deleteStorageError } = await supabase.storage
+                            .from('anexos_atividades')
+                            .remove(caminhosParaDeletar);
+                        if (deleteStorageError) {
+                            console.error("Erro ao deletar arquivos do storage:", deleteStorageError);
+                            toast.error("Erro ao remover arquivos antigos do storage", {
+                                description: deleteStorageError.message
+                            });
+                        }
+                    }
+                }
+            }
+
             const novasUrls: string[] = [];
 
             if (arquivos && arquivos.length > 0) {
@@ -417,11 +483,76 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato", boxAberto: true }));
     };
 
-    const abrirMensagemContato = () => {
-        setConteudo("");
-        setAssunto("");
-        setPosts((anterior) => ({ ...anterior, boxAberto: false }));
-        abrirMural();
+    const enviarMensagemContato = async (assuntoText: string, mensagemText: string, arquivos: File[]) => {
+        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+            toast.error("Erro de autenticação", {
+                description: "Não foi possível enviar a mensagem."
+            });
+            return;
+        }
+
+        try {
+            // 1. Buscar o professor da turma
+            const { data: profRel, error: profRelError } = await supabase
+                .from("professor_turma")
+                .select("professor_id")
+                .eq("turma_id", turmaId)
+                .maybeSingle();
+
+            if (profRelError || !profRel) {
+                throw new Error("Professor desta turma não encontrado.");
+            }
+
+            // 2. Upload de arquivos para o bucket 'duvidasalunostoprofessor'
+            const urls: string[] = [];
+            if (arquivos && arquivos.length > 0) {
+                for (const file of arquivos) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const { error: uploadError } = await supabase.storage
+                        .from('duvidasalunostoprofessor')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = supabase.storage
+                        .from('duvidasalunostoprofessor')
+                        .getPublicUrl(fileName);
+
+                    if (publicUrlData?.publicUrl) {
+                        urls.push(publicUrlData.publicUrl);
+                    }
+                }
+            }
+
+            const anexoUrl = urls.length > 0 ? JSON.stringify(urls) : null;
+
+            // 3. Inserir na tabela duvidasalunostoprofessor
+            const { error: insertError } = await supabase
+                .from("duvidasalunostoprofessor")
+                .insert({
+                    aluno_id: perfil.id,
+                    prof_id: profRel.professor_id,
+                    turma_id: turmaId,
+                    assunto: assuntoText.trim(),
+                    descricao: mensagemText.trim(),
+                    anexo_url: anexoUrl,
+                });
+
+            if (insertError) throw insertError;
+
+            toast.success("Mensagem enviada com sucesso!");
+            setConteudo("");
+            setAssunto("");
+            setPosts((anterior) => ({ ...anterior, boxAberto: false }));
+            abrirMural();
+        } catch (err: any) {
+            console.error("Erro ao enviar mensagem:", err);
+            toast.error("Erro ao enviar mensagem", {
+                description: err.message || "Tente novamente."
+            });
+            throw err;
+        }
     };
 
     const abrirAlunos = () => {
@@ -466,7 +597,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         abrirMural,
         abrirAtividades,
         abrirContato,
-        abrirMensagemContato,
+        enviarMensagemContato,
         abrirAlunos,
         deletarPost,
         publicarAtividade,

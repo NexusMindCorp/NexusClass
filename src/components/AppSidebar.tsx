@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, ChevronDown, Compass } from "lucide-react"
+import { Home, Inbox, Calendar, Search, ChevronDown, Compass, MessageCircleQuestionMark, MessageCircleQuestion } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
@@ -8,8 +8,10 @@ import type { EscolaProps } from "@/hooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
+import { useOutletContext } from "react-router-dom"
 
-const itens = [
+
+let itens = [
     { title: "Inicio", id: "principal", icon: Home },
     { title: "Pesquisar", id: "pesquisar", icon: Search },
     { title: "Mensagens", id: "mensagens", icon: Inbox },
@@ -26,8 +28,11 @@ type AppSidebarProps = {
 
 export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
     const isMaster = perfil?.role === "master";
+    const isProfessor = perfil?.role === "professor";
+        const itensMenu = isProfessor 
+        ? [...itens, { title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestion }] 
+        : itens;
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
-
     const turmasParaExibir = isMaster
         ? Object.entries(listaEscolar?.turmas || {})
         : Object.entries(listaEscolar?.turmas || {}).filter(([id]) => inscricoes[id]);
@@ -60,7 +65,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                     <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
                     <SidebarContent>
                         <SidebarMenu>
-                            {itens.map((item) => (
+                            {itensMenu.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
                                         <a
