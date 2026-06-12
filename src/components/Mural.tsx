@@ -11,13 +11,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { Plus, MoreVertical, Trash2, User } from "lucide-react";
+import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
 import { PerfilAvatar } from "./PerfilAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
+import { BoxAtividade } from "./BoxAtividade";
 
 type MuralProps = {
   materia: string;
@@ -27,8 +28,11 @@ type MuralProps = {
 
 export function Mural({ materia, turma, perfil }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
+  const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
   const {
     posts,
+    atividades,
+    loadingAtividades,
     conteudo,
     setConteudo,
     assunto,
@@ -42,6 +46,8 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
     abrirMensagemContato,
     abrirAlunos,
     deletarPost,
+    publicarAtividade,
+    deletarAtividade,
   } = useMural(materia, perfil);
 
   return (
@@ -53,6 +59,12 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
           currentUserProfile={perfil}
         />
       )}
+      <BoxAtividade
+        materia={turma.materia}
+        aberto={boxAtividadeAberto}
+        onClose={() => setBoxAtividadeAberto(false)}
+        onPublicar={publicarAtividade}
+      />
       <Card className="relative w-full overflow-hidden h-67">
         <img
           src={turma.banners}
@@ -95,9 +107,17 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
         </CardHeader>
       </Card>
 
-      <Button className=" w-fit" onClick={() => mudarAberturaBox(true)}>
-        <Plus />Postar no mural
-      </Button>
+      {posts.tipoAmostar === "mural" && (
+        <Button className=" w-fit" onClick={() => mudarAberturaBox(true)}>
+          <Plus />Postar no mural
+        </Button>
+      )}
+
+      {posts.tipoAmostar === "atividade" && (perfil.role === "professor" || perfil.role === "master") && (
+        <Button className=" w-fit bg-purple-600 hover:bg-purple-700 text-white cursor-pointer" onClick={() => setBoxAtividadeAberto(true)}>
+          <Plus />Postar Atividade
+        </Button>
+      )}
 
       <BoxMural
         materia={turma.materia}
@@ -172,14 +192,71 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
             </Card>
           )
         ) : posts.tipoAmostar === "atividade" ? (
-          <Card className="overflow-hidden p-4">
-            <div className="flex gap-1 items-center justify-center">
-              <img src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png" alt="Não encontrado imagem" className="h-40 w-40 object-cover rounded" />
-              <p className="text-muted-foreground">
-                Nenhuma atividade ainda.
-              </p>
-            </div>
-          </Card>
+          atividades.length > 0 ? (
+            atividades.map((atv) => (
+              <Card key={atv.id} className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <h4 className="font-bold text-base text-foreground leading-tight">{atv.titulo}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Postado por {atv.professor_nome} • {new Date(atv.created_at).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {atv.data_entrega && (
+                      <span className="text-xs font-semibold px-2 py-1 rounded bg-amber-500/10 text-amber-500 flex items-center gap-1 border border-amber-500/20">
+                        <Calendar className="h-3 w-3" />
+                        Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { day: "numeric", month: "short", hour: "numeric", minute: "numeric" })}
+                      </span>
+                    )}
+
+                    {(perfil.role === "professor" || perfil.role === "master") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deletarAtividade(atv.id)}
+                        className="h-8 w-8 p-0 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1 mb-4">{atv.descricao}</p>
+
+                {atv.anexo_url && (
+                  <div className="mt-2 pt-3 border-t border-border/40">
+                    <a
+                      href={atv.anexo_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 text-xs font-medium text-foreground hover:bg-muted transition-colors w-fit"
+                    >
+                      <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                      Visualizar anexo
+                      <Download className="h-3.5 w-3.5 ml-1 text-muted-foreground" />
+                    </a>
+                  </div>
+                )}
+              </Card>
+            ))
+          ) : (
+            <Card className="overflow-hidden p-6">
+              <div className="flex flex-col items-center justify-center text-center p-4">
+                <img src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png" alt="Não encontrado imagem" className="h-32 w-32 object-cover rounded opacity-80 mb-3" />
+                <p className="text-muted-foreground text-sm">
+                  Nenhuma atividade publicada para esta turma ainda.
+                </p>
+              </div>
+            </Card>
+          )
         ) : (
           <AtendimentoContato
             professorNome={turma.professor}

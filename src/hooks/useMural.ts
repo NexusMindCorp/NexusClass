@@ -11,12 +11,26 @@ export type Post = {
     autor: PerfilUsuario | null;
 };
 
+export type Atividade = {
+    id: string;
+    turma_id: string;
+    professor_id: string;
+    titulo: string;
+    descricao: string;
+    data_entrega: string | null;
+    created_at: string;
+    anexo_url: string | null;
+    professor_nome?: string;
+};
+
 export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar: "atividade" | "mural" | "contato" | "alunos" }>({
         posts: [],
         boxAberto: false,
         tipoAmostar: "mural",
     });
+    const [atividades, setAtividades] = useState<Atividade[]>([]);
+    const [loadingAtividades, setLoadingAtividades] = useState(false);
     const [conteudo, setConteudo] = useState("");
     const [assunto, setAssunto] = useState("");
 
@@ -36,7 +50,11 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
                     perfis:autor_id (
                         id,
                         nome,
-                        foto_url
+                        email,
+                        bio,
+                        foto_url,
+                        role,
+                        created_at
                     )
                 `)
                 .eq("turma_id", turmaId)
@@ -69,9 +87,62 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         }
     }, [turmaId]);
 
+    const carregarAtividades = useCallback(async () => {
+        if (!hasSupabaseConfig || !supabase || !turmaId) return;
+
+        try {
+            setLoadingAtividades(true);
+            const { data, error } = await supabase
+                .from("atividades")
+                .select(`
+                    id,
+                    turma_id,
+                    professor_id,
+                    titulo,
+                    descricao,
+                    data_entrega,
+                    created_at,
+                    anexo_url,
+                    perfis:professor_id (
+                        nome
+                    )
+                `)
+                .eq("turma_id", turmaId)
+                .order("created_at", { ascending: false });
+
+            if (error) throw error;
+
+            if (data) {
+                const atividadesFormatadas: Atividade[] = data.map((a: any) => {
+                    const perfilProf = Array.isArray(a.perfis) ? a.perfis[0] : a.perfis;
+                    return {
+                        id: a.id,
+                        turma_id: a.turma_id,
+                        professor_id: a.professor_id,
+                        titulo: a.titulo,
+                        descricao: a.descricao,
+                        data_entrega: a.data_entrega,
+                        created_at: a.created_at,
+                        anexo_url: a.anexo_url,
+                        professor_nome: perfilProf?.nome || "Professor",
+                    };
+                });
+                setAtividades(atividadesFormatadas);
+            }
+        } catch (err: any) {
+            console.error("Erro ao carregar atividades:", err);
+            toast.error("Erro ao carregar atividades", {
+                description: "Não foi possível carregar as atividades da turma."
+            });
+        } finally {
+            setLoadingAtividades(false);
+        }
+    }, [turmaId]);
+
     useEffect(() => {
         void carregarPosts();
-    }, [carregarPosts]);
+        void carregarAtividades();
+    }, [carregarPosts, carregarAtividades]);
 
     const handlePublicar = async () => {
         if (!conteudo.trim()) return;
@@ -134,6 +205,105 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         }
     };
 
+    const publicarAtividade = async (titulo: string, descricao: string, dataEntrega: string | null, arquivo: File | null) => {
+        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+            toast.error("Erro de autenticação", {
+                description: "Não foi possível salvar a atividade."
+            });
+            return;
+        }
+
+        try {
+            let anexoUrl: string | null = null;
+
+            if (arquivo) {
+                const fileExt = arquivo.name.split('.').pop();
+                const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('anexos_suporte')
+                    .upload(fileName, arquivo);
+
+                if (uploadError) throw uploadError;
+
+                const { data: publicUrlData } = supabase.storage
+                    .from('anexos_suporte')
+                    .getPublicUrl(fileName);
+
+                anexoUrl = publicUrlData.publicUrl;
+            }
+
+            const { data, error } = await supabase
+                .from("atividades")
+                .insert({
+                    turma_id: turmaId,
+                    professor_id: perfil.id,
+                    titulo: titulo.trim(),
+                    descricao: descricao.trim(),
+                    data_entrega: dataEntrega ? new Date(dataEntrega).toISOString() : null,
+                    anexo_url: anexoUrl,
+                })
+                .select(`
+                    id,
+                    turma_id,
+                    professor_id,
+                    titulo,
+                    descricao,
+                    data_entrega,
+                    created_at,
+                    anexo_url,
+                    perfis:professor_id (
+                        nome
+                    )
+                `)
+                .single();
+
+            if (error) throw error;
+
+            const perfilProf = Array.isArray(data.perfis) ? data.perfis[0] : data.perfis;
+            const novaAtividade: Atividade = {
+                id: data.id,
+                turma_id: data.turma_id,
+                professor_id: data.professor_id,
+                titulo: data.titulo,
+                descricao: data.descricao,
+                data_entrega: data.data_entrega,
+                created_at: data.created_at,
+                anexo_url: data.anexo_url,
+                professor_nome: perfilProf?.nome || perfil.nome,
+            };
+
+            setAtividades((anterior) => [novaAtividade, ...anterior]);
+            toast.success("Atividade criada com sucesso!");
+        } catch (err: any) {
+            console.error("Erro ao criar atividade:", err);
+            toast.error("Erro ao criar atividade", {
+                description: err.message || "Tente novamente."
+            });
+            throw err;
+        }
+    };
+
+    const deletarAtividade = async (atividadeId: string) => {
+        if (!hasSupabaseConfig || !supabase) return;
+
+        try {
+            const { error } = await supabase
+                .from("atividades")
+                .delete()
+                .eq("id", atividadeId);
+
+            if (error) throw error;
+
+            setAtividades((anterior) => anterior.filter((a) => a.id !== atividadeId));
+            toast.success("Atividade excluída com sucesso!");
+        } catch (err: any) {
+            console.error("Erro ao excluir atividade:", err);
+            toast.error("Erro ao excluir atividade", {
+                description: err.message || "Tente novamente."
+            });
+        }
+    };
+
     const handleCancelar = () => {
         setConteudo("");
         setAssunto("");
@@ -190,6 +360,8 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
 
     return {
         posts,
+        atividades,
+        loadingAtividades,
         conteudo,
         setConteudo,
         assunto,
@@ -203,5 +375,8 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         abrirMensagemContato,
         abrirAlunos,
         deletarPost,
+        publicarAtividade,
+        deletarAtividade,
+        carregarAtividades,
     };
 }
