@@ -1,5 +1,4 @@
 import { createPortal } from "react-dom"
-import { Button } from "@/components/ui/button"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { Loader2, Mail, FileText, Calendar, ShieldCheck, X } from "lucide-react"
 import { usePerfilUsuario } from "@/hooks/usePerfilUsuario"

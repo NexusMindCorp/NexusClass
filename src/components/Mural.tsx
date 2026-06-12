@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { Plus } from "lucide-react";
+import { LineChart, Plus } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
@@ -39,7 +39,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
     abrirContato,
     abrirMensagemContato,
     abrirAlunos,
-  } = useMural();
+  } = useMural(materia, perfil);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-1 min-h-screen pb-16">
@@ -90,7 +90,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
       </Button>
 
       <BoxMural
-        materia={materia}
+        materia={turma.materia}
         professorNome={turma.professor}
         aberto={posts.boxAberto}
         onClose={handleCancelar}
@@ -103,9 +103,21 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
         {posts.tipoAmostar === "mural" ? (
           posts.posts.length > 0 ? (
             posts.posts.map((post) => (
-              <Card key={post.id} className="p-4">
-                <p className="mb-2 text-sm text-muted-foreground">{post.data}</p>
-                <p className="whitespace-pre-wrap">{post.conteudo}</p>
+              <Card key={post.id} className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <PerfilAvatar
+                    classNameAvatar="h-10 w-10 rounded-full object-cover border border-border/80"
+                    classNameDiv="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                    foto={post.autor?.foto_url}
+                    tipo="usuario"
+                    palavra={post.Nome}
+                  />
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-sm text-foreground leading-tight">{post.Nome}</span>
+                    <span className="text-xs text-muted-foreground mt-0.5">{post.data}</span>
+                  </div>
+                </div>
+                <p className="ml-15 whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1">{post.conteudo}</p>
               </Card>
             ))
           ) : (
