@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/useAuth"
@@ -63,51 +63,51 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
 
     const acionarAjuda = () => setPedirAjuda(true);
 
-    useEffect(() => {
+    const buscarMatriculasDoUsuario = useCallback(async () => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) {
             setLoadingInscricoes(false);
             return;
         }
 
-        const buscarMatriculasDoUsuario = async () => {
-            setLoadingInscricoes(true);
-            const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
-            const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
+        setLoadingInscricoes(true);
+        const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
+        const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
 
-            try {
-                const { data, error } = await supabase
-                    .from(tabelaAssociativa)
-                    .select("turma_id")
-                    .eq(colunaFiltro, perfil.id)
+        try {
+            const { data, error } = await supabase
+                .from(tabelaAssociativa)
+                .select("turma_id")
+                .eq(colunaFiltro, perfil.id)
 
-                if (error) throw error
+            if (error) throw error
 
-                const novasInscricoes: Record<string, boolean> = {}
-                const listaIds: string[] = []
+            const novasInscricoes: Record<string, boolean> = {}
+            const listaIds: string[] = []
 
-                if (data) {
-                    data.forEach((item: any) => {
-                        novasInscricoes[item.turma_id] = true
-                        listaIds.push(item.turma_id)
-                    })
-                }
-
-                setUsuario((anterior) => ({
-                    ...anterior,
-                    inscricoes: novasInscricoes,
-                    listaDosInscritos: listaIds,
-                }))
-            } catch (error: any) {
-                toast.error("Erro ao carregar inscrições", {
-                    description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
+            if (data) {
+                data.forEach((item: any) => {
+                    novasInscricoes[item.turma_id] = true
+                    listaIds.push(item.turma_id)
                 })
-            } finally {
-                setLoadingInscricoes(false);
             }
-        }
 
-        void buscarMatriculasDoUsuario()
+            setUsuario((anterior) => ({
+                ...anterior,
+                inscricoes: novasInscricoes,
+                listaDosInscritos: listaIds,
+            }))
+        } catch (error: any) {
+            toast.error("Erro ao carregar inscrições", {
+                description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
+            })
+        } finally {
+            setLoadingInscricoes(false);
+        }
     }, [perfil]);
+
+    useEffect(() => {
+        void buscarMatriculasDoUsuario()
+    }, [buscarMatriculasDoUsuario]);
 
     const mudarInscricao = async (turmaId: string) => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) {
@@ -172,6 +172,9 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
 
     const navegarPara = (tela: OpcoesTela) => {
         setUsuario((anterior) => ({ ...anterior, acessouOq: tela }));
+        if (tela === "principal") {
+            void buscarMatriculasDoUsuario();
+        }
     };
 
     const marcarPesquisa = () => {

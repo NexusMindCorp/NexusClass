@@ -11,6 +11,7 @@ import { Suporte } from "./Suporte";
 import type { PerfilUsuario } from "@/hooks/useAuth";
 import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 
+
 type GerenciadorTelasProps = {
     usuario: any;
     mudarInscricao: (key: string) => void;
@@ -25,11 +26,10 @@ type GerenciadorTelasProps = {
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
     const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];
-    const isNovoUsuario = !props.loadingInscricoes && Object.keys(props.usuario.inscricoes).length === 0;
-
+    const isNovoUsuario = !props.loadingInscricoes && props.usuario.listaDosInscritos.length === 0;
     return (
         <>
-            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && isNovoUsuario && (
+            {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && isNovoUsuario&& (
                 <BoasVindas perfil={props.perfil} acionarExplorar={() => props.navegarPara("pesquisar")} />
             )}
             {(props.usuario.acessouOq === "principal" || props.usuario.acessouOq === "pesquisar") && (
