@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { TurmaProps } from "@/hooks/leituraJson";
 import type { PerfilUsuario } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { LineChart, Plus } from "lucide-react";
+import { Plus, MoreVertical, Trash2, User } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { getCorMateria, getCorNomeUsuario } from "@/lib/utils";
 import { PerfilAvatar } from "./PerfilAvatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
 
 type MuralProps = {
   materia: string;
@@ -25,6 +26,7 @@ type MuralProps = {
 };
 
 export function Mural({ materia, turma, perfil }: MuralProps) {
+  const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
   const {
     posts,
     conteudo,
@@ -39,10 +41,18 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
     abrirContato,
     abrirMensagemContato,
     abrirAlunos,
+    deletarPost,
   } = useMural(materia, perfil);
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-1 min-h-screen pb-16">
+      {nomePerfilParaVer && (
+        <BoxPerfilUsuario
+          nomeUsuario={nomePerfilParaVer}
+          onClose={() => setNomePerfilParaVer(null)}
+          currentUserProfile={perfil}
+        />
+      )}
       <Card className="relative w-full overflow-hidden h-67">
         <img
           src={turma.banners}
@@ -104,20 +114,51 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
           posts.posts.length > 0 ? (
             posts.posts.map((post) => (
               <Card key={post.id} className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <PerfilAvatar
-                    classNameAvatar="h-10 w-10 rounded-full object-cover border border-border/80"
-                    classNameDiv="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    foto={post.autor?.foto_url}
-                    tipo="usuario"
-                    palavra={post.Nome}
-                  />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-sm text-foreground leading-tight">{post.Nome}</span>
-                    <span className="text-xs text-muted-foreground mt-0.5">{post.data}</span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <PerfilAvatar
+                      classNameAvatar="h-10 w-10 rounded-full object-cover border border-border/80"
+                      classNameDiv="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                      foto={post.autor?.foto_url}
+                      tipo="usuario"
+                      palavra={post.Nome}
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-sm text-foreground leading-tight">{post.Nome}</span>
+                      <span className="text-xs text-muted-foreground mt-0.5">{post.data}</span>
+                    </div>
                   </div>
+
+                  {/* Dropdown Menu (Três Pontos) */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-muted">
+                        <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onSelect={() => setNomePerfilParaVer(post.Nome)}
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Ver Perfil
+                      </DropdownMenuItem>
+
+                      {/* Mostrar Excluir se for o autor ou se for professor/master */}
+                      {(post.autor?.id === perfil.id || perfil.role === "professor" || perfil.role === "master") && (
+                        <DropdownMenuItem
+                          className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                          onSelect={() => deletarPost(post.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Excluir
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <p className="ml-15 whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1">{post.conteudo}</p>
+                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1">{post.conteudo}</p>
               </Card>
             ))
           ) : (

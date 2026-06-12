@@ -164,6 +164,30 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "alunos" }));
     };
 
+    const deletarPost = async (postId: string) => {
+        if (!hasSupabaseConfig || !supabase) return;
+
+        try {
+            const { error } = await supabase
+                .from("mural_posts")
+                .delete()
+                .eq("id", postId);
+
+            if (error) throw error;
+
+            setPosts((anterior) => ({
+                ...anterior,
+                posts: anterior.posts.filter((p) => p.id !== postId),
+            }));
+            toast.success("Publicação excluída com sucesso!");
+        } catch (err: any) {
+            console.error("Erro ao excluir post:", err);
+            toast.error("Erro ao excluir", {
+                description: err.message || "Tente novamente."
+            });
+        }
+    };
+
     return {
         posts,
         conteudo,
@@ -178,5 +202,6 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         abrirContato,
         abrirMensagemContato,
         abrirAlunos,
+        deletarPost,
     };
 }
