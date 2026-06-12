@@ -30,6 +30,7 @@ import { supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import { getCorNomeUsuario } from "@/lib/utils"
 import type { PerfilUsuario } from "@/hooks/useAuth"
+import { PerfilAvatar } from "./PerfilAvatar"
 
 type NavbarProps = {
     perfil: PerfilUsuario;
@@ -148,15 +149,12 @@ export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 focus-visible:ring-0 focus-visible:ring-offset-0" >
-                            <Avatar>
-                                {!perfil?.foto_url ? (
-                                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white ${getCorNomeUsuario(perfil?.nome || "U")}`}>
-                                        {(perfil?.nome || "U").charAt(0).toUpperCase()}
-                                    </div>
-                                ) : (
-                                    <AvatarImage src={perfil.foto_url} alt="Foto do Perfil" className="object-cover" />
-                                )}
-                            </Avatar>
+                            <PerfilAvatar
+                                classNameDiv={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white`}
+                                foto={perfil?.foto_url}
+                                tipo="usuario"
+                                palavra={perfil?.nome}
+                            />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent sideOffset={10} align="end">
@@ -182,15 +180,13 @@ export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
                             <DialogTitle>Perfil do Usuário</DialogTitle>
                         </DialogHeader>
                         <div className="flex flex-col items-center gap-4 py-6">
-                            <Avatar className="h-24 w-24 border-2 border-primary rounded-full">
-                                {!perfil?.foto_url ? (
-                                    <div className={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorNomeUsuario(perfil?.nome || "U")}`}>
-                                        {(perfil?.nome || "U").charAt(0).toUpperCase()}
-                                    </div>
-                                ) : (
-                                    <AvatarImage src={perfil.foto_url} alt="Foto do Perfil" className="object-cover" />
-                                )}
-                            </Avatar>
+                            <PerfilAvatar
+                                classNameAvatar={`h-24 w-24 border-2 border-primary rounded-full`}
+                                classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl `}
+                                foto={perfil?.foto_url}
+                                tipo="usuario"
+                                palavra={perfil?.nome}
+                            />
                             <div className="text-center space-y-1">
                                 <h2 className="text-2xl font-bold">{perfil?.nome}</h2>
                                 <p className="text-sm font-semibold uppercase text-purple-500">{perfil?.role}</p>

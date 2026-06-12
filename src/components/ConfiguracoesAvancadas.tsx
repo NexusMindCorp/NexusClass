@@ -3,8 +3,7 @@ import { BoxAlertaDeletaConta } from "./BoxAlertaDeletaConta";
 import { ListagemConteudosInscritos } from "./ListagemConteudosInscritos";
 import { useConfiguracoesAvancadas } from "@/hooks/useConfiguracoesAvancadas";
 import { BoxRestrito } from "./BoxRestrito";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { getCorNomeUsuario } from "@/lib/utils";
+import { PerfilAvatar } from "./PerfilAvatar";
 
 export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {
     const { perfil, senhaDoInput, setSenhaDoInput, areaSensivel, setAreaSensivel, carregando, handleAlterarSenha, handleDeletarConta } = useConfiguracoesAvancadas();
@@ -18,15 +17,13 @@ export function ConfiguracoesAvancadas({ usuario, listaEscolar, cancelarInscrica
        
           <div className="flex-shrink-0">
             <div className="relative group">
-              <Avatar className="h-24 w-24 border-2 border-primary rounded-full">
-                                {!perfil?.foto_url ? (
-                                    <div className={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorNomeUsuario(perfil?.nome || "U")}`}>
-                                        {(perfil?.nome || "U").charAt(0).toUpperCase()}
-                                    </div>
-                                ) : (
-                                    <AvatarImage src={perfil.foto_url} alt="Foto do Perfil" className="object-cover" />
-                                )}
-                            </Avatar>
+                <PerfilAvatar
+                    classNameAvatar={`h-24 w-24 border-2 border-primary rounded-full`}
+                    classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl `}
+                    foto={perfil?.foto_url}
+                    tipo="usuario"
+                    palavra={perfil?.nome}
+                />          
             </div>
           </div>
 

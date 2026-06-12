@@ -7,9 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ButtonGroup, ButtonGroupSeparator } from "./ui/button-group";
-import { Avatar, AvatarImage } from "./ui/avatar";
-import { getCorMateria, getCorNomeUsuario } from "@/lib/utils";
+import { ButtonGroup} from "./ui/button-group";
+import { PerfilAvatar } from "./PerfilAvatar";
 
 type TurmasProps = {
   materia: string;
@@ -38,15 +37,13 @@ export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, tu
 
       <CardHeader className={compacto ? "p-4 pb-1 pt-0" : ""}>
         <CardAction className="relative z-40 h-11 w-11">
-          <Avatar className={`rounded-full object-cover border-2 border-background shadow-sm ${compacto ? 'h-10 w-10' : 'h-14 w-14'}`}>
-                                {!fotoProfessor ? (
-                                    <div className={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorMateria(professor || "U")}`}>
-                                        {(professor || "U").charAt(0).toUpperCase()}
-                                    </div>
-                                ) : (
-                                    <AvatarImage src={fotoProfessor} alt="Foto do Professor" className="object-cover" />
-                                )}
-                            </Avatar>
+          <PerfilAvatar 
+            classNameAvatar={`rounded-full object-cover border-2 border-background shadow-sm ${compacto ? 'h-10 w-10' : 'h-14 w-14'}`}
+            classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl`}
+            foto={fotoProfessor}
+            tipo="materia"
+            palavra={professor}
+          />
         </CardAction>
 
         <CardTitle className={compacto ? "text-lg mt-1" : ""}>{materia}</CardTitle>

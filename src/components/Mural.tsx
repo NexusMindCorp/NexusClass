@@ -15,6 +15,7 @@ import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { getCorMateria, getCorNomeUsuario } from "@/lib/utils";
+import { PerfilAvatar } from "./PerfilAvatar";
 
 type MuralProps = {
   materia: string;
@@ -56,15 +57,13 @@ export function Mural({ materia, turma }: MuralProps) {
           </div>
           <CardAction className="self-end">
             <div className="flex flex-col items-end gap-2">
-              <Avatar className="h-20 w-20 rounded-full object-cover">
-                                {!turma.foto_professor ? (
-                                    <div className={` flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl ${getCorMateria(turma.professor || "U")}`}>
-                                        {(turma.professor || "U").charAt(0).toUpperCase()}
-                                    </div>
-                                ) : (
-                                    <AvatarImage src={turma.foto_professor} alt="Foto do Professor" className="object-cover" />
-                                )}
-                            </Avatar>
+              <PerfilAvatar
+                classNameAvatar={`h-20 w-20 rounded-full object-cover border-2 border-background shadow-sm`}
+                classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl`}
+                foto={turma.foto_professor}
+                tipo="materia"
+                palavra={turma.professor}
+              />
               <ButtonGroup>
                 <Button onClick={() => abrirMural()} className="text-white" variant="link" size="sm">
                   Mural
