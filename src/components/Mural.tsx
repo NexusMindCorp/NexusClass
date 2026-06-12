@@ -18,7 +18,8 @@ import { AlunosTurma } from "./AlunosTurma";
 import { PerfilAvatar } from "./PerfilAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
-import { BoxAtividade } from "./BoxAtividade";
+import { BoxAtividade, obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
+import type { Atividade } from "@/hooks/useMural";
 
 type MuralProps = {
   materia: string;
@@ -29,6 +30,7 @@ type MuralProps = {
 export function Mural({ materia, turma, perfil }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
+  const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
   const {
     posts,
     atividades,
@@ -48,6 +50,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
     deletarPost,
     publicarAtividade,
     deletarAtividade,
+    editarAtividade,
   } = useMural(materia, perfil);
 
   return (
@@ -62,8 +65,13 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
       <BoxAtividade
         materia={turma.materia}
         aberto={boxAtividadeAberto}
-        onClose={() => setBoxAtividadeAberto(false)}
+        onClose={() => {
+          setBoxAtividadeAberto(false);
+          setAtividadeParaEditar(null);
+        }}
         onPublicar={publicarAtividade}
+        atividadeParaEditar={atividadeParaEditar}
+        onEditar={editarAtividade}
       />
       <Card className="relative w-full overflow-hidden h-67">
         <img
@@ -217,32 +225,51 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
                     )}
 
                     {(perfil.role === "professor" || perfil.role === "master") && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deletarAtividade(atv.id)}
-                        className="h-8 w-8 p-0 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setAtividadeParaEditar(atv);
+                            setBoxAtividadeAberto(true);
+                          }}
+                          className="h-8 w-8 p-0 rounded-full hover:bg-muted cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deletarAtividade(atv.id)}
+                          className="h-8 w-8 p-0 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>
 
                 <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1 mb-4">{atv.descricao}</p>
 
-                {atv.anexo_url && (
-                  <div className="mt-2 pt-3 border-t border-border/40">
-                    <a
-                      href={atv.anexo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 text-xs font-medium text-foreground hover:bg-muted transition-colors w-fit"
-                    >
-                      <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
-                      Visualizar anexo
-                      <Download className="h-3.5 w-3.5 ml-1 text-muted-foreground" />
-                    </a>
+                {atv.anexo_url && obterUrlsAnexo(atv.anexo_url).length > 0 && (
+                  <div className="mt-4 pt-3 border-t border-border/40 space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Arquivos Anexos</p>
+                    <div className="flex flex-wrap gap-2">
+                      {obterUrlsAnexo(atv.anexo_url).map((url, index) => (
+                        <a
+                          key={index}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 text-xs font-medium text-foreground hover:bg-muted transition-colors max-w-xs truncate"
+                        >
+                          <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <span className="truncate">{obterNomeArquivoDoUrl(url)}</span>
+                          <Download className="h-3.5 w-3.5 ml-1 text-muted-foreground shrink-0" />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 )}
               </Card>

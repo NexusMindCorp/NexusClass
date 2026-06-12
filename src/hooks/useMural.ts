@@ -205,7 +205,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         }
     };
 
-    const publicarAtividade = async (titulo: string, descricao: string, dataEntrega: string | null, arquivo: File | null) => {
+    const publicarAtividade = async (titulo: string, descricao: string, dataEntrega: string | null, arquivos: File[]) => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) {
             toast.error("Erro de autenticação", {
                 description: "Não foi possível salvar a atividade."
@@ -214,23 +214,29 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         }
 
         try {
-            let anexoUrl: string | null = null;
+            const urls: string[] = [];
 
-            if (arquivo) {
-                const fileExt = arquivo.name.split('.').pop();
-                const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                const { error: uploadError } = await supabase.storage
-                    .from('anexos_atividades')
-                    .upload(fileName, arquivo);
+            if (arquivos && arquivos.length > 0) {
+                for (const file of arquivos) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const { error: uploadError } = await supabase.storage
+                        .from('anexos_atividades')
+                        .upload(fileName, file);
 
-                if (uploadError) throw uploadError;
+                    if (uploadError) throw uploadError;
 
-                const { data: publicUrlData } = supabase.storage
-                    .from('anexos_atividades')
-                    .getPublicUrl(fileName);
+                    const { data: publicUrlData } = supabase.storage
+                        .from('anexos_atividades')
+                        .getPublicUrl(fileName);
 
-                anexoUrl = publicUrlData.publicUrl;
+                    if (publicUrlData?.publicUrl) {
+                        urls.push(publicUrlData.publicUrl);
+                    }
+                }
             }
+
+            const anexoUrl = urls.length > 0 ? JSON.stringify(urls) : null;
 
             const { data, error } = await supabase
                 .from("atividades")
@@ -301,6 +307,94 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
             toast.error("Erro ao excluir atividade", {
                 description: err.message || "Tente novamente."
             });
+        }
+    };
+
+    const editarAtividade = async (
+        atividadeId: string,
+        titulo: string,
+        descricao: string,
+        dataEntrega: string | null,
+        arquivos: File[],
+        urlsMantidas: string[]
+    ) => {
+        if (!hasSupabaseConfig || !supabase) return;
+
+        try {
+            const novasUrls: string[] = [];
+
+            if (arquivos && arquivos.length > 0) {
+                for (const file of arquivos) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+                    const { error: uploadError } = await supabase.storage
+                        .from('anexos_atividades')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = supabase.storage
+                        .from('anexos_atividades')
+                        .getPublicUrl(fileName);
+
+                    if (publicUrlData?.publicUrl) {
+                        novasUrls.push(publicUrlData.publicUrl);
+                    }
+                }
+            }
+
+            const urlsFinais = [...urlsMantidas, ...novasUrls];
+            const anexoUrl = urlsFinais.length > 0 ? JSON.stringify(urlsFinais) : null;
+
+            const { data, error } = await supabase
+                .from("atividades")
+                .update({
+                    titulo: titulo.trim(),
+                    descricao: descricao.trim(),
+                    data_entrega: dataEntrega ? new Date(dataEntrega).toISOString() : null,
+                    anexo_url: anexoUrl,
+                })
+                .eq("id", atividadeId)
+                .select(`
+                    id,
+                    turma_id,
+                    professor_id,
+                    titulo,
+                    descricao,
+                    data_entrega,
+                    created_at,
+                    anexo_url,
+                    perfis:professor_id (
+                        nome
+                    )
+                `)
+                .single();
+
+            if (error) throw error;
+
+            const perfilProf = Array.isArray(data.perfis) ? data.perfis[0] : data.perfis;
+            const atividadeAtualizada: Atividade = {
+                id: data.id,
+                turma_id: data.turma_id,
+                professor_id: data.professor_id,
+                titulo: data.titulo,
+                descricao: data.descricao,
+                data_entrega: data.data_entrega,
+                created_at: data.created_at,
+                anexo_url: data.anexo_url,
+                professor_nome: perfilProf?.nome || perfil.nome,
+            };
+
+            setAtividades((anterior) =>
+                anterior.map((a) => (a.id === atividadeId ? atividadeAtualizada : a))
+            );
+            toast.success("Atividade atualizada com sucesso!");
+        } catch (err: any) {
+            console.error("Erro ao atualizar atividade:", err);
+            toast.error("Erro ao atualizar atividade", {
+                description: err.message || "Tente novamente."
+            });
+            throw err;
         }
     };
 
@@ -378,5 +472,6 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         publicarAtividade,
         deletarAtividade,
         carregarAtividades,
+        editarAtividade,
     };
 }
