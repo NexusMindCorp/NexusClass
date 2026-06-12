@@ -94,10 +94,15 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
 
                                 {/* Assunto e Descrição */}
                                 <div className="space-y-1.5 pl-1">
-                                    <h4 className="font-bold text-sm text-foreground">{duvida.assunto}</h4>
+                                    <h4 className="font-bold text-sm text-foreground">Assunto: {duvida.assunto}</h4>
                                     <p className="text-sm text-card-foreground/90 whitespace-pre-wrap leading-relaxed">
-                                        {duvida.descricao}
+                                        Descrição:
                                     </p>
+                                    <div className="p-3 bg-muted rounded-md border border-border/80">
+                                        <p className="text-sm text-card-foreground/90 whitespace-pre-wrap leading-relaxed">
+                                            {duvida.descricao}
+                                        </p>
+                                    </div>
                                 </div>
 
                                 {/* Anexos da dúvida */}

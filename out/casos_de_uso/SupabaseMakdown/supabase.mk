@@ -159,3 +159,18 @@
 | `lida` | `bool` |  |
 | `created_at` | `timestamptz` |  |
 
+## Table `duvidasalunostoprofessor`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `aluno_id` | `uuid` |  |
+| `prof_id` | `uuid` |  |
+| `turma_id` | `uuid` |  |
+| `assunto` | `text` |  |
+| `descricao` | `text` |  |
+| `anexo_url` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  |
+
