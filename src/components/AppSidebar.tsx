@@ -8,6 +8,7 @@ import type { EscolaProps } from "@/hooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
+import { useDuvidas } from "@/hooks/useDuvidas"
 
 
 
@@ -28,6 +29,7 @@ type AppSidebarProps = {
 }
 
 export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
+    const { duvidas } = useDuvidas(perfil);
     const isMaster = perfil?.role === "master";
     const isProfessor = perfil?.role === "professor";
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
@@ -36,6 +38,16 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
         : Object.entries(listaEscolar?.turmas || {}).filter(([id]) => inscricoes[id]);
 
     const isNovoAluno = perfil?.role === "aluno" && turmasParaExibir.length === 0;
+
+    // Calcular quantidade de dúvidas pendentes
+    const duvidasPendentes = duvidas.filter((d) => {
+        if (!perfil) return false;
+        if (d.resolvido) return false;
+        if (perfil.role === "master") return true;
+        if (perfil.role === "professor") return d.prof_id === perfil.id;
+        return d.aluno_id === perfil.id;
+    });
+    const totalDuvidasPendentes = duvidasPendentes.length;
 
     return (
         <Sidebar collapsible="icon">
@@ -79,6 +91,11 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                                     </SidebarMenuButton>
                                     {item.title === "Mensagens" && (
                                         <SidebarMenuBadge>0</SidebarMenuBadge>
+                                    )}
+                                    {item.id === "duvidas" && totalDuvidasPendentes > 0 && (
+                                        <SidebarMenuBadge className="bg-purple-600 text-white dark:bg-purple-500 font-semibold rounded-full shadow-sm shadow-purple-500/20 px-1.5">
+                                            {totalDuvidasPendentes}
+                                        </SidebarMenuBadge>
                                     )}
                                 </SidebarMenuItem>
                             ))}
