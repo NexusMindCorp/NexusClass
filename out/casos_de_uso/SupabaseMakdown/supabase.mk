@@ -173,4 +173,6 @@
 | `descricao` | `text` |  |
 | `anexo_url` | `text` |  Nullable |
 | `created_at` | `timestamptz` |  |
+| `resolvido` | `bool` | Default: false |
+| `resposta` | `text` | Nullable |
 

@@ -12,6 +12,8 @@ export type Duvida = {
     descricao: string;
     anexo_url: string | null;
     created_at: string;
+    resolvido: boolean;
+    resposta: string | null;
     aluno?: {
         nome: string;
         email: string;
@@ -70,6 +72,8 @@ export function useDuvidas(perfil: PerfilUsuario | null) {
                     descricao,
                     anexo_url,
                     created_at,
+                    resolvido,
+                    resposta,
                     aluno:aluno_id (nome, email, foto_url),
                     professor:prof_id (nome),
                     turma:turma_id (materia, turma)
@@ -140,6 +144,35 @@ export function useDuvidas(perfil: PerfilUsuario | null) {
         }
     };
 
+    const responderDuvida = async (duvidaId: string, respostaText: string) => {
+        if (!hasSupabaseConfig || !supabase) return;
+
+        try {
+            const { error } = await supabase
+                .from("duvidasalunostoprofessor")
+                .update({
+                    resposta: respostaText,
+                    resolvido: true,
+                })
+                .eq("id", duvidaId);
+
+            if (error) throw error;
+
+            setDuvidas((prev) =>
+                prev.map((d) =>
+                    d.id === duvidaId ? { ...d, resposta: respostaText, resolvido: true } : d
+                )
+            );
+            toast.success("Dúvida respondida com sucesso!");
+        } catch (err: any) {
+            console.error("Erro ao responder dúvida:", err);
+            toast.error("Erro ao responder dúvida", {
+                description: err.message || "Tente novamente."
+            });
+            throw err;
+        }
+    };
+
     useEffect(() => {
         void carregarDuvidas();
     }, [carregarDuvidas]);
@@ -148,6 +181,7 @@ export function useDuvidas(perfil: PerfilUsuario | null) {
         duvidas,
         loading,
         carregarDuvidas,
-        deletarDuvida
+        deletarDuvida,
+        responderDuvida
     };
 }

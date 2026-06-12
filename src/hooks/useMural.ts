@@ -537,6 +537,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
                     assunto: assuntoText.trim(),
                     descricao: mensagemText.trim(),
                     anexo_url: anexoUrl,
+                    resolvido: false,
                 });
 
             if (insertError) throw insertError;

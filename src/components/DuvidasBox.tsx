@@ -1,10 +1,14 @@
+import { useState } from "react";
 import type { UsuarioProps } from "@/hooks/useGerenciador";
 import type { PerfilUsuario } from "@/hooks/useAuth";
-import { useDuvidas } from "@/hooks/useDuvidas";
+import { useDuvidas, type Duvida } from "@/hooks/useDuvidas";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2, Paperclip, Download, MessageSquare } from "lucide-react";
 import { obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 type DuvidasBoxProps = {
     usuario: UsuarioProps|any;
@@ -12,7 +16,26 @@ type DuvidasBoxProps = {
 };
 
 export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
-    const { duvidas, loading, deletarDuvida } = useDuvidas(perfil);
+    const { duvidas, loading, deletarDuvida, responderDuvida } = useDuvidas(perfil);
+    const [duvidaSelecionada, setDuvidaSelecionada] = useState<Duvida | null>(null);
+    const [textoResposta, setTextoResposta] = useState("");
+    const [modalAberto, setModalAberto] = useState(false);
+    const [enviandoResposta, setEnviandoResposta] = useState(false);
+
+    const handleEnviarResposta = async () => {
+        if (!duvidaSelecionada || !textoResposta.trim()) return;
+        try {
+            setEnviandoResposta(true);
+            await responderDuvida(duvidaSelecionada.id, textoResposta.trim());
+            setModalAberto(false);
+            setDuvidaSelecionada(null);
+            setTextoResposta("");
+        } catch (error) {
+            // erro tratado pelo hook
+        } finally {
+            setEnviandoResposta(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -72,6 +95,11 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
                                                         {duvida.turma.materia} • {duvida.turma.turma}
                                                     </span>
                                                 )}
+                                                {duvida.resolvido ? (
+                                                    <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] py-0 px-2 h-5">Resolvida</Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border border-amber-500/20 text-[10px] py-0 px-2 h-5">Pendente</Badge>
+                                                )}
                                             </div>
                                             <span className="text-xs text-muted-foreground mt-0.5">
                                                 Enviado em {new Date(duvida.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
@@ -126,6 +154,40 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Resposta do Professor */}
+                                {duvida.resposta && (
+                                    <div className="pl-1 pt-3 border-t border-border/40 space-y-2 mt-3">
+                                        <div className="flex items-center gap-2">
+                                            <MessageSquare className="h-4 w-4 text-purple-500" />
+                                            <span className="text-xs font-bold text-foreground">Resposta do Professor:</span>
+                                        </div>
+                                        <div className="p-3 bg-purple-500/5 rounded-md border border-purple-500/10">
+                                            <p className="text-sm text-card-foreground/90 whitespace-pre-wrap leading-relaxed">
+                                                {duvida.resposta}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Botão para Responder Dúvida (Somente para Professores ou Master) */}
+                                {(isProfessor || isMaster) && (
+                                    <div className="flex justify-end pt-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-2 border-purple-500/30 text-purple-600 hover:bg-purple-500/10 hover:text-purple-700 cursor-pointer"
+                                            onClick={() => {
+                                                setDuvidaSelecionada(duvida);
+                                                setTextoResposta(duvida.resposta || "");
+                                                setModalAberto(true);
+                                            }}
+                                        >
+                                            <MessageSquare className="h-4 w-4" />
+                                            {duvida.resolvido ? "Editar Resposta" : "Responder Dúvida"}
+                                        </Button>
+                                    </div>
+                                )}
                             </Card>
                         );
                     })
@@ -143,6 +205,54 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
                     </Card>
                 )}
             </div>
+
+            {/* Modal de resposta da dúvida */}
+            <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <MessageSquare className="h-5 w-5 text-purple-500" />
+                            Responder Dúvida
+                        </DialogTitle>
+                    </DialogHeader>
+                    {duvidaSelecionada && (
+                        <div className="space-y-4 py-2">
+                            <div>
+                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Dúvida do Aluno ({duvidaSelecionada.aluno?.nome})</h4>
+                                <div className="p-3 bg-muted rounded-md text-sm text-card-foreground/95">
+                                    <p className="font-semibold mb-1">Assunto: {duvidaSelecionada.assunto}</p>
+                                    <p className="whitespace-pre-wrap">{duvidaSelecionada.descricao}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor="resposta-textarea" className="text-sm font-semibold text-foreground">
+                                    Sua Resposta:
+                                </label>
+                                <Textarea
+                                    id="resposta-textarea"
+                                    placeholder="Digite aqui sua orientação ou resposta para o aluno..."
+                                    value={textoResposta}
+                                    onChange={(e) => setTextoResposta(e.target.value)}
+                                    rows={6}
+                                    className="resize-none"
+                                />
+                            </div>
+                        </div>
+                    )}
+                    <DialogFooter className="gap-2">
+                        <Button variant="outline" onClick={() => setModalAberto(false)} disabled={enviandoResposta}>
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleEnviarResposta}
+                            disabled={enviandoResposta || !textoResposta.trim()}
+                            className="bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
+                        >
+                            {enviandoResposta ? "Enviando..." : "Enviar Resposta"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

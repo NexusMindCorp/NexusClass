@@ -11,11 +11,12 @@ import { getCorMateria } from "@/lib/utils"
 import { useOutletContext } from "react-router-dom"
 
 
-let itens = [
+let itensMenu = [
     { title: "Inicio", id: "principal", icon: Home },
     { title: "Pesquisar", id: "pesquisar", icon: Search },
     { title: "Mensagens", id: "mensagens", icon: Inbox },
     { title: "Calendario", id: "calendario", icon: Calendar },
+    {title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestionMark }
 ];
 
 type AppSidebarProps = {
@@ -29,9 +30,6 @@ type AppSidebarProps = {
 export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
     const isMaster = perfil?.role === "master";
     const isProfessor = perfil?.role === "professor";
-        const itensMenu = isProfessor 
-        ? [...itens, { title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestion }] 
-        : itens;
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
     const turmasParaExibir = isMaster
         ? Object.entries(listaEscolar?.turmas || {})
