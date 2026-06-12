@@ -55,7 +55,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             )}
             {props.usuario.acessouOq === "mural" && (
                 <div>
-                    {turmaSelecionada && <Mural materia={props.usuario.chaveMural} turma={turmaSelecionada} />}
+                    {turmaSelecionada && <Mural materia={props.usuario.chaveMural} turma={turmaSelecionada} perfil={props.perfil} />}
                 </div>
             )}
             {props.usuario.acessouOq === "calendario" &&

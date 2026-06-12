@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { LogOutIcon, Moon, Edit, Sun, User, Mail, Bell, AlertCircle } from "lucide-react"
-import { Avatar, AvatarImage } from "./ui/avatar"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,7 +27,6 @@ import { useTheme } from "./provedores/ThemeProvider"
 import { SidebarTrigger } from "./ui/sidebar"
 import { supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
-import { getCorNomeUsuario } from "@/lib/utils"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { PerfilAvatar } from "./PerfilAvatar"
 
@@ -40,8 +38,8 @@ type NavbarProps = {
 export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
     const { setTheme } = useTheme()
     const navigate = useNavigate()
-    const [notifications, setNotifications] = React.useState({ email: true, alert: true, })
-    const [saindo, setSaindo] = React.useState(false)
+    const [notifications, setNotifications] =useState({ email: true, alert: true, })
+    const [saindo, setSaindo] =useState(false)
     const [salvando, setSalvando] = useState(false)
     const [modalVisualizar, setModalVisualizar] = useState(false)
     const [modalEditar, setModalEditar] = useState(false)

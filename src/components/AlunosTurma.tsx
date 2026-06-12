@@ -19,12 +19,15 @@ import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lu
 import { getCorMateria } from "@/lib/utils"
 import { useOptionAlunos } from "@/hooks/useOptionAlunos"
 import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno"
+import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario"
+import type { PerfilUsuario } from "@/hooks/useAuth"
 
 type AlunosTurmaProps = {
   turma: TurmaProps
+  perfil: PerfilUsuario
 }
 
-export function AlunosTurma({ turma }: AlunosTurmaProps) {
+export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()
   const renderiarModal =
     opcaoSelecionada === 'Denunciar' && nomeAluno ? (
@@ -32,8 +35,12 @@ export function AlunosTurma({ turma }: AlunosTurmaProps) {
         aluno={nomeAluno}
         onClose={() => handleOptionSelect(null)}
       />
-    ) : opcaoSelecionada === 'Ver Perfil' ? (
-      null
+    ) : opcaoSelecionada === 'Ver Perfil' && nomeAluno ? (
+      <BoxPerfilUsuario
+        nomeUsuario={nomeAluno}
+        onClose={() => handleOptionSelect(null)}
+        currentUserProfile={perfil}
+      />
     ) : opcaoSelecionada === 'Enviar Mensagem' ? (
       null
     ) : null
@@ -86,7 +93,10 @@ export function AlunosTurma({ turma }: AlunosTurmaProps) {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onSelect={() => handleOptionSelect('Ver Perfil', aluno)}
+                        >
                           <User2 className="mr-2 h-4 w-4" />
                           Ver Perfil
                         </DropdownMenuItem>

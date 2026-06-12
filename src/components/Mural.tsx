@@ -1,4 +1,5 @@
 import type { TurmaProps } from "@/hooks/leituraJson";
+import type { PerfilUsuario } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -20,9 +21,10 @@ import { PerfilAvatar } from "./PerfilAvatar";
 type MuralProps = {
   materia: string;
   turma: TurmaProps;
+  perfil: PerfilUsuario;
 };
 
-export function Mural({ materia, turma }: MuralProps) {
+export function Mural({ materia, turma, perfil }: MuralProps) {
   const {
     posts,
     conteudo,
@@ -138,7 +140,7 @@ export function Mural({ materia, turma }: MuralProps) {
           />
         )}
         {posts.tipoAmostar === "alunos" && (
-          <AlunosTurma turma={turma} />
+          <AlunosTurma turma={turma} perfil={perfil} />
         )}
       </div>
     </div>
