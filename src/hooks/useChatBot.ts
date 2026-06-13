@@ -117,16 +117,39 @@ export const useGeminiChat = (
   const resumoAcordoUso =
     "Aqui está o resumo do Acordo de Uso da Plataforma: O Acordo de Uso da Plataforma inclui: 1) Privacidade: Respeitamos seus dados, mas coletamos informações básicas para personalizar a experiência. 2) Segurança de Conta: Você é responsável por manter sua senha segura e não compartilhar sua conta. 3) Responsabilidades do Usuário: Proibido usar a plataforma para atividades ilegais, assédio ou violação de direitos autorais. 4) Modificações nos Termos: Podemos atualizar os termos, notificando os usuários sobre mudanças significativas. 5) Uso Aceitável: Evite conteúdo ofensivo, spam ou comportamento disruptivo. Para dúvidas específicas, contate o suporte.";
 
+  const perfilId = usuario.perfil?.id;
+  const perfilRole = usuario.perfil?.role;
+  const inscricoesStr = Object.keys(usuario.inscricoes || {})
+    .filter(key => usuario.inscricoes[key])
+    .sort()
+    .join(',');
+
   const carregarResumoEventos = useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
       setResumoEventosCalendario('Agenda indisponível: integração com calendário não configurada.');
       return;
     }
 
-    const { data, error } = await supabase
+    if (!perfilId) {
+      setResumoEventosCalendario('Eventos do calendário ainda não carregados: perfil do usuário não identificado.');
+      return;
+    }
+
+    let query = supabase
       .from('eventos_calendario')
       .select('titulo,descricao,data,horario')
-      .gte('data', hojeChaveLocal())
+      .gte('data', hojeChaveLocal());
+
+    if (perfilRole !== 'master') {
+      const idsTurmas = inscricoesStr ? inscricoesStr.split(',') : [];
+      if (idsTurmas.length > 0) {
+        query = query.or(`and(tipo.eq.pessoal,autor_id.eq.${perfilId}),and(tipo.eq.turma,turma_id.in.(${idsTurmas.join(',')}))`);
+      } else {
+        query = query.eq('tipo', 'pessoal').eq('autor_id', perfilId);
+      }
+    }
+
+    const { data, error } = await query
       .order('data', { ascending: true })
       .order('horario', { ascending: true, nullsFirst: false })
       .limit(10);
@@ -149,7 +172,7 @@ export const useGeminiChat = (
     });
 
     setResumoEventosCalendario(`Próximos eventos do aluno:\n${linhas.join('\n')}`);
-  }, []);
+  }, [perfilId, perfilRole, inscricoesStr]);
 
   useEffect(() => {
     void carregarResumoEventos();
