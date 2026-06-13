@@ -168,9 +168,33 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
     void carregarEventosSupabase()
   }, [carregarEventosSupabase, usaSupabase])
 
-  const datasComEvento = useMemo(() => {
-    const unicas = new Set(eventos.map((evento) => evento.data))
-    return Array.from(unicas).map(paraData)
+  const datasPorTipoEvento = useMemo(() => {
+    const pessoais = new Set<string>()
+    const turmas = new Set<string>()
+
+    eventos.forEach((evento) => {
+      if (evento.tipo === "pessoal") {
+        pessoais.add(evento.data)
+      }
+
+      if (evento.tipo === "turma") {
+        turmas.add(evento.data)
+      }
+    })
+
+    const mistas = new Set(
+      Array.from(pessoais).filter((data) => turmas.has(data))
+    )
+
+    return {
+      pessoais: Array.from(pessoais)
+        .filter((data) => !mistas.has(data))
+        .map(paraData),
+      turmas: Array.from(turmas)
+        .filter((data) => !mistas.has(data))
+        .map(paraData),
+      mistas: Array.from(mistas).map(paraData),
+    }
   }, [eventos])
 
   const eventosDoDia = useMemo(() => {
@@ -315,7 +339,9 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
     setSobreEvento,
     processamentoEvento,
     erroBanco,
-    datasComEvento,
+    datasComEventoPessoal: datasPorTipoEvento.pessoais,
+    datasComEventoTurma: datasPorTipoEvento.turmas,
+    datasComEventosMistos: datasPorTipoEvento.mistas,
     eventosDoDia,
     adicionarEvento,
     removerEvento,

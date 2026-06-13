@@ -53,21 +53,25 @@ export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, tu
 						const podeRemover = evento.tipo === "pessoal" || perfil.role !== "aluno";
 						const nomeTurma = evento.turma_id ? turmasGlobais[evento.turma_id]?.materia : null;
 						const textoBadge = ehEventoTurma ? `Turma: ${nomeTurma || "Turma não encontrada"}` : "Pessoal";
+						const classesEvento = ehEventoTurma
+							? {
+								card: "border-l-primary bg-primary/5 dark:bg-primary/10",
+								badge: "border-primary/30 bg-primary/10 text-primary dark:border-primary/40 dark:bg-primary/15 dark:text-primary-foreground",
+							}
+							: {
+								card: "border-l-violet-500 bg-violet-500/5 dark:bg-violet-500/10",
+								badge: "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:border-violet-400/35 dark:bg-violet-400/10 dark:text-violet-200",
+							};
 
 						return (
 							<div
 								key={evento.id}
-								className={`flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/30 p-3 shadow-sm transition-colors border-l-4 ${ehEventoTurma ? "border-l-purple-500" : "border-l-emerald-500"
-									}`}
+								className={`flex items-start justify-between gap-3 rounded-lg border border-border p-3 shadow-sm transition-colors border-l-4 ${classesEvento.card}`}
 							>
 								<div className="space-y-1.5 w-full">
 									<div className="flex items-center gap-2 flex-wrap">
 										<p className="text-sm font-bold text-foreground">{evento.titulo}</p>
-										<Badge variant="outline" className={
-											ehEventoTurma
-												? "bg-purple-500/10 text-purple-500 border-purple-500/20 text-[10px] py-0 h-4"
-												: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] py-0 h-4"
-										}>
+										<Badge variant="outline" className={`text-[10px] py-0 h-4 ${classesEvento.badge}`}>
 											{textoBadge}
 										</Badge>
 									</div>
@@ -89,7 +93,7 @@ export function BoxAgendados({ perfil, date, carregandoEventos, eventosDoDia, tu
 									<Button
 										variant="outline"
 										size="sm"
-										className="border-border bg-background text-foreground hover:bg-destructive hover:text-destructive-foreground cursor-pointer transition-colors"
+										className="border-destructive/30 bg-background/80 text-destructive shadow-sm hover:border-destructive hover:bg-destructive/10 hover:text-destructive dark:bg-background/40 dark:text-destructive dark:hover:bg-destructive/15 cursor-pointer transition-colors"
 										onClick={() => removerEvento(evento.id)}
 									>
 										Remover

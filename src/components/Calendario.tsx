@@ -26,7 +26,9 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
     setSobreEvento,
     processamentoEvento,
     erroBanco,
-    datasComEvento,
+    datasComEventoPessoal,
+    datasComEventoTurma,
+    datasComEventosMistos,
     eventosDoDia,
     adicionarEvento,
     removerEvento,
@@ -56,14 +58,36 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
               onSelect={selecionarDataCalendario}
               month={currentMonth}
               onMonthChange={setCurrentMonth}
-              modifiers={{ comEvento: datasComEvento }}
+              modifiers={{
+                eventoPessoal: datasComEventoPessoal,
+                eventoTurma: datasComEventoTurma,
+                eventosMistos: datasComEventosMistos,
+              }}
               modifiersClassNames={{
-                comEvento:
-                  "bg-primary/15 rounded-md [&_button]:border [&_button]:border-primary/40",
+                eventoPessoal:
+                  "rounded-md bg-violet-500/15 text-violet-700 dark:text-violet-100 [&_button]:border [&_button]:border-violet-500/40 [&_button]:bg-violet-500/10 [&_button]:hover:bg-violet-500/20",
+                eventoTurma:
+                  "rounded-md bg-primary/15 text-primary dark:text-primary-foreground [&_button]:border [&_button]:border-primary/45 [&_button]:bg-primary/10 [&_button]:hover:bg-primary/20",
+                eventosMistos:
+                  "rounded-md bg-[linear-gradient(135deg,rgba(139,92,246,0.24)_0%,rgba(236,72,153,0.24)_100%)] text-foreground [&_button]:border [&_button]:border-primary/50 [&_button]:bg-transparent [&_button]:hover:bg-primary/15",
               }}
               fixedWeeks
               className="p-2 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(11)]"
             />
+            <div className="flex flex-wrap gap-2 px-2 pb-1 pt-2 text-[11px] text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
+                Pessoal
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                Turma
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full border border-primary/40 bg-[linear-gradient(90deg,#8b5cf6_0_50%,#ec4899_50%_100%)]" />
+                Ambos
+              </span>
+            </div>
           </div>
 
           <div className="space-y-4">
