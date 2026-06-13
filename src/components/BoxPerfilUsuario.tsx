@@ -50,7 +50,7 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                                 <PerfilAvatar
                                     classNameAvatar="h-24 w-24 rounded-full object-cover border"
                                     classNameDiv="h-24 w-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-black shadow-lg"
-                                    foto={ehProprioUsuario ? perfilAlvo.foto_url : null}
+                                    foto={perfilAlvo.foto_url }
                                     tipo="usuario"
                                     palavra={perfilAlvo.nome}
                                 />

@@ -12,7 +12,7 @@ export function PerfilAvatar( { classNameAvatar, classNameDiv, foto, tipo = 'usu
     const classNameAvatarFinal = classNameAvatar ? { className: classNameAvatar } : {};
     return (
         <Avatar {...classNameAvatarFinal}>
-            {!foto ? (
+            {!foto || foto === "" ? (
                 <div className={`${classNameDiv} ${tipoPalavra}`.trim()}>
                     {(palavra || "U").charAt(0).toUpperCase()}
                 </div>
