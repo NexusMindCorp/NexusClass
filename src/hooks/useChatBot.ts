@@ -217,7 +217,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
       return `${index + 1}. ${evento.titulo} em ${formatarDataCurta(evento.data)}${horario}${descricao}`;
     });
 
-    setResumoEventosCalendario(`Próximos eventos do aluno:\n${linhas.join('\n')}`);
+    setResumoEventosCalendario(`Sempre deve ser dito com dia, mês e ano os próximos eventos do aluno:\n${linhas.join('\n')}`);
   }, [perfilId, perfilRole, inscricoesStr]);
 
   useEffect(() => {
