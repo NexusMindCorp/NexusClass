@@ -23,7 +23,7 @@ export function AnexoArquivo({ fileInputRef, attachedFiles, onFileChange }: Anex
 			/>
 			<Button
 				type="button"
-				className="bg-red-500 text-slate-950 hover:bg-red-600 transition-colors shadow-sm hover:shadow-[0_0_12px_rgba(239,68,68,0.18)] focus-visible:ring-2 focus-visible:ring-red-300"
+				className="bg-destructive text-slate-950 hover:bg-destructive/90 transition-colors shadow-sm hover:shadow-[0_0_12px_rgba(239,68,68,0.18)] focus-visible:ring-2 focus-visible:ring-ring"
 				onClick={() => fileInputRef.current?.click()}
 			>
 				<Upload /> Anexar arquivos

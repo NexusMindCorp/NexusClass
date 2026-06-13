@@ -46,31 +46,30 @@ export function Suporte() {
 					<CardContent>
 						<form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
 							<FieldSet>
-												<FieldGroup className="gap-5">
-																		{/* If we have a logged-in profile, show name/email and skip rendering those inputs */}
-																		{perfil && (
-																			<div className="space-y-1">
-																				<div className="text-sm text-muted-foreground">Nome</div>
-																				<div className="text-foreground font-medium">{perfil.nome}</div>
-																				<div className="text-sm text-muted-foreground mt-2">Email</div>
-																				<div className="text-foreground font-medium">{perfil.email}</div>
-																			</div>
-																		)}
+								<FieldGroup className="gap-5">
+									{perfil && (
+										<div className="space-y-1">
+											<div className="text-sm text-muted-foreground">Nome</div>
+											<div className="text-foreground font-medium">{perfil.nome}</div>
+											<div className="text-sm text-muted-foreground mt-2">Email</div>
+											<div className="text-foreground font-medium">{perfil.email}</div>
+										</div>
+									)}
 
-																		{formFields.filter((f) => f.key !== 'name' && f.key !== 'email').map((field) => (
-																				<InputsEntrada
-																						key={field.key}
-																						titulo={field.titulo}
-																						id={field.id}
-																						nome={field.nome}
-																						escritoNoInputbox={field.escritoNoInputbox}
-																						decricao={field.decricao}
-																						tipo={field.tipo}
-																						textArea={field.textArea}
-																						inputOption={field.inputOption}
-																						required={field.required}
-																				/>
-																		))}
+									{formFields.filter((f) => f.key !== 'name' && f.key !== 'email').map((field) => (
+										<InputsEntrada
+											key={field.key}
+											titulo={field.titulo}
+											id={field.id}
+											nome={field.nome}
+											escritoNoInputbox={field.escritoNoInputbox}
+											decricao={field.decricao}
+											tipo={field.tipo}
+											textArea={field.textArea}
+											inputOption={field.inputOption}
+											required={field.required}
+										/>
+									))}
 
 									<AnexoArquivo
 										fileInputRef={fileInputRef}
