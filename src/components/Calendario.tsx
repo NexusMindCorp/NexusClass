@@ -71,6 +71,10 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
                 eventosMistos:
                   "rounded-md bg-[linear-gradient(135deg,rgba(139,92,246,0.24)_0%,rgba(236,72,153,0.24)_100%)] text-foreground [&_button]:border [&_button]:border-primary/50 [&_button]:bg-transparent [&_button]:hover:bg-primary/15",
               }}
+              classNames={{
+                weekdays: "flex gap-1",
+                week: "flex w-full gap-1 mt-2",
+              }}
               fixedWeeks
               className="p-2 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(11)]"
             />
