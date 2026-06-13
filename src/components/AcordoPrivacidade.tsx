@@ -171,7 +171,7 @@ export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">13. Legislação Aplicável e Foro</h2>
                             <p className="mb-3">
-                                Este termo de uso é regido pela legislação da República Federativa do Brasil. Eventuais controvérsias judiciais que não puderem ser solucionadas amigavelmente serão resolvidas no foro central da comarca de desenvolvimento da plataforma.
+                                Este termo de uso é regido pela legislação da República Federativa do Brasil. Eventuais controvérsias judiciais que  poderão ser solucionadas amigavelmente.
                             </p>
                         </section>
 
