@@ -50,6 +50,7 @@ interface JsonInstruction {
     usageAgreementSummary?: string;
     calendarEventsSummary?: string;
     userProfileSummary?: string;
+    questionsFrequents?: string;
   };
 }
 
@@ -80,10 +81,60 @@ export const useGeminiChat = (
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [resumoEventosCalendario, setResumoEventosCalendario] = useState<string>('Eventos do calendário ainda não carregados.');
+  const [perguntasFrequentes, setPerguntasFrequentes] = useState<string>('Carregando perguntas frequentes...');
   const chatRef = useRef<ChatSession | null>(null);
   const resumoPerfilUsuario = usuario.perfil
     ? `Nome do usuário: ${usuario.perfil.nome}. Papel: ${usuario.perfil.role}. Use esse nome para personalizar o atendimento.`
     : 'Perfil do usuário não carregado. Atenda de forma genérica até o perfil estar disponível.';
+
+  const perfilId = usuario.perfil?.id;
+  const perfilRole = usuario.perfil?.role;
+  const inscricoesStr = Object.keys(usuario.inscricoes || {})
+    .filter(key => usuario.inscricoes[key])
+    .sort()
+    .join(',');
+
+  const perguntas = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase) {
+      return;
+    }
+    if (!perfilId || !perfilRole) {
+      setPerguntasFrequentes('Perfil do usuário não identificado. Não foi possível carregar dúvidas.');
+      return;
+    }
+    try {
+      let query = supabase
+        .from('duvidasalunostoprofessor')
+        .select('assunto,descricao,resposta,resolvido');
+
+      if (perfilRole === 'aluno') {
+        query = query.eq('aluno_id', perfilId);
+      } else if (perfilRole === 'professor') {
+        query = query.eq('prof_id', perfilId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Erro ao buscar dúvidas:", error);
+        setPerguntasFrequentes('Nenhuma dúvida cadastrada no momento por falha ao carregar.');
+        return;
+      }
+
+      setPerguntasFrequentes(
+        `Leve em consideração as seguintes dúvidas cadastradas pelo usuário:
+${data && data.length > 0 ? data.map((item: any) => `- Assunto: ${item.assunto} | Descrição: ${item.descricao} | Status: ${item.resolvido ? 'Resolvido' : 'Pendente'} ${item.resposta ? `| Resposta do Professor: ${item.resposta}` : ''}`).join('\n') : 'Nenhuma dúvida cadastrada no momento.'}
+Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, caso exista, e se a duvida foi resolvida ou não. Se a dúvida for recorrente ou tiver uma resposta interessante, use como base para ajudar o usuário.
+`
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }, [perfilId, perfilRole]);
+
+  useEffect(() => {
+    void perguntas();
+  }, [perguntas]);
 
   const stringDeInscricoes = (() => {
     const role = usuario.perfil?.role;
@@ -117,12 +168,7 @@ export const useGeminiChat = (
   const resumoAcordoUso =
     "Aqui está o resumo do Acordo de Uso da Plataforma: O Acordo de Uso da Plataforma inclui: 1) Privacidade: Respeitamos seus dados, mas coletamos informações básicas para personalizar a experiência. 2) Segurança de Conta: Você é responsável por manter sua senha segura e não compartilhar sua conta. 3) Responsabilidades do Usuário: Proibido usar a plataforma para atividades ilegais, assédio ou violação de direitos autorais. 4) Modificações nos Termos: Podemos atualizar os termos, notificando os usuários sobre mudanças significativas. 5) Uso Aceitável: Evite conteúdo ofensivo, spam ou comportamento disruptivo. Para dúvidas específicas, contate o suporte.";
 
-  const perfilId = usuario.perfil?.id;
-  const perfilRole = usuario.perfil?.role;
-  const inscricoesStr = Object.keys(usuario.inscricoes || {})
-    .filter(key => usuario.inscricoes[key])
-    .sort()
-    .join(',');
+
 
   const carregarResumoEventos = useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
@@ -280,6 +326,7 @@ export const useGeminiChat = (
           enrollmentSummary: stringDeInscricoes,
           calendarEventsSummary: resumoEventosCalendario,
           userProfileSummary: resumoPerfilUsuario,
+          questionsFrequents: perguntasFrequentes,
         },
       };
 
