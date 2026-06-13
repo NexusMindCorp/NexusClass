@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { UsuarioProps } from "@/hooks/useGerenciador";
 import type { PerfilUsuario } from "@/hooks/useAuth";
 import { useDuvidas, type Duvida } from "@/hooks/useDuvidas";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Trash2, Paperclip, Download, MessageSquare } from "lucide-react";
+import { Loader2, Trash2, Paperclip, Download, MessageSquare, Funnel  } from "lucide-react";
 import { obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ButtonGroup } from "./ui/button-group";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+
 
 type DuvidasBoxProps = {
     usuario: UsuarioProps|any;
@@ -21,6 +24,7 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
     const [textoResposta, setTextoResposta] = useState("");
     const [modalAberto, setModalAberto] = useState(false);
     const [enviandoResposta, setEnviandoResposta] = useState(false);
+    const [filtro, setFiltro] = useState("todas");
 
     const handleEnviarResposta = async () => {
         if (!duvidaSelecionada || !textoResposta.trim()) return;
@@ -31,11 +35,29 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
             setDuvidaSelecionada(null);
             setTextoResposta("");
         } catch (error) {
-            // erro tratado pelo hook
+            console.error("Erro ao enviar resposta:", error);
         } finally {
             setEnviandoResposta(false);
         }
     };
+
+    // Filtrar dúvidas conforme o papel do usuário logado
+    const duvidasFiltradas = duvidas.filter((d) => {
+        if (!perfil) return false;
+        if (perfil.role === "master") return true;
+        if (perfil.role === "professor") return d.prof_id === perfil.id;
+        return d.aluno_id === perfil.id; 
+    });
+
+    useEffect(() => {
+        setFiltro("todas");
+    }, [perfil]);
+
+    const duvidasFiltradasPorStatus = duvidasFiltradas.filter((d) => {
+        if (filtro === "pendentes") return !d.resolvido;
+        if (filtro === "resolvidas") return d.resolvido;
+        return true;
+    });
 
     if (loading) {
         return (
@@ -45,15 +67,6 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
             </div>
         );
     }
-
-    // Filtrar dúvidas conforme o papel do usuário logado
-    const duvidasFiltradas = duvidas.filter((d) => {
-        if (!perfil) return false;
-        if (perfil.role === "master") return true;
-        if (perfil.role === "professor") return d.prof_id === perfil.id;
-        return d.aluno_id === perfil.id; // Aluno vê apenas suas próprias dúvidas
-    });
-
     return (
         <div className="mx-auto w-full max-w-3xl space-y-6 min-h-screen pb-16">
             <div className="flex flex-col gap-1.5 border-b border-border/60 pb-4">
@@ -61,18 +74,45 @@ export function DuvidasBox({ usuario, perfil }: DuvidasBoxProps) {
                     <MessageSquare className="h-6 w-6 text-purple-500" />
                     Central de Mensagens / Dúvidas
                 </h2>
-                <p className="text-sm text-muted-foreground">
-                    {perfil?.role === "professor"
-                        ? "Gerencie e delete as dúvidas e contatos diretos enviados pelos seus alunos."
-                        : perfil?.role === "master"
-                        ? "Painel de administração para monitoramento de dúvidas escolares."
-                        : "Acompanhe as dúvidas e mensagens diretas que você enviou aos professores."}
-                </p>
+                <div className="flex items-center gap-39.5">
+                    <p className="text-sm text-muted-foreground">
+                        {perfil?.role === "professor"
+                            ? "Gerencie e delete as dúvidas e contatos diretos enviados pelos seus alunos."
+                            : perfil?.role === "master"
+                            ? "Painel de administração para monitoramento de dúvidas escolares."
+                            : "Acompanhe as dúvidas e mensagens diretas que você enviou aos professores."}
+                    </p>
+                    <ButtonGroup>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="pl-2!">
+                                <p className="text-sm nd flex items-center gap-1">
+                                    <Funnel className="h-4 w-4" />
+                                    Filtrar
+                                </p>
+                            </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem  onSelect={() => setFiltro("todas")}>
+                                        Todos
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem  onSelect={() => setFiltro("pendentes")}>
+                                        <span className="text-orange-500">Pendente</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => setFiltro("resolvidas")}>
+                                        <span className="text-green-500">Resolvida</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                </div>
             </div>
 
             <div className="space-y-4">
-                {duvidasFiltradas.length > 0 ? (
-                    duvidasFiltradas.map((duvida) => {
+                {duvidasFiltradasPorStatus.length > 0 ? (
+                    duvidasFiltradasPorStatus.map((duvida) => {
                         const attachments = obterUrlsAnexo(duvida.anexo_url);
                         const isProfessor = perfil?.role === "professor";
                         const isMaster = perfil?.role === "master";
