@@ -29,6 +29,7 @@ type AlunosTurmaProps = {
 
 export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()
+
   const renderiarModal =
     opcaoSelecionada === 'Denunciar' && nomeAluno ? (
       <BoxDenunciaAluno
@@ -44,6 +45,7 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
     ) : opcaoSelecionada === 'Enviar Mensagem' ? (
       null
     ) : null
+
   return (
     <>
       {renderiarModal}
@@ -68,7 +70,7 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
             </TableHeader>
             <TableBody>
               {turma.alunos.map((aluno, index) => (
-                <TableRow key={index} className="group hover:bg-muted/50 transition-colors">
+                <TableRow key={aluno.id || index} className="group hover:bg-muted/50 transition-colors">
 
                   <TableCell className="py-3">
                     <div className="flex items-center gap-3">
@@ -76,9 +78,10 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
                         classNameAvatar="h-8 w-8 rounded-full object-cover shadow-sm"
                         classNameDiv="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                         tipo="usuario"
-                        palavra={aluno}
+                        palavra={aluno.nome}
+                        foto={aluno.foto_url || undefined}
                       />
-                      <span className="font-medium text-sm">{aluno}</span>
+                      <span className="font-medium text-sm">{aluno.nome}</span>
                     </div>
                   </TableCell>
 
@@ -96,7 +99,7 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onSelect={() => handleOptionSelect('Ver Perfil', aluno)}
+                          onSelect={() => handleOptionSelect('Ver Perfil', aluno.nome)}
                         >
                           <User2 className="mr-2 h-4 w-4" />
                           Ver Perfil
@@ -110,7 +113,7 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
 
                         <DropdownMenuItem
                           className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-                          onSelect={() => handleOptionSelect('Denunciar', aluno)}
+                          onSelect={() => handleOptionSelect('Denunciar', aluno.nome)}
                         >
                           <AlertCircle className="mr-2 h-4 w-4" />
                           Denunciar

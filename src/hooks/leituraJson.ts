@@ -1,10 +1,17 @@
 import turmasJson from "@/dados/turmas.json";
 
+export type UsuarioResumo = {
+  id: string;
+  nome: string;
+  foto_url: string | null;
+}
+
 export type TurmaProps = {
   materia: string;
   professor: string;
+  professor_id?: string;
   banners: string;
-  alunos: string[];
+  alunos: UsuarioResumo[];
   foto_professor: string;
   sala: string;
   turma: string;
@@ -16,4 +23,4 @@ export type EscolaProps = {
   turmas: Record<string, TurmaProps>;
 };
 
-export const listaEscolar = turmasJson as EscolaProps;
+export const listaEscolar = turmasJson as unknown as EscolaProps;

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-import type { EscolaProps, TurmaProps } from "@/hooks/leituraJson"
+import type { EscolaProps, TurmaProps, UsuarioResumo } from "@/hooks/leituraJson"
 
 type TurmaBanco = {
   id: string
@@ -55,13 +55,13 @@ export function useEscolaDados() {
       const turmas = turmasData as TurmaBanco[]
       const turmasId = turmas.map((turma) => turma.id)
 
-      const alunosPorTurma = new Map<string, string[]>()
-      const professoresPorTurma = new Map<string, { nome: string; foto_url: string | null }>()
+      const alunosPorTurma = new Map<string, UsuarioResumo[]>()
+      const professoresPorTurma = new Map<string, UsuarioResumo>()
 
       if (turmasId.length > 0) {
         const { data: profData } = await supabase
           .from("professor_turma")
-          .select("turma_id,perfis(nome,foto_url)")
+          .select("turma_id,perfis(id,nome,foto_url)")
           .in("turma_id", turmasId)
 
         if (profData) {
@@ -69,6 +69,7 @@ export function useEscolaDados() {
             const perfil = Array.isArray(item.perfis) ? item.perfis[0] : item.perfis;
             if (perfil) {
               professoresPorTurma.set(item.turma_id, {
+                id: perfil.id,
                 nome: perfil.nome || '',
                 foto_url: perfil.foto_url || null
               })
@@ -78,7 +79,7 @@ export function useEscolaDados() {
 
         const { data: alunoData } = await supabase
           .from("aluno_turma")
-          .select("turma_id,perfis(nome)")
+          .select("turma_id,perfis(id,nome,foto_url)")
           .in("turma_id", turmasId)
 
         if (alunoData) {
@@ -87,7 +88,11 @@ export function useEscolaDados() {
 
             if (perfil?.nome) {
               const listaAtual = alunosPorTurma.get(item.turma_id) || []
-              listaAtual.push(perfil.nome)
+              listaAtual.push({
+                id: perfil.id,
+                nome: perfil.nome,
+                foto_url: perfil.foto_url || null
+              })
               alunosPorTurma.set(item.turma_id, listaAtual)
             }
           })
@@ -101,6 +106,7 @@ export function useEscolaDados() {
         turmasFormatadas[turma.id] = {
           materia: turma.materia || "",
           professor: prof?.nome || "Anônimo",
+          professor_id: prof?.id,
           banners: turma.banner_url || "",
           alunos: alunosPorTurma.get(turma.id) || [],
           foto_professor: prof?.foto_url || "",
