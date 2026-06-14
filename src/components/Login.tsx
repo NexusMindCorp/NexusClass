@@ -8,6 +8,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Eye, EyeClosed, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import { getAssetPath } from "@/lib/assetPath";
+import { capitalizer } from "@/lib/utils";
 
 export function Login() {
     const navigate = useNavigate(); 
@@ -66,6 +67,10 @@ export function Login() {
         );
     }
 
+    const capitalizerNomeTodo = (nome: string) => {
+        nome.split(" ").map(capitalizer);
+        return nome.split(" ").map(capitalizer).join(" ");
+    };
     return (
         <div className="min-h-screen flex items-center justify-center p-4 md:p-6 w-full bg-[#080311] relative overflow-hidden">
             {/* Gradientes de fundo */}
@@ -99,7 +104,7 @@ export function Login() {
                                 <Label htmlFor="nome" className="text-white text-sm font-medium">Nome completo</Label>
                                 <div className="relative">
                                     <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
-                                    <Input id="nome" type="text" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} required className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500" />
+                                    <Input id="nome" type="text" placeholder="Seu nome" value={nome} onChange={(e) => setNome(capitalizerNomeTodo(e.target.value))} required className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500" />
                                 </div>
                             </div>
                         )}
