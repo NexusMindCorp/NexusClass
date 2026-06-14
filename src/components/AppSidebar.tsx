@@ -10,14 +10,12 @@ import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
 import { useDuvidas } from "@/hooks/useDuvidas"
 
-
-
 let itensMenu = [
     { title: "Inicio", id: "principal", icon: Home },
     { title: "Pesquisar", id: "pesquisar", icon: Search },
     { title: "Mensagens", id: "mensagens", icon: Inbox },
     { title: "Calendario", id: "calendario", icon: Calendar },
-    {title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestionMark }
+    { title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestionMark }
 ];
 
 type AppSidebarProps = {
@@ -92,7 +90,7 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                                         <SidebarMenuBadge>0</SidebarMenuBadge>
                                     )}
                                     {item.id === "duvidas" && totalDuvidasPendentes > 0 && (
-                                        <SidebarMenuBadge className="bg-purple-600 text-white dark:bg-purple-500 font-semibold rounded-full shadow-sm shadow-purple-500/20 px-1.5">
+                                        <SidebarMenuBadge className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20">
                                             {totalDuvidasPendentes}
                                         </SidebarMenuBadge>
                                     )}
