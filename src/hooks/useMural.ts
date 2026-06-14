@@ -584,6 +584,72 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         }
     };
 
+    useEffect(() => {
+        carregarPosts();
+        carregarAtividades();
+    }, [carregarPosts, carregarAtividades]);
+
+useEffect(() => {
+        if (!hasSupabaseConfig || !supabase || !turmaId || !perfil) return;
+
+
+        const channelPosts = supabase
+            .channel('realtime:mural_posts')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'mural_posts',
+                    filter: `turma_id=eq.${turmaId}`
+                },
+                (payload) => {
+              
+                    if (payload.new.autor_id !== perfil.id) {
+                        toast('O mural foi atualizado!', {
+                            description: 'Uma nova publicação foi adicionada.',
+                            action: {
+                                label: 'Carregar',
+                                onClick: () => void carregarPosts(),
+                            },
+                        });
+                    }
+                }
+            )
+            .subscribe();
+
+       
+        const channelAtividades = supabase
+            .channel('realtime:atividades')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'atividades',
+                    filter: `turma_id=eq.${turmaId}`
+                },
+                (payload) => {
+
+                    if (payload.new.professor_id !== perfil.id) {
+                        toast('Novas atividades!', {
+                            description: 'Uma nova atividade foi postada na turma.',
+                            action: {
+                                label: 'Carregar',
+                                onClick: () => void carregarAtividades(),
+                            },
+                        });
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channelPosts);
+            supabase.removeChannel(channelAtividades);
+        };
+    }, [turmaId, perfil?.id, carregarPosts, carregarAtividades, hasSupabaseConfig, supabase]);
+
     return {
         posts,
         atividades,
