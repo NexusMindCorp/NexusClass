@@ -25,9 +25,10 @@ type MuralProps = {
   materia: string;
   turma: TurmaProps;
   perfil: PerfilUsuario;
+  abrirChat: (contatoId: string) => void;
 };
 
-export function Mural({ materia, turma, perfil }: MuralProps) {
+export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
   const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
@@ -290,7 +291,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
           />
         )}
         {posts.tipoAmostar === "alunos" && (
-          <AlunosTurma turma={turma} perfil={perfil} />
+          <AlunosTurma turma={turma} perfil={perfil} abrirChat={abrirChat} />
         )}
       </div>
     </div>

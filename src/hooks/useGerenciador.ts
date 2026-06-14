@@ -28,6 +28,7 @@ export type UsuarioProps = {
     acessouOq: OpcoesTela
     chaveMural: string
     listaDosInscritos: Array<string>
+    chatAtivoId: string | null
 }
 
 const ESTADO_INICIAL_USUARIO: UsuarioProps = {
@@ -35,6 +36,7 @@ const ESTADO_INICIAL_USUARIO: UsuarioProps = {
     acessouOq: "principal" as OpcoesTela,
     chaveMural: "",
     listaDosInscritos: [],
+    chatAtivoId: null,
 }
 
 export function useGerenciador(perfil: PerfilUsuario | null) {
@@ -42,6 +44,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
     const [pedirAjuda, setPedirAjuda] = useState(false);
     const [usuario, setUsuario] = useState<UsuarioProps>(ESTADO_INICIAL_USUARIO);
     const [loadingInscricoes, setLoadingInscricoes] = useState(true);
+
 
     const limparEstado = () => {
         setUsuario(ESTADO_INICIAL_USUARIO);
@@ -174,6 +177,10 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         setUsuario((anterior) => ({ ...anterior, acessouOq: "privacidade" }));
     }
 
+    const abrirChat = (contatoId: string) => {
+        setUsuario((anterior) => ({ ...anterior, chatAtivoId: contatoId, acessouOq: "mensagens" }));
+    }
+
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase) {
             return
@@ -279,5 +286,20 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
-    return { usuario, pedirAjuda, setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade, loadingInscricoes };
+    return {
+        usuario,
+        pedirAjuda,
+        setUsuario,
+        limparEstado,
+        acionarAjuda,
+        mudarInscricao,
+        estaInscrito,
+        marcarMural,
+        marcarCalendario,
+        navegarPara,
+        marcarPesquisa,
+        marcarPrivacidade,
+        loadingInscricoes,
+        abrirChat
+    };
 }

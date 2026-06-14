@@ -23,6 +23,7 @@ type GerenciadorTelasProps = {
     marcarMural: (key: string) => void;
     navegarPara: (tela: OpcoesTela) => void;
     abrirChatComAjuda: () => void;
+    abrirChat: (contatoId: string) => void;
 }
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
@@ -59,7 +60,12 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             )}
             {props.usuario.acessouOq === "mural" && (
                 <div>
-                    {turmaSelecionada && <Mural materia={props.usuario.chaveMural} turma={turmaSelecionada} perfil={props.perfil} />}
+                    {turmaSelecionada && <Mural
+                        materia={props.usuario.chaveMural}
+                        turma={turmaSelecionada}
+                        perfil={props.perfil}
+                        abrirChat={props.abrirChat}
+                    />}
                 </div>
             )}
             {props.usuario.acessouOq === "calendario" &&
@@ -100,7 +106,11 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             {props.usuario.acessouOq === "configuracoesAvancadas" && (
                 <div className="w-full flex items-center justify-center p-4">
                     <div className="w-full max-w-3xl">
-                        <ConfiguracoesAvancadas estaInscrito={props.estaInscrito} usuario={props.usuario} listaEscolar={props.listaEscolar} cancelarInscricao={props.mudarInscricao} />
+                        <ConfiguracoesAvancadas
+                            estaInscrito={props.estaInscrito}
+                            usuario={props.usuario}
+                            listaEscolar={props.listaEscolar}
+                            cancelarInscricao={props.mudarInscricao} />
                     </div>
                 </div>
             )}

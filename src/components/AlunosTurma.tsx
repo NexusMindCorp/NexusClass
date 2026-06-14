@@ -25,9 +25,10 @@ import { PerfilAvatar } from "./PerfilAvatar"
 type AlunosTurmaProps = {
   turma: TurmaProps
   perfil: PerfilUsuario
+  abrirChat: (contatoId: string) => void;
 }
 
-export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
+export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()
 
   const renderiarModal =
@@ -104,7 +105,7 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
                           <User2 className="mr-2 h-4 w-4" />
                           Ver Perfil
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem className="cursor-pointer" onSelect={() => abrirChat(aluno.id)}>
                           <MessageCircle className="mr-2 h-4 w-4" />
                           Enviar mensagem
                         </DropdownMenuItem>
