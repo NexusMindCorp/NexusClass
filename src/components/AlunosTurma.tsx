@@ -16,11 +16,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lucide-react"
-import { getCorMateria } from "@/lib/utils"
 import { useOptionAlunos } from "@/hooks/useOptionAlunos"
 import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno"
 import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario"
 import type { PerfilUsuario } from "@/hooks/useAuth"
+import { PerfilAvatar } from "./PerfilAvatar"
 
 type AlunosTurmaProps = {
   turma: TurmaProps
@@ -72,11 +72,12 @@ export function AlunosTurma({ turma, perfil }: AlunosTurmaProps) {
 
                   <TableCell className="py-3">
                     <div className="flex items-center gap-3">
-                      <div
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm ${getCorMateria(aluno)}`}
-                      >
-                        {aluno.charAt(0).toUpperCase()}
-                      </div>
+                      <PerfilAvatar
+                        classNameAvatar="h-8 w-8 rounded-full object-cover shadow-sm"
+                        classNameDiv="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                        tipo="usuario"
+                        palavra={aluno}
+                      />
                       <span className="font-medium text-sm">{aluno}</span>
                     </div>
                   </TableCell>

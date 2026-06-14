@@ -49,7 +49,7 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                             <div >
                                 <PerfilAvatar
                                     classNameAvatar="h-24 w-24 rounded-full object-cover border bg-black"
-                                    classNameDiv="h-24 w-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-black shadow-lg"
+                                    classNameDiv="h-24 w-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-2 border-black/40 shadow-lg"
                                     foto={perfilAlvo.foto_url}
                                     tipo="usuario"
                                     palavra={perfilAlvo.nome}
@@ -68,7 +68,7 @@ export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: B
                                 {ehProprioUsuario ? `Seu Perfil (${perfilAlvo.role})` : `Perfil de ${perfilAlvo.role}`}
                             </span>
                             {/* Rodapé com nota de rodapé e botão de Fechar */}
-                            <div className="w-full mt-1 pt-2 flex justify-end gap-1">
+                            <div className="w-full mt-1 pt-2 flex justify-center gap-1">
                                 <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                                     <Calendar className="h-3.5 w-3.5 text-muted-foreground/80" />
                                     Membro desde {perfilAlvo.created_at ? new Date(perfilAlvo.created_at).toLocaleDateString("pt-BR", {
