@@ -75,11 +75,23 @@ export const getCorNomeUsuario = (nome: string) => {
   return cores[Math.abs(hash) % cores.length];
 };
 
-export const capitalizer =(str: string) => {
+export const capitalizer = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
 export const capitalizerNomeTodo = (nome: string) => {
-        nome.split(" ").map(capitalizer);
-        return nome.split(" ").map(capitalizer).join(" ");
+  nome.split(" ").map(capitalizer);
+  return nome.split(" ").map(capitalizer).join(" ");
 };
+
+export function formatarDataLocal(data: Date) {
+  const ano = data.getFullYear()
+  const mes = String(data.getMonth() + 1).padStart(2, "0")
+  const dia = String(data.getDate()).padStart(2, "0")
+  return `${ano}-${mes}-${dia}`
+}
+
+export function montarDataEvento(data: string, horario: string) {
+  const dataEvento = new Date(`${data}T${horario}`)
+  return Number.isNaN(dataEvento.getTime()) ? null : dataEvento
+}

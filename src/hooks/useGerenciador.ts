@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/useAuth"
+import { formatarDataLocal, montarDataEvento } from "@/lib/utils"
 
 export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas";
 
@@ -34,18 +35,6 @@ const ESTADO_INICIAL_USUARIO: UsuarioProps = {
     acessouOq: "principal" as OpcoesTela,
     chaveMural: "",
     listaDosInscritos: [],
-}
-
-function formatarDataLocal(data: Date) {
-    const ano = data.getFullYear()
-    const mes = String(data.getMonth() + 1).padStart(2, "0")
-    const dia = String(data.getDate()).padStart(2, "0")
-    return `${ano}-${mes}-${dia}`
-}
-
-function montarDataEvento(data: string, horario: string) {
-    const dataEvento = new Date(`${data}T${horario}`)
-    return Number.isNaN(dataEvento.getTime()) ? null : dataEvento
 }
 
 export function useGerenciador(perfil: PerfilUsuario | null) {
@@ -222,7 +211,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
-    
+
 
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase) {
@@ -290,5 +279,5 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         }
     }, [])
 
-    return { usuario, pedirAjuda,  setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade, loadingInscricoes };
+    return { usuario, pedirAjuda, setUsuario, limparEstado, acionarAjuda, mudarInscricao, estaInscrito, marcarMural, marcarCalendario, navegarPara, marcarPesquisa, marcarPrivacidade, loadingInscricoes };
 }
