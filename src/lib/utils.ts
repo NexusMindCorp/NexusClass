@@ -67,9 +67,11 @@ export const getCorNomeUsuario = (nome: string) => {
     "bg-teal-700 text-white dark:bg-teal-500/30 dark:text-teal-100",
   ];
 
+  const inicial = (nome.trim().charAt(0) || "U").toUpperCase();
+
   let hash = 0;
-  for (let i = 0; i < nome.length; i++) {
-    hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < inicial.length; i++) {
+    hash = inicial.charCodeAt(i) + ((hash << 5) - hash);
   }
 
   return cores[Math.abs(hash) % cores.length];

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ChangeEvent  } from "react"
+import { useState, useEffect, useRef, type ChangeEvent } from "react"
 import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -58,7 +58,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
             setTitulo(atividadeParaEditar.titulo)
             setDescricao(atividadeParaEditar.descricao)
             setUrlsMantidas(obterUrlsAnexo(atividadeParaEditar.anexo_url))
-            
+
             if (atividadeParaEditar.data_entrega) {
                 const date = new Date(atividadeParaEditar.data_entrega)
                 const tzOffset = date.getTimezoneOffset() * 60000
@@ -118,11 +118,11 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
     }
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4 animate-in fade-in duration-200">
             <Card className="relative w-full max-w-xl p-6 shadow-2xl border border-border bg-card text-card-foreground max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1 rounded-full bg-background/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
+                    className="absolute top-4 right-4 p-1.5 rounded-full bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors z-10 cursor-pointer"
                 >
                     <X className="h-5 w-5" />
                 </button>
@@ -141,7 +141,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                 value={titulo}
                                 onChange={(e) => setTitulo(e.target.value)}
                                 placeholder="Ex: Exercícios de Fixação..."
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                             />
                         </Field>
 
@@ -153,6 +153,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                 rows={4}
                                 value={descricao}
                                 onChange={(e) => setDescricao(e.target.value)}
+                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary transition-colors resize-none"
                             />
                         </Field>
 
@@ -164,7 +165,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                     type="datetime-local"
                                     value={dataEntrega}
                                     onChange={(e) => setDataEntrega(e.target.value)}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
                                 />
                             </Field>
 
@@ -181,7 +182,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                     type="button"
                                     variant="outline"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="w-full justify-start cursor-pointer"
+                                    className="w-full justify-start cursor-pointer border-input hover:bg-muted hover:text-foreground transition-colors"
                                 >
                                     <Upload className="h-4 w-4 mr-2" />
                                     Adicionar arquivos...
@@ -191,10 +192,10 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
 
                         {/* Empilhamento de Anexos */}
                         {(urlsMantidas.length > 0 || arquivos.length > 0) && (
-                            <div className="space-y-2">
+                            <div className="space-y-2 pt-2">
                                 <FieldLabel>Arquivos Anexados ({urlsMantidas.length + arquivos.length})</FieldLabel>
                                 <div className="border border-border/80 rounded-lg bg-muted/20 p-3 max-h-[160px] overflow-y-auto space-y-1.5">
-                                    
+
                                     {/* Anexos Existentes (Em edição) */}
                                     {urlsMantidas.map((url, i) => (
                                         <div key={`url-${i}`} className="flex items-center justify-between p-1.5 rounded bg-background border border-border/60 text-xs gap-3">
@@ -207,7 +208,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => removerUrlMantida(url)}
-                                                className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
+                                                className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
@@ -216,8 +217,8 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
 
                                     {/* Novos arquivos na fila */}
                                     {arquivos.map((file, i) => (
-                                        <div key={`file-${i}`} className="flex items-center justify-between p-1.5 rounded bg-purple-500/5 border border-purple-500/10 text-xs gap-3">
-                                            <span className="flex items-center gap-1.5 truncate text-purple-500 font-semibold">
+                                        <div key={`file-${i}`} className="flex items-center justify-between p-1.5 rounded bg-primary/5 border border-primary/10 text-xs gap-3">
+                                            <span className="flex items-center gap-1.5 truncate text-primary font-semibold">
                                                 <Upload className="h-3.5 w-3.5 shrink-0" />
                                                 {file.name}
                                                 <span className="text-[10px] text-muted-foreground font-normal">
@@ -229,7 +230,7 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => removerArquivoNovo(i)}
-                                                className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 cursor-pointer"
+                                                className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
                                             >
                                                 <Trash2 className="h-3.5 w-3.5" />
                                             </Button>
@@ -241,11 +242,11 @@ export function BoxAtividade({ materia, aberto, onClose, onPublicar, atividadePa
                     </FieldGroup>
                 </FieldSet>
 
-                <div className="flex justify-end gap-2 mt-6">
-                    <Button variant="outline" onClick={onClose} disabled={loading}>
+                <div className="flex justify-end gap-3 mt-8">
+                    <Button variant="outline" className="cursor-pointer" onClick={onClose} disabled={loading}>
                         Cancelar
                     </Button>
-                    <Button onClick={handleConfirm} disabled={!titulo.trim() || !descricao.trim() || loading}>
+                    <Button className="cursor-pointer" onClick={handleConfirm} disabled={!titulo.trim() || !descricao.trim() || loading}>
                         {loading ? (
                             <>
                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -34,11 +34,8 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
   const {
     posts,
     atividades,
-    loadingAtividades,
     conteudo,
     setConteudo,
-    assunto,
-    setAssunto,
     mudarAberturaBox,
     handlePublicar,
     handleCancelar,
@@ -90,10 +87,10 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
           <CardAction className="self-end">
             <div className="flex flex-col items-end gap-2">
               <PerfilAvatar
-                classNameAvatar={`h-20 w-20 rounded-full object-cover border-2 border-background shadow-sm`}
+                classNameAvatar={`h-20 w-20 rounded-full object-cover border-2 border-white/20 shadow-sm bg-black/60`}
                 classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl`}
                 foto={turma.foto_professor}
-                tipo="materia"
+                tipo="usuario"
                 palavra={turma.professor}
               />
               <ButtonGroup>
@@ -103,9 +100,9 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
                 <Button onClick={() => abrirAtividades()} className="text-white" variant="link" size="sm">
                   Atividades
                 </Button>{perfil.role === "aluno" &&
-                <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
-                  Entrar em contato
-                </Button>}
+                  <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
+                    Entrar em contato
+                  </Button>}
                 <Button onClick={() => abrirAlunos()} className="text-white" variant="link" size="sm">
                   Alunos
                 </Button>
@@ -218,7 +215,7 @@ export function Mural({ materia, turma, perfil }: MuralProps) {
 
                   <div className="flex items-center gap-2">
                     {atv.data_entrega && (
-                      <span className="text-xs font-semibold px-2 py-1 rounded bg-amber-500/10 text-amber-500 flex items-center gap-1 border border-amber-500/20">
+                      <span className="text-xs font-semibold px-2 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center gap-1 border border-amber-500/20 dark:border-amber-400/20">
                         <Calendar className="h-3 w-3" />
                         Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { day: "numeric", month: "short", hour: "numeric", minute: "numeric" })}
                       </span>
