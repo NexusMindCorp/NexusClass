@@ -8,7 +8,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Eye, EyeClosed, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import { getAssetPath } from "@/lib/assetPath";
-import { capitalizer } from "@/lib/utils";
+import { capitalizerNomeTodo } from "@/lib/utils";
 
 export function Login() {
     const navigate = useNavigate(); 
@@ -67,10 +67,6 @@ export function Login() {
         );
     }
 
-    const capitalizerNomeTodo = (nome: string) => {
-        nome.split(" ").map(capitalizer);
-        return nome.split(" ").map(capitalizer).join(" ");
-    };
     return (
         <div className="min-h-screen flex items-center justify-center p-4 md:p-6 w-full bg-[#080311] relative overflow-hidden">
             {/* Gradientes de fundo */}

@@ -78,3 +78,8 @@ export const getCorNomeUsuario = (nome: string) => {
 export const capitalizer =(str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
+
+export const capitalizerNomeTodo = (nome: string) => {
+        nome.split(" ").map(capitalizer);
+        return nome.split(" ").map(capitalizer).join(" ");
+};
