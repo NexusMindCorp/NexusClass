@@ -6,6 +6,8 @@ import { BoxAgendamento } from "./BoxAgendamento"
 import { BoxAgendados } from "./BoxAgendados"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import type { TurmaProps } from "@/hooks/leituraJson"
+import { setHours } from "date-fns"
+import { comparaDataHj } from "@/lib/utils"
 
 type CalendarioProps = {
   perfil: PerfilUsuario;
@@ -95,7 +97,7 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
           </div>
 
           <div className="space-y-4">
-            {!mostrarBoxAgendamento ? (
+            {!mostrarBoxAgendamento || !comparaDataHj(date) ? (
               <div className="rounded-xl border border-dashed border-border bg-muted/50 p-4">
                 <p className="text-sm text-muted-foreground">
                   Selecione um dia no calendário para adicionar um evento.

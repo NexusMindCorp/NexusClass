@@ -95,3 +95,8 @@ export function montarDataEvento(data: string, horario: string) {
   const dataEvento = new Date(`${data}T${horario}`)
   return Number.isNaN(dataEvento.getTime()) ? null : dataEvento
 }
+export function comparaDataHj(data: Date) {
+  const diaHoje = new Date();
+  diaHoje.setHours(0, 0, 0, 0); 
+  return data >= diaHoje;
+}
