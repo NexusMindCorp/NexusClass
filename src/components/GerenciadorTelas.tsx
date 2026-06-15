@@ -12,7 +12,6 @@ import type { PerfilUsuario } from "@/hooks/useAuth";
 import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 import { DuvidasBox } from "./DuvidasBox";
 
-
 type GerenciadorTelasProps = {
     usuario: any;
     perfil: PerfilUsuario;
@@ -90,7 +89,11 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                 </div>}
             {props.usuario.acessouOq === "mensagens" &&
                 <div className="w-full flex items-center justify-center p-4">
-                    <Mensagens />
+                    <Mensagens
+                        perfil={props.perfil}
+                        chatAtivoId={props.usuario.chatAtivoId}
+                        listaEscolar={props.listaEscolar}
+                    />
                 </div>}
             {props.usuario.acessouOq === "suporte" &&
                 <div className="w-full flex items-center justify-center p-4">

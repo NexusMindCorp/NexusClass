@@ -14,7 +14,7 @@ export function LayoutPrincipal() {
     perfil: PerfilUsuario
     atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void
   }>()
-  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, loadingInscricoes } = useGerenciador(perfil)
+  const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
 
@@ -46,6 +46,7 @@ export function LayoutPrincipal() {
             abrirChatComAjuda={abrirChatComAjuda}
             perfil={perfil}
             loadingInscricoes={loadingInscricoes}
+            abrirChat={abrirChat}
           />
         </div>
       </main>
