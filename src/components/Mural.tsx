@@ -102,7 +102,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                   Atividades
                 </Button>{perfil.role === "aluno" &&
                   <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
-                    Entrar em contato
+                    Enviar Dúvida
                   </Button>}
                 <Button onClick={() => abrirAlunos()} className="text-white" variant="link" size="sm">
                   Alunos

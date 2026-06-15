@@ -1,4 +1,4 @@
-import { Home, Inbox, Calendar, Search, ChevronDown, Compass, MessageCircleQuestionMark } from "lucide-react"
+import { Home, Calendar, Search, ChevronDown, MessageCircle, Compass, MessageCircleQuestionMark, } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "./ui/sidebar"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
@@ -13,7 +13,7 @@ import { useDuvidas } from "@/hooks/useDuvidas"
 let itensMenu = [
     { title: "Inicio", id: "principal", icon: Home },
     { title: "Pesquisar", id: "pesquisar", icon: Search },
-    { title: "Mensagens", id: "mensagens", icon: Inbox },
+    { title: "Mensagens", id: "mensagens", icon: MessageCircle },
     { title: "Calendario", id: "calendario", icon: Calendar },
     { title: "Dúvidas", id: "duvidas", icon: MessageCircleQuestionMark }
 ];

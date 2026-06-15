@@ -1,11 +1,10 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { MessageCircle, Send, X, Bot, Sparkles } from 'lucide-react';
+import { Send, X, Bot, Sparkles } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useChatBox } from '../hooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
 import type { PerfilUsuario } from '@/hooks/useAuth';
 import { getAssetPath } from '@/lib/assetPath';
-import type { EscolaProps } from '@/hooks/leituraJson';
 
 const perfilBot = getAssetPath('perfilBot/perfilBot.jpg');
 
@@ -136,7 +135,7 @@ export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: Ch
           className="w-14 h-14 rounded-full flex cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white"
           style={{ backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' }}
         >
-          <MessageCircle size={28} />
+          <Bot size={28} />
         </button>
       )}
     </div>
