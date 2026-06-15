@@ -6,7 +6,6 @@ import { BoxAgendamento } from "./BoxAgendamento"
 import { BoxAgendados } from "./BoxAgendados"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import type { TurmaProps } from "@/hooks/leituraJson"
-import { setHours } from "date-fns"
 import { comparaDataHj } from "@/lib/utils"
 
 type CalendarioProps = {
