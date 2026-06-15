@@ -1,4 +1,4 @@
-import * as React from "react"
+import { useEffect, useState ,useCallback} from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { EscolaProps, TurmaProps, UsuarioResumo } from "@/hooks/leituraJson"
 
@@ -12,15 +12,15 @@ type TurmaBanco = {
 }
 
 export function useEscolaDados() {
-  const [listaEscolar, setListaEscolar] = React.useState<EscolaProps>({
+  const [listaEscolar, setListaEscolar] = useState<EscolaProps>({
     escola: "",
     ano_letivo: new Date().getFullYear(),
     turmas: {},
   })
-  const [carregandoEscola, setCarregandoEscola] = React.useState(false)
-  const [erroEscola, setErroEscola] = React.useState<string | null>(null)
+  const [carregandoEscola, setCarregandoEscola] = useState(false)
+  const [erroEscola, setErroEscola] = useState<string | null>(null)
 
-  const carregar = React.useCallback(async () => {
+  const carregar = useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
       setErroEscola("Supabase não configurado para carregar turmas.")
       return
@@ -127,7 +127,7 @@ export function useEscolaDados() {
     }
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     void carregar()
   }, [carregar])
 
