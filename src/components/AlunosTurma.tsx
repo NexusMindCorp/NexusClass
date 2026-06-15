@@ -30,6 +30,7 @@ type AlunosTurmaProps = {
 
 export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()
+  const listaSemUsuario = turma.alunos.filter(aluno => aluno.id !== perfil.id);
 
   const renderiarModal =
     opcaoSelecionada === 'Denunciar' && nomeAluno ? (
@@ -43,8 +44,6 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
         onClose={() => handleOptionSelect(null)}
         currentUserProfile={perfil}
       />
-    ) : opcaoSelecionada === 'Enviar Mensagem' ? (
-      null
     ) : null
 
   return (
@@ -57,7 +56,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
             Colegas de Turma
           </h3>
           <span className="text-sm text-muted-foreground">
-            {turma.alunos.length} {turma.alunos.length === 1 ? 'aluno' : 'alunos'}
+            {listaSemUsuario.length} {listaSemUsuario.length === 1 ? 'aluno' : 'alunos'}
           </span>
         </div>
 
@@ -70,7 +69,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {turma.alunos.map((aluno, index) => (
+              {listaSemUsuario.map((aluno, index) => (
                 <TableRow key={aluno.id || index} className="group hover:bg-muted/50 transition-colors">
 
                   <TableCell className="py-3">
