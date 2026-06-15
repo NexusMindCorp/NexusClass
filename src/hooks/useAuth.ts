@@ -118,7 +118,6 @@ export function useAuth() {
         let isInitialLoad = true
 
         const loadSessionAndData = async () => {
-            console.log("[useAuth] loadSessionAndData - Iniciando carregamento inicial...")
             try {
                 const { data: { session: initialSession }, error } = await supabase.auth.getSession()
                 if (error) {
@@ -148,12 +147,9 @@ export function useAuth() {
                 console.error("[useAuth] loadSessionAndData - Erro no fluxo inicial:", err)
             } finally {
                 if (isMounted) {
-                    
                     setLoading(false)
                     isInitialLoad = false
-                } else {
-                    console.log("[useAuth] loadSessionAndData - Finalizado após desmontar. Ignorando finalização de estado.")
-                }
+                } 
             }
         }
 
@@ -163,11 +159,8 @@ export function useAuth() {
         // Escuta mudanças de estado de autenticação
       
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
-            console.log("[useAuth] onAuthStateChange disparado. Evento:", event, "Session:", sessionAtualizada?.user?.id || "Nenhuma", "isInitialLoad:", isInitialLoad)
-            
             // Ignora o primeiro disparo se for INITIAL_SESSION ou SIGNED_IN redundante com a carga inicial
             if (isInitialLoad && (event === "INITIAL_SESSION" || event === "SIGNED_IN")) {
-                console.log("[useAuth] onAuthStateChange - Ignorando evento inicial redundante:", event)
                 return
             }
 
@@ -199,7 +192,6 @@ export function useAuth() {
                         }
                     }
                 } else {
-                    console.log("[useAuth] Mesmo usuário. Apenas atualizando sessão (sem alterar loading ou buscar dados).")
                     setSession(sessionAtualizada)
                 }
             } else {
