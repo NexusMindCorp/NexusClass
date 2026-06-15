@@ -57,7 +57,22 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [loadingAtividades, setLoadingAtividades] = useState(false);
     const [conteudo, setConteudo] = useState("");
     const [assunto, setAssunto] = useState("");
+    const [opcaoSelecionada, setOpcaoSelecionada] = useState<"mural" | "atividade" | "contato" | "alunos">("mural");
 
+    const mudarCorSelect = () => {
+        if(opcaoSelecionada === "mural"){
+        return "text-blue-500"
+        }
+        if(opcaoSelecionada === "atividade"){
+        return "text-yellow-500"
+        }
+        if(opcaoSelecionada === "contato"){
+        return "text-red-500"
+        }
+        if(opcaoSelecionada === "alunos"){
+        return "text-green-500"
+        }
+  };
     const mudarAberturaBox = (boxAberto: boolean) =>
         setPosts((anterior) => ({ ...anterior, boxAberto }));
 
@@ -473,14 +488,17 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
 
     const abrirMural = () => {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "mural" }));
+        setOpcaoSelecionada("mural");
     };
 
     const abrirAtividades = () => {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "atividade" }));
+        setOpcaoSelecionada("atividade");
     };
 
     const abrirContato = () => {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato", boxAberto: true }));
+        setOpcaoSelecionada("contato");
     };
 
     const enviarMensagemContato = async (assuntoText: string, mensagemText: string, arquivos: File[]) => {
@@ -558,6 +576,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
 
     const abrirAlunos = () => {
         setPosts((anterior) => ({ ...anterior, tipoAmostar: "alunos" }));
+        setOpcaoSelecionada("alunos");
     };
 
     const deletarPost = async (postId: string) => {
@@ -651,6 +670,7 @@ useEffect(() => {
     }, [turmaId, perfil?.id, carregarPosts, carregarAtividades, hasSupabaseConfig, supabase]);
 
     return {
+        opcaoSelecionada,
         posts,
         atividades,
         loadingAtividades,
@@ -671,5 +691,6 @@ useEffect(() => {
         deletarAtividade,
         carregarAtividades,
         editarAtividade,
+        mudarCorSelect
     };
 }

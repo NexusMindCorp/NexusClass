@@ -33,6 +33,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
   const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
   const {
+    opcaoSelecionada,
     posts,
     atividades,
     conteudo,
@@ -49,6 +50,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
     publicarAtividade,
     deletarAtividade,
     editarAtividade,
+    mudarCorSelect
   } = useMural(materia, perfil);
 
   return (
@@ -95,16 +97,16 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                 palavra={turma.professor}
               />
               <ButtonGroup>
-                <Button onClick={() => abrirMural()} className="text-white" variant="link" size="sm">
+                <Button onClick={() => abrirMural()} className={opcaoSelecionada === "mural" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
                   Mural
                 </Button>
-                <Button onClick={() => abrirAtividades()} className="text-white" variant="link" size="sm">
+                <Button onClick={() => abrirAtividades()} className={opcaoSelecionada === "atividade" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
                   Atividades
                 </Button>{perfil.role === "aluno" &&
-                  <Button onClick={() => abrirContato()} className="text-white" variant="link" size="sm">
+                  <Button onClick={() => abrirContato()} className={opcaoSelecionada === "contato" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
                     Enviar Dúvida
                   </Button>}
-                <Button onClick={() => abrirAlunos()} className="text-white" variant="link" size="sm">
+                <Button onClick={() => abrirAlunos()} className={opcaoSelecionada === "alunos" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
                   Alunos
                 </Button>
               </ButtonGroup>
