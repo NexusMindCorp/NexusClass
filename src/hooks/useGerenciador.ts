@@ -21,6 +21,9 @@ type EventoCalendarioNotificacao = {
     titulo: string
     data: string
     horario: string
+    tipo: "pessoal" | "turma"
+    turma_id: string | null
+    autor_id: string
 }
 
 export type UsuarioProps = {
@@ -44,6 +47,38 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
     const [pedirAjuda, setPedirAjuda] = useState(false);
     const [usuario, setUsuario] = useState<UsuarioProps>(ESTADO_INICIAL_USUARIO);
     const [loadingInscricoes, setLoadingInscricoes] = useState(true);
+
+    const perfilRef = useRef(perfil);
+    const usuarioRef = useRef(usuario);
+
+    useEffect(() => {
+        perfilRef.current = perfil;
+    }, [perfil]);
+
+    useEffect(() => {
+        usuarioRef.current = usuario;
+    }, [usuario]);
+
+    const deveAlertarEvento = useCallback((evento: { tipo: "pessoal" | "turma"; autor_id: string; turma_id: string | null }) => {
+        const perfilAtual = perfilRef.current;
+        const usuarioAtual = usuarioRef.current;
+
+        if (!perfilAtual) return false;
+
+        if (evento.tipo === "pessoal") {
+            return evento.autor_id === perfilAtual.id;
+        }
+
+        if (evento.tipo === "turma") {
+            if (perfilAtual.role === "master") return true;
+            if (evento.autor_id === perfilAtual.id) return true;
+            if (evento.turma_id && usuarioAtual.inscricoes[evento.turma_id]) {
+                return true;
+            }
+        }
+
+        return false;
+    }, []);
 
 
     const limparEstado = () => {
@@ -195,12 +230,30 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
                     schema: "public",
                     table: "alertas_calendario",
                 },
-                (payload) => {
+                async (payload) => {
                     const alerta = payload.new as PayloadAlertaCalendario
                     const minuto = alerta.minutos_antes ?? "db"
                     const chaveAlerta = `${alerta.evento_id}-${minuto}`
 
                     if (alertasEnviadosRef.current.has(chaveAlerta)) {
+                        return
+                    }
+
+                    try {
+                        const { data: evento, error } = await supabaseClient
+                            .from("eventos_calendario")
+                            .select("tipo, turma_id, autor_id")
+                            .eq("id", alerta.evento_id)
+                            .single()
+
+                        if (error || !evento) {
+                            return
+                        }
+
+                        if (!deveAlertarEvento(evento as any)) {
+                            return
+                        }
+                    } catch {
                         return
                     }
 
@@ -216,7 +269,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         return () => {
             void supabaseClient.removeChannel(channel)
         }
-    }, [])
+    }, [deveAlertarEvento])
 
 
 
@@ -234,7 +287,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
 
             const { data, error } = await supabaseClient
                 .from("eventos_calendario")
-                .select("id,titulo,data,horario")
+                .select("id,titulo,data,horario,tipo,turma_id,autor_id")
                 .not("horario", "is", null)
                 .gte("data", hoje)
                 .lte("data", amanha)
@@ -244,6 +297,10 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
             }
 
             for (const evento of data as EventoCalendarioNotificacao[]) {
+                if (!deveAlertarEvento(evento)) {
+                    continue
+                }
+
                 const dataEvento = montarDataEvento(evento.data, evento.horario)
                 if (!dataEvento) {
                     continue
@@ -284,7 +341,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         return () => {
             window.clearInterval(intervalo)
         }
-    }, [])
+    }, [deveAlertarEvento])
 
     return {
         usuario,
