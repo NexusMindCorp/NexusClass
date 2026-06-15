@@ -98,16 +98,16 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
               />
               <ButtonGroup>
                 <Button onClick={() => abrirMural()} className={opcaoSelecionada === "mural" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  Mural
+                  {opcaoSelecionada === "mural" ? ">Mural<" : "Mural"}
                 </Button>
                 <Button onClick={() => abrirAtividades()} className={opcaoSelecionada === "atividade" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  Atividades
+                  {opcaoSelecionada === "atividade" ? ">Atividades<" : "Atividades"}
                 </Button>{perfil.role === "aluno" &&
                   <Button onClick={() => abrirContato()} className={opcaoSelecionada === "contato" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                    Enviar Dúvida
+                    {opcaoSelecionada === "contato" ? ">Enviar Dúvida<" : "Enviar Dúvida"}
                   </Button>}
                 <Button onClick={() => abrirAlunos()} className={opcaoSelecionada === "alunos" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  Alunos
+                  {opcaoSelecionada === "alunos" ? ">Alunos<" : "Alunos"}
                 </Button>
               </ButtonGroup>
             </div>
