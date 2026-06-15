@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar, Pencil } from "lucide-react";
+import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar, Pencil, MessageSquare } from "lucide-react";
 import { useMural } from "@/hooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
@@ -160,7 +160,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                   {/* Dropdown Menu (Três Pontos) */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-muted">
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-full cursor-pointer hover:bg-muted">
                         <MoreVertical className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -172,6 +172,15 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                         <User className="mr-2 h-4 w-4" />
                         Ver Perfil
                       </DropdownMenuItem>
+                      {(post.autor?.id !== perfil.id) && (
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onSelect={() => abrirChat(post.autor?.id || "")}
+                        >
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Enviar Mensagem
+                        </DropdownMenuItem>
+                      )}
 
                       {/* Mostrar Excluir se for o autor ou se for professor/master */}
                       {(post.autor?.id === perfil.id || perfil.role === "professor" || perfil.role === "master") && (
