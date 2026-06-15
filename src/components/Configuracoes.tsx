@@ -34,6 +34,9 @@ export function Configuracoes({ navegarPara}: ConfiguracoesProps) {
         <DropdownMenuItem onSelect={() => navegarPara?.("privacidade")}>
           Sobre acordo de privacidade
         </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navegarPara?.("info")}>
+          Info
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

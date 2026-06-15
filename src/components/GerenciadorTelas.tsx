@@ -11,6 +11,7 @@ import { Suporte } from "./Suporte";
 import type { PerfilUsuario } from "@/hooks/useAuth";
 import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 import { DuvidasBox } from "./DuvidasBox";
+import { InfoAplicacao } from "./InfoAplicacao";
 
 type GerenciadorTelasProps = {
     usuario: any;
@@ -120,6 +121,11 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
             {props.usuario.acessouOq === "duvidas" && (
                 <div className="w-full flex items-center justify-center p-4">
                     <DuvidasBox usuario={props.usuario} perfil={props.perfil} />
+                </div>
+            )}
+            {props.usuario.acessouOq === "info" && (
+                <div className="w-full flex items-center justify-center p-4">
+                    <InfoAplicacao />
                 </div>
             )}
         </>

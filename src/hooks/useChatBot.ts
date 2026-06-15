@@ -7,7 +7,7 @@ import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
 
 
 const API_KEY = import.meta.env.VITE_GEMINI_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+const genAI = new GoogleGenerativeAI( __API_GEMINI_KEY__);
 
 export interface Message {
   role: 'user' | 'model';

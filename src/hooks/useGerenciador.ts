@@ -4,7 +4,7 @@ import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/useAuth"
 import { formatarDataLocal, montarDataEvento } from "@/lib/utils"
 
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas";
+export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas"|"info";
 
 type PayloadAlertaCalendario = {
     id: string
