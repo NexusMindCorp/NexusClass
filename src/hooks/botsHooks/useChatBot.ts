@@ -17,6 +17,7 @@ export function useGeminiChat (
   const [loading, setLoading] = useState(false);
   const [resumoEventosCalendario, setResumoEventosCalendario] = useState<string>('Eventos do calendário ainda não carregados.');
   const [perguntasFrequentes, setPerguntasFrequentes] = useState<string>('Carregando perguntas frequentes...');
+  const [resumoAtividadesAbertas, setResumoAtividadesAbertas] = useState<string>('Atividades em aberto ainda não carregadas.');
   const chatRef = useRef<ChatSession | null>(null);
   const resumoPerfilUsuario = usuario.perfil
     ? `Nome do usuário: ${usuario.perfil.nome}. Papel: ${usuario.perfil.role}. Use esse nome para personalizar o atendimento.`
@@ -229,6 +230,125 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
       void supabaseClient.removeChannel(canalEventos);
     };
   }, [carregarResumoEventos]);
+
+  const carregarAtividadesAbertas = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase || !perfilId) return;
+
+    try {
+      if (perfilRole === 'aluno') {
+        const idTurmas = inscricoesStr ? inscricoesStr.split(',') : [];
+        if (idTurmas.length === 0) {
+          setResumoAtividadesAbertas('Nenhuma atividade em aberto, pois o aluno não está inscrito em nenhuma turma.');
+          return;
+        }
+
+        // 1. Buscar todas as atividades das turmas do aluno
+        const { data: atividades, error: errAtiv } = await supabase
+          .from('atividades')
+          .select('id, titulo, descricao, data_entrega, turma_id')
+          .in('turma_id', idTurmas);
+
+        if (errAtiv) throw errAtiv;
+        console.log('[useChatBot] Atividades buscadas para o aluno:', atividades);
+
+        // 2. Buscar as entregas já feitas por esse aluno
+        const { data: entregas, error: errEntr } = await supabase
+          .from('entregas_atividades')
+          .select('atividade_id')
+          .eq('aluno_id', perfilId);
+
+        if (errEntr) throw errEntr;
+        console.log('[useChatBot] Entregas buscadas para o aluno:', entregas);
+
+        const idsEntregues = new Set((entregas || []).map((e: any) => e.atividade_id));
+
+        // 3. Filtrar as que não foram entregues
+        const abertas = (atividades || []).filter((a: any) => !idsEntregues.has(a.id));
+        console.log('[useChatBot] Atividades em aberto (filtradas):', abertas);
+
+        if (abertas.length === 0) {
+          setResumoAtividadesAbertas('Parabéns! O aluno não possui nenhuma atividade em aberto.');
+          return;
+        }
+
+        const linhas = abertas.map((a: any) => {
+          const materia = usuario.listaEscolar?.[a.turma_id]?.materia || 'Matéria desconhecida';
+          const prazo = a.data_entrega ? formatarDataCurta(a.data_entrega) : 'Sem prazo';
+          const desc = a.descricao?.trim() ? ` - ${a.descricao.trim()}` : '';
+          return `- [${materia}] ${a.titulo} (Prazo: ${prazo})${desc}`;
+        });
+
+        setResumoAtividadesAbertas(`Atividades pendentes de entrega pelo aluno:\n${linhas.join('\n')}`);
+      } else if (perfilRole === 'professor') {
+        // Professor: Listar atividades cadastradas por ele
+        const { data: atividades, error: errAtiv } = await supabase
+          .from('atividades')
+          .select('id, titulo, data_entrega, turma_id')
+          .eq('professor_id', perfilId);
+
+        if (errAtiv) throw errAtiv;
+        console.log('[useChatBot] Atividades criadas pelo professor:', atividades);
+
+        if (!atividades || atividades.length === 0) {
+          setResumoAtividadesAbertas('O professor não possui atividades cadastradas.');
+          return;
+        }
+
+        const linhas = atividades.map((a: any) => {
+          const materia = usuario.listaEscolar?.[a.turma_id]?.materia || 'Matéria desconhecida';
+          const prazo = a.data_entrega ? formatarDataCurta(a.data_entrega) : 'Sem prazo';
+          return `- [${materia}] ${a.titulo} (Prazo de entrega: ${prazo})`;
+        });
+
+        setResumoAtividadesAbertas(`Atividades cadastradas pelo professor:\n${linhas.join('\n')}`);
+      } else {
+        setResumoAtividadesAbertas('Sem atividades relevantes para o perfil atual.');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar atividades em aberto:', error);
+      setResumoAtividadesAbertas('Não foi possível carregar as atividades em aberto devido a uma falha de conexão.');
+    }
+  }, [perfilId, perfilRole, inscricoesStr, usuario.listaEscolar]);
+
+  useEffect(() => {
+    void carregarAtividadesAbertas();
+
+    if (!hasSupabaseConfig || !supabase) {
+      return;
+    }
+
+    const supabaseClient = supabase;
+
+    const canalAtividades = supabaseClient
+      .channel('chatbot-atividades-contexto')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'atividades',
+        },
+        () => {
+          void carregarAtividadesAbertas();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'entregas_atividades',
+        },
+        () => {
+          void carregarAtividadesAbertas();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabaseClient.removeChannel(canalAtividades);
+    };
+  }, [carregarAtividadesAbertas]);
   
   const instructionJson: JsonInstruction = isHelpMode
     ? {
@@ -289,7 +409,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
           },
         },
         scope: {
-          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário"],
+          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário", "atividades em aberto"],
           deniedTopicsBehavior: "Explique que só pode ajudar com temas escolares da plataforma e sugira suporte.",
         },
         safety: {
@@ -309,6 +429,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
           userProfileSummary: resumoPerfilUsuario,
           questionsFrequents: perguntasFrequentes,
           postProfessorSummary: resumoPostProfessor,
+          openActivitiesSummary: resumoAtividadesAbertas,
         },
       };
 

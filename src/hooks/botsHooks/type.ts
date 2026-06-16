@@ -41,6 +41,7 @@ export interface JsonInstruction {
     userProfileSummary?: string;
     questionsFrequents?: string;
     postProfessorSummary?: string;
+    openActivitiesSummary?: string;
   };
 }
 
