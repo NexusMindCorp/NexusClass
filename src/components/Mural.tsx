@@ -249,13 +249,14 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                         
                         {!atividadesEntregues.has(atv.id) ? (
                           // Se NÃO foi entregue: mostra apenas a data limite
-                          `Entrega: ${new Date(atv.data_entrega).toLocaleDateString("pt-BR", { 
+                          <span className="text-orange-500 font-semibold ">
+                          Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { 
                             day: "numeric", 
                             month: "short", 
                             hour: "numeric", 
                             minute: "numeric" 
-                          })}`
-                        ) : (
+                          })}
+                        </span>) : (
                           <>
                             {prazoEntrega(atv.data_entrega) ? (
                               <span className="text-green-500">Entregue no prazo</span>
