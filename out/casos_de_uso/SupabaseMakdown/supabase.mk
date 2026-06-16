@@ -173,6 +173,23 @@
 | `descricao` | `text` |  |
 | `anexo_url` | `text` |  Nullable |
 | `created_at` | `timestamptz` |  |
-| `resolvido` | `bool` | Default: false |
-| `resposta` | `text` | Nullable |
+| `resolvido` | `bool` |  |
+| `resposta` | `text` |  Nullable |
+
+## Table `entregas_atividades`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `atividade_id` | `uuid` |  |
+| `aluno_id` | `uuid` |  |
+| `url_anexo` | `text` |  Nullable |
+| `nota` | `numeric` |  Nullable |
+| `feedback` | `text` |  Nullable |
+| `no_prazo` | `bool` |  |
+| `entregue_em` | `timestamptz` |  |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
 
