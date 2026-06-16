@@ -113,3 +113,8 @@ export function hojeChaveLocal() {
   const dia = String(agora.getDate()).padStart(2, '0');
   return `${ano}-${mes}-${dia}`;
 };
+export function isDataEntregaFutura(dataEntrega: string) {
+    const dataAtual = new Date();
+    const dataEntregaObj = new Date(dataEntrega);
+    return dataEntregaObj > dataAtual;
+  };

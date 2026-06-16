@@ -21,6 +21,7 @@ import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
 import { BoxAtividade, obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
 import { BoxEntregaAtividade } from "./BoxEntregaAtividade";
 import type { Atividade } from "@/hooks/useMural";
+import { isDataEntregaFutura } from "@/lib/utils";
 
 type MuralProps = {
   materia: string;
@@ -40,12 +41,6 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  const prazoEntrega = (dataEntrega: string) => {
-    const dataAtual = new Date();
-    const dataEntregaObj = new Date(dataEntrega);
-    return dataEntregaObj > dataAtual;
   };
 
   const {
@@ -248,7 +243,6 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                         <Calendar className="h-3 w-3" />
                         
                         {!atividadesEntregues.has(atv.id) ? (
-                          // Se NÃO foi entregue: mostra apenas a data limite
                           <span className="text-orange-500 font-semibold ">
                           Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { 
                             day: "numeric", 
@@ -258,7 +252,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                           })}
                         </span>) : (
                           <>
-                            {prazoEntrega(atv.data_entrega) ? (
+                            {isDataEntregaFutura(atv.data_entrega) ? (
                               <span className="text-green-500">Entregue no prazo</span>
                             ) : (
                               <span className="text-red-500">com atraso</span>
