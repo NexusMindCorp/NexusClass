@@ -54,6 +54,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         tipoAmostar: "mural",
     });
     const [atividades, setAtividades] = useState<Atividade[]>([]);
+    const [atividadesEntregues, setAtividadesEntregues] = useState<Set<string>>(new Set());
     const [loadingAtividades, setLoadingAtividades] = useState(false);
     const [conteudo, setConteudo] = useState("");
     const [assunto, setAssunto] = useState("");
@@ -168,6 +169,18 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
                 });
                 setAtividades(atividadesFormatadas);
             }
+
+            // Carrega as entregas realizadas pelo aluno para identificar o status
+            if (perfil?.role === "aluno" && perfil?.id) {
+                const { data: entregas, error: errEntregas } = await supabase
+                    .from("entregas_atividades")
+                    .select("atividade_id")
+                    .eq("aluno_id", perfil.id);
+                
+                if (!errEntregas && entregas) {
+                    setAtividadesEntregues(new Set(entregas.map((e: any) => e.atividade_id)));
+                }
+            }
         } catch (err: any) {
             console.error("Erro ao carregar atividades:", err);
             toast.error("Erro ao carregar atividades", {
@@ -176,7 +189,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         } finally {
             setLoadingAtividades(false);
         }
-    }, [turmaId]);
+    }, [turmaId, perfil?.role, perfil?.id]);
 
     useEffect(() => {
         void carregarPosts();
@@ -685,9 +698,26 @@ useEffect(() => {
             )
             .subscribe();
 
+        const channelEntregas = supabase
+            .channel('realtime:entregas-mural')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'entregas_atividades',
+                    filter: `aluno_id=eq.${perfil.id}`
+                },
+                () => {
+                    void carregarAtividades();
+                }
+            )
+            .subscribe();
+
         return () => {
             supabase.removeChannel(channelPosts);
             supabase.removeChannel(channelAtividades);
+            supabase.removeChannel(channelEntregas);
         };
     }, [turmaId, perfil?.id, carregarPosts, carregarAtividades, hasSupabaseConfig, supabase]);
 
@@ -695,6 +725,7 @@ useEffect(() => {
         opcaoSelecionada,
         posts,
         atividades,
+        atividadesEntregues,
         loadingAtividades,
         conteudo,
         setConteudo,

@@ -41,10 +41,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
       [id]: !prev[id],
     }));
   };
+
   const {
     opcaoSelecionada,
     posts,
     atividades,
+    atividadesEntregues,
     conteudo,
     setConteudo,
     mudarAberturaBox,
@@ -301,7 +303,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                     {atividadesEntregasAbertas[atv.id]
                       ? "Ocultar Área de Entrega"
                       : perfil.role === "aluno"
-                      ? "Entregar Trabalho E Ver Status"
+                      ? atividadesEntregues.has(atv.id) ? "Ver Status" : "Entregar Trabalho"
                       : "Gerenciar Entregas de Alunos"}
                   </Button>
                 </div>

@@ -30,13 +30,12 @@ export function obterUrlsAnexo(anexoUrl: string | null): string[] {
     }
 }
 
-// Auxiliar para extrair um nome de arquivo legível da URL pública do Supabase
 export function obterNomeArquivoDoUrl(url: string): string {
     try {
         const decoded = decodeURIComponent(url)
         const parts = decoded.split("/")
         const lastPart = parts[parts.length - 1]
-        // Limpar o prefixo gerado de timestamp + random string, ex: "172081920-abc123-nome.pdf" -> "nome.pdf"
+    
         const cleanName = lastPart.replace(/^\d+-[a-z0-9]+-/, "")
         return cleanName || lastPart
     } catch {
