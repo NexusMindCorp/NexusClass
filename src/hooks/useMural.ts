@@ -59,6 +59,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [conteudo, setConteudo] = useState("");
     const [assunto, setAssunto] = useState("");
     const [opcaoSelecionada, setOpcaoSelecionada] = useState<"mural" | "atividade" | "contato" | "alunos">("mural");
+    const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<Record<string, boolean>>({});
 
     const mudarCorSelect = () => {
         if(opcaoSelecionada === "mural"){
@@ -76,6 +77,12 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
   };
     const mudarAberturaBox = (boxAberto: boolean) =>
         setPosts((anterior) => ({ ...anterior, boxAberto }));
+    const alternarAreaEntrega = (id: string) => {
+        setAtividadesEntregasAbertas((prev) => ({
+        ...prev,
+        [id]: !prev[id],
+        }));
+  };
 
     const carregarPosts = useCallback(async () => {
         if (!hasSupabaseConfig || !supabase || !turmaId) return;
@@ -744,6 +751,8 @@ useEffect(() => {
         deletarAtividade,
         carregarAtividades,
         editarAtividade,
-        mudarCorSelect
+        mudarCorSelect,
+        atividadesEntregasAbertas,
+        alternarAreaEntrega,
     };
 }

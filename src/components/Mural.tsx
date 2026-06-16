@@ -34,15 +34,6 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
   const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
-  const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<Record<string, boolean>>({});
-
-  const alternarAreaEntrega = (id: string) => {
-    setAtividadesEntregasAbertas((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
   const {
     opcaoSelecionada,
     posts,
@@ -62,7 +53,9 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
     publicarAtividade,
     deletarAtividade,
     editarAtividade,
-    mudarCorSelect
+    mudarCorSelect,
+    atividadesEntregasAbertas,
+    alternarAreaEntrega
   } = useMural(materia, perfil);
 
   return (
