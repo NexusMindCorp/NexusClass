@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useGeminiChat } from './useChatBot';
-import type { UsuarioProps } from './useGerenciador';
-import type { PerfilUsuario } from './useAuth';
+import type { UsuarioProps } from '../useGerenciador';
+import type { PerfilUsuario } from '../useAuth';
 
 export function useChatBox(usuario: UsuarioProps, perfil?: PerfilUsuario | null, materiasProfessor: string[] = [], listaEscolar?: any) {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +12,6 @@ export function useChatBox(usuario: UsuarioProps, perfil?: PerfilUsuario | null,
   // Fechar chat e retomar instrução principal
   const closeChat = useCallback(() => {
     setIsOpen(false);
-    console.log(materiasProfessor);
     setIsHelpMode(false);
   }, []);
     

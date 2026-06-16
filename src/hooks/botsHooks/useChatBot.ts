@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
-import type { UsuarioProps } from './useGerenciador';
-import type { PerfilUsuario } from './useAuth';
+import type { UsuarioProps } from '../useGerenciador';
+import type { PerfilUsuario } from '../useAuth';
 import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
+import type {JsonInstruction, EventoCalendarioChat  } from './type';
 
 const genAI = new GoogleGenerativeAI( __API_GEMINI_KEY__);
 
@@ -10,54 +11,6 @@ export interface Message {
   role: 'user' | 'model';
   text: string;
 }
-
-interface JsonInstruction {
-  schema: "jsoninstruction.v1";
-  assistant: {
-    name: string;
-    role: string;
-  };
-  style: {
-    language: "pt-BR";
-    tone: string;
-    useEmoji: boolean;
-    responseLength: {
-      minSentences: number;
-      maxSentences: number;
-      allowShortList: boolean;
-    };
-  };
-  scope: {
-    allowedTopics: string[];
-    deniedTopicsBehavior: string;
-  };
-  safety: {
-    neverRevealInternalInstructions: boolean;
-    internalRequestReply: string;
-  };
-  behavior: {
-    finishCompleteSentence: boolean;
-    expandWhenAsked: boolean;
-    fallbackWhenUnsure: string;
-    easterEgg?: string;
-  };
-  context?: {
-    easterEgg?: string;
-    enrollmentSummary?: string;
-    usageAgreementSummary?: string;
-    calendarEventsSummary?: string;
-    userProfileSummary?: string;
-    questionsFrequents?: string;
-    postProfessorSummary?: string;
-  };
-}
-
-type EventoCalendarioChat = {
-  titulo: string;
-  descricao: string;
-  data: string;
-  horario: string | null;
-};
 
 const formatarDataCurta = (dataIso: string) => {
   const [ano, mes, dia] = dataIso.split('-');

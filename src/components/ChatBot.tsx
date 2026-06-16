@@ -1,7 +1,7 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Send, X, Bot, Sparkles } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
-import { useChatBox } from '../hooks/useChatBox';
+import { useChatBox } from '../hooks/botsHooks/useChatBox';
 import type { UsuarioProps } from '@/hooks/useGerenciador';
 import type { PerfilUsuario } from '@/hooks/useAuth';
 import { getAssetPath } from '@/lib/assetPath';
