@@ -3,32 +3,15 @@ import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
 import type { UsuarioProps } from '../useGerenciador';
 import type { PerfilUsuario } from '../useAuth';
 import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
-import type {JsonInstruction, EventoCalendarioChat  } from './type';
+import type {JsonInstruction, EventoCalendarioChat , Message } from './type';
+import { formatarDataCurta, hojeChaveLocal} from '@/lib/utils';
 
 const genAI = new GoogleGenerativeAI( __API_GEMINI_KEY__);
 
-export interface Message {
-  role: 'user' | 'model';
-  text: string;
-}
-
-const formatarDataCurta = (dataIso: string) => {
-  const [ano, mes, dia] = dataIso.split('-');
-  return `${dia}/${mes}/${ano}`;
-};
-
-const hojeChaveLocal = () => {
-  const agora = new Date();
-  const ano = agora.getFullYear();
-  const mes = String(agora.getMonth() + 1).padStart(2, '0');
-  const dia = String(agora.getDate()).padStart(2, '0');
-  return `${ano}-${mes}-${dia}`;
-};
-
-export const useGeminiChat = (
+export function useGeminiChat (
   usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any },
   isHelpMode: boolean = false
-) => {
+){
   const [resumoPostProfessor, setResumoPostProfessor] = useState<string>('Nenhuma postagem recente de professor disponível.');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -87,9 +70,11 @@ export const useGeminiChat = (
       setResumoPostProfessor('Nenhuma postagem recente de professor disponível por falha ao carregar.');
     }
   }, [perfilId, inscricoesStr]);
+
   useEffect(() => {
     void carregarPostsProfessor();
   }, [carregarPostsProfessor]);
+
   const perguntas = useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
       return;
@@ -304,7 +289,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
           },
         },
         scope: {
-          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso"],
+          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário"],
           deniedTopicsBehavior: "Explique que só pode ajudar com temas escolares da plataforma e sugira suporte.",
         },
         safety: {
@@ -369,9 +354,9 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
     setLoading(true);
 
     const MAX_RETRIES = 2;
-    const DELAY_BASE = 500; // 500ms início mais rápido
+    const DELAY_BASE = 500;
 
-    // Função recursiva para tentar enviar a mensagem com retry
+
     const sendWithRetry = async (attempt = 0): Promise<string> => {
       try {
         const result = await chatRef.current!.sendMessage(input);
@@ -382,7 +367,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
         const isServiceUnavailable = status === 503 || error?.message?.includes("503") || 
                                     error?.message?.includes("high demand");
 
-        // Se o serviço está indisponível e ainda temos tentativas, aguarda e tenta novamente
+       
         if (isServiceUnavailable && attempt < MAX_RETRIES) {
           const delay = DELAY_BASE * Math.pow(2, attempt); // Backoff exponencial
           console.log(`Tentando de novo em ${delay}ms... (${attempt + 1}/${MAX_RETRIES})`);

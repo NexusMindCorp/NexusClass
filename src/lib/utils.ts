@@ -100,3 +100,16 @@ export function comparaDataHj(data: Date) {
   diaHoje.setHours(0, 0, 0, 0); 
   return data >= diaHoje;
 }
+
+export function formatarDataCurta(dataIso: string) {
+  const [ano, mes, dia] = dataIso.split('-');
+  return `${dia}/${mes}/${ano}`;
+};
+
+export function hojeChaveLocal() {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
+};
