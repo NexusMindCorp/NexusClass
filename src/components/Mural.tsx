@@ -19,6 +19,7 @@ import { PerfilAvatar } from "./PerfilAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
 import { BoxAtividade, obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
+import { BoxEntregaAtividade } from "./BoxEntregaAtividade";
 import type { Atividade } from "@/hooks/useMural";
 
 type MuralProps = {
@@ -32,6 +33,14 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
   const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
+  const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<Record<string, boolean>>({});
+
+  const alternarAreaEntrega = (id: string) => {
+    setAtividadesEntregasAbertas((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
   const {
     opcaoSelecionada,
     posts,
@@ -280,6 +289,30 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       ))}
                     </div>
                   </div>
+                )}
+
+                {/* Botão para abrir a área de entregas */}
+                <div className="mt-4 pt-3 border-t border-border/40 flex justify-end">
+                  <Button
+                
+                    size="sm"
+                    onClick={() => alternarAreaEntrega(atv.id)}
+                                      >
+                    {atividadesEntregasAbertas[atv.id]
+                      ? "Ocultar Área de Entrega"
+                      : perfil.role === "aluno"
+                      ? "Entregar Trabalho E Ver Status"
+                      : "Gerenciar Entregas de Alunos"}
+                  </Button>
+                </div>
+
+                {/* Área de entrega expandida */}
+                {atividadesEntregasAbertas[atv.id] && (
+                  <BoxEntregaAtividade
+                    atividadeId={atv.id}
+                    perfil={perfil}
+                    dataEntregaAtividade={atv.data_entrega}
+                  />
                 )}
               </Card>
             ))

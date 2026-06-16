@@ -332,7 +332,28 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
         if (!hasSupabaseConfig || !supabase) return;
 
         try {
-            // Deletar os arquivos vinculados a esta atividade do storage
+            // 1. Deletar os arquivos de entrega dos alunos no storage
+            const { data: entregas, error: erroEntregas } = await supabase
+                .from("entregas_atividades")
+                .select("url_anexo")
+                .eq("atividade_id", atividadeId);
+
+            if (!erroEntregas && entregas && entregas.length > 0) {
+                const caminhosEntregas = entregas
+                    .map((ent) => ent.url_anexo)
+                    .filter(Boolean) as string[];
+                
+                if (caminhosEntregas.length > 0) {
+                    const { error: errorDeletarEntregasStorage } = await supabase.storage
+                        .from("entregas_atividades")
+                        .remove(caminhosEntregas);
+                    if (errorDeletarEntregasStorage) {
+                        console.error("Erro ao deletar arquivos de entregas no storage:", errorDeletarEntregasStorage);
+                    }
+                }
+            }
+
+            // 2. Deletar os arquivos vinculados a esta atividade do storage (Professor)
             const atividadeExistente = atividades.find((a) => a.id === atividadeId);
             if (atividadeExistente) {
                 const urlsOriginais = extrairUrlsAnexo(atividadeExistente.anexo_url);
@@ -352,6 +373,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
                 }
             }
 
+            // 3. Deletar a atividade do banco de dados (o que deleta os registros da tabela entregas em cascata)
             const { error } = await supabase
                 .from("atividades")
                 .delete()
