@@ -42,6 +42,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
     }));
   };
 
+  const prazoEntrega = (dataEntrega: string) => {
+    const dataAtual = new Date();
+    const dataEntregaObj = new Date(dataEntrega);
+    return dataEntregaObj > dataAtual;
+  };
+
   const {
     opcaoSelecionada,
     posts,
@@ -238,9 +244,26 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
 
                   <div className="flex items-center gap-2">
                     {atv.data_entrega && (
-                      <span className="text-xs font-semibold px-2 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center gap-1 border border-amber-500/20 dark:border-amber-400/20">
+                      <span className="border border-border/60 border-color bg-muted px-2 py-1 rounded-md text-xs text-muted-foreground text-color- flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { day: "numeric", month: "short", hour: "numeric", minute: "numeric" })}
+                        
+                        {!atividadesEntregues.has(atv.id) ? (
+                          // Se NÃO foi entregue: mostra apenas a data limite
+                          `Entrega: ${new Date(atv.data_entrega).toLocaleDateString("pt-BR", { 
+                            day: "numeric", 
+                            month: "short", 
+                            hour: "numeric", 
+                            minute: "numeric" 
+                          })}`
+                        ) : (
+                          <>
+                            {prazoEntrega(atv.data_entrega) ? (
+                              <span className="text-green-500">Entregue no prazo</span>
+                            ) : (
+                              <span className="text-red-500">com atraso</span>
+                            )}
+                          </>
+                        )}
                       </span>
                     )}
 
