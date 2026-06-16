@@ -4,9 +4,6 @@ import type { UsuarioProps } from './useGerenciador';
 import type { PerfilUsuario } from './useAuth';
 import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
 
-
-
-const API_KEY = import.meta.env.VITE_GEMINI_KEY;
 const genAI = new GoogleGenerativeAI( __API_GEMINI_KEY__);
 
 export interface Message {
@@ -51,6 +48,7 @@ interface JsonInstruction {
     calendarEventsSummary?: string;
     userProfileSummary?: string;
     questionsFrequents?: string;
+    postProfessorSummary?: string;
   };
 }
 
@@ -78,6 +76,7 @@ export const useGeminiChat = (
   usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any },
   isHelpMode: boolean = false
 ) => {
+  const [resumoPostProfessor, setResumoPostProfessor] = useState<string>('Nenhuma postagem recente de professor disponível.');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [resumoEventosCalendario, setResumoEventosCalendario] = useState<string>('Eventos do calendário ainda não carregados.');
@@ -94,6 +93,50 @@ export const useGeminiChat = (
     .sort()
     .join(',');
 
+  const carregarPostsProfessor = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase || !perfilId) return;
+    try{
+      const idTurmas = inscricoesStr ? inscricoesStr.split(',') : [];
+      if(idTurmas.length === 0) {
+        setResumoPostProfessor('Nenhuma postagem recente de professor disponível, pois o usuário não está inscrito em nenhuma turma.');
+        return;
+      }
+      const { data, error } = await supabase
+      .from("mural_posts")
+      .select(`
+        conteudo,
+        created_at,
+        perfis:autor_id (
+          nome,
+          role
+          )`
+      )
+      .in('turma_id', idTurmas)
+      .order('created_at', { ascending: false })
+      if(error) console.error("Erro ao carregar posts do mural:", error);
+
+      const filtraPost = (data ?? [])
+      .filter((post: any) => {                                         
+            const autor = Array.isArray(post.perfis) ? post.perfis[0] :    
+            post.perfis;                                                             
+            return autor?.role === 'professor' || autor?.role === 'master';
+          }).map((post: any) => {
+            const autor = Array.isArray(post.perfis) ? post.perfis[0] : post.perfis;
+            return `- ${post.conteudo} (por ${autor?.nome || 'Professor'})`;
+          });
+          if(filtraPost.length === 0) {
+            setResumoPostProfessor('Nenhuma postagem recente de professor disponível nas turmas do usuário.');
+            return;
+          }
+          setResumoPostProfessor(`Conteúdos e avisos abordados pelos professores em aula:\n${filtraPost.join('\n')}`)         
+    }catch(error){
+      console.error("Erro ao carregar posts do mural:", error);
+      setResumoPostProfessor('Nenhuma postagem recente de professor disponível por falha ao carregar.');
+    }
+  }, [perfilId, inscricoesStr]);
+  useEffect(() => {
+    void carregarPostsProfessor();
+  }, [carregarPostsProfessor]);
   const perguntas = useCallback(async () => {
     if (!hasSupabaseConfig || !supabase) {
       return;
@@ -327,6 +370,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
           calendarEventsSummary: resumoEventosCalendario,
           userProfileSummary: resumoPerfilUsuario,
           questionsFrequents: perguntasFrequentes,
+          postProfessorSummary: resumoPostProfessor,
         },
       };
 
