@@ -10,9 +10,7 @@ import {
     Paperclip,
     CheckCircle,
     AlertCircle,
-    Calendar,
     Award,
-    MessageSquare,
     Download,
     RefreshCw
 } from "lucide-react";
