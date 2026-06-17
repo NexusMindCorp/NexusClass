@@ -16,7 +16,7 @@ export function useGeminiChat (
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const chatRef = useRef<ChatSession | null>(null);
-  
+
   const resumoPerfilUsuario = usuario.perfil
     ? `Nome do usuário: ${usuario.perfil.nome}. Papel: ${usuario.perfil.role}. Use esse nome para personalizar o atendimento.`
     : 'Perfil do usuário não carregado. Atenda de forma genérica até o perfil estar disponível.';
@@ -35,7 +35,7 @@ export function useGeminiChat (
     carregarResumoEventos, 
     perguntas,
     carregarAtividadesAbertas,
-    carregarPostsProfessor } = CarregamentoDados(usuario, usuario.listaEscolar, hasSupabaseConfig, supabase, perfilId || null, inscricoesStr || null, perfilRole || null);
+    carregarPostsProfessor } = CarregamentoDados(usuario.listaEscolar, hasSupabaseConfig, supabase, perfilId || null, inscricoesStr || null, perfilRole || null);
   
   useEffect(() => {
     void carregarPostsProfessor();

@@ -1,9 +1,8 @@
 import { useCallback, useState } from "react";
 import { hojeChaveLocal, formatarDataCurta } from "@/lib/utils.ts";
-import type { UsuarioProps } from "../useGerenciador";
 import type { EventoCalendarioChat } from "./type";
 
-export function CarregamentoDados(usuario: UsuarioProps , listaEscolar: any,hasSupabaseConfig: boolean, supabase: any, perfilId: string | null, inscricoesStr: string | null, perfilRole: string | null) {
+export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean, supabase: any, perfilId: string | null, inscricoesStr: string | null, perfilRole: string | null) {
     const [resumoEventosCalendario, setResumoEventosCalendario] = useState<string>('Eventos do calendário ainda não carregados.');
     const [perguntasFrequentes, setPerguntasFrequentes] = useState<string>('Carregando perguntas frequentes...');
     const [resumoAtividadesAbertas, setResumoAtividadesAbertas] = useState<string>('Atividades em aberto ainda não carregadas.');
