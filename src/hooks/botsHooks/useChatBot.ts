@@ -1,17 +1,13 @@
 import { useState, useRef, useEffect, } from 'react';
 import { GoogleGenerativeAI, ChatSession } from "@google/generative-ai";
-import type { UsuarioProps } from '../useGerenciador';
-import type { PerfilUsuario } from '../useAuth';
 import { hasSupabaseConfig, supabase } from '@/lib/supabaseClient';
-import type {JsonInstruction , Message } from './type';
+import type {JsonInstruction , Message, UseGeminiChatProps } from './type';
 import { ConfigBot } from './configBot';
 import { CarregamentoDados } from './carregamentoDados';
 
 const genAI = new GoogleGenerativeAI( __API_GEMINI_KEY__);
-
 export function useGeminiChat (
-  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any },
-  isHelpMode: boolean = false
+  { usuario, isHelpMode = false }: UseGeminiChatProps
 ){
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);

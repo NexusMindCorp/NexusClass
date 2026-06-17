@@ -1,3 +1,6 @@
+import type { PerfilUsuario } from "../useAuth";
+import type { UsuarioProps } from "../useGerenciador";
+
 export interface Message {
   role: 'user' | 'model';
   text: string;
@@ -63,3 +66,15 @@ export type BotConfigProps = {
   MAX_RETRIES: number;
   DELAY_BASE: number;
 };
+
+export type UseGeminiChatProps = {
+  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any };
+  isHelpMode?: boolean;
+};
+
+export type UseChatBox= {
+  usuario: UsuarioProps;
+  perfil?: PerfilUsuario | null;
+  materiasProfessor?: string[];
+  listaEscolar?: any;
+}
