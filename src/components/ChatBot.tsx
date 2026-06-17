@@ -17,7 +17,7 @@ type ChatBotProps = {
 export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: ChatBotProps, ref) {
   const { perfil, materiasProfessor } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null; materiasProfessor: string[] }>()
   // Log for debugging end-to-end subject passing
-  const {isHelpMode ,isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox(usuario, perfil, materiasProfessor, listaEscolar);
+  const {isHelpMode ,isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox({ usuario, perfil, materiasProfessor, listaEscolar });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Expor função de abrir com modo ajuda
