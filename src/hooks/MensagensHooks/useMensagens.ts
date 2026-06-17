@@ -1,13 +1,36 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
 import type { Mensagem, ConversaResumo} from "@/hooks/MensagensHooks/type"
 
+const CHAVE_MENSAGENS_LIDAS = "nexusclass:mensagens-lidas"
+
+function obterIdsLidos(usuarioId: string) {
+    try {
+        const valorSalvo = localStorage.getItem(`${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`)
+        return new Set<string>(valorSalvo ? JSON.parse(valorSalvo) : [])
+    } catch {
+        return new Set<string>()
+    }
+}
+
+function salvarIdsLidos(usuarioId: string, ids: Set<string>) {
+    localStorage.setItem(
+        `${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`,
+        JSON.stringify(Array.from(ids))
+    )
+}
+
 export function useMensagens(perfil: PerfilUsuario | null) {
     const [mensagens, setMensagens] = useState<Mensagem[]>([])
     const [loadingChat, setLoadingChat] = useState(false)
     const [conversas, setConversas] = useState<ConversaResumo[]>([])
+    const mensagensRef = useRef<Mensagem[]>([])
+
+    useEffect(() => {
+        mensagensRef.current = mensagens
+    }, [mensagens])
 
     const carregarHistorico = useCallback(async () => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) return
@@ -24,7 +47,12 @@ export function useMensagens(perfil: PerfilUsuario | null) {
             if (error) throw error
 
             if (data) {
-                setMensagens(data as Mensagem[])
+                const idsLidos = obterIdsLidos(perfil.id)
+                const historico = (data as Mensagem[]).map((mensagem) => ({
+                    ...mensagem,
+                    lida: mensagem.lida || idsLidos.has(mensagem.id),
+                }))
+                setMensagens(historico)
             }
         } catch (error: any) {
             console.error("Erro ao carregar mensagens:", error)
@@ -59,6 +87,17 @@ export function useMensagens(perfil: PerfilUsuario | null) {
 
     const marcarComoLidas = useCallback(async (contatoId: string) => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) return
+
+        const idsLidos = obterIdsLidos(perfil.id)
+        mensagensRef.current.forEach((mensagem) => {
+            if (
+                mensagem.remetente_id === contatoId &&
+                mensagem.destinatario_id === perfil.id
+            ) {
+                idsLidos.add(mensagem.id)
+            }
+        })
+        salvarIdsLidos(perfil.id, idsLidos)
 
         setMensagens((prevMensagens) =>
             prevMensagens.map((msg) =>
@@ -99,7 +138,12 @@ export function useMensagens(perfil: PerfilUsuario | null) {
                 "postgres_changes",
                 { event: "*", schema: "public", table: "mensagens" },
                 (payload) => {
-                    const novaMensagem = payload.new as Mensagem
+                    const mensagemRecebida = payload.new as Mensagem
+                    const idsLidos = obterIdsLidos(perfil.id)
+                    const novaMensagem = {
+                        ...mensagemRecebida,
+                        lida: mensagemRecebida.lida || idsLidos.has(mensagemRecebida.id),
+                    }
                     if (novaMensagem.remetente_id === perfil.id || novaMensagem.destinatario_id === perfil.id) {
                         if (payload.eventType === "INSERT") {
                             setMensagens((prevMensagens) => {
