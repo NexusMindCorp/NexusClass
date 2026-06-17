@@ -2,25 +2,7 @@ import { useCallback, useEffect, useState, useRef } from "react"
 import type { Session } from "@supabase/supabase-js"
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient"
 import { toast } from "sonner"
-
-export type PerfilUsuario = {
-    id: string;
-    nome: string;
-    email: string;
-    foto_url: string | null;
-    bio: string | null;
-    created_at: string;
-    role: "aluno" | "professor" | "master";
-}
-
-export type TurmaProfessor = {
-    id: string;
-    chave: string;
-    materia: string;
-    professor: string;
-    sala: string;
-    turma: string;
-}
+import type { PerfilUsuario, TurmaProfessor } from "./type"
 
 export function useAuth() {
     const [session, setSession] = useState<Session | null>(null)

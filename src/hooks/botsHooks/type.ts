@@ -1,4 +1,4 @@
-import type { PerfilUsuario } from "../useAuth";
+import type { PerfilUsuario } from "../AuthHooks/useAuth";
 import type { UsuarioProps } from "../useGerenciador";
 
 export interface Message {

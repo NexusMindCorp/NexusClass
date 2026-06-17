@@ -1,7 +1,7 @@
 import { Sparkles, Compass, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { getAssetPath } from "@/lib/assetPath";
 
 type BoasVindasProps = {

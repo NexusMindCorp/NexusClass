@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { UsuarioProps } from "@/hooks/useGerenciador";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { useDuvidas, type Duvida } from "@/hooks/useDuvidas";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 
 type BoxAgendamentoProps = {
   perfil: PerfilUsuario;

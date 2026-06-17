@@ -9,23 +9,9 @@ import {
 } from "@/components/ui/card"
 import { ButtonGroup } from "./ui/button-group";
 import { PerfilAvatar } from "./PerfilAvatar";
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type {TurmasProps} from '../hooks/TurmaCardHooks/type';
 import { Plus } from "lucide-react"
 
-type TurmasProps = {
-  materia: string;
-  professor: string;
-  banners: string;
-  fotoProfessor: string;
-  sala: string;
-  turma: string;
-  inscrito?: boolean;
-  compacto?: boolean;
-  modoPesquisa?: boolean;
-  perfil: PerfilUsuario;
-  clickInscrito?: () => void;
-  clickMural?: () => void;
-}
 
 export function TurmaCard({ materia, professor, banners, fotoProfessor, sala, turma, inscrito = false, compacto = false, modoPesquisa, clickMural, clickInscrito, perfil }: TurmasProps) {
   const isMaster = perfil?.role === "master";

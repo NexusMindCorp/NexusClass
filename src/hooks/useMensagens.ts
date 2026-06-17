@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth"
 import { toast } from "sonner"
 
 export type Mensagem = {

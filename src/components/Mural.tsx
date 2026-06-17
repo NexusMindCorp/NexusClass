@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { TurmaProps } from "@/hooks/leituraJson";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {

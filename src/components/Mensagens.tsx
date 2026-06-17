@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { EscolaProps } from "@/hooks/leituraJson";
 import { useMensagens } from "@/hooks/useMensagens";
 import { Button } from "@/components/ui/button";

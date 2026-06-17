@@ -6,7 +6,7 @@ import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lu
 import { useOptionAlunos } from "@/hooks/useOptionAlunos"
 import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno"
 import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { PerfilAvatar } from "./PerfilAvatar"
 
 type AlunosTurmaProps = {

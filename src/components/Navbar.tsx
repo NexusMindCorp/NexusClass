@@ -27,7 +27,7 @@ import { useTheme } from "./provedores/ThemeProvider"
 import { SidebarTrigger } from "./ui/sidebar"
 import { supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { PerfilAvatar } from "./PerfilAvatar"
 
 type NavbarProps = {

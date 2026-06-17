@@ -7,7 +7,7 @@ import { GerenciadorTelas } from "@/components//GerenciadorTelas"
 import { useGerenciador } from "@/hooks/useGerenciador"
 import { useEscolaDados } from "@/hooks/useEscolaDados"
 import { ChatBot } from "@/components/ChatBot"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth"
 
 export function LayoutPrincipal() {
   const { perfil, atualizarPerfilLocal } = useOutletContext<{

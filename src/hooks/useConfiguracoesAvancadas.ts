@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { useOutletContext } from "react-router-dom";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth";
 export function useConfiguracoesAvancadas() {
       const { perfil } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null }>();
   const [senhaDoInput, setSenhaDoInput] = useState("");

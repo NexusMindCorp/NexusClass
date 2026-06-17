@@ -3,7 +3,7 @@ import { Send, X, Bot, Sparkles } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useChatBox } from '../hooks/botsHooks/useChatBox';
 import type {ChatBotProps} from '../hooks/botsHooks/type';
-import type { PerfilUsuario } from '@/hooks/useAuth';
+import type { PerfilUsuario } from '@/hooks/AuthHooks/type';
 import {ConfigBot} from '../hooks/botsHooks/configBot';
 
 

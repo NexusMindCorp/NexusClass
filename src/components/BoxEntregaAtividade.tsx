@@ -1,5 +1,5 @@
 import { useState, useRef, type ChangeEvent } from "react";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { useEntregas } from "@/hooks/useEntregas";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

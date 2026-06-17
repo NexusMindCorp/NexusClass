@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { Loader2, Mail, FileText, Calendar, ShieldCheck, X } from "lucide-react"
 import { usePerfilUsuario } from "@/hooks/usePerfilUsuario"
 import { PerfilAvatar } from "./PerfilAvatar"

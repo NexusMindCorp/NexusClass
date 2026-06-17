@@ -20,7 +20,8 @@ export default defineConfig(({ mode }) => {
       '__APP_VERSION__': JSON.stringify(packageJson.version),
       '__API_GEMINI_KEY__': JSON.stringify(env.VITE_GEMINI_KEY),
       '__URL_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_URL),
-      '__KEY_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_ANON_KEY)
+      '__KEY_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
+      '__BASE_URL__': JSON.stringify(env.BASE_URL || '/NexusClassWeb/')
     },
   }
 })

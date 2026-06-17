@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 

@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { TurmaProps } from "./leituraJson"
-import type { PerfilUsuario } from "./useAuth"
+import type { PerfilUsuario } from "../hooks/AuthHooks/type"
 
 type EventoCalendario = {
   id: string

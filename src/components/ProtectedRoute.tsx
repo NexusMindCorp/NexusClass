@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/hooks/AuthHooks/useAuth"
 
 export function ProtectedRoute() {
   const { session, loading, perfil, materiasProfessorNomes, atualizarPerfilLocal } = useAuth()

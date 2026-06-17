@@ -8,7 +8,7 @@ import { Mensagens } from "./Mensagens";
 import type { OpcoesTela } from "@/hooks/useGerenciador";
 import { AcordoPrivacidade } from "./AcordoPrivacidade";
 import { Suporte } from "./Suporte";
-import type { PerfilUsuario } from "@/hooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 import { DuvidasBox } from "./DuvidasBox";
 import { InfoAplicacao } from "./InfoAplicacao";

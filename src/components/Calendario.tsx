@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { useCalendario } from "@/hooks/useCalendario"
 import { BoxAgendamento } from "./BoxAgendamento"
 import { BoxAgendados } from "./BoxAgendados"
-import type { PerfilUsuario } from "@/hooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import type { TurmaProps } from "@/hooks/leituraJson"
 import { comparaDataHj } from "@/lib/utils"
 
