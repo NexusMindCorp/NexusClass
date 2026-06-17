@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 
 type UsePesquisaProps = {
     aoFecharPesquisa: () => void

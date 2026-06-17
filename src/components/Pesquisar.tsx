@@ -10,7 +10,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TurmaCard } from "./TurmaCard"
 import { usePesquisa } from "@/hooks/usePesquisa"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 
 type PesquisarProps = {

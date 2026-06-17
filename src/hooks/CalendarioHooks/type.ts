@@ -1,5 +1,5 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 export type EventoCalendario = {
   id: string
   titulo: string

@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lucide-react"
