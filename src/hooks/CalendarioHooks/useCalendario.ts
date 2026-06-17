@@ -1,77 +1,9 @@
 import { useState, useCallback, useEffect, useMemo } from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-import type { TurmaProps } from "./leituraJson"
-import type { PerfilUsuario } from "../hooks/AuthHooks/type"
+import type{EventoCalendario, UseCalendarioProps, EventoCalendarioBanco} from "./type"
+import {paraChaveData, paraData, hojeLocal, formatarErroSupabase} from "@/lib/utils"
 
-type EventoCalendario = {
-  id: string
-  titulo: string
-  descricao: string
-  data: string
-  horario: string
-  tipo: "pessoal" | "turma"
-  turma_id: string | null
-  autor_id: string
-}
-
-type EventoCalendarioBanco = {
-  id: string
-  titulo: string
-  descricao: string
-  data: string
-  horario: string | null
-  tipo: "pessoal" | "turma"
-  turma_id: string | null
-  autor_id: string
-}
-
-type ErroSupabase = {
-  code?: string
-  message?: string
-  details?: string
-}
-
-type UseCalendarioProps = {
-  perfil: PerfilUsuario;
-  inscricoes: Record<string, boolean>;
-  turmasGlobais: Record<string, TurmaProps>;
-}
-
-function paraChaveData(data: Date) {
-  const ano = data.getFullYear()
-  const mes = String(data.getMonth() + 1).padStart(2, "0")
-  const dia = String(data.getDate()).padStart(2, "0")
-  return `${ano}-${mes}-${dia}`
-}
-
-function paraData(chaveData: string) {
-  const [ano, mes, dia] = chaveData.split("-").map(Number)
-  return new Date(ano, mes - 1, dia)
-}
-
-function hojeLocal() {
-  const agora = new Date()
-  return new Date(agora.getFullYear(), agora.getMonth(), agora.getDate())
-}
-
-function formatarErroSupabase(erro: ErroSupabase, acao: string) {
-  if (erro.code === "PGRST205") {
-    return `Falha ao ${acao}: PostgREST nao encontrou public.eventos_calendario no cache de schema. Rode o SQL em supabase/001_eventos_calendario.sql e recarregue o schema.`
-  }
-
-  if (erro.code === "42P01") {
-    return `Falha ao ${acao}: tabela eventos_calendario nao existe. Rode o SQL em supabase/001_eventos_calendario.sql.`
-  }
-
-  if (erro.code === "42501") {
-    return `Falha ao ${acao}: permissao negada (RLS). Verifique as policies da tabela eventos_calendario.`
-  }
-
-  const detalhes = erro.details ? ` (${erro.details})` : ""
-  const mensagem = erro.message ? ` ${erro.message}${detalhes}` : ""
-  return `Falha ao ${acao} no Supabase.${mensagem}`
-}
 
 export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendarioProps) {
   const usaSupabase = Boolean(supabase && hasSupabaseConfig)

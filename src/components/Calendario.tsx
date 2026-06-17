@@ -1,18 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useCalendario } from "@/hooks/useCalendario"
+import { useCalendario } from "@/hooks/CalendarioHooks/useCalendario"
 import { BoxAgendamento } from "./BoxAgendamento"
 import { BoxAgendados } from "./BoxAgendados"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type{ CalendarioProps } from "@/hooks/CalendarioHooks/type"
 import { comparaDataHj } from "@/lib/utils"
 
-type CalendarioProps = {
-  perfil: PerfilUsuario;
-  inscricoes: Record<string, boolean>;
-  turmasGlobais: Record<string, TurmaProps>;
-};
 
 export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProps) {
   const {

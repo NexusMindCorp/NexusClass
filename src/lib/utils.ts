@@ -1,3 +1,4 @@
+import type { ErroSupabase } from "@/hooks/CalendarioHooks/type";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -117,4 +118,38 @@ export function isDataEntregaFutura(dataEntrega: string) {
     const dataAtual = new Date();
     const dataEntregaObj = new Date(dataEntrega);
     return dataEntregaObj > dataAtual;
-  };
+};
+
+export function paraChaveData(data: Date) {
+  const ano = data.getFullYear()
+  const mes = String(data.getMonth() + 1).padStart(2, "0")
+  const dia = String(data.getDate()).padStart(2, "0")
+  return `${ano}-${mes}-${dia}`
+}
+export function paraData(chaveData: string) {
+  const [ano, mes, dia] = chaveData.split("-").map(Number)
+  return new Date(ano, mes - 1, dia)
+}
+
+export function hojeLocal() {
+  const agora = new Date()
+  return new Date(agora.getFullYear(), agora.getMonth(), agora.getDate())
+}
+
+export function formatarErroSupabase(erro: ErroSupabase, acao: string) {
+  if (erro.code === "PGRST205") {
+    return `Falha ao ${acao}: PostgREST nao encontrou public.eventos_calendario no cache de schema. Rode o SQL em supabase/001_eventos_calendario.sql e recarregue o schema.`
+  }
+
+  if (erro.code === "42P01") {
+    return `Falha ao ${acao}: tabela eventos_calendario nao existe. Rode o SQL em supabase/001_eventos_calendario.sql.`
+  }
+
+  if (erro.code === "42501") {
+    return `Falha ao ${acao}: permissao negada (RLS). Verifique as policies da tabela eventos_calendario.`
+  }
+
+  const detalhes = erro.details ? ` (${erro.details})` : ""
+  const mensagem = erro.message ? ` ${erro.message}${detalhes}` : ""
+  return `Falha ao ${acao} no Supabase.${mensagem}`
+}
