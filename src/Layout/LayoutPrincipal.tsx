@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react"
+import { useRef, useCallback, useState } from "react"
 import { useOutletContext } from "react-router-dom"
 import { Navbar } from "@/components//Navbar"
 import { AppSidebar } from "@/components//AppSidebar"
@@ -18,6 +18,10 @@ export function LayoutPrincipal() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const { mensagens, conversas, enviarMensagem, marcarComoLidas, totalMensagensNaoLidas } = useMensagens(perfil)
+  const [indicadoresNotificacao, setIndicadoresNotificacao] = useState({
+    mensagens: true,
+    duvidas: true,
+  })
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
 
   const abrirChatComAjuda = useCallback(() => {
@@ -33,10 +37,17 @@ export function LayoutPrincipal() {
         listaEscolar={listaEscolar}
         perfil={perfil}
         totalMensagensNaoLidas={totalMensagensNaoLidas}
+        mostrarIndicadorMensagens={indicadoresNotificacao.mensagens}
+        mostrarIndicadorDuvidas={indicadoresNotificacao.duvidas}
       />
 
       <main className="pagina-principal">
-        <Navbar perfil={perfil} atualizarPerfilLocal={atualizarPerfilLocal} />
+        <Navbar
+          perfil={perfil}
+          atualizarPerfilLocal={atualizarPerfilLocal}
+          indicadoresNotificacao={indicadoresNotificacao}
+          setIndicadoresNotificacao={setIndicadoresNotificacao}
+        />
 
         <div className="pagina-conteudo">
           <GerenciadorTelas

@@ -1,6 +1,6 @@
-import{ useState } from "react"
+import { useState, type Dispatch, type SetStateAction } from "react"
 import { useNavigate } from "react-router-dom"
-import { LogOutIcon, Moon, Edit, Sun, User, Mail, Bell, AlertCircle } from "lucide-react"
+import { LogOutIcon, Moon, Edit, Sun, User, Bell, MessageCircle, MessageCircleQuestionMark } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,12 +33,19 @@ import { PerfilAvatar } from "./PerfilAvatar"
 type NavbarProps = {
     perfil: PerfilUsuario;
     atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void;
+    indicadoresNotificacao: {
+        mensagens: boolean;
+        duvidas: boolean;
+    };
+    setIndicadoresNotificacao: Dispatch<SetStateAction<{
+        mensagens: boolean;
+        duvidas: boolean;
+    }>>;
 }
 
-export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
+export function Navbar({ perfil, atualizarPerfilLocal, indicadoresNotificacao, setIndicadoresNotificacao }: NavbarProps) {
     const { setTheme } = useTheme()
     const navigate = useNavigate()
-    const [notifications, setNotifications] =useState({ email: true, alert: true, })
     const [saindo, setSaindo] =useState(false)
     const [salvando, setSalvando] = useState(false)
     const [modalVisualizar, setModalVisualizar] = useState(false)
@@ -117,11 +124,27 @@ export function Navbar({ perfil, atualizarPerfilLocal }: NavbarProps) {
                     <DropdownMenuContent className="w-40" align="end">
                         <DropdownMenuGroup>
                             <DropdownMenuLabel>Tipos de Notificação</DropdownMenuLabel>
-                            <DropdownMenuCheckboxItem checked={notifications.email} onCheckedChange={(c) => setNotifications({ ...notifications, email: c })}>
-                                <Mail className="mr-2 h-4 w-4" /> Mensagens
+                            <DropdownMenuCheckboxItem
+                                checked={indicadoresNotificacao.mensagens}
+                                onCheckedChange={(checked) =>
+                                    setIndicadoresNotificacao((anterior) => ({
+                                        ...anterior,
+                                        mensagens: checked === true,
+                                    }))
+                                }
+                            >
+                                <MessageCircle className="mr-2 h-4 w-4" /> Mensagens
                             </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem checked={notifications.alert} onCheckedChange={(c) => setNotifications({ ...notifications, alert: c })}>
-                                <AlertCircle className="mr-2 h-4 w-4" /> Alertas
+                            <DropdownMenuCheckboxItem
+                                checked={indicadoresNotificacao.duvidas}
+                                onCheckedChange={(checked) =>
+                                    setIndicadoresNotificacao((anterior) => ({
+                                        ...anterior,
+                                        duvidas: checked === true,
+                                    }))
+                                }
+                            >
+                                <MessageCircleQuestionMark className="mr-2 h-4 w-4" /> Dúvidas
                             </DropdownMenuCheckboxItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
