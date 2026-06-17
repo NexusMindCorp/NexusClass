@@ -2,32 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-
-export type Duvida = {
-    id: string;
-    aluno_id: string;
-    prof_id: string;
-    turma_id: string;
-    assunto: string;
-    descricao: string;
-    anexo_url: string | null;
-    created_at: string;
-    resolvido: boolean;
-    resposta: string | null;
-    aluno?: {
-        nome: string;
-        email: string;
-        foto_url: string | null;
-    };
-    professor?: {
-        nome: string;
-    };
-    turma?: {
-        materia: string;
-        turma: string;
-    };
-};
-
+import type { Duvida } from "@/hooks/DuvidaHooks/type";
 function extrairUrlsAnexo(anexoUrl: string | null): string[] {
     if (!anexoUrl) return [];
     try {

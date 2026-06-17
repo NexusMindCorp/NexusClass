@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import type { UsuarioProps } from "@/hooks/useGerenciador";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-import { useDuvidas, type Duvida } from "@/hooks/useDuvidas";
+import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas";
+import type { Duvida, DuvidasBoxProps } from "@/hooks/DuvidaHooks/type";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2, Paperclip, Download, MessageSquare, Funnel } from "lucide-react";
@@ -11,11 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ButtonGroup } from "./ui/button-group";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-
-type DuvidasBoxProps = {
-    usuario: UsuarioProps | any;
-    perfil: PerfilUsuario | null;
-};
 
 export function DuvidasBox({ perfil }: DuvidasBoxProps) {
     const { duvidas, loading, deletarDuvida, responderDuvida } = useDuvidas(perfil);

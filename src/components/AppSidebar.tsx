@@ -8,7 +8,7 @@ import type { EscolaProps } from "@/hooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
-import { useDuvidas } from "@/hooks/useDuvidas"
+import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas"
 
 let itensMenu = [
     { title: "Inicio", id: "principal", icon: Home },
