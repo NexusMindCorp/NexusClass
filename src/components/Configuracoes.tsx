@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Settings } from "lucide-react"
 import { SidebarMenuButton } from "./ui/sidebar"
-import type { OpcoesTela } from "@/hooks/useGerenciador"
+import type { OpcoesTela } from "@/hooks/GerenciadorHooks/type"
 
 type ConfiguracoesProps = {
   navegarPara?: (tela: OpcoesTela) => void

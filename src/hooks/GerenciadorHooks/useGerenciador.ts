@@ -3,44 +3,8 @@ import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { formatarDataLocal, montarDataEvento } from "@/lib/utils"
-
-export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas"|"info";
-
-type PayloadAlertaCalendario = {
-    id: string
-    evento_id: string
-    titulo_evento: string
-    mensagem: string
-    minutos_antes?: number
-    lembrete_para: string
-    created_at: string
-}
-
-type EventoCalendarioNotificacao = {
-    id: string
-    titulo: string
-    data: string
-    horario: string
-    tipo: "pessoal" | "turma"
-    turma_id: string | null
-    autor_id: string
-}
-
-export type UsuarioProps = {
-    inscricoes: Record<string, boolean>
-    acessouOq: OpcoesTela
-    chaveMural: string
-    listaDosInscritos: Array<string>
-    chatAtivoId: string | null
-}
-
-const ESTADO_INICIAL_USUARIO: UsuarioProps = {
-    inscricoes: {} as Record<string, boolean>,
-    acessouOq: "principal" as OpcoesTela,
-    chaveMural: "",
-    listaDosInscritos: [],
-    chatAtivoId: null,
-}
+import type { OpcoesTela, EventoCalendarioNotificacao,PayloadAlertaCalendario, UsuarioProps } from "./type"
+import { ESTADO_INICIAL_USUARIO } from "./config"
 
 export function useGerenciador(perfil: PerfilUsuario | null) {
     const alertasEnviadosRef = useRef<Set<string>>(new Set())

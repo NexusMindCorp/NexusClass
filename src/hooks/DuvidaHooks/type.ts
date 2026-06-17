@@ -1,4 +1,4 @@
-import type { UsuarioProps } from "@/hooks/useGerenciador";
+import type { UsuarioProps } from "@/hooks/GerenciadorHooks/type";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 export type Duvida = {
     id: string;

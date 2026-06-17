@@ -3,7 +3,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/react-collapsible"
 import { Configuracoes } from "./Configuracoes"
 import { Button } from "./ui/button"
-import type { OpcoesTela } from "@/hooks/useGerenciador"
+import type { OpcoesTela } from "@/hooks/GerenciadorHooks/type"
 import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getAssetPath } from "@/lib/assetPath"

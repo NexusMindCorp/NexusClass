@@ -1,30 +1,15 @@
-import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson";
 import { TurmaCard } from "./TurmaCard";
 import { BoasVindas } from "./BoasVindas"
 import { Mural } from "./Mural";
 import { Calendario } from "./Calendario";
 import { Pesquisar } from "./Pesquisar";
 import { Mensagens } from "./Mensagens";
-import type { OpcoesTela } from "@/hooks/useGerenciador";
 import { AcordoPrivacidade } from "./AcordoPrivacidade";
 import { Suporte } from "./Suporte";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { ConfiguracoesAvancadas } from "./ConfiguracoesAvancadas";
 import { DuvidasBox } from "./DuvidasBox";
 import { InfoAplicacao } from "./InfoAplicacao";
-
-type GerenciadorTelasProps = {
-    usuario: any;
-    perfil: PerfilUsuario;
-    listaEscolar: EscolaProps;
-    loadingInscricoes: boolean;
-    mudarInscricao: (key: string) => void;
-    estaInscrito: (key: string) => boolean;
-    marcarMural: (key: string) => void;
-    navegarPara: (tela: OpcoesTela) => void;
-    abrirChatComAjuda: () => void;
-    abrirChat: (contatoId: string) => void;
-}
+import type { GerenciadorTelasProps } from "@/hooks/GerenciadorHooks/type";
 
 export function GerenciadorTelas(props: GerenciadorTelasProps) {
     const turmaSelecionada = props.listaEscolar.turmas[props.usuario.chaveMural];

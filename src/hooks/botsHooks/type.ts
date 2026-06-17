@@ -1,5 +1,5 @@
-import type { PerfilUsuario } from "../AuthHooks/useAuth";
-import type { UsuarioProps } from "../useGerenciador";
+import type { PerfilUsuario } from "../AuthHooks/type";
+import type { UsuarioProps } from "../GerenciadorHooks/type";
 
 export interface Message {
   role: 'user' | 'model';
