@@ -2,17 +2,11 @@ import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Send, X, Bot, Sparkles } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useChatBox } from '../hooks/botsHooks/useChatBox';
-import type { UsuarioProps } from '@/hooks/useGerenciador';
+import type {ChatBotProps} from '../hooks/botsHooks/type';
 import type { PerfilUsuario } from '@/hooks/useAuth';
-import { getAssetPath } from '@/lib/assetPath';
+import {ConfigBot} from '../hooks/botsHooks/configBot';
 
-const perfilBot = getAssetPath('perfilBot/perfilBot.jpg');
-const perfilBot2 = getAssetPath('perfilBot/perfilBot2.png');
 
-type ChatBotProps = {
-  usuario: UsuarioProps
-  listaEscolar: any;
-}
 
 export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: ChatBotProps, ref) {
   const { perfil, materiasProfessor } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null; materiasProfessor: string[] }>()
@@ -49,12 +43,12 @@ export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: Ch
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-lg">
               {isHelpMode? (
-                <img src={perfilBot2} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />):(
-                <img src={perfilBot} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />
+                <img src={ConfigBot.fotos[1]} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />):(
+                <img src={ConfigBot.fotos[0]} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />
               )}
               </div>
               <div>
-                <p className="text-sm font-bold leading-none">{isHelpMode ? 'Falcão Penegrino' : 'Tigreso'}</p>
+                <p className="text-sm font-bold leading-none">{isHelpMode ? ConfigBot.nome[1] : ConfigBot.nome[0]}</p>
                 <p className="text-[10px] text-primary-foreground/80 mt-1 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> Online Agora
                 </p>

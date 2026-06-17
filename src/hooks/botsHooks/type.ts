@@ -65,6 +65,7 @@ export type BotConfigProps = {
   maxTokensOutPut: number;
   MAX_RETRIES: number;
   DELAY_BASE: number;
+  fotos: string[];
 };
 
 export type UseGeminiChatProps = {
@@ -77,4 +78,9 @@ export type UseChatBox= {
   perfil?: PerfilUsuario | null;
   materiasProfessor?: string[];
   listaEscolar?: any;
+}
+
+export type ChatBotProps = {
+  usuario: UsuarioProps
+  listaEscolar: any;
 }

@@ -1,3 +1,4 @@
+import { getAssetPath } from "@/lib/assetPath";
 import type { BotConfigProps } from "./type";
 
 export const ConfigBot: BotConfigProps = {
@@ -9,5 +10,9 @@ export const ConfigBot: BotConfigProps = {
     temperatura: 0.55,
     maxTokensOutPut: 1000,
     MAX_RETRIES: 2,
-    DELAY_BASE: 500
+    DELAY_BASE: 500,
+    fotos: [
+        getAssetPath('perfilBot/perfilBot.jpg'),
+        getAssetPath('perfilBot/perfilBot2.png')
+    ]
 }
