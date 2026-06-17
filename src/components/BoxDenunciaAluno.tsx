@@ -1,12 +1,8 @@
 import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
-import { useDenuncia } from "@/hooks/useDenuncia"
-
-type BoxDenunciaAlunoProps = {
-    aluno: string
-    onClose: () => void
-}
+import { useDenuncia } from "@/hooks/DenunciaHooks/useDenuncia"
+import type { BoxDenunciaAlunoProps } from "@/hooks/DenunciaHooks/type"
 
 export function BoxDenunciaAluno({ aluno, onClose }: BoxDenunciaAlunoProps) {
     const {
