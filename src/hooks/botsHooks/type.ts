@@ -51,3 +51,15 @@ export type EventoCalendarioChat = {
   data: string;
   horario: string | null;
 };
+
+export type BotConfigProps = {
+  nome: string[];
+  linguagem: string;
+  minSentences: number;
+  maxSentences: number;
+  model: string;
+  temperatura:number;
+  maxTokensOutPut: number;
+  MAX_RETRIES: number;
+  DELAY_BASE: number;
+};
