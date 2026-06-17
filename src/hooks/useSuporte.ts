@@ -3,7 +3,7 @@ import { useRef, useState } from "react"
 import type { ChangeEvent, FormEvent } from "react"
 import { toast } from "sonner"
 import { useOutletContext } from 'react-router-dom'
-import type { PerfilUsuario } from '@/hooks/AuthHooks/useAuth'
+import type { PerfilUsuario } from '@/hooks/AuthHooks/type'
 
 export type FormField = {
   key: string

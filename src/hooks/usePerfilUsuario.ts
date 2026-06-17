@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getCorNomeUsuario } from "@/lib/utils"
 export function usePerfilUsuario(nomeUsuario: string, currentUserProfile: PerfilUsuario | null) {
     const [perfilAlvo, setPerfilAlvo] = useState<PerfilUsuario | null>(null)

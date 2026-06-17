@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { formatarDataLocal, montarDataEvento } from "@/lib/utils"
 
 export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas"|"info";

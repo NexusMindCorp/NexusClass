@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 
 export type Duvida = {
     id: string;
