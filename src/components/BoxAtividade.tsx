@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, X, Upload, Paperclip, Trash2 } from "lucide-react"
-import type { Atividade } from "@/hooks/useMural"
+import type { Atividade } from "@/hooks/MuralHooks/type"
 
 type BoxAtividadeProps = {
     materia: string

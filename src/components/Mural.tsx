@@ -1,6 +1,4 @@
 import { useState } from "react";
-import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -12,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
 import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar, Pencil, MessageSquare } from "lucide-react";
-import { useMural } from "@/hooks/useMural";
+import { useMural } from "@/hooks/MuralHooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
 import { PerfilAvatar } from "./PerfilAvatar";
@@ -20,15 +18,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
 import { BoxAtividade, obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
 import { BoxEntregaAtividade } from "./BoxEntregaAtividade";
-import type { Atividade } from "@/hooks/useMural";
+import type { Atividade } from "@/hooks/MuralHooks/type";
 import { isDataEntregaFutura } from "@/lib/utils";
-
-type MuralProps = {
-  materia: string;
-  turma: TurmaProps;
-  perfil: PerfilUsuario;
-  abrirChat: (contatoId: string) => void;
-};
+import type { MuralProps } from "@/hooks/MuralHooks/type";
 
 export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);

@@ -2,50 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
-
-export type Post = {
-    id: string;
-    Nome: string;
-    conteudo: string;
-    data: string;
-    autor: PerfilUsuario | null;
-};
-
-export type Atividade = {
-    id: string;
-    turma_id: string;
-    professor_id: string;
-    titulo: string;
-    descricao: string;
-    data_entrega: string | null;
-    created_at: string;
-    anexo_url: string | null;
-    professor_nome?: string;
-};
-
-function extrairUrlsAnexo(anexoUrl: string | null): string[] {
-    if (!anexoUrl) return [];
-    try {
-        if (anexoUrl.startsWith("[") && anexoUrl.endsWith("]")) {
-            const parsed = JSON.parse(anexoUrl);
-            if (Array.isArray(parsed)) return parsed;
-        }
-        return [anexoUrl];
-    } catch {
-        return [anexoUrl];
-    }
-}
-
-function obterNomeArquivoDoUrl(url: string): string {
-    try {
-        const decoded = decodeURIComponent(url);
-        const cleanUrl = decoded.split("?")[0];
-        const parts = cleanUrl.split("/");
-        return parts[parts.length - 1];
-    } catch {
-        return "";
-    }
-}
+import{ extrairUrlsAnexo, obterNomeArquivoDoUrl } from '@/lib/utils';
+import type { Post, Atividade } from "./type";
 
 export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar: "atividade" | "mural" | "contato" | "alunos" }>({
