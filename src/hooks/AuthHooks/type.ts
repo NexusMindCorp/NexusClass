@@ -16,3 +16,12 @@ export type TurmaProfessor = {
     sala: string;
     turma: string;
 }
+
+export type CarregamentoDadosProps = {
+    setPerfil: React.Dispatch<React.SetStateAction<PerfilUsuario | null>>,
+    setMateriasProfessor: React.Dispatch<React.SetStateAction<TurmaProfessor[]>>
+    isMountedRef: React.RefObject<boolean>
+    lastUserIdRef: React.RefObject<string | null>
+    setSession: React.Dispatch<React.SetStateAction<any>>,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+}
