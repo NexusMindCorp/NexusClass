@@ -388,7 +388,6 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
         },
         context: {
           usageAgreementSummary: resumoAcordoUso,
-          calendarEventsSummary: resumoEventosCalendario,
           userProfileSummary: resumoPerfilUsuario,
         },
       }
