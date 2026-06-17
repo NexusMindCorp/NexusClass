@@ -4,7 +4,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@radix-ui/r
 import { Configuracoes } from "./Configuracoes"
 import { Button } from "./ui/button"
 import type { OpcoesTela } from "@/hooks/useGerenciador"
-import type { EscolaProps } from "@/hooks/leituraJson"
+import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"

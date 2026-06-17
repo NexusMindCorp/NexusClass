@@ -5,9 +5,9 @@ import { AppSidebar } from "@/components//AppSidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { GerenciadorTelas } from "@/components//GerenciadorTelas"
 import { useGerenciador } from "@/hooks/useGerenciador"
-import { useEscolaDados } from "@/hooks/useEscolaDados"
+import { useEscolaDados } from "@/hooks/LeituraDataHooks/useEscolaDados"
 import { ChatBot } from "@/components/ChatBot"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/useAuth"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 
 export function LayoutPrincipal() {
   const { perfil, atualizarPerfilLocal } = useOutletContext<{

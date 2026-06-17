@@ -1,4 +1,4 @@
-import type { EscolaProps } from "@/hooks/leituraJson";
+import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson";
 import { TurmaCard } from "./TurmaCard";
 import { BoasVindas } from "./BoasVindas"
 import { Mural } from "./Mural";

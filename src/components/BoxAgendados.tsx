@@ -2,7 +2,7 @@ import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
-import type { TurmaProps } from "@/hooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 
 type EventoCalendario = {
 	id: string

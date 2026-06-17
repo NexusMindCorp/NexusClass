@@ -23,4 +23,13 @@ export type EscolaProps = {
   turmas: Record<string, TurmaProps>;
 };
 
+export type TurmaBanco = {
+  id: string
+  chave: string
+  materia: string
+  banner_url: string
+  sala: string
+  turma: string
+}
+
 export const listaEscolar = turmasJson as unknown as EscolaProps;

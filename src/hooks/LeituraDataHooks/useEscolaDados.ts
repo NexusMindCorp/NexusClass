@@ -1,15 +1,6 @@
 import { useEffect, useState ,useCallback} from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
-import type { EscolaProps, TurmaProps, UsuarioResumo } from "@/hooks/leituraJson"
-
-type TurmaBanco = {
-  id: string
-  chave: string
-  materia: string
-  banner_url: string
-  sala: string
-  turma: string
-}
+import type { EscolaProps, TurmaProps, UsuarioResumo, TurmaBanco } from "@/hooks/LeituraDataHooks/leituraJson"
 
 export function useEscolaDados() {
   const [listaEscolar, setListaEscolar] = useState<EscolaProps>({

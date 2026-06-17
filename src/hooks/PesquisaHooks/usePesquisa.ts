@@ -1,10 +1,5 @@
 import { useState, useMemo } from "react"
-import type { TurmaProps } from "@/hooks/leituraJson"
-
-type UsePesquisaProps = {
-    aoFecharPesquisa: () => void
-    turmas: Record<string, TurmaProps>
-}
+import type { UsePesquisaProps } from "@/hooks/PesquisaHooks/type"
 
 export function usePesquisa({ aoFecharPesquisa, turmas }: UsePesquisaProps) {
     const [textoPesquisa, setTextoPesquisa] = useState("")
