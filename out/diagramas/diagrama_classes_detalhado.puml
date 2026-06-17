@@ -1,0 +1,236 @@
+@startuml
+skinparam handwritten false
+skinparam class {
+    BackgroundColor White
+    ArrowColor #7C3AED
+    BorderColor #DB2777
+}
+
+class LayoutPrincipal {
+    +chatBotRefRef : MutableRefObject
+    +perfil : PerfilUsuario
+    +usuario : UsuarioProps
+    +listaEscolar : EscolaProps
+    +atualizarPerfilLocal() : void
+    +abrirChatComAjuda() : void
+    +render()
+}
+
+class GerenciadorTelas {
+    +usuario : UsuarioProps
+    +listaEscolar : EscolaProps
+    +perfil : PerfilUsuario
+    +mudarInscricao() : void
+    +estaInscrito() : boolean
+    +marcarMural() : void
+    +navegarPara() : void
+    +render()
+}
+
+class ProtectedRoute {
+    +session : Session
+    +loading : boolean
+    +perfil : PerfilUsuario
+    +render()
+}
+
+class useAuth {
+    +session : Session | null
+    +loading : boolean
+    +perfil : PerfilUsuario | null
+    +materiasProfessor : TurmaProfessor[]
+    +materiasProfessorNomes : string[]
+    +atualizarPerfilLocal(perfilAtualizado: PerfilUsuario) : void
+}
+
+class useGerenciador {
+    +usuario : UsuarioProps
+    +pedirAjuda : boolean
+    +loadingInscricoes : boolean
+    +mudarInscricao(turmaId: string) : Promise
+    +estaInscrito(materia: string) : boolean
+    +marcarMural(key: string) : void
+    +navegarPara(tela: OpcoesTela) : void
+    +abrirChat(contatoId: string) : void
+    +limparEstado() : void
+}
+
+class useEscolaDados {
+    +listaEscolar : EscolaProps
+    +carregandoEscola : boolean
+    +erroEscola : string | null
+    +carregar() : Promise
+}
+
+class ChatBot {
+    +usuario : UsuarioProps
+    +listaEscolar : any
+    +perfil : PerfilUsuario
+    +materiasProfessor : string[]
+    +scrollRef : MutableRefObject
+    +render()
+}
+
+class useChatBox {
+    +isOpen : boolean
+    +isHelpMode : boolean
+    +input : string
+    +messages : Message[]
+    +loading : boolean
+    +closeChat() : void
+    +handleSend() : void
+}
+
+class useGeminiChat {
+    +messages : Message[]
+    +loading : boolean
+    +chatRef : MutableRefObject
+    +sendMessage(input: string) : Promise
+}
+
+class CarregamentoDados {
+    +resumoEventosCalendario : string
+    +perguntasFrequentes : string
+    +resumoAtividadesAbertas : string
+    +resumoPostProfessor : string
+    +carregarPostsProfessor() : Promise
+    +perguntas() : Promise
+    +carregarResumoEventos() : Promise
+    +carregarAtividadesAbertas() : Promise
+}
+
+class Mural {
+    +turmaId : string
+    +perfil : PerfilUsuario
+    +render()
+}
+class useMural {
+    +posts : Post[]
+    +loading : boolean
+    +comentarioInputs : Record
+    +criarPost(conteudo: string, arquivoUrl?: string) : Promise
+    +deletarPost(postId: string) : Promise
+    +criarComentario(postId: string) : Promise
+    +deletarComentario(comentarioId: string) : Promise
+}
+
+class Calendario {
+    +perfil : PerfilUsuario
+    +inscricoes : Record
+    +turmasGlobais : Record
+    +render()
+}
+class useCalendario {
+    +eventos : Evento[]
+    +loading : boolean
+    +novoEvento : NovoEvento
+    +carregarEventos() : Promise
+    +criarEvento() : Promise
+    +deletarEvento(id: string) : Promise
+}
+
+class Mensagens {
+    +perfil : PerfilUsuario
+    +render()
+}
+class useMensagens {
+    +conversas : Conversa[]
+    +chatAtivo : Chat | null
+    +mensagens : Mensagem[]
+    +loading : boolean
+    +enviarMensagem(texto: string) : Promise
+    +selecionarChat(id: string) : void
+    +iniciarConversa(destinatarioId: string) : Promise
+}
+
+class DuvidasBox {
+    +perfil : PerfilUsuario
+    +render()
+}
+class useDuvidas {
+    +duvidas : Duvida[]
+    +loading : boolean
+    +novaDuvida : NovaDuvida
+    +criarDuvida() : Promise
+    +resolverDuvida(id: string) : Promise
+    +responderDuvida(id: string, resposta: string) : Promise
+}
+
+class Suporte {
+    +render()
+}
+class useSuporte {
+    +tickets : Ticket[]
+    +loading : boolean
+    +criarTicket(assunto: string, mensagem: string) : Promise
+    +denunciarUsuario(alunoId: string, motivo: string) : Promise
+}
+
+class Pesquisar {
+    +turmas : Record
+    +aoFecharPesquisa : () => void
+    +render()
+}
+class usePesquisa {
+    +termoPesquisa : string
+    +resultados : Turma[]
+    +pesquisar(termo: string) : void
+}
+
+class BoxPerfilUsuario {
+    +render()
+}
+class usePerfilUsuario {
+    +perfilEditado : PerfilUsuario
+    +loading : boolean
+    +salvarAlteracoes() : Promise
+    +deletarConta() : Promise
+}
+
+class BoxEntregaAtividade {
+    +atividadeId : string
+    +perfil : PerfilUsuario
+    +render()
+}
+class useEntregas {
+    +entregas : Entrega[]
+    +loading : boolean
+    +novaEntrega : NovaEntrega
+    +enviarEntrega() : Promise
+    +avaliarEntrega(entregaId: string, nota: number) : Promise
+}
+
+%% Relations Layout & Routing
+ProtectedRoute --> useAuth : "authenticates"
+ProtectedRoute *-- LayoutPrincipal : "renders on success"
+LayoutPrincipal --> useGerenciador : "executes hook"
+LayoutPrincipal --> useEscolaDados : "executes hook"
+LayoutPrincipal *-- GerenciadorTelas : "renders"
+LayoutPrincipal *-- ChatBot : "renders"
+
+%% Relations ChatBot
+ChatBot --> useChatBox : "executes hook"
+useChatBox --> useGeminiChat : "executes hook"
+useGeminiChat --> CarregamentoDados : "delegates loading"
+
+%% Relations Features & Router
+GerenciadorTelas *-- Mural : "renders screen 'mural'"
+GerenciadorTelas *-- Calendario : "renders screen 'calendario'"
+GerenciadorTelas *-- Mensagens : "renders screen 'mensagens'"
+GerenciadorTelas *-- DuvidasBox : "renders screen 'suporte/duvidas'"
+GerenciadorTelas *-- Suporte : "renders screen 'suporte'"
+GerenciadorTelas *-- Pesquisar : "renders screen 'pesquisar'"
+GerenciadorTelas *-- BoxPerfilUsuario : "renders profile modal"
+Mural *-- BoxEntregaAtividade : "renders"
+
+
+Mural --> useMural : "executes hook"
+Calendario --> useCalendario : "executes hook"
+Mensagens --> useMensagens : "executes hook"
+DuvidasBox --> useDuvidas : "executes hook"
+Suporte --> useSuporte : "executes hook"
+Pesquisar --> usePesquisa : "executes hook"
+BoxPerfilUsuario --> usePerfilUsuario : "executes hook"
+BoxEntregaAtividade --> useEntregas : "executes hook"
+
+@enduml

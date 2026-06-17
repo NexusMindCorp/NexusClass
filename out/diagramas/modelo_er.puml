@@ -1,0 +1,186 @@
+@startuml
+!theme plain
+hide circle
+skinparam handwritten false
+skinparam nodesep 120
+skinparam ranksep 120
+
+skinparam entity {
+    BackgroundColor White
+    ArrowColor #7C3AED
+    BorderColor #DB2777
+}
+
+entity "perfis" as perfis {
+  *id : uuid <<PK>>
+  --
+  role : user_role
+  nome : text
+  email : text
+  bio : text
+  foto_url : text
+  created_at : timestamptz
+}
+
+entity "escolas" as escolas {
+  *id : uuid <<PK>>
+  --
+  nome : text
+  ano_letivo : int4
+  created_at : timestamptz
+}
+
+entity "turmas_escolares" as turmas_escolares {
+  *id : uuid <<PK>>
+  --
+  escola_id : uuid <<FK>>
+  chave : text
+  materia : text
+  banner_url : text
+  sala : text
+  turma : text
+  created_at : timestamptz
+}
+
+entity "aluno_turma" as aluno_turma {
+  *id : uuid <<PK>>
+  --
+  aluno_id : uuid <<FK>>
+  turma_id : uuid <<FK>>
+  created_at : timestamptz
+}
+
+entity "professor_turma" as professor_turma {
+  *id : uuid <<PK>>
+  --
+  professor_id : uuid <<FK>>
+  turma_id : uuid <<FK>>
+  created_at : timestamptz
+}
+
+entity "atividades" as atividades {
+  *id : uuid <<PK>>
+  --
+  turma_id : uuid <<FK>>
+  professor_id : uuid <<FK>>
+  titulo : text
+  descricao : text
+  data_entrega : timestamptz
+  created_at : timestamptz
+  anexo_url : text
+}
+
+entity "entregas_atividades" as entregas_atividades {
+  *id : uuid <<PK>>
+  --
+  atividade_id : uuid <<FK>>
+  aluno_id : uuid <<FK>>
+  url_anexo : text
+  nota : numeric
+  feedback : text
+  no_prazo : bool
+  entregue_em : timestamptz
+  created_at : timestamptz
+  updated_at : timestamptz
+}
+
+entity "mensagens" as mensagens {
+  *id : uuid <<PK>>
+  --
+  remetente_id : uuid <<FK>>
+  destinatario_id : uuid <<FK>>
+  assunto : text
+  conteudo : text
+  lida : bool
+  created_at : timestamptz
+}
+
+entity "mural_posts" as mural_posts {
+  *id : uuid <<PK>>
+  --
+  turma_id : uuid <<FK>>
+  autor_id : uuid <<FK>>
+  conteudo : text
+  created_at : timestamptz
+}
+
+entity "eventos_calendario" as eventos_calendario {
+  *id : uuid <<PK>>
+  --
+  titulo : text
+  descricao : text
+  data : date
+  horario : time
+  created_at : timestamptz
+  autor_id : uuid <<FK>>
+  tipo : text
+  turma_id : uuid <<FK>>
+}
+
+entity "alertas_calendario" as alertas_calendario {
+  *id : uuid <<PK>>
+  --
+  evento_id : uuid <<FK>>
+  titulo_evento : text
+  mensagem : text
+  lembrete_para : timestamptz
+  created_at : timestamptz
+  minutos_antes : int4
+}
+
+entity "duvidasalunostoprofessor" as duvidasalunostoprofessor {
+  *id : uuid <<PK>>
+  --
+  aluno_id : uuid <<FK>>
+  prof_id : uuid <<FK>>
+  turma_id : uuid <<FK>>
+  assunto : text
+  descricao : text
+  anexo_url : text
+  created_at : timestamptz
+  resolvido : bool
+  resposta : text
+}
+
+entity "denuncias" as denuncias {
+  *id : uuid <<PK>>
+  --
+  created_at : timestamptz
+  aluno_denunciado : text
+  motivo : text
+  descricao : text
+  status : text
+}
+
+entity "suporte" as suporte {
+  *id : uuid <<PK>>
+  --
+  created_at : timestamptz
+  nome : text
+  email : text
+  assunto : text
+  mensagem : text
+  status : text
+  anexos_suporte : text
+}
+
+escolas ||--o{ turmas_escolares : "contém"
+turmas_escolares ||--o{ aluno_turma : "possui"
+perfis ||--o{ aluno_turma : "inscreve-se"
+turmas_escolares ||--o{ professor_turma : "aloca"
+perfis ||--o{ professor_turma : "leciona"
+turmas_escolares ||--o{ atividades : "registra"
+perfis ||--o{ atividades : "cria"
+atividades ||--o{ entregas_atividades : "vincula"
+perfis ||--o{ entregas_atividades : "entrega"
+perfis ||--o{ mensagens : "envia"
+perfis ||--o{ mensagens : "recebe"
+turmas_escolares ||--o{ mural_posts : "exibe"
+perfis ||--o{ mural_posts : "publica"
+perfis ||--o{ eventos_calendario : "agenda"
+turmas_escolares ||--o{ eventos_calendario : "associa"
+eventos_calendario ||--o{ alertas_calendario : "dispara"
+perfis ||--o{ duvidasalunostoprofessor : "pergunta"
+perfis ||--o{ duvidasalunostoprofessor : "responde"
+turmas_escolares ||--o{ duvidasalunostoprofessor : "pertence"
+@enduml
