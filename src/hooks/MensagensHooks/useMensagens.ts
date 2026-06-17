@@ -60,23 +60,27 @@ export function useMensagens(perfil: PerfilUsuario | null) {
     const marcarComoLidas = useCallback(async (contatoId: string) => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) return
 
+        setMensagens((prevMensagens) =>
+            prevMensagens.map((msg) =>
+                msg.remetente_id === contatoId && msg.destinatario_id === perfil.id
+                    ? { ...msg, lida: true }
+                    : msg
+            )
+        )
+
         try {
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from("mensagens")
                 .update({ lida: true })
                 .eq("remetente_id", contatoId)
                 .eq("destinatario_id", perfil.id)
                 .eq("lida", false)
+                .select("id")
 
             if (error) throw error
-
-            setMensagens((prevMensagens) =>
-                prevMensagens.map((msg) =>
-                    msg.remetente_id === contatoId && msg.destinatario_id === perfil.id
-                        ? { ...msg, lida: true }
-                        : msg
-                )
-            )
+            if (!data || data.length === 0) {
+                console.warn("Nenhuma mensagem pendente precisou ser atualizada.")
+            }
         } catch (error) {
             console.error("Erro ao marcar mensagens como lidas:", error)
         }
@@ -153,6 +157,9 @@ export function useMensagens(perfil: PerfilUsuario | null) {
     return {
         mensagens,
         conversas,
+        totalMensagensNaoLidas: mensagens.filter(
+            (msg) => !msg.lida && msg.destinatario_id === perfil?.id
+        ).length,
         loadingChat,
         enviarMensagem,
         marcarComoLidas,

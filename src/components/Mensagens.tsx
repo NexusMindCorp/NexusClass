@@ -1,17 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import type{ MensagensProps } from "@/hooks/MensagensHooks/type";
-import { useMensagens } from "@/hooks/MensagensHooks/useMensagens";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, MessageCircle, Info } from "lucide-react";
 import { PerfilAvatar } from "./PerfilAvatar";
 
-export function Mensagens({ perfil, chatAtivoId, listaEscolar }: MensagensProps) {
-    const { mensagens, conversas, enviarMensagem, marcarComoLidas } = useMensagens(perfil);
+export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conversas, enviarMensagem, marcarComoLidas }: MensagensProps) {
     const [contatoAtivo, setContatoAtivo] = useState<string | null>(chatAtivoId);
     const [texto, setTexto] = useState("");
     const mensagensEndRef = useRef<HTMLDivElement>(null);
+    const naoLidasDoContatoAtivo = mensagens.filter(
+        (msg) =>
+            !msg.lida &&
+            msg.remetente_id === contatoAtivo &&
+            msg.destinatario_id === perfil?.id
+    ).length;
 
     const obterInfoUsuario = (id: string) => {
         if (!listaEscolar?.turmas) return { nome: "Usuário", foto: null };
@@ -32,11 +36,14 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar }: MensagensProps)
     }, [chatAtivoId]);
 
     useEffect(() => {
-        if (contatoAtivo) {
+        if (contatoAtivo && naoLidasDoContatoAtivo > 0) {
             void marcarComoLidas(contatoAtivo);
-            mensagensEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }
-    }, [contatoAtivo, mensagens, marcarComoLidas]);
+    }, [contatoAtivo, marcarComoLidas, naoLidasDoContatoAtivo]);
+
+    useEffect(() => {
+        mensagensEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [contatoAtivo, mensagens]);
 
     const handleEnviar = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -1,5 +1,6 @@
 import type { EscolaProps } from "../LeituraDataHooks/leituraJson";
 import type { PerfilUsuario } from "../AuthHooks/type";
+import type { ConversaResumo, Mensagem } from "../MensagensHooks/type";
 
 export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "mensagens" | "suporte" | "privacidade" | "configuracoesAvancadas"|"info";
 
@@ -41,4 +42,8 @@ export type GerenciadorTelasProps = {
     navegarPara: (tela: OpcoesTela) => void;
     abrirChatComAjuda: () => void;
     abrirChat: (contatoId: string) => void;
+    mensagens: Mensagem[];
+    conversas: ConversaResumo[];
+    enviarMensagem: (destinatarioId: string, conteudoTexto: string) => Promise<void>;
+    marcarComoLidas: (contatoId: string) => Promise<void>;
 }

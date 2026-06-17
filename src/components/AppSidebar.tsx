@@ -24,9 +24,10 @@ type AppSidebarProps = {
     marcarMural: (key: string) => void;
     listaEscolar: EscolaProps;
     perfil: PerfilUsuario;
+    totalMensagensNaoLidas: number;
 }
 
-export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil }: AppSidebarProps) {
+export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar, perfil, totalMensagensNaoLidas }: AppSidebarProps) {
     const { duvidas } = useDuvidas(perfil);
     const isMaster = perfil?.role === "master";
     const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
@@ -86,8 +87,10 @@ export function AppSidebar({ navegarPara, inscricoes, marcarMural, listaEscolar,
                                             <span>{item.title}</span>
                                         </a>
                                     </SidebarMenuButton>
-                                    {item.title === "Mensagens" && (
-                                        <SidebarMenuBadge>0</SidebarMenuBadge>
+                                    {item.id === "mensagens" && totalMensagensNaoLidas > 0 && (
+                                        <SidebarMenuBadge className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20">
+                                            {totalMensagensNaoLidas}
+                                        </SidebarMenuBadge>
                                     )}
                                     {item.id === "duvidas" && totalDuvidasPendentes > 0 && (
                                         <SidebarMenuBadge className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground shadow-sm shadow-primary/20">

@@ -23,4 +23,8 @@ export type MensagensProps = {
     perfil: PerfilUsuario | null;
     chatAtivoId: string | null;
     listaEscolar: EscolaProps;
+    mensagens: Mensagem[];
+    conversas: ConversaResumo[];
+    enviarMensagem: (destinatarioId: string, conteudoTexto: string) => Promise<void>;
+    marcarComoLidas: (contatoId: string) => Promise<void>;
 };

@@ -79,6 +79,10 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                         perfil={props.perfil}
                         chatAtivoId={props.usuario.chatAtivoId}
                         listaEscolar={props.listaEscolar}
+                        mensagens={props.mensagens}
+                        conversas={props.conversas}
+                        enviarMensagem={props.enviarMensagem}
+                        marcarComoLidas={props.marcarComoLidas}
                     />
                 </div>}
             {props.usuario.acessouOq === "suporte" &&

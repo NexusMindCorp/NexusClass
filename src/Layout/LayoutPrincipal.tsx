@@ -8,6 +8,7 @@ import { useGerenciador } from "@/hooks/GerenciadorHooks/useGerenciador"
 import { useEscolaDados } from "@/hooks/LeituraDataHooks/useEscolaDados"
 import { ChatBot } from "@/components/ChatBot"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
+import { useMensagens } from "@/hooks/MensagensHooks/useMensagens"
 
 export function LayoutPrincipal() {
   const { perfil, atualizarPerfilLocal } = useOutletContext<{
@@ -16,6 +17,7 @@ export function LayoutPrincipal() {
   }>()
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
+  const { mensagens, conversas, enviarMensagem, marcarComoLidas, totalMensagensNaoLidas } = useMensagens(perfil)
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
 
   const abrirChatComAjuda = useCallback(() => {
@@ -30,6 +32,7 @@ export function LayoutPrincipal() {
         marcarMural={marcarMural}
         listaEscolar={listaEscolar}
         perfil={perfil}
+        totalMensagensNaoLidas={totalMensagensNaoLidas}
       />
 
       <main className="pagina-principal">
@@ -47,6 +50,10 @@ export function LayoutPrincipal() {
             perfil={perfil}
             loadingInscricoes={loadingInscricoes}
             abrirChat={abrirChat}
+            mensagens={mensagens}
+            conversas={conversas}
+            enviarMensagem={enviarMensagem}
+            marcarComoLidas={marcarComoLidas}
           />
         </div>
       </main>
