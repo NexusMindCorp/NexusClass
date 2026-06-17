@@ -1,6 +1,5 @@
 import { useState, useRef, type ChangeEvent } from "react";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-import { useEntregas } from "@/hooks/useEntregas";
+import { useEntregas } from "@/hooks/EntregasHooks/useEntregas";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -14,12 +13,7 @@ import {
     Download,
     RefreshCw
 } from "lucide-react";
-
-type BoxEntregaAtividadeProps = {
-    atividadeId: string;
-    perfil: PerfilUsuario;
-    dataEntregaAtividade: string | null;
-};
+import type { BoxEntregaAtividadeProps } from "@/hooks/EntregasHooks/type";
 
 export function BoxEntregaAtividade({ atividadeId, perfil, dataEntregaAtividade }: BoxEntregaAtividadeProps) {
     const {
