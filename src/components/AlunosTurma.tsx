@@ -1,26 +1,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
 import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lucide-react"
-import { useOptionAlunos } from "@/hooks/useOptionAlunos"
+import { useOptionAlunos } from "@/hooks/AlunosHooks/useOptionAlunos"
 import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno"
 import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { PerfilAvatar } from "./PerfilAvatar"
-
-type AlunosTurmaProps = {
-  turma: TurmaProps
-  perfil: PerfilUsuario
-  abrirChat: (contatoId: string) => void;
-}
-
-type tableRowProps = {
-  id: string
-  nome: string
-  foto?: string | null
-  descricao?: string
-}
+import type{AlunosTurmaProps, tableRowProps} from "@/hooks/AlunosHooks/type"
 
 export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()

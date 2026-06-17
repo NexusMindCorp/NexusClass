@@ -1,6 +1,6 @@
 import { useState } from "react";
+import type { Option } from "./type"
 
-type Option ='Ver Perfil' | 'Enviar Mensagem' | 'Adicionar aos Favoritos' | 'Denunciar';
 export function useOptionAlunos() {
     const [opcaoSelecionada, setOpcaoSelecionada] = useState<Option | null>(null);
     const [nomeAluno, setNomeAluno] = useState<string>("");
