@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { BoxAlertaDeletaConta } from "./BoxAlertaDeletaConta";
 import { ListagemConteudosInscritos } from "./ListagemConteudosInscritos";
-import { useConfiguracoesAvancadas } from "@/hooks/useConfiguracoesAvancadas";
+import { useConfiguracoesAvancadas } from "@/hooks/ConfigAvancadaHooks/useConfiguracoesAvancadas";
 import { BoxRestrito } from "./BoxRestrito";
 import { PerfilAvatar } from "./PerfilAvatar";
 import { Trash2, EyeClosed, Eye } from "lucide-react";
