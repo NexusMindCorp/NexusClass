@@ -354,7 +354,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
     ? {
         schema: "jsoninstruction.v1",
         assistant: {
-          name: "Tigreso",
+          name: "Falcão peregrino",
           role: "assistente virtual para dúvidas sobre Acordo de Uso e Termos da Plataforma",
         },
         style: {
@@ -445,7 +445,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
       chatRef.current = model.startChat({
         history: [],
         generationConfig: {
-          maxOutputTokens: 900,
+          maxOutputTokens: 1000,
           temperature: 0.55,
         },
       });
@@ -455,7 +455,7 @@ Se a duvida foi persistida, tente reexplicar baseado na resposta do professor, c
   }, [systemInstruction]);
 
   useEffect(() => {
-    // Limpar mensagens ao entrar no modo ajuda para evitar confusão
+
     if (isHelpMode) {
       setMessages([]);
     }
