@@ -1,18 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson";
-import { useMensagens } from "@/hooks/useMensagens";
+import type{ MensagensProps } from "@/hooks/MensagensHooks/type";
+import { useMensagens } from "@/hooks/MensagensHooks/useMensagens";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, MessageCircle, Info } from "lucide-react";
 import { PerfilAvatar } from "./PerfilAvatar";
-
-type MensagensProps = {
-    perfil: PerfilUsuario | null;
-    chatAtivoId: string | null;
-    listaEscolar: EscolaProps;
-};
 
 export function Mensagens({ perfil, chatAtivoId, listaEscolar }: MensagensProps) {
     const { mensagens, conversas, enviarMensagem, marcarComoLidas } = useMensagens(perfil);

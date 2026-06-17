@@ -2,25 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
-
-export type Mensagem = {
-    id: string;
-    remetente_id: string;
-    destinatario_id: string;
-    conteudo: string;
-    lida: boolean;
-    created_at: string;
-    assunto?: string | null;
-}
-
-export type ConversaResumo = {
-    usuarioId: string;
-    nome: string;
-    foto_url: string | null;
-    ultimaMensagem: string;
-    dataUltimaMensagem: string;
-    mensagensNaoLidas: number;
-}
+import type { Mensagem, ConversaResumo} from "@/hooks/MensagensHooks/type"
 
 export function useMensagens(perfil: PerfilUsuario | null) {
     const [mensagens, setMensagens] = useState<Mensagem[]>([])
