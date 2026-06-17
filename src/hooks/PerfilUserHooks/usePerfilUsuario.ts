@@ -2,7 +2,8 @@ import { useState, useEffect } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getCorNomeUsuario } from "@/lib/utils"
-export function usePerfilUsuario(nomeUsuario: string, currentUserProfile: PerfilUsuario | null) {
+import type { usePerfilUsuarioProps } from "./type"
+export function usePerfilUsuario({ nomeUsuario, currentUserProfile }: usePerfilUsuarioProps) {
     const [perfilAlvo, setPerfilAlvo] = useState<PerfilUsuario | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)

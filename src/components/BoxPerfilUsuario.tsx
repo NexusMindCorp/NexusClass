@@ -1,17 +1,11 @@
 import { createPortal } from "react-dom"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { Loader2, Mail, FileText, Calendar, ShieldCheck, X } from "lucide-react"
-import { usePerfilUsuario } from "@/hooks/usePerfilUsuario"
+import { usePerfilUsuario } from "@/hooks/PerfilUserHooks/usePerfilUsuario"
 import { PerfilAvatar } from "./PerfilAvatar"
-
-type BoxPerfilUsuarioProps = {
-    nomeUsuario: string
-    onClose: () => void
-    currentUserProfile: PerfilUsuario | null
-}
+import type { BoxPerfilUsuarioProps } from "@/hooks/PerfilUserHooks/type"
 
 export function BoxPerfilUsuario({ nomeUsuario, onClose, currentUserProfile }: BoxPerfilUsuarioProps) {
-    const { perfilAlvo, loading, error, ehProprioUsuario } = usePerfilUsuario(nomeUsuario, currentUserProfile)
+    const { perfilAlvo, loading, error, ehProprioUsuario } = usePerfilUsuario({ nomeUsuario, currentUserProfile })
 
     const modalContent = (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-in fade-in duration-200">
