@@ -3,30 +3,7 @@ import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { Duvida } from "@/hooks/DuvidaHooks/type";
-function extrairUrlsAnexo(anexoUrl: string | null): string[] {
-    if (!anexoUrl) return [];
-    try {
-        if (anexoUrl.startsWith("[") && anexoUrl.endsWith("]")) {
-            const parsed = JSON.parse(anexoUrl);
-            if (Array.isArray(parsed)) return parsed;
-        }
-        return [anexoUrl];
-    } catch {
-        return [anexoUrl];
-    }
-}
-
-function obterNomeArquivoDoUrl(url: string): string {
-    try {
-        const decoded = decodeURIComponent(url);
-        const cleanUrl = decoded.split("?")[0];
-        const parts = cleanUrl.split("/");
-        return parts[parts.length - 1];
-    } catch {
-        return "";
-    }
-}
-
+import { extrairUrlsAnexo, obterNomeArquivoDoUrl } from "@/lib/utils";
 export function useDuvidas(perfil: PerfilUsuario | null) {
     const [duvidas, setDuvidas] = useState<Duvida[]>([]);
     const [loading, setLoading] = useState(false);

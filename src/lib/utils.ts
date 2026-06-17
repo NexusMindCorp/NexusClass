@@ -153,3 +153,26 @@ export function formatarErroSupabase(erro: ErroSupabase, acao: string) {
   const mensagem = erro.message ? ` ${erro.message}${detalhes}` : ""
   return `Falha ao ${acao} no Supabase.${mensagem}`
 }
+export function extrairUrlsAnexo(anexoUrl: string | null): string[] {
+    if (!anexoUrl) return [];
+    try {
+        if (anexoUrl.startsWith("[") && anexoUrl.endsWith("]")) {
+            const parsed = JSON.parse(anexoUrl);
+            if (Array.isArray(parsed)) return parsed;
+        }
+        return [anexoUrl];
+    } catch {
+        return [anexoUrl];
+    }
+}
+
+export function obterNomeArquivoDoUrl(url: string): string {
+    try {
+        const decoded = decodeURIComponent(url);
+        const cleanUrl = decoded.split("?")[0];
+        const parts = cleanUrl.split("/");
+        return parts[parts.length - 1];
+    } catch {
+        return "";
+    }
+}
