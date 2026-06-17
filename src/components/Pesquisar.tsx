@@ -9,18 +9,9 @@ import {
 } from "@/components/ui/sheet"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TurmaCard } from "./TurmaCard"
-import { usePesquisa } from "@/hooks/usePesquisa"
-import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
-import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
+import { usePesquisa } from "@/hooks/PesquisaHooks/usePesquisa"
+import type { PesquisarProps } from "@/hooks/PesquisaHooks/type"
 
-type PesquisarProps = {
-    mudarInscricao: (materia: string) => void
-    estaInscrito: (materia: string) => boolean
-    marcarMural: (key: string) => void
-    voltarPrincipal: () => void
-    turmas: Record<string, TurmaProps>
-    perfil: PerfilUsuario
-}
 
 export function Pesquisar(props: PesquisarProps) {
     const [abaAtiva, setAbaAtiva] = useState("minhas")
