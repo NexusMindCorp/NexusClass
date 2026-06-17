@@ -3,7 +3,7 @@
  * Usado para GitHub Pages onde a aplicação fica em /ProjetoPilotoShadcn/
  */
 export const getAssetPath = (path: string): string => {
-  const basePath = import.meta.env.BASE_URL
+  const basePath = __BASE_URL__
   // Remove leading slash se houver para evitar duplicação
   const cleanPath = path.startsWith('/') ? path.slice(1) : path
   return `${basePath}${cleanPath}`

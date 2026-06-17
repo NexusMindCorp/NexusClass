@@ -9,7 +9,7 @@ import { NotFound } from "./Layout/NotFound"
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <BrowserRouter basename={__BASE_URL__}>
         <Routes>
           {/* Rota Pública de Autenticação */}
           <Route path="/login" element={
