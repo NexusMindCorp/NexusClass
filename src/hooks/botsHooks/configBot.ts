@@ -5,7 +5,7 @@ export const ConfigBot: BotConfigProps = {
     linguagem: 'pt-BR',
     minSentences: 3,
     maxSentences: 6,
-    model: "gemini-3-flash-preview",
+    model: "gemini-3.1-flash-lite-preview",
     temperatura: 0.55,
     maxTokensOutPut: 1000,
     MAX_RETRIES: 2,
