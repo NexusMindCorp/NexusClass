@@ -1,26 +1,112 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabaseClient";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 
-export function BoxAlertaDeletaConta({ onClose }: { onClose: () => void }) {
+export function BoxAlertaDeletaConta({ onClose, perfil }: { onClose: () => void; perfil: PerfilUsuario | null }) {
   const [senhaConfirmacao, setSenhaConfirmacao] = useState("");
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [carregando, setCarregando] = useState(false);
 
   const handleConfirmarDelecao = async () => {
-    // 1. Validação do texto
+    // 1. Validação do texto de segurança
     if (textoConfirmacao !== "DELETAR") {
       return toast.error("Você deve digitar DELETAR para confirmar.");
     }
 
-    setCarregando(true);
-    // 2. Aqui você chamaria a lógica de deleção do Supabase
-    // Exemplo: await supabase.auth.signInWithPassword({ email, password: senhaConfirmacao });
-    // Exemplo: await supabase.auth.deleteUser(uid);
+    if (!perfil?.email || !perfil?.id) {
+      return toast.error("E-mail ou ID do usuário não encontrado. Tente novamente.");
+    }
 
-    toast.success("Conta deletada com sucesso!");
-    setCarregando(false);
-    onClose();
+    setCarregando(true);
+
+    try {
+      // 2. Valida a senha do usuário tentando fazer login de confirmação
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: perfil.email,
+        password: senhaConfirmacao,
+      });
+
+      if (authError) {
+        throw new Error("Senha atual incorreta. Confirme suas credenciais.");
+      }
+
+      // 3. Limpar arquivos do Storage das entregas do aluno
+      try {
+        const { data: entregas } = await supabase
+          .from("entregas_atividades")
+          .select("url_anexo")
+          .eq("aluno_id", perfil.id)
+          .not("url_anexo", "is", null);
+
+        if (entregas && entregas.length > 0) {
+          const caminhosEntregas = entregas.map((e) => e.url_anexo).filter(Boolean);
+          if (caminhosEntregas.length > 0) {
+            await supabase.storage.from("entregas_atividades").remove(caminhosEntregas);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao limpar storage de entregas:", err);
+      }
+
+      // 4. Limpar arquivos do Storage das dúvidas do aluno
+      try {
+        const { data: duvidas } = await supabase
+          .from("duvidasalunostoprofessor")
+          .select("anexo_url")
+          .eq("aluno_id", perfil.id)
+          .not("anexo_url", "is", null);
+
+        if (duvidas && duvidas.length > 0) {
+          const nomesArquivosDuvidas: string[] = [];
+          
+          duvidas.forEach((d) => {
+            if (!d.anexo_url) return;
+            try {
+              const urls = JSON.parse(d.anexo_url);
+              if (Array.isArray(urls)) {
+                urls.forEach((url) => {
+                  const nome = url.split("/").pop()?.split("?")[0];
+                  if (nome) nomesArquivosDuvidas.push(nome);
+                });
+              }
+            } catch {
+              const nome = d.anexo_url.split("/").pop()?.split("?")[0];
+              if (nome) nomesArquivosDuvidas.push(nome);
+            }
+          });
+
+          if (nomesArquivosDuvidas.length > 0) {
+            await supabase.storage.from("duvidasalunostoprofessor").remove(nomesArquivosDuvidas);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao limpar storage de dúvidas:", err);
+      }
+
+      // 5. Executa a deleção no banco de dados através da RPC
+      const { error: rpcError } = await supabase.rpc("deletar_propria_conta");
+      if (rpcError) {
+        throw new Error(rpcError.message || "Erro ao processar exclusão no banco de dados.");
+      }
+
+      toast.success("Sua conta foi deletada definitivamente.");
+      
+      // 6. Encerra a sessão localmente
+      await supabase.auth.signOut();
+      
+      // 7. Recarrega a página para atualizar o estado de autenticação geral da aplicação
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Erro na deleção de conta:", error);
+      toast.error("Falha ao deletar conta", {
+        description: error.message || "Tente novamente mais tarde.",
+      });
+    } finally {
+      setCarregando(false);
+      onClose();
+    }
   };
 
   return (
