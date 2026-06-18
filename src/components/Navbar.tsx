@@ -28,19 +28,14 @@ import { SidebarTrigger } from "./ui/sidebar"
 import { supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
+import type { IndicadoresNotificacao } from "@/hooks/NotificacoesHooks/type"
 import { PerfilAvatar } from "./PerfilAvatar"
 
 type NavbarProps = {
     perfil: PerfilUsuario;
     atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void;
-    indicadoresNotificacao: {
-        mensagens: boolean;
-        duvidas: boolean;
-    };
-    setIndicadoresNotificacao: Dispatch<SetStateAction<{
-        mensagens: boolean;
-        duvidas: boolean;
-    }>>;
+    indicadoresNotificacao: IndicadoresNotificacao;
+    setIndicadoresNotificacao: Dispatch<SetStateAction<IndicadoresNotificacao>>;
 }
 
 export function Navbar({ perfil, atualizarPerfilLocal, indicadoresNotificacao, setIndicadoresNotificacao }: NavbarProps) {

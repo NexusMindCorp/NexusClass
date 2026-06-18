@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from "react"
+import { useRef, useCallback } from "react"
 import { useOutletContext } from "react-router-dom"
 import { Navbar } from "@/components//Navbar"
 import { AppSidebar } from "@/components//AppSidebar"
@@ -9,6 +9,7 @@ import { useEscolaDados } from "@/hooks/LeituraDataHooks/useEscolaDados"
 import { ChatBot } from "@/components/ChatBot"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { useMensagens } from "@/hooks/MensagensHooks/useMensagens"
+import { useNotificacoes } from "@/hooks/NotificacoesHooks/useNotificacoes"
 
 export function LayoutPrincipal() {
   const { perfil, atualizarPerfilLocal } = useOutletContext<{
@@ -18,10 +19,7 @@ export function LayoutPrincipal() {
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
   const { mensagens, conversas, enviarMensagem, marcarComoLidas, excluirConversa, totalMensagensNaoLidas } = useMensagens(perfil)
-  const [indicadoresNotificacao, setIndicadoresNotificacao] = useState({
-    mensagens: true,
-    duvidas: true,
-  })
+  const { indicadoresNotificacao, setIndicadoresNotificacao } = useNotificacoes(perfil.id)
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)
 
   const abrirChatComAjuda = useCallback(() => {

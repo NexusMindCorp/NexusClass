@@ -223,3 +223,24 @@ export function salvarSetLocalStorage(chave: string, valores: Set<string>) {
 
   window.localStorage.setItem(chave, JSON.stringify(Array.from(valores)))
 }
+
+export function obterObjetoLocalStorage<T>(chave: string, valorPadrao: T): T {
+  if (typeof window === "undefined") {
+    return valorPadrao
+  }
+
+  try {
+    const valorSalvo = window.localStorage.getItem(chave)
+    return valorSalvo ? JSON.parse(valorSalvo) as T : valorPadrao
+  } catch {
+    return valorPadrao
+  }
+}
+
+export function salvarObjetoLocalStorage<T>(chave: string, valor: T) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.localStorage.setItem(chave, JSON.stringify(valor))
+}
