@@ -83,6 +83,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
                         conversas={props.conversas}
                         enviarMensagem={props.enviarMensagem}
                         marcarComoLidas={props.marcarComoLidas}
+                        excluirConversa={props.excluirConversa}
                     />
                 </div>}
             {props.usuario.acessouOq === "suporte" &&

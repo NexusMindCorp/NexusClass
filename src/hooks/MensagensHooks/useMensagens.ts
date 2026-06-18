@@ -3,24 +3,13 @@ import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
 import type { Mensagem, ConversaResumo} from "@/hooks/MensagensHooks/type"
+import { obterSetLocalStorage, salvarSetLocalStorage } from "@/lib/utils"
 
 const CHAVE_MENSAGENS_LIDAS = "nexusclass:mensagens-lidas"
+const CHAVE_MENSAGENS_OCULTAS = "nexusclass:mensagens-ocultas"
 
-function obterIdsLidos(usuarioId: string) {
-    try {
-        const valorSalvo = localStorage.getItem(`${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`)
-        return new Set<string>(valorSalvo ? JSON.parse(valorSalvo) : [])
-    } catch {
-        return new Set<string>()
-    }
-}
-
-function salvarIdsLidos(usuarioId: string, ids: Set<string>) {
-    localStorage.setItem(
-        `${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`,
-        JSON.stringify(Array.from(ids))
-    )
-}
+const chaveMensagensLidas = (usuarioId: string) => `${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`
+const chaveMensagensOcultas = (usuarioId: string) => `${CHAVE_MENSAGENS_OCULTAS}:${usuarioId}`
 
 export function useMensagens(perfil: PerfilUsuario | null) {
     const [mensagens, setMensagens] = useState<Mensagem[]>([])
@@ -47,11 +36,14 @@ export function useMensagens(perfil: PerfilUsuario | null) {
             if (error) throw error
 
             if (data) {
-                const idsLidos = obterIdsLidos(perfil.id)
-                const historico = (data as Mensagem[]).map((mensagem) => ({
-                    ...mensagem,
-                    lida: mensagem.lida || idsLidos.has(mensagem.id),
-                }))
+                const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
+                const idsOcultos = obterSetLocalStorage(chaveMensagensOcultas(perfil.id))
+                const historico = (data as Mensagem[])
+                    .filter((mensagem) => !idsOcultos.has(mensagem.id))
+                    .map((mensagem) => ({
+                        ...mensagem,
+                        lida: mensagem.lida || idsLidos.has(mensagem.id),
+                    }))
                 setMensagens(historico)
             }
         } catch (error: any) {
@@ -88,7 +80,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
     const marcarComoLidas = useCallback(async (contatoId: string) => {
         if (!hasSupabaseConfig || !supabase || !perfil?.id) return
 
-        const idsLidos = obterIdsLidos(perfil.id)
+        const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
         mensagensRef.current.forEach((mensagem) => {
             if (
                 mensagem.remetente_id === contatoId &&
@@ -97,7 +89,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
                 idsLidos.add(mensagem.id)
             }
         })
-        salvarIdsLidos(perfil.id, idsLidos)
+        salvarSetLocalStorage(chaveMensagensLidas(perfil.id), idsLidos)
 
         setMensagens((prevMensagens) =>
             prevMensagens.map((msg) =>
@@ -125,6 +117,32 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         }
     }, [perfil?.id])
 
+    const excluirConversa = useCallback((contatoId: string) => {
+        if (!perfil?.id) return
+
+        const idsOcultos = obterSetLocalStorage(chaveMensagensOcultas(perfil.id))
+        mensagensRef.current.forEach((mensagem) => {
+            const pertenceAConversa =
+                (mensagem.remetente_id === perfil.id && mensagem.destinatario_id === contatoId) ||
+                (mensagem.remetente_id === contatoId && mensagem.destinatario_id === perfil.id)
+
+            if (pertenceAConversa) {
+                idsOcultos.add(mensagem.id)
+            }
+        })
+        salvarSetLocalStorage(chaveMensagensOcultas(perfil.id), idsOcultos)
+
+        setMensagens((mensagensAtuais) =>
+            mensagensAtuais.filter((mensagem) => {
+                const pertenceAConversa =
+                    (mensagem.remetente_id === perfil.id && mensagem.destinatario_id === contatoId) ||
+                    (mensagem.remetente_id === contatoId && mensagem.destinatario_id === perfil.id)
+
+                return !pertenceAConversa
+            })
+        )
+    }, [perfil?.id])
+
     useEffect(() => {
         void carregarHistorico()
     }, [carregarHistorico])
@@ -139,7 +157,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
                 { event: "*", schema: "public", table: "mensagens" },
                 (payload) => {
                     const mensagemRecebida = payload.new as Mensagem
-                    const idsLidos = obterIdsLidos(perfil.id)
+                    const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
                     const novaMensagem = {
                         ...mensagemRecebida,
                         lida: mensagemRecebida.lida || idsLidos.has(mensagemRecebida.id),
@@ -207,6 +225,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         loadingChat,
         enviarMensagem,
         marcarComoLidas,
+        excluirConversa,
         recarregarChat: carregarHistorico,
     }
 }

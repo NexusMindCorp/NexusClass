@@ -176,3 +176,50 @@ export function obterNomeArquivoDoUrl(url: string): string {
         return "";
     }
 }
+
+export function obterChaveDataLocal(dataIso: string) {
+  return new Date(dataIso).toLocaleDateString("pt-BR")
+}
+
+export function formatarDataRelativa(dataIso: string) {
+  const data = new Date(dataIso)
+  const hoje = new Date()
+  const ontem = new Date(hoje)
+  ontem.setDate(hoje.getDate() - 1)
+
+  if (data.toDateString() === hoje.toDateString()) {
+    return "Hoje"
+  }
+
+  if (data.toDateString() === ontem.toDateString()) {
+    return "Ontem"
+  }
+
+  return data.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  })
+}
+
+export function obterSetLocalStorage(chave: string) {
+  if (typeof window === "undefined") {
+    return new Set<string>()
+  }
+
+  try {
+    const valorSalvo = window.localStorage.getItem(chave)
+    const valores = valorSalvo ? JSON.parse(valorSalvo) : []
+    return new Set<string>(Array.isArray(valores) ? valores : [])
+  } catch {
+    return new Set<string>()
+  }
+}
+
+export function salvarSetLocalStorage(chave: string, valores: Set<string>) {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.localStorage.setItem(chave, JSON.stringify(Array.from(valores)))
+}

@@ -46,4 +46,5 @@ export type GerenciadorTelasProps = {
     conversas: ConversaResumo[];
     enviarMensagem: (destinatarioId: string, conteudoTexto: string) => Promise<void>;
     marcarComoLidas: (contatoId: string) => Promise<void>;
+    excluirConversa: (contatoId: string) => void;
 }

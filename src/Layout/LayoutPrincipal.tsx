@@ -17,7 +17,7 @@ export function LayoutPrincipal() {
   }>()
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
   const { listaEscolar } = useEscolaDados()
-  const { mensagens, conversas, enviarMensagem, marcarComoLidas, totalMensagensNaoLidas } = useMensagens(perfil)
+  const { mensagens, conversas, enviarMensagem, marcarComoLidas, excluirConversa, totalMensagensNaoLidas } = useMensagens(perfil)
   const [indicadoresNotificacao, setIndicadoresNotificacao] = useState({
     mensagens: true,
     duvidas: true,
@@ -65,6 +65,7 @@ export function LayoutPrincipal() {
             conversas={conversas}
             enviarMensagem={enviarMensagem}
             marcarComoLidas={marcarComoLidas}
+            excluirConversa={excluirConversa}
           />
         </div>
       </main>

@@ -1,15 +1,22 @@
-import { useState, useEffect, useRef } from "react";
+import { Fragment, useState, useEffect, useRef } from "react";
 import type{ MensagensProps } from "@/hooks/MensagensHooks/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MessageCircle, Info } from "lucide-react";
+import { Send, MessageCircle, Info, MoreVertical, Trash2 } from "lucide-react";
 import { PerfilAvatar } from "./PerfilAvatar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { formatarDataRelativa, obterChaveDataLocal } from "@/lib/utils";
 
-export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conversas, enviarMensagem, marcarComoLidas }: MensagensProps) {
+export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conversas, enviarMensagem, marcarComoLidas, excluirConversa }: MensagensProps) {
     const [contatoAtivo, setContatoAtivo] = useState<string | null>(chatAtivoId);
     const [texto, setTexto] = useState("");
-    const mensagensEndRef = useRef<HTMLDivElement>(null);
+    const mensagensScrollRef = useRef<HTMLDivElement>(null);
     const naoLidasDoContatoAtivo = mensagens.filter(
         (msg) =>
             !msg.lida &&
@@ -42,7 +49,13 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
     }, [contatoAtivo, marcarComoLidas, naoLidasDoContatoAtivo]);
 
     useEffect(() => {
-        mensagensEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        const areaMensagens = mensagensScrollRef.current;
+        if (!areaMensagens) return;
+
+        areaMensagens.scrollTo({
+            top: areaMensagens.scrollHeight,
+            behavior: "smooth",
+        });
     }, [contatoAtivo, mensagens]);
 
     const handleEnviar = async (e: React.FormEvent) => {
@@ -62,17 +75,24 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
 
     const infoContatoAtivo = contatoAtivo ? obterInfoUsuario(contatoAtivo) : null;
 
+    const handleExcluirConversa = () => {
+        if (!contatoAtivo) return;
+
+        excluirConversa(contatoAtivo);
+        setContatoAtivo(null);
+    };
+
     return (
-        <div className="flex h-[75vh] w-full max-w-5xl rounded-xl border border-border bg-card overflow-hidden shadow-sm mx-auto">
+        <div className="flex h-[75vh] min-h-0 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-sm mx-auto">
             {/* BARRA LATERAL: Lista de Conversas */}
-            <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/20">
-                <div className="p-4 border-b border-border bg-card">
+            <div className="flex min-h-0 w-1/3 min-w-[250px] flex-col border-r border-border bg-muted/20">
+                <div className="shrink-0 p-4 border-b border-border bg-card">
                     <h2 className="text-lg font-bold flex items-center gap-2 text-foreground">
                         <MessageCircle className="h-5 w-5 text-primary" />
                         Mensagens
                     </h2>
                 </div>
-                <ScrollArea className="flex-1">
+                <ScrollArea className="min-h-0 flex-1">
                     {conversas.length === 0 ? (
                         <div className="p-6 text-center text-muted-foreground text-sm flex flex-col items-center gap-2">
                             <Info className="h-8 w-8 opacity-50" />
@@ -124,11 +144,11 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
             </div>
 
             {/* ÁREA PRINCIPAL: O Chat Ativo */}
-            <div className="flex-1 flex flex-col bg-background/50">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background/50">
                 {contatoAtivo && infoContatoAtivo ? (
                     <>
                         {/* Cabeçalho do Chat */}
-                        <div className="h-16 border-b border-border bg-card flex items-center px-4 gap-3 shadow-sm z-10">
+                        <div className="z-10 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-4 shadow-sm">
                             <PerfilAvatar
                                 classNameAvatar="h-10 w-10 rounded-full object-cover"
                                 classNameDiv="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
@@ -137,41 +157,78 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
                                 palavra={infoContatoAtivo.nome}
                             />
                             <span className="font-bold text-foreground">{infoContatoAtivo.nome}</span>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="ml-auto h-9 w-9 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        title="Opções da conversa"
+                                    >
+                                        <MoreVertical className="h-5 w-5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                        onSelect={handleExcluirConversa}
+                                        className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                    >
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Apagar conversa
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
                         {/* Balões de Mensagem */}
-                        <ScrollArea className="flex-1 p-4">
-                            <div className="flex flex-col gap-3">
+                        <div
+                            ref={mensagensScrollRef}
+                            className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4"
+                        >
+                            <div className="flex min-h-full flex-col gap-3">
                                 {mensagensDoChat.length === 0 ? (
                                     <div className="text-center text-muted-foreground text-sm mt-10 bg-muted/50 w-fit mx-auto px-4 py-2 rounded-full border border-border">
                                         Envie a primeira mensagem para iniciar a conversa.
                                     </div>
                                 ) : (
-                                    mensagensDoChat.map((msg) => {
+                                    mensagensDoChat.map((msg, index) => {
                                         const souEu = msg.remetente_id === perfil?.id;
+                                        const mensagemAnterior = mensagensDoChat[index - 1];
+                                        const mostrarSeparador =
+                                            !mensagemAnterior ||
+                                            obterChaveDataLocal(mensagemAnterior.created_at) !== obterChaveDataLocal(msg.created_at);
+
                                         return (
-                                            <div key={msg.id} className={`flex flex-col ${souEu ? "items-end" : "items-start"}`}>
-                                                <div
-                                                    className={`max-w-[75%] px-4 py-2 rounded-2xl ${souEu
-                                                        ? "bg-primary text-primary-foreground rounded-tr-sm"
-                                                        : "bg-muted-foreground/30 border border-border text-foreground rounded-tl-sm shadow-sm"
-                                                        }`}
-                                                >
-                                                    <p className="text-sm whitespace-pre-wrap break-words">{msg.conteudo}</p>
+                                            <Fragment key={msg.id}>
+                                                {mostrarSeparador && (
+                                                    <div className="my-2 flex items-center justify-center">
+                                                        <span className="rounded-full border border-border bg-card/90 px-3 py-1 text-[11px] font-medium text-muted-foreground shadow-sm">
+                                                            {formatarDataRelativa(msg.created_at)}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className={`flex flex-col ${souEu ? "items-end" : "items-start"}`}>
+                                                    <div
+                                                        className={`max-w-[75%] px-4 py-2 rounded-2xl ${souEu
+                                                            ? "bg-primary text-primary-foreground rounded-tr-sm"
+                                                            : "bg-muted-foreground/30 border border-border text-foreground rounded-tl-sm shadow-sm"
+                                                            }`}
+                                                    >
+                                                        <p className="text-sm whitespace-pre-wrap break-words">{msg.conteudo}</p>
+                                                    </div>
+                                                    <span className="text-[10px] text-muted-foreground mt-1 px-1">
+                                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
                                                 </div>
-                                                <span className="text-[10px] text-muted-foreground mt-1 px-1">
-                                                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
-                                            </div>
+                                            </Fragment>
                                         );
                                     })
                                 )}
-                                <div ref={mensagensEndRef} />
                             </div>
-                        </ScrollArea>
+                        </div>
 
                         {/* Input de Envio */}
-                        <div className="p-3 bg-card border-t border-border">
+                        <div className="shrink-0 p-3 bg-card border-t border-border">
                             <form onSubmit={handleEnviar} className="flex gap-2 items-center">
                                 <Input
                                     value={texto}
