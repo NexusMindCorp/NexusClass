@@ -3,19 +3,30 @@ import type{ MensagensProps } from "@/hooks/MensagensHooks/type";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MessageCircle, Info, MoreVertical, Trash2 } from "lucide-react";
+import { Send, MessageCircle, Info, MoreVertical, Trash2, User2, AlertTriangle } from "lucide-react";
 import { PerfilAvatar } from "./PerfilAvatar";
+import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { formatarDataRelativa, obterChaveDataLocal } from "@/lib/utils";
 
 export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conversas, enviarMensagem, marcarComoLidas, excluirConversa }: MensagensProps) {
     const [contatoAtivo, setContatoAtivo] = useState<string | null>(chatAtivoId);
     const [texto, setTexto] = useState("");
+    const [perfilContatoAberto, setPerfilContatoAberto] = useState(false);
+    const [confirmacaoExclusaoAberta, setConfirmacaoExclusaoAberta] = useState(false);
     const mensagensScrollRef = useRef<HTMLDivElement>(null);
     const naoLidasDoContatoAtivo = mensagens.filter(
         (msg) =>
@@ -79,6 +90,7 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
         if (!contatoAtivo) return;
 
         excluirConversa(contatoAtivo);
+        setConfirmacaoExclusaoAberta(false);
         setContatoAtivo(null);
     };
 
@@ -170,7 +182,14 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem
-                                        onSelect={handleExcluirConversa}
+                                        onSelect={() => setPerfilContatoAberto(true)}
+                                        className="cursor-pointer"
+                                    >
+                                        <User2 className="mr-2 h-4 w-4" />
+                                        Ver perfil
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onSelect={() => setConfirmacaoExclusaoAberta(true)}
                                         className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                                     >
                                         <Trash2 className="mr-2 h-4 w-4" />
@@ -255,6 +274,45 @@ export function Mensagens({ perfil, chatAtivoId, listaEscolar, mensagens, conver
                     </div>
                 )}
             </div>
+
+            {perfilContatoAberto && infoContatoAtivo ? (
+                <BoxPerfilUsuario
+                    nomeUsuario={infoContatoAtivo.nome}
+                    onClose={() => setPerfilContatoAberto(false)}
+                    currentUserProfile={perfil}
+                />
+            ) : null}
+
+            <Dialog open={confirmacaoExclusaoAberta} onOpenChange={setConfirmacaoExclusaoAberta}>
+                <DialogContent className="mensagens-dialog-exclusao sm:max-w-md">
+                    <DialogHeader className="items-center text-center sm:text-center">
+                        <div className="mensagens-dialog-exclusao-icone">
+                            <AlertTriangle className="h-6 w-6" />
+                        </div>
+                        <DialogTitle>Apagar esta conversa?</DialogTitle>
+                        <DialogDescription>
+                            A conversa com {infoContatoAtivo?.nome ?? "este usuário"} será removida da sua lista.
+                            Esta ação não pode ser desfeita.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="sm:justify-center">
+                        <Button
+                            variant="outline"
+                            className="cursor-pointer"
+                            onClick={() => setConfirmacaoExclusaoAberta(false)}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            className="mensagens-botao-confirmar-exclusao cursor-pointer"
+                            onClick={handleExcluirConversa}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            Apagar conversa
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

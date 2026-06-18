@@ -178,6 +178,25 @@
   }
 }
 
+@layer Mensagens {
+  .mensagens-dialog-exclusao {
+    @apply border-border bg-card text-card-foreground shadow-2xl;
+  }
+
+  .mensagens-dialog-exclusao-icone {
+    @apply mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive;
+  }
+
+  .mensagens-botao-confirmar-exclusao {
+    @apply bg-destructive text-white hover:bg-destructive/90;
+    background-image: none !important;
+  }
+
+  .mensagens-botao-confirmar-exclusao:hover {
+    background-image: none !important;
+  }
+}
+
 
 ::-webkit-scrollbar {
   width: 6px;
