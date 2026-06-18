@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/NexusClassWeb/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/NexusClassWeb(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
