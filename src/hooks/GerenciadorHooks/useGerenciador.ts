@@ -2,15 +2,17 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
-import { formatarDataLocal, montarDataEvento } from "@/lib/utils"
-import type { OpcoesTela, EventoCalendarioNotificacao,PayloadAlertaCalendario, UsuarioProps } from "./type"
+import { montarDataEvento } from "@/lib/utils"
+import type { OpcoesTela,PayloadAlertaCalendario, UsuarioProps } from "./type"
 import { ESTADO_INICIAL_USUARIO } from "./config"
+import { useCarregarData } from "./carregarData"
 
 export function useGerenciador(perfil: PerfilUsuario | null) {
     const alertasEnviadosRef = useRef<Set<string>>(new Set())
     const [pedirAjuda, setPedirAjuda] = useState(false);
     const [usuario, setUsuario] = useState<UsuarioProps>(ESTADO_INICIAL_USUARIO);
     const [loadingInscricoes, setLoadingInscricoes] = useState(true);
+    const{ buscarMatriculasDoUsuario, verificarLembretesLocais } = useCarregarData({ hasSupabaseConfig, supabase, perfil, setLoadingInscricoes, setUsuario, toast })
 
     const perfilRef = useRef(perfil);
     const usuarioRef = useRef(usuario);
@@ -54,47 +56,6 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
 
     const acionarAjuda = () => setPedirAjuda(true);
 
-    const buscarMatriculasDoUsuario = useCallback(async () => {
-        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
-            setLoadingInscricoes(false);
-            return;
-        }
-
-        setLoadingInscricoes(true);
-        const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
-        const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
-
-        try {
-            const { data, error } = await supabase
-                .from(tabelaAssociativa)
-                .select("turma_id")
-                .eq(colunaFiltro, perfil.id)
-
-            if (error) throw error
-
-            const novasInscricoes: Record<string, boolean> = {}
-            const listaIds: string[] = []
-
-            if (data) {
-                data.forEach((item: any) => {
-                    novasInscricoes[item.turma_id] = true
-                    listaIds.push(item.turma_id)
-                })
-            }
-
-            setUsuario((anterior) => ({
-                ...anterior,
-                inscricoes: novasInscricoes,
-                listaDosInscritos: listaIds,
-            }))
-        } catch (error: any) {
-            toast.error("Erro ao carregar inscrições", {
-                description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
-            })
-        } finally {
-            setLoadingInscricoes(false);
-        }
-    }, [perfil]);
 
     useEffect(() => {
         void buscarMatriculasDoUsuario()
@@ -244,62 +205,9 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
 
         const supabaseClient = supabase
 
-        const verificarLembretesLocais = async () => {
-            const agora = new Date()
-            const hoje = formatarDataLocal(agora)
-            const amanha = formatarDataLocal(new Date(agora.getTime() + 24 * 60 * 60 * 1000))
-
-            const { data, error } = await supabaseClient
-                .from("eventos_calendario")
-                .select("id,titulo,data,horario,tipo,turma_id,autor_id")
-                .not("horario", "is", null)
-                .gte("data", hoje)
-                .lte("data", amanha)
-
-            if (error || !data) {
-                return
-            }
-
-            for (const evento of data as EventoCalendarioNotificacao[]) {
-                if (!deveAlertarEvento(evento)) {
-                    continue
-                }
-
-                const dataEvento = montarDataEvento(evento.data, evento.horario)
-                if (!dataEvento) {
-                    continue
-                }
-
-                const diferencaMs = dataEvento.getTime() - agora.getTime()
-                if (diferencaMs <= 0) {
-                    continue
-                }
-
-                const diferencaMinutos = diferencaMs / 60000
-
-                for (const alvo of [5, 1]) {
-                    const dentroDaJanela = diferencaMinutos <= alvo && diferencaMinutos > alvo - 1
-                    if (!dentroDaJanela) {
-                        continue
-                    }
-
-                    const chaveAlerta = `${evento.id}-${alvo}`
-                    if (alertasEnviadosRef.current.has(chaveAlerta)) {
-                        continue
-                    }
-
-                    alertasEnviadosRef.current.add(chaveAlerta)
-                    toast.warning(`Lembrete: "${evento.titulo}" comeca em ${alvo} minuto${alvo === 1 ? "" : "s"}.`, {
-                        description: evento.titulo,
-                        duration: 12000,
-                    })
-                }
-            }
-        }
-
-        void verificarLembretesLocais()
+        void verificarLembretesLocais(supabaseClient, deveAlertarEvento, montarDataEvento, alertasEnviadosRef)
         const intervalo = window.setInterval(() => {
-            void verificarLembretesLocais()
+            void verificarLembretesLocais(supabaseClient, deveAlertarEvento, montarDataEvento, alertasEnviadosRef)
         }, 30000)
 
         return () => {

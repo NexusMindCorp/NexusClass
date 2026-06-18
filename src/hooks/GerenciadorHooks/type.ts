@@ -48,3 +48,12 @@ export type GerenciadorTelasProps = {
     marcarComoLidas: (contatoId: string) => Promise<void>;
     excluirConversa: (contatoId: string) => void;
 }
+
+export type UseCarregarDataProps ={
+    hasSupabaseConfig: boolean;
+    supabase: any;
+    perfil: any;
+    setLoadingInscricoes: any;
+    setUsuario: any;
+    toast: any
+}
