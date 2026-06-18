@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
 import {
   Card,
   CardAction,
@@ -45,7 +44,6 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
     publicarAtividade,
     deletarAtividade,
     editarAtividade,
-    mudarCorSelect,
     atividadesEntregasAbertas,
     alternarAreaEntrega
   } = useMural(materia, perfil);
@@ -93,20 +91,50 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                 tipo="usuario"
                 palavra={turma.professor}
               />
-              <ButtonGroup>
-                <Button onClick={() => abrirMural()} className={opcaoSelecionada === "mural" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  {opcaoSelecionada === "mural" ? ">Mural<" : "Mural"}
+              <nav className="mural-navegacao" aria-label="Seções da turma">
+                <Button
+                  onClick={() => abrirMural()}
+                  className="mural-navegacao-item"
+                  data-active={opcaoSelecionada === "mural" ? "true" : undefined}
+                  aria-current={opcaoSelecionada === "mural" ? "page" : undefined}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Mural
                 </Button>
-                <Button onClick={() => abrirAtividades()} className={opcaoSelecionada === "atividade" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  {opcaoSelecionada === "atividade" ? ">Atividades<" : "Atividades"}
-                </Button>{perfil.role === "aluno" &&
-                  <Button onClick={() => abrirContato()} className={opcaoSelecionada === "contato" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                    {opcaoSelecionada === "contato" ? ">Enviar Dúvida<" : "Enviar Dúvida"}
-                  </Button>}
-                <Button onClick={() => abrirAlunos()} className={opcaoSelecionada === "alunos" ? `${mudarCorSelect()}` : "text-white"} variant="link" size="sm">
-                  {opcaoSelecionada === "alunos" ? ">Alunos<" : "Alunos"}
+                <Button
+                  onClick={() => abrirAtividades()}
+                  className="mural-navegacao-item"
+                  data-active={opcaoSelecionada === "atividade" ? "true" : undefined}
+                  aria-current={opcaoSelecionada === "atividade" ? "page" : undefined}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Atividades
                 </Button>
-              </ButtonGroup>
+                {perfil.role === "aluno" && (
+                  <Button
+                    onClick={() => abrirContato()}
+                    className="mural-navegacao-item"
+                    data-active={opcaoSelecionada === "contato" ? "true" : undefined}
+                    aria-current={opcaoSelecionada === "contato" ? "page" : undefined}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Enviar Dúvida
+                  </Button>
+                )}
+                <Button
+                  onClick={() => abrirAlunos()}
+                  className="mural-navegacao-item"
+                  data-active={opcaoSelecionada === "alunos" ? "true" : undefined}
+                  aria-current={opcaoSelecionada === "alunos" ? "page" : undefined}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Alunos
+                </Button>
+              </nav>
             </div>
           </CardAction>
         </CardHeader>

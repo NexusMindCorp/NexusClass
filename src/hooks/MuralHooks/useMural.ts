@@ -19,20 +19,6 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
     const [opcaoSelecionada, setOpcaoSelecionada] = useState<"mural" | "atividade" | "contato" | "alunos">("mural");
     const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<Record<string, boolean>>({});
 
-    const mudarCorSelect = () => {
-        if(opcaoSelecionada === "mural"){
-        return "text-blue-500"
-        }
-        if(opcaoSelecionada === "atividade"){
-        return "text-yellow-500"
-        }
-        if(opcaoSelecionada === "contato"){
-        return "text-red-500"
-        }
-        if(opcaoSelecionada === "alunos"){
-        return "text-green-500"
-        }
-  };
     const mudarAberturaBox = (boxAberto: boolean) =>
         setPosts((anterior) => ({ ...anterior, boxAberto }));
     const alternarAreaEntrega = (id: string) => {
@@ -709,7 +695,6 @@ useEffect(() => {
         deletarAtividade,
         carregarAtividades,
         editarAtividade,
-        mudarCorSelect,
         atividadesEntregasAbertas,
         alternarAreaEntrega,
     };

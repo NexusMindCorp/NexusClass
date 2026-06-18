@@ -197,6 +197,26 @@
   }
 }
 
+@layer Mural {
+  .mural-navegacao {
+    @apply flex flex-wrap items-center justify-end gap-1 rounded-xl border border-white/15 bg-black/35 p-1 shadow-lg backdrop-blur-md;
+  }
+
+  .mural-navegacao-item {
+    @apply relative cursor-pointer rounded-lg px-3 text-sm font-semibold text-white/75 transition-all duration-200 hover:bg-white/10 hover:text-white;
+  }
+
+  .mural-navegacao-item[data-active="true"] {
+    @apply bg-white/15 text-white shadow-sm;
+  }
+
+  .mural-navegacao-item[data-active="true"]::after {
+    content: "";
+    @apply absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  }
+}
+
 
 ::-webkit-scrollbar {
   width: 6px;
