@@ -4,12 +4,15 @@ import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
 import type { Mensagem, ConversaResumo} from "@/hooks/MensagensHooks/type"
 import { obterSetLocalStorage, salvarSetLocalStorage } from "@/lib/utils"
-
-const CHAVE_MENSAGENS_LIDAS = "nexusclass:mensagens-lidas"
-const CHAVE_MENSAGENS_OCULTAS = "nexusclass:mensagens-ocultas"
-
-const chaveMensagensLidas = (usuarioId: string) => `${CHAVE_MENSAGENS_LIDAS}:${usuarioId}`
-const chaveMensagensOcultas = (usuarioId: string) => `${CHAVE_MENSAGENS_OCULTAS}:${usuarioId}`
+import {
+    ASSUNTO_MENSAGEM_PADRAO,
+    CANAL_MENSAGENS,
+    EVENTO_REALTIME_MENSAGENS,
+    SCHEMA_REALTIME_MENSAGENS,
+    TABELA_MENSAGENS,
+    chaveMensagensLidas,
+    chaveMensagensOcultas,
+} from "@/hooks/MensagensHooks/config"
 
 export function useMensagens(perfil: PerfilUsuario | null) {
     const [mensagens, setMensagens] = useState<Mensagem[]>([])
@@ -28,7 +31,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
 
         try {
             const { data, error } = await supabase
-                .from("mensagens")
+                .from(TABELA_MENSAGENS)
                 .select("*")
                 .or(`remetente_id.eq.${perfil.id},destinatario_id.eq.${perfil.id}`)
                 .order("created_at", { ascending: true })
@@ -59,13 +62,13 @@ export function useMensagens(perfil: PerfilUsuario | null) {
 
         try {
             const { error } = await supabase
-                .from("mensagens")
+                .from(TABELA_MENSAGENS)
                 .insert({
                     remetente_id: perfil.id,
                     destinatario_id: destinatarioId,
                     conteudo: conteudoTexto.trim(),
                     lida: false,
-                    assunto: "",
+                    assunto: ASSUNTO_MENSAGEM_PADRAO,
                 })
 
             if (error) throw error
@@ -101,7 +104,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
 
         try {
             const { data, error } = await supabase
-                .from("mensagens")
+                .from(TABELA_MENSAGENS)
                 .update({ lida: true })
                 .eq("remetente_id", contatoId)
                 .eq("destinatario_id", perfil.id)
@@ -151,10 +154,14 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         if (!supabase || !hasSupabaseConfig || !perfil?.id) return
 
         const canalMensagens = supabase
-            .channel("chat-nexusclass")
+            .channel(CANAL_MENSAGENS)
             .on(
                 "postgres_changes",
-                { event: "*", schema: "public", table: "mensagens" },
+                {
+                    event: EVENTO_REALTIME_MENSAGENS,
+                    schema: SCHEMA_REALTIME_MENSAGENS,
+                    table: TABELA_MENSAGENS,
+                },
                 (payload) => {
                     const mensagemRecebida = payload.new as Mensagem
                     const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
