@@ -9,9 +9,7 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
     const [resumoPostProfessor, setResumoPostProfessor] = useState<string>('Nenhuma postagem recente de professor disponível.');
     
     const carregarPostsProfessor = useCallback(async () => {
-        console.log('[CarregamentoDados] carregarPostsProfessor iniciado. perfilId:', perfilId, 'inscricoesStr:', inscricoesStr);
         if (!hasSupabaseConfig || !supabase || !perfilId) {
-            console.log('[CarregamentoDados] carregarPostsProfessor abortado: integração ou perfilId ausente.');
             return;
         }
         try{
@@ -47,7 +45,6 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
                 setResumoPostProfessor('Nenhuma postagem recente de professor disponível nas turmas do usuário.');
                 return;
               }
-              console.log('[CarregamentoDados] carregarPostsProfessor posts carregados:', filtraPost);
               setResumoPostProfessor(`Conteúdos e avisos abordados pelos professores em aula:\n${filtraPost.join('\n')}`)         
         }catch(error){
           console.error("Erro ao carregar posts do mural:", error);
@@ -56,13 +53,10 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
       }, [perfilId, inscricoesStr]);
 
     const perguntas = useCallback(async () => {
-        console.log('[CarregamentoDados] perguntas iniciado. perfilId:', perfilId, 'perfilRole:', perfilRole);
         if (!hasSupabaseConfig || !supabase) {
-          console.log('[CarregamentoDados] perguntas abortado: supabase não configurado.');
           return;
         }
         if (!perfilId || !perfilRole) {
-          console.log('[CarregamentoDados] perguntas abortado: perfilId ou perfilRole ausente.');
           setPerguntasFrequentes('Perfil do usuário não identificado. Não foi possível carregar dúvidas.');
           return;
         }
@@ -85,7 +79,6 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
             return;
           }
     
-          console.log('[CarregamentoDados] perguntas carregadas:', data);
           setPerguntasFrequentes(
             `Leve em consideração as seguintes dúvidas cadastradas pelo usuário:
     ${data && data.length > 0 ? data.map((item: any) => `- Assunto: ${item.assunto} | Descrição: ${item.descricao} | Status: ${item.resolvido ? 'Resolvido' : 'Pendente'} ${item.resposta ? `| Resposta do Professor: ${item.resposta}` : ''}`).join('\n') : 'Nenhuma dúvida cadastrada no momento.'}
@@ -98,15 +91,12 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
       }, [perfilId, perfilRole]);
 
     const carregarResumoEventos = useCallback(async () => {
-        console.log('[CarregamentoDados] carregarResumoEventos iniciado. perfilId:', perfilId, 'perfilRole:', perfilRole);
         if (!hasSupabaseConfig || !supabase) {
-          console.log('[CarregamentoDados] carregarResumoEventos abortado: supabase não configurado.');
           setResumoEventosCalendario('Agenda indisponível: integração com calendário não configurada.');
           return;
         }
     
         if (!perfilId) {
-          console.log('[CarregamentoDados] carregarResumoEventos abortado: perfilId ausente.');
           setResumoEventosCalendario('Eventos do calendário ainda não carregados: perfil do usuário não identificado.');
           return;
         }
@@ -136,7 +126,6 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
         }
     
         const eventos = (data ?? []) as EventoCalendarioChat[];
-        console.log('[CarregamentoDados] carregarResumoEventos eventos carregados:', eventos);
         if (eventos.length === 0) {
           setResumoEventosCalendario('Nenhum evento futuro cadastrado no calendário.');
           return;
@@ -152,9 +141,7 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
       }, [perfilId, perfilRole, inscricoesStr]);
     
     const carregarAtividadesAbertas = useCallback(async () => {
-        console.log('[CarregamentoDados] carregarAtividadesAbertas iniciado. perfilId:', perfilId, 'perfilRole:', perfilRole);
         if (!hasSupabaseConfig || !supabase || !perfilId) {
-            console.log('[CarregamentoDados] carregarAtividadesAbertas abortado: integração ou perfilId ausente.');
             return;
         }
     
@@ -173,7 +160,6 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
               .in('turma_id', idTurmas);
     
             if (errAtiv) throw errAtiv;
-            console.log('[useChatBot] Atividades buscadas para o aluno:', atividades);
     
             // 2. Buscar as entregas já feitas por esse aluno
             const { data: entregas, error: errEntr } = await supabase
@@ -182,13 +168,11 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
               .eq('aluno_id', perfilId);
     
             if (errEntr) throw errEntr;
-            console.log('[useChatBot] Entregas buscadas para o aluno:', entregas);
     
             const idsEntregues = new Set((entregas || []).map((e: any) => e.atividade_id));
     
             // 3. Filtrar as que não foram entregues
             const abertas = (atividades || []).filter((a: any) => !idsEntregues.has(a.id));
-            console.log('[useChatBot] Atividades em aberto (filtradas):', abertas);
     
             if (abertas.length === 0) {
               setResumoAtividadesAbertas('Parabéns! O aluno não possui nenhuma atividade em aberto.');
@@ -211,7 +195,6 @@ export function CarregamentoDados( listaEscolar: any,hasSupabaseConfig: boolean,
               .eq('professor_id', perfilId);
     
             if (errAtiv) throw errAtiv;
-            console.log('[useChatBot] Atividades criadas pelo professor:', atividades);
     
             if (!atividades || atividades.length === 0) {
               setResumoAtividadesAbertas('O professor não possui atividades cadastradas.');
