@@ -1,5 +1,5 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-import type { EscolaProps } from "@/hooks/LeituraDataHooks/leituraJson";
+import type { EscolaProps } from "@/hooks/LeituraDataHooks/type";
 export type Mensagem = {
     id: string;
     remetente_id: string;

@@ -1,5 +1,5 @@
 import type{ PerfilUsuario } from "@/hooks/AuthHooks/type"
-import type { TurmaProps } from "../LeituraDataHooks/leituraJson";
+import type { TurmaProps } from "../LeituraDataHooks/type";
 export type Post = {
     id: string;
     Nome: string;

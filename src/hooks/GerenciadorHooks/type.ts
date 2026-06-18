@@ -1,4 +1,4 @@
-import type { EscolaProps } from "../LeituraDataHooks/leituraJson";
+import type { EscolaProps } from "../LeituraDataHooks/type";
 import type { PerfilUsuario } from "../AuthHooks/type";
 import type { ConversaResumo, Mensagem } from "../MensagensHooks/type";
 

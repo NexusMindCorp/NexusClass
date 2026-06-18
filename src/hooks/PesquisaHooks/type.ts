@@ -1,4 +1,4 @@
-import type {TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
+import type {TurmaProps } from "@/hooks/LeituraDataHooks/type"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 export type PesquisarProps = {
     mudarInscricao: (materia: string) => void

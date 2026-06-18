@@ -1,5 +1,5 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
-import type { TurmaProps } from "@/hooks/LeituraDataHooks/leituraJson"
+import type { TurmaProps } from "@/hooks/LeituraDataHooks/type"
 export type Option ='Ver Perfil' | 'Enviar Mensagem' | 'Adicionar aos Favoritos' | 'Denunciar';
 export type AlunosTurmaProps = {
   turma: TurmaProps
