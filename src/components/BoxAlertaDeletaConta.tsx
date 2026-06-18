@@ -32,71 +32,35 @@ export function BoxAlertaDeletaConta({ onClose, perfil }: { onClose: () => void;
         throw new Error("Senha atual incorreta. Confirme suas credenciais.");
       }
 
-      // 3. Limpar arquivos do Storage das entregas do aluno
-      try {
-        const { data: entregas } = await supabase
-          .from("entregas_atividades")
-          .select("url_anexo")
-          .eq("aluno_id", perfil.id)
-          .not("url_anexo", "is", null);
+      // 3. Obtém as credenciais e o token da sessão atual
+      const { data: { session } } = await supabase.auth.getSession();
+      const supabaseUrl = (supabase as any).supabaseUrl;
+      const supabaseKey = (supabase as any).supabaseKey;
 
-        if (entregas && entregas.length > 0) {
-          const caminhosEntregas = entregas.map((e) => e.url_anexo).filter(Boolean);
-          if (caminhosEntregas.length > 0) {
-            await supabase.storage.from("entregas_atividades").remove(caminhosEntregas);
-          }
-        }
-      } catch (err) {
-        console.error("Erro ao limpar storage de entregas:", err);
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Credenciais do Supabase não encontradas.");
       }
 
-      // 4. Limpar arquivos do Storage das dúvidas do aluno
-      try {
-        const { data: duvidas } = await supabase
-          .from("duvidasalunostoprofessor")
-          .select("anexo_url")
-          .eq("aluno_id", perfil.id)
-          .not("anexo_url", "is", null);
+      // 4. Invoca a Edge Function no backend via fetch nativo, passando apikey na URL para passar pelo preflight CORS
+      const response = await fetch(`${supabaseUrl}/functions/v1/deletar-conta?apikey=${supabaseKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token}`,
+        },
+      });
 
-        if (duvidas && duvidas.length > 0) {
-          const nomesArquivosDuvidas: string[] = [];
-          
-          duvidas.forEach((d) => {
-            if (!d.anexo_url) return;
-            try {
-              const urls = JSON.parse(d.anexo_url);
-              if (Array.isArray(urls)) {
-                urls.forEach((url) => {
-                  const nome = url.split("/").pop()?.split("?")[0];
-                  if (nome) nomesArquivosDuvidas.push(nome);
-                });
-              }
-            } catch {
-              const nome = d.anexo_url.split("/").pop()?.split("?")[0];
-              if (nome) nomesArquivosDuvidas.push(nome);
-            }
-          });
-
-          if (nomesArquivosDuvidas.length > 0) {
-            await supabase.storage.from("duvidasalunostoprofessor").remove(nomesArquivosDuvidas);
-          }
-        }
-      } catch (err) {
-        console.error("Erro ao limpar storage de dúvidas:", err);
-      }
-
-      // 5. Executa a deleção no banco de dados através da RPC
-      const { error: rpcError } = await supabase.rpc("deletar_propria_conta");
-      if (rpcError) {
-        throw new Error(rpcError.message || "Erro ao processar exclusão no banco de dados.");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Falha na execução do processo de deleção.");
       }
 
       toast.success("Sua conta foi deletada definitivamente.");
       
-      // 6. Encerra a sessão localmente
+      // 4. Encerra a sessão localmente
       await supabase.auth.signOut();
       
-      // 7. Recarrega a página para atualizar o estado de autenticação geral da aplicação
+      // 5. Recarrega a página para atualizar o estado de autenticação geral da aplicação
       window.location.reload();
     } catch (error: any) {
       console.error("Erro na deleção de conta:", error);
