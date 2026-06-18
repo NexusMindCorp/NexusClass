@@ -5,64 +5,8 @@ import { toast } from "sonner"
 import { useOutletContext } from 'react-router-dom'
 import type { PerfilUsuario } from '@/hooks/AuthHooks/type'
 import { formFields } from "@/hooks/SuporteHooks/config"
-export const sendContactEmail = async (formElement: HTMLFormElement, files: File[], perfil?: { nome: string; email: string } | null): Promise<void> => {
-  const formData = new FormData(formElement);
-  const nomeFromForm = String(formData.get("from_name") ?? "").trim();
-  const emailFromForm = String(formData.get("from_email") ?? formData.get("reply_to") ?? "").trim();
-  const nome = nomeFromForm || perfil?.nome || "";
-  const email = emailFromForm || perfil?.email || "";
-  const assunto = String(formData.get("subject") ?? "").trim();
-  const mensagem = String(formData.get("message") ?? "").trim();
+import { sendContactEmail } from "@/hooks/SuporteHooks/loadData"
 
-  if (!nome || !email || !assunto || !mensagem) {
-    throw new Error("Preencha todos os campos antes de confirmar o envio.");
-  }
-
-  const urlsAnexos: string[] = [];
-
-  
-  if (files.length > 0) {
-    for (const file of files) {
-    
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      
-      // Faz o upload para o bucket 'anexos_suporte'
-      const { error: uploadError } = await supabase.storage
-        .from('anexos_suporte')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        throw new Error("Erro ao fazer upload do anexo: " + uploadError.message);
-      }
-
-      // Pega a URL pública da imagem recém-upada
-      const { data: publicUrlData } = supabase.storage
-        .from('anexos_suporte')
-        .getPublicUrl(fileName);
-
-      urlsAnexos.push(publicUrlData.publicUrl);
-    }
-  }
-
-  
-  const { error } = await supabase
-    .from('suporte')
-    .insert([
-      { 
-        nome,
-        email,
-        assunto,
-        mensagem,
-        anexos_urls: urlsAnexos, 
-        status: 'pendente'
-      }
-    ]);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-};
 
 export function useSuporte() {
 
@@ -84,7 +28,7 @@ export function useSuporte() {
 
     try {
      
-      await sendContactEmail(formRef.current, attachedFiles, perfil)
+      await sendContactEmail({ formElement: formRef.current, files: attachedFiles, perfil, supabase })
       toast.success("Mensagem enviada com sucesso.")
       
       formRef.current.reset()

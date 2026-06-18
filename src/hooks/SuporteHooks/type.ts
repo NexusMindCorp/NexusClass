@@ -13,3 +13,10 @@ export type FormField = {
     value: string
   }>
 }
+
+export type sendContactEmailParams = {
+  formElement: HTMLFormElement,
+  files: File[],
+  perfil?: { nome: string; email: string } | null
+  supabase: any
+}
