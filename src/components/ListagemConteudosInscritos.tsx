@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { AlertTriangle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -12,12 +21,14 @@ import {
 
 export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInscricao, estaInscrito }: { usuario: any; listaEscolar: any; cancelarInscricao: any; estaInscrito: any }) {
   const [carregandoAcao, setCarregandoAcao] = useState<string | null>(null);
+  const [turmaParaSair, setTurmaParaSair] = useState<{ key: string; materia: string; turma: string } | null>(null);
 
   const handleSair = async (key: string) => {
     setCarregandoAcao(key);
     try {
       await cancelarInscricao(key);
       toast.success("Você saiu da turma com sucesso.");
+      setTurmaParaSair(null);
     } catch (err) {
       toast.error("Erro ao sair da turma.");
     } finally {
@@ -66,7 +77,7 @@ export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInsc
                       variant="outline"
                       size="sm"
                       className="border-destructive/30 text-destructive  hover:text-destructive-foreground hover:scale-105 hover:shadow-md transition-all duration-200 h-8 cursor-pointer"
-                      onClick={() => handleSair(key)}
+                      onClick={() => setTurmaParaSair({ key, materia: turma.materia, turma: turma.turma })}
                       disabled={carregandoAcao === key}
                     >
                       {carregandoAcao === key ? "Saindo..." : "Sair da Turma"}
@@ -78,6 +89,43 @@ export function ListagemConteudosInscritos({ usuario, listaEscolar, cancelarInsc
           </TableBody>
         </Table>
       </div>
+
+      <Dialog
+        open={turmaParaSair !== null}
+        onOpenChange={(aberto) => {
+          if (!aberto && !carregandoAcao) setTurmaParaSair(null);
+        }}
+      >
+        <DialogContent className="mensagens-dialog-exclusao sm:max-w-md">
+          <DialogHeader className="items-center text-center sm:text-center">
+            <div className="mensagens-dialog-exclusao-icone">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+            <DialogTitle>Sair desta turma?</DialogTitle>
+            <DialogDescription>
+              Você deixará a turma {turmaParaSair?.materia} ({turmaParaSair?.turma}) e perderá o acesso ao mural e aos conteúdos dela.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => setTurmaParaSair(null)}
+              disabled={carregandoAcao !== null}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="mensagens-botao-confirmar-exclusao cursor-pointer"
+              onClick={() => turmaParaSair && void handleSair(turmaParaSair.key)}
+              disabled={carregandoAcao !== null}
+            >
+              <LogOut className="h-4 w-4" />
+              {carregandoAcao ? "Saindo..." : "Sair da turma"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
