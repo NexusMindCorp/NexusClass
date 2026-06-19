@@ -1,0 +1,30 @@
+@startuml
+skinparam handwritten false
+skinparam state {
+    BackgroundColor White
+    ArrowColor #7C3AED
+    BorderColor #DB2777
+    FontName Arial
+}
+
+title Ciclo de Estados da Dúvida (Classe Duvida - Atributo resolvido)
+
+state "Aberta\n(Aguardando Resposta)" as Aberta
+state "Respondida\n(Aguardando Confirmação)" as Respondida
+state "Resolvida\n(Concluída)" as Resolvida
+
+state "Professor Respondeu?" as choiceRespondeu <<choice>>
+state "Dúvida Sanada?" as choiceSanada <<choice>>
+
+[*] --> Aberta : criarDuvida() / resolvido = false, resposta = null
+
+Aberta --> choiceRespondeu : responderDuvida(resposta)
+choiceRespondeu --> Respondida : [SIM] / resposta = texto
+choiceRespondeu --> Aberta : [NÃO]
+
+Respondida --> choiceSanada : interagir()
+choiceSanada --> Resolvida : [SIM] / resolverDuvida() -> resolvido = true
+choiceSanada --> Aberta : [NÃO] / resposta = null
+
+Resolvida --> [*]
+@enduml

@@ -177,6 +177,22 @@ class usePesquisa {
     +pesquisar(termo: string) : void
 }
 
+class TurmaCard {
+    +materia : string
+    +professor : string
+    +banners : string
+    +fotoProfessor : string
+    +sala : string
+    +turma : string
+    +inscrito : boolean
+    +compacto : boolean
+    +modoPesquisa : boolean
+    +clickMural() : void
+    +clickInscrito() : void
+    +perfil : PerfilUsuario
+    +render()
+}
+
 class BoxPerfilUsuario {
     +render()
 }
@@ -201,36 +217,37 @@ class useEntregas {
 }
 
 %% Relations Layout & Routing
-ProtectedRoute --> useAuth : "authenticates"
-ProtectedRoute *-- LayoutPrincipal : "renders on success"
-LayoutPrincipal --> useGerenciador : "executes hook"
-LayoutPrincipal --> useEscolaDados : "executes hook"
-LayoutPrincipal *-- GerenciadorTelas : "renders"
-LayoutPrincipal *-- ChatBot : "renders"
+ProtectedRoute "1" ..> "1" useAuth : autentica
+ProtectedRoute "1" *-- "0..1" LayoutPrincipal : renderiza
+LayoutPrincipal "1" ..> "1" useGerenciador : consome
+LayoutPrincipal "1" ..> "1" useEscolaDados : carrega dados com
+LayoutPrincipal "1" *-- "1" GerenciadorTelas : renderiza
+LayoutPrincipal "1" *-- "0..1" ChatBot : renderiza
 
 %% Relations ChatBot
-ChatBot --> useChatBox : "executes hook"
-useChatBox --> useGeminiChat : "executes hook"
-useGeminiChat --> CarregamentoDados : "delegates loading"
+ChatBot "1" ..> "1" useChatBox : gerencia estado com
+useChatBox "1" ..> "1" useGeminiChat : comunica via
+useGeminiChat "1" ..> "1" CarregamentoDados : carrega dados com
 
 %% Relations Features & Router
-GerenciadorTelas *-- Mural : "renders screen 'mural'"
-GerenciadorTelas *-- Calendario : "renders screen 'calendario'"
-GerenciadorTelas *-- Mensagens : "renders screen 'mensagens'"
-GerenciadorTelas *-- DuvidasBox : "renders screen 'suporte/duvidas'"
-GerenciadorTelas *-- Suporte : "renders screen 'suporte'"
-GerenciadorTelas *-- Pesquisar : "renders screen 'pesquisar'"
-GerenciadorTelas *-- BoxPerfilUsuario : "renders profile modal"
-Mural *-- BoxEntregaAtividade : "renders"
+GerenciadorTelas "1" *-- "0..1" Mural : exibe
+GerenciadorTelas "1" *-- "0..1" Calendario : exibe
+GerenciadorTelas "1" *-- "0..1" Mensagens : exibe
+GerenciadorTelas "1" *-- "0..1" DuvidasBox : exibe
+GerenciadorTelas "1" *-- "0..1" Suporte : exibe
+GerenciadorTelas "1" *-- "0..1" Pesquisar : exibe
+GerenciadorTelas "1" *-- "0..1" BoxPerfilUsuario : exibe
+GerenciadorTelas "1" *-- "0..*" TurmaCard : renderiza
+Pesquisar "1" *-- "0..*" TurmaCard : renderiza
+Mural "1" *-- "0..*" BoxEntregaAtividade : renderiza
 
-
-Mural --> useMural : "executes hook"
-Calendario --> useCalendario : "executes hook"
-Mensagens --> useMensagens : "executes hook"
-DuvidasBox --> useDuvidas : "executes hook"
-Suporte --> useSuporte : "executes hook"
-Pesquisar --> usePesquisa : "executes hook"
-BoxPerfilUsuario --> usePerfilUsuario : "executes hook"
-BoxEntregaAtividade --> useEntregas : "executes hook"
+Mural "1" ..> "1" useMural : gerencia posts com
+Calendario "1" ..> "1" useCalendario : gerencia eventos com
+Mensagens "1" ..> "1" useMensagens : gerencia conversas com
+DuvidasBox "1" ..> "1" useDuvidas : gerencia dúvidas com
+Suporte "1" ..> "1" useSuporte : gerencia tickets com
+Pesquisar "1" ..> "1" usePesquisa : busca turmas com
+BoxPerfilUsuario "1" ..> "1" usePerfilUsuario : atualiza dados com
+BoxEntregaAtividade "1" ..> "1" useEntregas : gerencia entregas com
 
 @enduml

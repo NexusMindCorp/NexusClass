@@ -1,0 +1,37 @@
+@startuml
+skinparam handwritten false
+skinparam state {
+    BackgroundColor White
+    ArrowColor #7C3AED
+    BorderColor #DB2777
+    FontName Arial
+}
+
+title Ciclo de Vida de uma Entrega de Atividade (Classe Entrega)
+
+state Pendente
+state PendenteAtrasada
+state EnviadaNoPrazo
+state EnviadaAtrasada
+state Avaliada
+state choice1 <<choice>>
+
+[*] --> Pendente : criarAtividade()
+
+Pendente --> choice1 : enviarEntrega(url_anexo)
+choice1 --> EnviadaNoPrazo : [dataAtual <= dataLimite] / registrarPrazo(true)
+choice1 --> EnviadaAtrasada : [dataAtual > dataLimite] / registrarPrazo(false)
+
+Pendente --> PendenteAtrasada : tempoEsgotado [dataAtual > dataLimite] / no_prazo = false
+PendenteAtrasada --> EnviadaAtrasada : enviarEntrega(url_anexo)
+
+EnviadaNoPrazo --> Avaliada : avaliarEntrega(nota, feedback) / atribuirNota()
+EnviadaAtrasada --> Avaliada : avaliarEntrega(nota, feedback) / atribuirNota()
+
+Pendente : entry / exibirCardPendente()
+EnviadaNoPrazo : entry / exibirStatus("Entregue")
+EnviadaAtrasada : entry / exibirStatus("Entregue com Atraso")
+Avaliada : entry / exibirNotaEEstabelecerConcluida()
+
+Avaliada --> [*]
+@enduml
