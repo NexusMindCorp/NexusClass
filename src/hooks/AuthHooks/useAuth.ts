@@ -31,7 +31,9 @@ export function useAuth() {
         isMountedRef.current = true
         let isInitialLoad = true
         
-        loadSessionAndData(isInitialLoad)
+        loadSessionAndData().then(() => {
+            isInitialLoad = false
+        })
 
         // Escuta mudanças de estado de autenticação
       

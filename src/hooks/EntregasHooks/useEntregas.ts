@@ -63,7 +63,6 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
 
         setUploading(true);
         try {
-            const ext = file.name.split(".").pop();
             // Evita caracteres especiais no nome do arquivo
             const nomeLimpo = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
             const caminhoArquivo = `${atividadeId}/${perfil.id}/${Date.now()}-${nomeLimpo}`;

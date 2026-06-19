@@ -74,7 +74,7 @@ export function carregamentoDados({setPerfil, setMateriasProfessor, isMountedRef
                 }
         }
 
-        const loadSessionAndData = async ( isInitialLoad: boolean) => {
+        const loadSessionAndData = async () => {
             try {
                 const { data: { session: initialSession }, error } = await supabase.auth.getSession()
                 if (error) {
@@ -104,8 +104,7 @@ export function carregamentoDados({setPerfil, setMateriasProfessor, isMountedRef
                 console.error("[useAuth] loadSessionAndData - Erro no fluxo inicial:", err)
             } finally {
                  if (isMountedRef.current) {
-                    setLoading(false)
-                    return isInitialLoad = false
+                    setLoading(false);
                 }
             }
         }
