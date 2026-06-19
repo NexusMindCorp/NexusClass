@@ -7,9 +7,10 @@ import packageJson from "./package.json"
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  const base = process.env.VERCEL ? '/' : (env.BASE_URL || '/NexusClassWeb/')
 
   return {
-    base: '/NexusClassWeb/',
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -21,7 +22,7 @@ export default defineConfig(({ mode }) => {
       '__API_GEMINI_KEY__': JSON.stringify(env.VITE_GEMINI_KEY),
       '__URL_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_URL),
       '__KEY_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
-      '__BASE_URL__': JSON.stringify(env.BASE_URL || '/NexusClassWeb/')
+      '__BASE_URL__': JSON.stringify(base)
     },
   }
 })

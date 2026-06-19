@@ -8,6 +8,10 @@
     {
       "source": "/NexusClassWeb(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
