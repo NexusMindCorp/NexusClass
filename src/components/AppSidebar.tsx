@@ -116,7 +116,7 @@ export function AppSidebar({
 
                 <SidebarSeparator className="mx-0 w-full" />
 
-                <Collapsible defaultOpen={false} className="group/collapsible">
+                <Collapsible defaultOpen={true} className="group/collapsible">
                     <SidebarGroup>
                         <SidebarGroupLabel asChild>
                             <CollapsibleTrigger>
