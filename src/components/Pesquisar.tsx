@@ -1,5 +1,15 @@
 import { useState } from "react"
+import { UserPlus } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import {
     Sheet,
     SheetContent,
@@ -15,6 +25,12 @@ import type { PesquisarProps } from "@/hooks/PesquisaHooks/type"
 
 export function Pesquisar(props: PesquisarProps) {
     const [abaAtiva, setAbaAtiva] = useState("minhas")
+    const [turmaParaInscrever, setTurmaParaInscrever] = useState<{
+        key: string
+        materia: string
+        turma: string
+    } | null>(null)
+    const [inscrevendo, setInscrevendo] = useState(false)
     const { textoPesquisa, setTextoPesquisa, aberto, mudarAberturaSheet, turmasFiltradas } = usePesquisa({
         aoFecharPesquisa: props.voltarPrincipal,
         turmas: props.turmas,
@@ -27,7 +43,7 @@ export function Pesquisar(props: PesquisarProps) {
         ? Object.entries(props.turmas).sort((a, b) => a[1].materia.localeCompare(b[1].materia))
         : turmasFiltradas;
 
-    const turmasParaExibir = turmasBase.filter(([key, _]) => {
+    const turmasParaExibir = turmasBase.filter(([key]) => {
         const inscrito = props.estaInscrito(key);
 
         if (isProfessor && !inscrito) return false;
@@ -47,6 +63,18 @@ export function Pesquisar(props: PesquisarProps) {
         if (!inscritoA && inscritoB) return 1;
         return 0;
     });
+
+    const handleConfirmarInscricao = async () => {
+        if (!turmaParaInscrever) return
+
+        setInscrevendo(true)
+        try {
+            await props.mudarInscricao(turmaParaInscrever.key)
+            setTurmaParaInscrever(null)
+        } finally {
+            setInscrevendo(false)
+        }
+    }
 
     return (
         <div className="w-full h-full flex items-center justify-center p-4">
@@ -114,7 +142,11 @@ export function Pesquisar(props: PesquisarProps) {
                                             sala={turma.sala}
                                             turma={turma.turma}
                                             inscrito={props.estaInscrito(key)}
-                                            clickInscrito={() => props.mudarInscricao(key)}
+                                            clickInscrito={() => setTurmaParaInscrever({
+                                                key,
+                                                materia: turma.materia,
+                                                turma: turma.turma,
+                                            })}
                                             clickMural={() => { props.marcarMural(key) }}
                                             modoPesquisa={true}
                                             perfil={props.perfil}
@@ -130,6 +162,43 @@ export function Pesquisar(props: PesquisarProps) {
                     </div>
                 </SheetContent>
             </Sheet>
+
+            <Dialog
+                open={turmaParaInscrever !== null}
+                onOpenChange={(aberto) => {
+                    if (!aberto && !inscrevendo) setTurmaParaInscrever(null)
+                }}
+            >
+                <DialogContent className="mensagens-dialog-exclusao sm:max-w-md">
+                    <DialogHeader className="items-center text-center sm:text-center">
+                        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <UserPlus className="h-6 w-6" />
+                        </div>
+                        <DialogTitle>Inscrever-se nesta turma?</DialogTitle>
+                        <DialogDescription>
+                            Você será inscrito em {turmaParaInscrever?.materia} ({turmaParaInscrever?.turma}) e terá acesso ao mural e aos conteúdos da turma.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="sm:justify-center">
+                        <Button
+                            variant="outline"
+                            className="cursor-pointer"
+                            onClick={() => setTurmaParaInscrever(null)}
+                            disabled={inscrevendo}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            className="cursor-pointer"
+                            onClick={() => void handleConfirmarInscricao()}
+                            disabled={inscrevendo}
+                        >
+                            <UserPlus className="h-4 w-4" />
+                            {inscrevendo ? "Inscrevendo..." : "Confirmar inscrição"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
