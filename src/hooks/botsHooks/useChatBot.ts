@@ -269,7 +269,7 @@ export function useGeminiChat (
       console.error("Erro no Gemini:", error);
       const errorMessage = error?.message?.includes("503") 
         ? "O serviço está sobrecarregado no momento. Por favor, tente novamente em alguns minutos."
-        : "Desculpe, tive um erro técnico. Pode tentar novamente?";
+        : `Erro ${error?.code}: ${error?.message}`;
       
       setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
