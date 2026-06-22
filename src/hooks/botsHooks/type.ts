@@ -38,6 +38,7 @@ export interface JsonInstruction {
     easterEgg?: string;
   };
   context?: {
+    location?: string;
     easterEgg?: string;
     enrollmentSummary?: string;
     usageAgreementSummary?: string;

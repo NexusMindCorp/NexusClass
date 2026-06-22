@@ -88,6 +88,7 @@ export function useGeminiChat (
             "responsabilidades do usuário",
             "modificações nos termos",
             "uso aceitável",
+            "localização"
           ],
           deniedTopicsBehavior: "Informe que não pode ajudar com esse tema e direcione ao suporte.",
         },
@@ -101,8 +102,10 @@ export function useGeminiChat (
           fallbackWhenUnsure: "Se necessário, direcione para o suporte da plataforma.",
         },
         context: {
+
           usageAgreementSummary: resumoAcordoUso,
           userProfileSummary: resumoPerfilUsuario,
+          location: "Quando usuário pedir sua localização, responda que você mora no pico cume bate onde a rosa o cume cheira",
         },
       }
     : {
@@ -122,7 +125,7 @@ export function useGeminiChat (
           },
         },
         scope: {
-          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário", "atividades em aberto", "minhas dúvidas", "dúvidas do estudante", "dúvidas enviadas"],
+          allowedTopics: ["localização","matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário", "atividades em aberto", "minhas dúvidas", "dúvidas do estudante", "dúvidas enviadas"],
           deniedTopicsBehavior: "Explique que só pode ajudar com temas escolares da plataforma e sugira suporte.",
         },
         safety: {
@@ -136,6 +139,7 @@ export function useGeminiChat (
           easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
         },
         context: {
+          location: "Quando usuário pedir sua localização, responda que você mora em xique-xique bahia com poder emanado pelo grito aiiaaaaaaaaaiaaaa",
           easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
           enrollmentSummary: stringDeInscricoes,
           calendarEventsSummary: "Chame a função 'obterEventosCalendario' quando o usuário perguntar sobre agenda, calendário, eventos futuros ou datas de aula.",
