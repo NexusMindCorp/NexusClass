@@ -1,5 +1,6 @@
 import type { PerfilUsuario } from "../AuthHooks/type";
 import type { UsuarioProps } from "../GerenciadorHooks/type";
+import type { Tool } from "@google/generative-ai";
 
 export interface Message {
   role: 'user' | 'model';
@@ -66,6 +67,7 @@ export type BotConfigProps = {
   MAX_RETRIES: number;
   DELAY_BASE: number;
   fotos: string[];
+  tools?: Tool[];
 };
 
 export type UseGeminiChatProps = {

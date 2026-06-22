@@ -24,23 +24,12 @@ export function useGeminiChat (
     .sort()
     .join(',');
 
-  const { resumoEventosCalendario,
-    perguntasFrequentes,
-    resumoAtividadesAbertas,
-    resumoPostProfessor, 
-    carregarResumoEventos, 
-    perguntas,
-    carregarAtividadesAbertas,
-    carregarPostsProfessor } = CarregamentoDados(usuario.listaEscolar, hasSupabaseConfig, supabase, perfilId || null, inscricoesStr || null, perfilRole || null);
-  
-  useEffect(() => {
-    void carregarPostsProfessor();
-  }, [carregarPostsProfessor]);
-
-
-  useEffect(() => {
-    void perguntas();
-  }, [perguntas]);
+  const {
+    obterResumoEventos,
+    obterDuvidas,
+    obterAtividadesAbertas,
+    obterPostsProfessor
+  } = CarregamentoDados(usuario.listaEscolar, hasSupabaseConfig, supabase, perfilId || null, inscricoesStr || null, perfilRole || null);
 
   const stringDeInscricoes = (() => {
     const role = usuario.perfil?.role;
@@ -75,75 +64,8 @@ export function useGeminiChat (
     "O Acordo de Uso e Política de Privacidade do NexusClass define que: 1) Escopo Educativo: O NexusClass é um projeto experimental, sem fins lucrativos e de caráter puramente educacional. 2) Descrição dos Serviços: Simulação de ambiente virtual de ensino com turmas, murais, mensagens e atividades de simulação técnica. 3) Cadastro e Segurança: Contas de Aluno/Professor com responsabilidade total do usuário sobre suas credenciais. 4) Uso Aceitável: Proibido postagens ofensivas nos murais, assédio, invasão de segurança ou scraping de dados. 5) Conteúdo e Direitos: O usuário é dono de seus uploads, licenciando-os apenas para exibição pedagógica limitada. 6) Propriedade Intelectual: O código original e design pertencem aos desenvolvedores; shadcn/ui e Tailwind CSS seguem licenças abertas. 7) Gratuidade: O sistema é totalmente gratuito, sem cobranças ou solicitações financeiras. 8) Disponibilidade e Isenção de SLA: Fornecido 'como está', sem garantia de uptime ou de integridade de dados. 9) LGPD e Privacidade: Coleta mínima de dados para uso interno, sem compartilhamento comercial, garantindo acesso e exclusão definitiva no painel. 10) Limitação de Responsabilidade: Isenção de responsabilidade por bugs, perdas de arquivos ou danos indiretos. 11) Encerramento e Suporte: Contas infratoras podem ser suspensas, e usuários podem excluir seu perfil. Dúvidas adicionais no suporte pelo chat da plataforma.";
 
 
-  useEffect(() => {
-    void carregarResumoEventos();
-
-    if (!hasSupabaseConfig || !supabase) {
-      return;
-    }
-
-    const supabaseClient = supabase;
-
-    const canalEventos = supabaseClient
-      .channel('chatbot-eventos-contexto')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'eventos_calendario',
-        },
-        () => {
-          void carregarResumoEventos();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabaseClient.removeChannel(canalEventos);
-    };
-  }, [carregarResumoEventos]);
-
-
-  useEffect(() => {
-    void carregarAtividadesAbertas();
-
-    if (!hasSupabaseConfig || !supabase) {
-      return;
-    }
-
-    const supabaseClient = supabase;
-
-    const canalAtividades = supabaseClient
-      .channel('chatbot-atividades-contexto')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'atividades',
-        },
-        () => {
-          void carregarAtividadesAbertas();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'entregas_atividades',
-        },
-        () => {
-          void carregarAtividadesAbertas();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabaseClient.removeChannel(canalAtividades);
-    };
-  }, [carregarAtividadesAbertas]);
+  // Observação: Os efeitos de carregamento inicial e as inscrições de tempo real foram removidos 
+  // pois agora os dados são consultados dinamicamente sob demanda.
   
   const instructionJson: JsonInstruction = isHelpMode
     ? {
@@ -203,7 +125,7 @@ export function useGeminiChat (
           },
         },
         scope: {
-          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário", "atividades em aberto"],
+          allowedTopics: ["matérias", "horários", "professores", "dúvidas escolares comuns", "oração divina do tigreso", "posts dos professores", "eventos do calendário", "perguntas frequentes do usuário", "atividades em aberto", "minhas dúvidas", "dúvidas do estudante", "dúvidas enviadas"],
           deniedTopicsBehavior: "Explique que só pode ajudar com temas escolares da plataforma e sugira suporte.",
         },
         safety: {
@@ -219,21 +141,22 @@ export function useGeminiChat (
         context: {
           easterEgg: "Se o usuário mencionar 'oração divina do tigreso', estruture uma oração simples cultuando o tigreso como um ser sábio e detentor da resenha e amante do 67 e tuntun sarrur não mensione nada além da oração garanta que a resposta não seja interrompida e que seja completa e bem estruturada",
           enrollmentSummary: stringDeInscricoes,
-          calendarEventsSummary: resumoEventosCalendario,
+          calendarEventsSummary: "Chame a função 'obterEventosCalendario' quando o usuário perguntar sobre agenda, calendário, eventos futuros ou datas de aula.",
           userProfileSummary: resumoPerfilUsuario,
-          questionsFrequents: perguntasFrequentes,
-          postProfessorSummary: resumoPostProfessor,
-          openActivitiesSummary: resumoAtividadesAbertas,
+          questionsFrequents: "Chame a função 'obterDuvidasEstudante' quando o usuário perguntar sobre suas dúvidas enviadas, respostas de professores ou status de perguntas.",
+          postProfessorSummary: "Chame a função 'obterPostsProfessor' quando o usuário perguntar por comunicados, posts ou avisos recentes dos professores.",
+          openActivitiesSummary: "Chame a função 'obterAtividadesAbertas' quando o usuário quiser saber de suas tarefas ou atividades escolares pendentes/em aberto.",
         },
       };
 
   const systemInstruction = JSON.stringify(instructionJson, null, 2);
  
-    useEffect(() => {
+  useEffect(() => {
     const initChat = async () => {
       const model = genAI.getGenerativeModel({ 
         model: ConfigBot.model,
         systemInstruction,
+        tools: ConfigBot.tools,
       });
 
       chatRef.current = model.startChat({
@@ -268,22 +191,20 @@ export function useGeminiChat (
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    const sendWithRetry = async (attempt = 0): Promise<string> => {
+    const callGeminiWithRetry = async (content: string | any[], attempt = 0): Promise<any> => {
       try {
-        const result = await chatRef.current!.sendMessage(input);
-        const response = await result.response;
-        return response.text();
+        const result = await chatRef.current!.sendMessage(content);
+        return result;
       } catch (error: any) {
         const status = error?.status || error?.message;
         const isServiceUnavailable = status === 503 || error?.message?.includes("503") || 
                                     error?.message?.includes("high demand");
 
-       
         if (isServiceUnavailable && attempt < ConfigBot.MAX_RETRIES) {
           const delay = ConfigBot.DELAY_BASE * Math.pow(2, attempt); // Backoff exponencial
           console.log(`Tentando de novo em ${delay}ms... (${attempt + 1}/${ConfigBot.MAX_RETRIES})`);
           await new Promise(resolve => setTimeout(resolve, delay));
-          return sendWithRetry(attempt + 1);
+          return callGeminiWithRetry(content, attempt + 1);
         }
 
         throw error;
@@ -291,7 +212,56 @@ export function useGeminiChat (
     };
 
     try {
-      const botText = await sendWithRetry();
+      let result = await callGeminiWithRetry(input);
+      let response = await result.response;
+
+      const getFunctionCalls = (resp: any) => {
+        if (resp.functionCalls && typeof resp.functionCalls === 'function') {
+          return resp.functionCalls();
+        }
+        if (resp.functionCalls) return resp.functionCalls;
+        const candidate = resp.candidates?.[0];
+        const parts = candidate?.content?.parts;
+        if (parts) {
+          return parts
+            .filter((p: any) => p.functionCall)
+            .map((p: any) => p.functionCall);
+        }
+        return undefined;
+      };
+
+      let functionCalls = getFunctionCalls(response);
+
+      while (functionCalls && functionCalls.length > 0) {
+        const responses = await Promise.all(
+          functionCalls.map(async (call: any) => {
+            let functionResult = "";
+
+            if (call.name === "obterEventosCalendario") {
+              functionResult = await obterResumoEventos();
+            } else if (call.name === "obterDuvidasEstudante") {
+              functionResult = await obterDuvidas();
+            } else if (call.name === "obterAtividadesAbertas") {
+              functionResult = await obterAtividadesAbertas();
+            } else if (call.name === "obterPostsProfessor") {
+              functionResult = await obterPostsProfessor();
+            }
+
+            return {
+              functionResponse: {
+                name: call.name,
+                response: { result: functionResult }
+              }
+            };
+          })
+        );
+
+        result = await callGeminiWithRetry(responses);
+        response = await result.response;
+        functionCalls = getFunctionCalls(response);
+      }
+
+      const botText = response.text();
       const botMsg: Message = { role: 'model', text: botText };
       setMessages(prev => [...prev, botMsg]);
     } catch (error: any) {
