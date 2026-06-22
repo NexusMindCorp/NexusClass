@@ -1,56 +1,89 @@
-import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { Send, X, Bot, Sparkles } from 'lucide-react';
-import { useOutletContext } from 'react-router-dom';
-import { useChatBox } from '../hooks/botsHooks/useChatBox';
-import type {ChatBotProps} from '../hooks/botsHooks/type';
-import type { PerfilUsuario } from '@/hooks/AuthHooks/type';
-import {ConfigBot} from '../hooks/botsHooks/configBot';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import { Send, X, Bot, Sparkles } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import { useChatBox } from "../hooks/botsHooks/useChatBox";
+import type { ChatBotProps } from "../hooks/botsHooks/type";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
+import { ConfigBot } from "../hooks/botsHooks/configBot";
 
-
-
-export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: ChatBotProps, ref) {
-  const { perfil, materiasProfessor } = useOutletContext<{ session: unknown; perfil: PerfilUsuario | null; materiasProfessor: string[] }>()
+export const ChatBot = forwardRef(function ChatBot(
+  { usuario, listaEscolar }: ChatBotProps,
+  ref,
+) {
+  const { perfil, materiasProfessor } = useOutletContext<{
+    session: unknown;
+    perfil: PerfilUsuario | null;
+    materiasProfessor: string[];
+  }>();
   // Log for debugging end-to-end subject passing
-  const {isHelpMode ,isOpen, setIsOpen, closeChat, setIsHelpMode, input, setInput, handleSend, messages, loading } = useChatBox({ usuario, perfil, materiasProfessor, listaEscolar });
+  const {
+    isHelpMode,
+    isOpen,
+    setIsOpen,
+    closeChat,
+    setIsHelpMode,
+    input,
+    setInput,
+    handleSend,
+    messages,
+    loading,
+  } = useChatBox({ usuario, perfil, materiasProfessor, listaEscolar });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Expor função de abrir com modo ajuda
-  useImperativeHandle(ref, () => ({
-    abrirComAjuda: () => {
-      setIsHelpMode(true);
-      setIsOpen(true);
-    }
-  }), [setIsHelpMode, setIsOpen]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      abrirComAjuda: () => {
+        setIsHelpMode(true);
+        setIsOpen(true);
+      },
+    }),
+    [setIsHelpMode, setIsOpen],
+  );
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, loading]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
-
       {/* Janela de Chat */}
       {isOpen && (
         <div className="w-[350px] h-[480px] max-h-[calc(100vh-6rem)] bg-card text-card-foreground rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col border border-border overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
-
           {/* Lugar Sagrado do Tigreso */}
           <div
             className="p-4 text-primary-foreground flex justify-between items-center"
-            style={{ backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' }}
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)",
+            }}
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-lg">
-              {isHelpMode? (
-                <img src={ConfigBot.fotos[1]} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />):(
-                <img src={ConfigBot.fotos[0]} alt="Perfil do Bot" className="w-10 h-10 rounded-full" />
-              )}
+                {isHelpMode ? (
+                  <img
+                    src={ConfigBot.fotos[1]}
+                    alt="Perfil do Bot"
+                    className="w-10 h-10 rounded-full"
+                  />
+                ) : (
+                  <img
+                    src={ConfigBot.fotos[0]}
+                    alt="Perfil do Bot"
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
               </div>
               <div>
-                <p className="text-sm font-bold leading-none">{isHelpMode ? ConfigBot.nome[1] : ConfigBot.nome[0]}</p>
+                <p className="text-sm font-bold leading-none">
+                  {isHelpMode ? ConfigBot.nome[1] : ConfigBot.nome[0]}
+                </p>
                 <p className="text-[10px] text-primary-foreground/80 mt-1 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" /> Online Agora
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />{" "}
+                  Online Agora
                 </p>
               </div>
             </div>
@@ -70,21 +103,35 @@ export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: Ch
             {messages.length === 0 && (
               <div className="text-center mt-10">
                 <Sparkles className="mx-auto text-primary/50 mb-2" size={32} />
-                <p className="text-muted-foreground text-xs">Como posso te ajudar hoje?</p>
+                <p className="text-muted-foreground text-xs">
+                  Como posso te ajudar hoje?
+                </p>
               </div>
             )}
 
             {messages.map((msg, idx) => {
-              const respostaLonga = msg.role === 'model' && msg.text.length > 220;
+              const respostaLonga =
+                msg.role === "model" && msg.text.length > 220;
 
               return (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  key={idx}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   <div
-                    className={`w-fit p-3 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${msg.role === 'user'
-                      ? 'text-white rounded-br-none'
-                      : `${respostaLonga ? 'max-w-[95%]' : 'max-w-[78%]'} bg-muted text-foreground border border-border rounded-bl-none`
-                      }`}
-                    style={msg.role === 'user' ? { backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' } : undefined}
+                    className={`w-fit p-3 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words shadow-sm ${
+                      msg.role === "user"
+                        ? "text-white rounded-br-none"
+                        : `${respostaLonga ? "max-w-[95%]" : "max-w-[78%]"} bg-muted text-foreground border border-border rounded-bl-none`
+                    }`}
+                    style={
+                      msg.role === "user"
+                        ? {
+                            backgroundImage:
+                              "linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)",
+                          }
+                        : undefined
+                    }
                   >
                     {msg.text}
                   </div>
@@ -111,7 +158,7 @@ export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: Ch
                 placeholder="Pergunte qualquer coisa..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
               <button
                 onClick={handleSend}
@@ -131,7 +178,10 @@ export const ChatBot = forwardRef(function ChatBot({ usuario, listaEscolar }: Ch
         <button
           onClick={() => setIsOpen(true)}
           className="w-14 h-14 rounded-full flex cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white"
-          style={{ backgroundImage: 'linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)' }}
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)",
+          }}
         >
           <Bot size={28} />
         </button>

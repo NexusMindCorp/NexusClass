@@ -7,17 +7,17 @@ interface BoxRestritoProps {
   children?: React.ReactNode;
 }
 
-export function BoxRestrito({ 
-  titulo = "Acesso Restrito", 
+export function BoxRestrito({
+  titulo = "Acesso Restrito",
   mensagem = "Vocês não tem permissão para visualizar este conteúdo. Entre em contato com o suporte caso seja algum erro.",
-  children 
+  children,
 }: BoxRestritoProps) {
   return (
     <div className="relative group w-full max-w-4xl mx-auto overflow-hidden rounded-3xl border border-destructive/20 bg-card/45 backdrop-blur-md p-10 md:p-16 text-center shadow-2xl transition-all duration-300 hover:border-destructive/40 hover:shadow-destructive/8">
       {/* Background decorative gradients */}
       <div className="absolute -top-32 -left-32 h-64 w-64 rounded-full bg-destructive/10 blur-3xl pointer-events-none transition-all duration-500 group-hover:bg-destructive/15" />
       <div className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-primary/10 blur-3xl pointer-events-none transition-all duration-500 group-hover:bg-primary/15" />
-      
+
       <div className="relative z-10 flex flex-col items-center">
         {/* Animated Lock Icon Circle */}
         <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-destructive/10 border border-destructive/20 mb-8 shadow-[0_0_20px_rgba(239,68,68,0.07)] transition-all duration-300 group-hover:scale-105 group-hover:border-destructive/40 group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)]">
@@ -45,4 +45,3 @@ export function BoxRestrito({
     </div>
   );
 }
-

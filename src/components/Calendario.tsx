@@ -1,14 +1,17 @@
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { useCalendario } from "@/hooks/CalendarioHooks/useCalendario"
-import { BoxAgendamento } from "./BoxAgendamento"
-import { BoxAgendados } from "./BoxAgendados"
-import type{ CalendarioProps } from "@/hooks/CalendarioHooks/type"
-import { comparaDataHj } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useCalendario } from "@/hooks/CalendarioHooks/useCalendario";
+import { BoxAgendamento } from "./BoxAgendamento";
+import { BoxAgendados } from "./BoxAgendados";
+import type { CalendarioProps } from "@/hooks/CalendarioHooks/type";
+import { comparaDataHj } from "@/lib/utils";
 
-
-export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProps) {
+export function Calendario({
+  perfil,
+  inscricoes,
+  turmasGlobais,
+}: CalendarioProps) {
   const {
     usaSupabase,
     date,
@@ -28,17 +31,17 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
     adicionarEvento,
     removerEvento,
     selecionarDataRelativa,
-  } = useCalendario({ perfil, inscricoes, turmasGlobais })
+  } = useCalendario({ perfil, inscricoes, turmasGlobais });
 
-  const turmasInscritas = Object.keys(inscricoes).map(key => ({
+  const turmasInscritas = Object.keys(inscricoes).map((key) => ({
     id: key,
     nome: turmasGlobais[key]?.materia || key,
-  }))
+  }));
 
-  const todasTurmas = Object.keys(turmasGlobais).map(key => ({
+  const todasTurmas = Object.keys(turmasGlobais).map((key) => ({
     id: key,
     nome: turmasGlobais[key]?.materia || key,
-  }))
+  }));
 
   const isMaster = perfil?.role === "master";
 
@@ -103,7 +106,9 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
                 tipo={sobreEvento.tipo}
                 setTipo={(tipo) => setSobreEvento((ant) => ({ ...ant, tipo }))}
                 turmaSelecionada={sobreEvento.turmaSelecionada}
-                setTurmaSelecionada={(turmaSelecionada) => setSobreEvento((ant) => ({ ...ant, turmaSelecionada }))}
+                setTurmaSelecionada={(turmaSelecionada) =>
+                  setSobreEvento((ant) => ({ ...ant, turmaSelecionada }))
+                }
                 cancelaAgendamento={cancelarAgendamento}
                 usaSupabase={usaSupabase}
                 date={date}
@@ -157,5 +162,5 @@ export function Calendario({ perfil, inscricoes, turmasGlobais }: CalendarioProp
         ))}
       </CardFooter>
     </Card>
-  )
+  );
 }

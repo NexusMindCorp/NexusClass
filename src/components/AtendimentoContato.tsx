@@ -1,4 +1,4 @@
-import { useState, useRef} from "react";
+import { useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,11 @@ type AtendimentoContatoProps = {
   professorNome: string;
   aberto: boolean;
   onClose: () => void;
-  onEnviar: (assunto: string, mensagem: string, arquivos: File[]) => Promise<void>;
+  onEnviar: (
+    assunto: string,
+    mensagem: string,
+    arquivos: File[],
+  ) => Promise<void>;
 };
 
 export function AtendimentoContato({
@@ -62,7 +66,10 @@ export function AtendimentoContato({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
       <Card className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl p-6 shadow-2xl border border-border bg-card text-card-foreground max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
@@ -93,7 +100,9 @@ export function AtendimentoContato({
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="mensagem-contato">Conteúdo da Dúvida</FieldLabel>
+              <FieldLabel htmlFor="mensagem-contato">
+                Conteúdo da Dúvida
+              </FieldLabel>
               <Textarea
                 id="mensagem-contato"
                 placeholder="Explique detalhadamente sua dúvida..."
@@ -129,10 +138,15 @@ export function AtendimentoContato({
             {/* Fila de arquivos selecionados */}
             {arquivos.length > 0 && (
               <div className="space-y-2">
-                <FieldLabel>Arquivos Selecionados ({arquivos.length})</FieldLabel>
+                <FieldLabel>
+                  Arquivos Selecionados ({arquivos.length})
+                </FieldLabel>
                 <div className="border border-border/80 rounded-lg bg-muted/20 p-3 max-h-[160px] overflow-y-auto space-y-1.5">
                   {arquivos.map((file, i) => (
-                    <div key={`file-${i}`} className="flex items-center justify-between p-1.5 rounded bg-purple-500/5 border border-purple-500/10 text-xs gap-3">
+                    <div
+                      key={`file-${i}`}
+                      className="flex items-center justify-between p-1.5 rounded bg-purple-500/5 border border-purple-500/10 text-xs gap-3"
+                    >
                       <span className="flex items-center gap-1.5 truncate text-purple-500 font-semibold">
                         <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         {file.name}

@@ -19,20 +19,27 @@ type BoxMuralProps = {
   onPublicar: () => void;
 };
 
-export function BoxMural({ materia, professorNome, aberto, onClose, conteudo, setConteudo, onPublicar }: BoxMuralProps) {
+export function BoxMural({
+  materia,
+  professorNome,
+  aberto,
+  onClose,
+  conteudo,
+  setConteudo,
+  onPublicar,
+}: BoxMuralProps) {
   if (!aberto) return null;
 
   return (
     <>
-      <div 
-        className="fixed inset-0 z-50 bg-black/50"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose} />
       <Card className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-xl p-6">
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="mensagem-mural">Postar no mural de {materia}</FieldLabel>
+              <FieldLabel htmlFor="mensagem-mural">
+                Postar no mural de {materia}
+              </FieldLabel>
               <Textarea
                 id="mensagem-mural"
                 placeholder="Escreva sua mensagem aqui..."

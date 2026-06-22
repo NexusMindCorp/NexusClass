@@ -3,17 +3,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Settings } from "lucide-react"
-import { SidebarMenuButton } from "./ui/sidebar"
-import type { OpcoesTela } from "@/hooks/GerenciadorHooks/type"
+} from "@/components/ui/dropdown-menu";
+import { Settings } from "lucide-react";
+import { SidebarMenuButton } from "./ui/sidebar";
+import type { OpcoesTela } from "@/hooks/GerenciadorHooks/type";
 
 type ConfiguracoesProps = {
-  navegarPara?: (tela: OpcoesTela) => void
+  navegarPara?: (tela: OpcoesTela) => void;
+};
 
-}
-
-export function Configuracoes({ navegarPara}: ConfiguracoesProps) {
+export function Configuracoes({ navegarPara }: ConfiguracoesProps) {
   return (
     <DropdownMenu>
       <SidebarMenuButton asChild>
@@ -25,7 +24,9 @@ export function Configuracoes({ navegarPara}: ConfiguracoesProps) {
         </DropdownMenuTrigger>
       </SidebarMenuButton>
       <DropdownMenuContent side="top" align="start" className="w-48">
-        <DropdownMenuItem onSelect={() => navegarPara?.("configuracoesAvancadas")}>
+        <DropdownMenuItem
+          onSelect={() => navegarPara?.("configuracoesAvancadas")}
+        >
           Configurações avançadas
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navegarPara?.("suporte")}>
@@ -39,5 +40,5 @@ export function Configuracoes({ navegarPara}: ConfiguracoesProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

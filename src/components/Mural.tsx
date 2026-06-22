@@ -8,23 +8,46 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BoxMural } from "./BoxMural";
-import { Plus, MoreVertical, Trash2, User, FileText, Download, Paperclip, Calendar, Pencil, MessageSquare } from "lucide-react";
+import {
+  Plus,
+  MoreVertical,
+  Trash2,
+  User,
+  FileText,
+  Download,
+  Paperclip,
+  Calendar,
+  Pencil,
+  MessageSquare,
+} from "lucide-react";
 import { useMural } from "@/hooks/MuralHooks/useMural";
 import { AtendimentoContato } from "./AtendimentoContato";
 import { AlunosTurma } from "./AlunosTurma";
 import { PerfilAvatar } from "./PerfilAvatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { BoxPerfilUsuario } from "./BoxPerfilUsuario";
-import { BoxAtividade, obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
+import {
+  BoxAtividade,
+  obterUrlsAnexo,
+  obterNomeArquivoDoUrl,
+} from "./BoxAtividade";
 import { BoxEntregaAtividade } from "./BoxEntregaAtividade";
 import type { Atividade } from "@/hooks/MuralHooks/type";
 import { isDataEntregaFutura } from "@/lib/utils";
 import type { MuralProps } from "@/hooks/MuralHooks/type";
 
 export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
-  const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(null);
+  const [nomePerfilParaVer, setNomePerfilParaVer] = useState<string | null>(
+    null,
+  );
   const [boxAtividadeAberto, setBoxAtividadeAberto] = useState(false);
-  const [atividadeParaEditar, setAtividadeParaEditar] = useState<Atividade | null>(null);
+  const [atividadeParaEditar, setAtividadeParaEditar] =
+    useState<Atividade | null>(null);
   const {
     opcaoSelecionada,
     posts,
@@ -45,7 +68,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
     deletarAtividade,
     editarAtividade,
     atividadesEntregasAbertas,
-    alternarAreaEntrega
+    alternarAreaEntrega,
   } = useMural(materia, perfil);
 
   return (
@@ -77,7 +100,9 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
         <div className="absolute inset-0 bg-black/50" />
         <CardHeader className="relative z-10 flex flex-col h-full justify-between">
           <div>
-            <CardTitle className="text-3xl text-white">{turma.materia}</CardTitle>
+            <CardTitle className="text-3xl text-white">
+              {turma.materia}
+            </CardTitle>
             <CardDescription className="text-white/90">
               Professor: {turma.professor} | Sala: {turma.sala}
             </CardDescription>
@@ -95,8 +120,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                 <Button
                   onClick={() => abrirMural()}
                   className="mural-navegacao-item"
-                  data-active={opcaoSelecionada === "mural" ? "true" : undefined}
-                  aria-current={opcaoSelecionada === "mural" ? "page" : undefined}
+                  data-active={
+                    opcaoSelecionada === "mural" ? "true" : undefined
+                  }
+                  aria-current={
+                    opcaoSelecionada === "mural" ? "page" : undefined
+                  }
                   variant="ghost"
                   size="sm"
                 >
@@ -105,8 +134,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                 <Button
                   onClick={() => abrirAtividades()}
                   className="mural-navegacao-item"
-                  data-active={opcaoSelecionada === "atividade" ? "true" : undefined}
-                  aria-current={opcaoSelecionada === "atividade" ? "page" : undefined}
+                  data-active={
+                    opcaoSelecionada === "atividade" ? "true" : undefined
+                  }
+                  aria-current={
+                    opcaoSelecionada === "atividade" ? "page" : undefined
+                  }
                   variant="ghost"
                   size="sm"
                 >
@@ -116,8 +149,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                   <Button
                     onClick={() => abrirContato()}
                     className="mural-navegacao-item"
-                    data-active={opcaoSelecionada === "contato" ? "true" : undefined}
-                    aria-current={opcaoSelecionada === "contato" ? "page" : undefined}
+                    data-active={
+                      opcaoSelecionada === "contato" ? "true" : undefined
+                    }
+                    aria-current={
+                      opcaoSelecionada === "contato" ? "page" : undefined
+                    }
                     variant="ghost"
                     size="sm"
                   >
@@ -127,8 +164,12 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                 <Button
                   onClick={() => abrirAlunos()}
                   className="mural-navegacao-item"
-                  data-active={opcaoSelecionada === "alunos" ? "true" : undefined}
-                  aria-current={opcaoSelecionada === "alunos" ? "page" : undefined}
+                  data-active={
+                    opcaoSelecionada === "alunos" ? "true" : undefined
+                  }
+                  aria-current={
+                    opcaoSelecionada === "alunos" ? "page" : undefined
+                  }
                   variant="ghost"
                   size="sm"
                 >
@@ -142,15 +183,18 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
 
       {posts.tipoAmostar === "mural" && (
         <Button className=" w-fit" onClick={() => mudarAberturaBox(true)}>
-          <Plus />Postar no mural
+          <Plus />
+          Postar no mural
         </Button>
       )}
 
-      {posts.tipoAmostar === "atividade" && (perfil.role === "professor" || perfil.role === "master") && (
-        <Button onClick={() => setBoxAtividadeAberto(true)}>
-          <Pencil />Postar Atividade
-        </Button>
-      )}
+      {posts.tipoAmostar === "atividade" &&
+        (perfil.role === "professor" || perfil.role === "master") && (
+          <Button onClick={() => setBoxAtividadeAberto(true)}>
+            <Pencil />
+            Postar Atividade
+          </Button>
+        )}
 
       <BoxMural
         materia={turma.materia}
@@ -166,7 +210,10 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
         {posts.tipoAmostar === "mural" ? (
           posts.posts.length > 0 ? (
             posts.posts.map((post) => (
-              <Card key={post.id} className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200">
+              <Card
+                key={post.id}
+                className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200"
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <PerfilAvatar
@@ -177,15 +224,22 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       palavra={post.Nome}
                     />
                     <div className="flex flex-col">
-                      <span className="font-semibold text-sm text-foreground leading-tight">{post.Nome}</span>
-                      <span className="text-xs text-muted-foreground mt-0.5">{post.data}</span>
+                      <span className="font-semibold text-sm text-foreground leading-tight">
+                        {post.Nome}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-0.5">
+                        {post.data}
+                      </span>
                     </div>
                   </div>
 
                   {/* Dropdown Menu (Três Pontos) */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-full cursor-pointer hover:bg-muted">
+                      <Button
+                        variant="ghost"
+                        className="h-10 w-10 p-0 rounded-full cursor-pointer hover:bg-muted"
+                      >
                         <MoreVertical className="h-4 w-4 text-muted-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -197,7 +251,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                         <User className="mr-2 h-4 w-4" />
                         Ver Perfil
                       </DropdownMenuItem>
-                      {(post.autor?.id !== perfil.id) && (
+                      {post.autor?.id !== perfil.id && (
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onSelect={() => abrirChat(post.autor?.id || "")}
@@ -208,7 +262,9 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       )}
 
                       {/* Mostrar Excluir se for o autor ou se for professor/master */}
-                      {(post.autor?.id === perfil.id || perfil.role === "professor" || perfil.role === "master") && (
+                      {(post.autor?.id === perfil.id ||
+                        perfil.role === "professor" ||
+                        perfil.role === "master") && (
                         <DropdownMenuItem
                           className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                           onSelect={() => deletarPost(post.id)}
@@ -220,32 +276,42 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1">{post.conteudo}</p>
+                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1">
+                  {post.conteudo}
+                </p>
               </Card>
             ))
           ) : (
             <Card className="overflow-hidden p-4">
               <div className="flex gap-1 items-center justify-center">
-                <img src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png" alt="Não encontrado imagem" className="h-40 w-40 object-cover rounded" />
-                <p className="text-muted-foreground">
-                  Nenhum post ainda.
-                </p>
+                <img
+                  src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png"
+                  alt="Não encontrado imagem"
+                  className="h-40 w-40 object-cover rounded"
+                />
+                <p className="text-muted-foreground">Nenhum post ainda.</p>
               </div>
             </Card>
           )
         ) : posts.tipoAmostar === "atividade" ? (
           atividades.length > 0 ? (
             atividades.map((atv) => (
-              <Card key={atv.id} className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200">
+              <Card
+                key={atv.id}
+                className="p-5 shadow-sm border border-border/60 hover:shadow-md transition-shadow duration-200"
+              >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
                       <FileText className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="font-bold text-base text-foreground leading-tight">{atv.titulo}</h4>
+                      <h4 className="font-bold text-base text-foreground leading-tight">
+                        {atv.titulo}
+                      </h4>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Postado por {atv.professor_nome} • {new Date(atv.created_at).toLocaleDateString("pt-BR")}
+                        Postado por {atv.professor_nome} •{" "}
+                        {new Date(atv.created_at).toLocaleDateString("pt-BR")}
                       </p>
                     </div>
                   </div>
@@ -254,19 +320,26 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                     {atv.data_entrega && (
                       <span className="border border-border/60 border-color bg-muted px-2 py-1 rounded-md text-xs text-muted-foreground text-color- flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        
+
                         {!atividadesEntregues.has(atv.id) ? (
                           <span className="text-orange-500 font-semibold ">
-                          Entrega: {new Date(atv.data_entrega).toLocaleDateString("pt-BR", { 
-                            day: "numeric", 
-                            month: "short", 
-                            hour: "numeric", 
-                            minute: "numeric" 
-                          })}
-                        </span>) : (
+                            Entrega:{" "}
+                            {new Date(atv.data_entrega).toLocaleDateString(
+                              "pt-BR",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                hour: "numeric",
+                                minute: "numeric",
+                              },
+                            )}
+                          </span>
+                        ) : (
                           <>
                             {isDataEntregaFutura(atv.data_entrega) ? (
-                              <span className="text-green-500">Entregue no prazo</span>
+                              <span className="text-green-500">
+                                Entregue no prazo
+                              </span>
                             ) : (
                               <span className="text-red-500">com atraso</span>
                             )}
@@ -275,7 +348,8 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       </span>
                     )}
 
-                    {(perfil.role === "professor" || perfil.role === "master") && (
+                    {(perfil.role === "professor" ||
+                      perfil.role === "master") && (
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
@@ -301,11 +375,15 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                   </div>
                 </div>
 
-                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1 mb-4">{atv.descricao}</p>
+                <p className="whitespace-pre-wrap text-sm text-card-foreground leading-relaxed pl-1 mb-4">
+                  {atv.descricao}
+                </p>
 
                 {atv.anexo_url && obterUrlsAnexo(atv.anexo_url).length > 0 && (
                   <div className="mt-4 pt-3 border-t border-border/40 space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Arquivos Anexos</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                      Arquivos Anexos
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {obterUrlsAnexo(atv.anexo_url).map((url, index) => (
                         <a
@@ -316,7 +394,9 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 text-xs font-medium text-foreground hover:bg-muted transition-colors max-w-xs truncate"
                         >
                           <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="truncate">{obterNomeArquivoDoUrl(url)}</span>
+                          <span className="truncate">
+                            {obterNomeArquivoDoUrl(url)}
+                          </span>
                           <Download className="h-3.5 w-3.5 ml-1 text-muted-foreground shrink-0" />
                         </a>
                       ))}
@@ -326,16 +406,14 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
 
                 {/* Botão para abrir a área de entregas */}
                 <div className="mt-4 pt-3 border-t border-border/40 flex justify-end">
-                  <Button
-                
-                    size="sm"
-                    onClick={() => alternarAreaEntrega(atv.id)}
-                                      >
+                  <Button size="sm" onClick={() => alternarAreaEntrega(atv.id)}>
                     {atividadesEntregasAbertas[atv.id]
                       ? "Ocultar Área de Entrega"
                       : perfil.role === "aluno"
-                      ? atividadesEntregues.has(atv.id) ? "Ver Status" : "Entregar Trabalho"
-                      : "Gerenciar Entregas de Alunos"}
+                        ? atividadesEntregues.has(atv.id)
+                          ? "Ver Status"
+                          : "Entregar Trabalho"
+                        : "Gerenciar Entregas de Alunos"}
                   </Button>
                 </div>
 
@@ -352,7 +430,11 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
           ) : (
             <Card className="overflow-hidden p-6">
               <div className="flex flex-col items-center justify-center text-center p-4">
-                <img src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png" alt="Não encontrado imagem" className="h-32 w-32 object-cover rounded opacity-80 mb-3" />
+                <img
+                  src="https://cdn.pixabay.com/photo/2016/10/28/16/56/list-1778593_1280.png"
+                  alt="Não encontrado imagem"
+                  className="h-32 w-32 object-cover rounded opacity-80 mb-3"
+                />
                 <p className="text-muted-foreground text-sm">
                   Nenhuma atividade publicada para esta turma ainda.
                 </p>

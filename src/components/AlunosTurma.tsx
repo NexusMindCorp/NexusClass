@@ -1,26 +1,52 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-import { MoreHorizontalIcon, MessageCircle, User2, AlertCircle, Users } from "lucide-react"
-import { useOptionAlunos } from "@/hooks/AlunosHooks/useOptionAlunos"
-import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno"
-import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario"
-import { PerfilAvatar } from "./PerfilAvatar"
-import type{AlunosTurmaProps, tableRowProps} from "@/hooks/AlunosHooks/type"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  MoreHorizontalIcon,
+  MessageCircle,
+  User2,
+  AlertCircle,
+  Users,
+} from "lucide-react";
+import { useOptionAlunos } from "@/hooks/AlunosHooks/useOptionAlunos";
+import { BoxDenunciaAluno } from "@/components/BoxDenunciaAluno";
+import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario";
+import { PerfilAvatar } from "./PerfilAvatar";
+import type { AlunosTurmaProps, tableRowProps } from "@/hooks/AlunosHooks/type";
 
 export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
-  const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos()
-  const listaSemUsuario = turma.alunos.filter(aluno => aluno.id !== perfil.id);
+  const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos();
+  const listaSemUsuario = turma.alunos.filter(
+    (aluno) => aluno.id !== perfil.id,
+  );
   const professorId = turma.professor_id || "";
-  const podeInteragirComProfessor = Boolean(professorId && professorId !== perfil.id);
+  const podeInteragirComProfessor = Boolean(
+    professorId && professorId !== perfil.id,
+  );
   const isProfessor = perfil.role === "professor" && professorId === perfil.id;
 
-  const renderLinhaPessoa = ({ id, nome, foto, descricao, }: tableRowProps) => {
+  const renderLinhaPessoa = ({ id, nome, foto, descricao }: tableRowProps) => {
     const podeEnviarMensagem = Boolean(id && id !== perfil.id);
     const podeDenunciar = Boolean(id !== perfil.id);
 
     return (
-      <TableRow key={id || nome} className="group hover:bg-muted/50 transition-colors">
+      <TableRow
+        key={id || nome}
+        className="group hover:bg-muted/50 transition-colors"
+      >
         <TableCell className="py-3">
           <div className="flex items-center gap-3">
             <PerfilAvatar
@@ -33,7 +59,9 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
             <div className="flex min-w-0 flex-col">
               <span className="font-medium text-sm truncate">{nome}</span>
               {descricao ? (
-                <span className="text-xs text-muted-foreground truncate">{descricao}</span>
+                <span className="text-xs text-muted-foreground truncate">
+                  {descricao}
+                </span>
               ) : null}
             </div>
           </div>
@@ -53,7 +81,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem
                 className="cursor-pointer"
-                onSelect={() => handleOptionSelect('Ver Perfil', nome)}
+                onSelect={() => handleOptionSelect("Ver Perfil", nome)}
               >
                 <User2 className="mr-2 h-4 w-4" />
                 Ver Perfil
@@ -72,7 +100,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
               <DropdownMenuItem
                 className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                 disabled={!podeDenunciar}
-                onSelect={() => handleOptionSelect('Denunciar', nome)}
+                onSelect={() => handleOptionSelect("Denunciar", nome)}
               >
                 <AlertCircle className="mr-2 h-4 w-4" />
                 Denunciar
@@ -81,22 +109,22 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
           </DropdownMenu>
         </TableCell>
       </TableRow>
-    )
-  }
+    );
+  };
 
   const renderiarModal =
-    opcaoSelecionada === 'Denunciar' && nomeAluno ? (
+    opcaoSelecionada === "Denunciar" && nomeAluno ? (
       <BoxDenunciaAluno
         aluno={nomeAluno}
         onClose={() => handleOptionSelect(null)}
       />
-    ) : opcaoSelecionada === 'Ver Perfil' && nomeAluno ? (
+    ) : opcaoSelecionada === "Ver Perfil" && nomeAluno ? (
       <BoxPerfilUsuario
         nomeUsuario={nomeAluno}
         onClose={() => handleOptionSelect(null)}
         currentUserProfile={perfil}
       />
-    ) : null
+    ) : null;
 
   return (
     <>
@@ -139,7 +167,8 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
             {isProfessor ? "Alunos da turma" : "Colegas de turma"}
           </h3>
           <span className="text-sm text-muted-foreground">
-            {listaSemUsuario.length} {listaSemUsuario.length === 1 ? 'aluno' : 'alunos'}
+            {listaSemUsuario.length}{" "}
+            {listaSemUsuario.length === 1 ? "aluno" : "alunos"}
           </span>
         </div>
 
@@ -152,15 +181,17 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {listaSemUsuario.map((aluno, index) => renderLinhaPessoa({
-                id: aluno.id || String(index),
-                nome: aluno.nome,
-                foto: aluno.foto_url,
-              }))}
+              {listaSemUsuario.map((aluno, index) =>
+                renderLinhaPessoa({
+                  id: aluno.id || String(index),
+                  nome: aluno.nome,
+                  foto: aluno.foto_url,
+                }),
+              )}
             </TableBody>
           </Table>
         </div>
       </div>
     </>
-  )
+  );
 }
