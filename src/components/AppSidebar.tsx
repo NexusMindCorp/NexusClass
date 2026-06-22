@@ -7,7 +7,6 @@ import type { OpcoesTela } from "@/hooks/GerenciadorHooks/type"
 import type { EscolaProps } from "@/hooks/LeituraDataHooks/type"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getAssetPath } from "@/lib/assetPath"
-import { getCorMateria } from "@/lib/utils"
 import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas"
 import { PerfilAvatar } from "./PerfilAvatar"
 
