@@ -64,9 +64,6 @@ export function useGeminiChat (
     "O Acordo de Uso e Política de Privacidade do NexusClass define que: 1) Escopo Educativo: O NexusClass é um projeto experimental, sem fins lucrativos e de caráter puramente educacional. 2) Descrição dos Serviços: Simulação de ambiente virtual de ensino com turmas, murais, mensagens e atividades de simulação técnica. 3) Cadastro e Segurança: Contas de Aluno/Professor com responsabilidade total do usuário sobre suas credenciais. 4) Uso Aceitável: Proibido postagens ofensivas nos murais, assédio, invasão de segurança ou scraping de dados. 5) Conteúdo e Direitos: O usuário é dono de seus uploads, licenciando-os apenas para exibição pedagógica limitada. 6) Propriedade Intelectual: O código original e design pertencem aos desenvolvedores; shadcn/ui e Tailwind CSS seguem licenças abertas. 7) Gratuidade: O sistema é totalmente gratuito, sem cobranças ou solicitações financeiras. 8) Disponibilidade e Isenção de SLA: Fornecido 'como está', sem garantia de uptime ou de integridade de dados. 9) LGPD e Privacidade: Coleta mínima de dados para uso interno, sem compartilhamento comercial, garantindo acesso e exclusão definitiva no painel. 10) Limitação de Responsabilidade: Isenção de responsabilidade por bugs, perdas de arquivos ou danos indiretos. 11) Encerramento e Suporte: Contas infratoras podem ser suspensas, e usuários podem excluir seu perfil. Dúvidas adicionais no suporte pelo chat da plataforma.";
 
 
-  // Observação: Os efeitos de carregamento inicial e as inscrições de tempo real foram removidos 
-  // pois agora os dados são consultados dinamicamente sob demanda.
-  
   const instructionJson: JsonInstruction = isHelpMode
     ? {
         schema: "jsoninstruction.v1",

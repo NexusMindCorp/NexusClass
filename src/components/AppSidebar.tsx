@@ -9,6 +9,7 @@ import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getAssetPath } from "@/lib/assetPath"
 import { getCorMateria } from "@/lib/utils"
 import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas"
+import { PerfilAvatar } from "./PerfilAvatar"
 
 let itensMenu = [
     { title: "Inicio", id: "principal", icon: Home },
@@ -148,9 +149,7 @@ export function AppSidebar({
                                                         onClick={() => marcarMural(id)}
                                                         className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
                                                     >
-                                                        <div className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${getCorMateria(turma.materia)}`}>
-                                                            {turma.materia.charAt(0).toUpperCase()}
-                                                        </div>
+                                                        <PerfilAvatar palavra={turma.materia} classNameAvatar="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full" foto={turma.foto_professor} />
                                                         <span className="truncate">{turma.materia} - {turma.turma}</span>
                                                     </SidebarMenuButton>
                                                 </SidebarMenuItem>
