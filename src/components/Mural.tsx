@@ -91,14 +91,14 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
         atividadeParaEditar={atividadeParaEditar}
         onEditar={editarAtividade}
       />
-      <Card className="relative w-full overflow-hidden h-67">
+      <Card className="relative h-72 w-full overflow-hidden sm:h-67">
         <img
           src={turma.banners}
           alt={`Banner da turma ${materia}`}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/50" />
-        <CardHeader className="relative z-10 flex flex-col h-full justify-between">
+        <CardHeader className="relative z-10 flex h-full flex-col justify-between p-4 sm:px-6">
           <div>
             <CardTitle className="text-3xl text-white">
               {turma.materia}
@@ -107,10 +107,10 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
               Professor: {turma.professor} | Sala: {turma.sala}
             </CardDescription>
           </div>
-          <CardAction className="self-end">
-            <div className="flex flex-col items-end gap-2">
+          <CardAction className="w-full self-end sm:w-auto">
+            <div className="flex w-full flex-col items-end gap-2">
               <PerfilAvatar
-                classNameAvatar={`h-20 w-20 rounded-full object-cover border-2 border-white/20 shadow-sm bg-black/60`}
+                classNameAvatar={`h-16 w-16 rounded-full object-cover border-2 border-white/20 shadow-sm bg-black/60 sm:h-20 sm:w-20`}
                 classNameDiv={`flex h-full w-full shrink-0 items-center justify-center rounded-full text-white text-3xl`}
                 foto={turma.foto_professor}
                 tipo="usuario"
