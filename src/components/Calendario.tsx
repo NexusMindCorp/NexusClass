@@ -33,10 +33,12 @@ export function Calendario({
     selecionarDataRelativa,
   } = useCalendario({ perfil, inscricoes, turmasGlobais });
 
-  const turmasInscritas = Object.keys(inscricoes).map((key) => ({
-    id: key,
-    nome: turmasGlobais[key]?.materia || key,
-  }));
+  const turmasInscritas = Object.keys(inscricoes)
+    .filter((key) => inscricoes[key])
+    .map((key) => ({
+      id: key,
+      nome: turmasGlobais[key]?.materia || key,
+    }));
 
   const todasTurmas = Object.keys(turmasGlobais).map((key) => ({
     id: key,

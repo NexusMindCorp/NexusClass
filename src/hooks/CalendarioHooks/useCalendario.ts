@@ -2,8 +2,16 @@ import { useState, useCallback, useEffect, useMemo } from "react"
 import { addDays } from "date-fns"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type{EventoCalendario, UseCalendarioProps, EventoCalendarioBanco} from "./type"
-import {paraChaveData, paraData, hojeLocal, formatarErroSupabase} from "@/lib/utils"
+import {paraChaveData, paraData, hojeLocal, formatarErroSupabase, montarDataEvento} from "@/lib/utils"
 
+function eventoAindaAtivo(evento: EventoCalendario, agora = new Date()) {
+  if (!evento.horario) {
+    return paraData(evento.data) >= hojeLocal()
+  }
+
+  const dataEvento = montarDataEvento(evento.data, evento.horario)
+  return Boolean(dataEvento && dataEvento > agora)
+}
 
 export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendarioProps) {
   const usaSupabase = Boolean(supabase && hasSupabaseConfig)
@@ -12,36 +20,19 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
   const [eventos, setEventos] = useState<EventoCalendario[]>([])
   const [sobreEvento, setSobreEvento] = useState({ titulo: "", descricao: "", horario: "", tipo: "pessoal" as EventoCalendario["tipo"], turmaSelecionada: "" })
   const [processamentoEvento, setProcessamentoEvento] = useState({ carregandoEventos: false, salvandoEvento: false })
-  const [erroBanco, setErroBanco] = useState<string | null>(null)
+  const [erroBanco, setErroBanco] = useState<string | null>(
+    usaSupabase
+      ? null
+      : "Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env."
+  )
   const [currentMonth, setCurrentMonth] = useState<Date>(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   )
-
-  const removerEventosPassados = async () => {
-    const hoje = hojeLocal()
-    const hojeChave = paraChaveData(hoje)
-
-    if (supabase) {
-      const { error } = await supabase
-        .from("eventos_calendario")
-        .delete()
-        .lt("data", hojeChave)
-
-      if (error) {
-        setErroBanco(formatarErroSupabase(error, "remover eventos passados"))
-      }
-    }
-
-    setEventos((anteriores) =>
-      anteriores.filter((evento) => paraData(evento.data) >= hoje)
-    )
-  }
 
   const carregarEventosSupabase = useCallback(async () => {
     if (!supabase || !perfil?.id) {
       return
     }
-    await removerEventosPassados()
     setProcessamentoEvento((anterior) => ({ ...anterior, carregandoEventos: true }))
     setErroBanco(null)
 
@@ -49,9 +40,12 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
       let query = supabase
         .from("eventos_calendario")
         .select("id,titulo,descricao,data,horario,tipo,turma_id,autor_id")
+        .gte("data", paraChaveData(hojeLocal()))
 
       if (perfil.role !== "master") {
-        const idsTurmas = Object.keys(inscricoes || {})
+        const idsTurmas = Object.keys(inscricoes || {}).filter(
+          (turmaId) => inscricoes[turmaId]
+        )
         if (idsTurmas.length > 0) {
           query = query.or(`and(tipo.eq.pessoal,autor_id.eq.${perfil.id}),and(tipo.eq.turma,turma_id.in.(${idsTurmas.join(",")}))`)
         } else {
@@ -68,16 +62,18 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
         return
       }
 
-      const normalizados = (data as EventoCalendarioBanco[]).map((evento) => ({
-        id: evento.id,
-        titulo: evento.titulo,
-        descricao: evento.descricao,
-        data: evento.data,
-        horario: evento.horario ?? "",
-        tipo: evento.tipo,
-        turma_id: evento.turma_id,
-        autor_id: evento.autor_id,
-      }))
+      const normalizados = (data as EventoCalendarioBanco[])
+        .map((evento) => ({
+          id: evento.id,
+          titulo: evento.titulo,
+          descricao: evento.descricao,
+          data: evento.data,
+          horario: evento.horario ?? "",
+          tipo: evento.tipo,
+          turma_id: evento.turma_id,
+          autor_id: evento.autor_id,
+        }))
+        .filter((evento) => eventoAindaAtivo(evento))
       setEventos(normalizados)
 
     } catch {
@@ -91,14 +87,29 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
 
   useEffect(() => {
     if (!usaSupabase) {
-      setErroBanco(
-        "Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env."
-      )
       return
     }
 
-    void carregarEventosSupabase()
+    const carregamentoAgendado = window.setTimeout(() => {
+      void carregarEventosSupabase()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(carregamentoAgendado)
+    }
   }, [carregarEventosSupabase, usaSupabase])
+
+  useEffect(() => {
+    const intervalo = window.setInterval(() => {
+      setEventos((eventosAtuais) =>
+        eventosAtuais.filter((evento) => eventoAindaAtivo(evento))
+      )
+    }, 30000)
+
+    return () => {
+      window.clearInterval(intervalo)
+    }
+  }, [])
 
   const datasPorTipoEvento = useMemo(() => {
     const pessoais = new Set<string>()

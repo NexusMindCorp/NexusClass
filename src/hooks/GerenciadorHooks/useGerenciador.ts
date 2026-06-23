@@ -155,30 +155,12 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
                     schema: "public",
                     table: "alertas_calendario",
                 },
-                async (payload) => {
+                (payload) => {
                     const alerta = payload.new as PayloadAlertaCalendario
                     const minuto = alerta.minutos_antes ?? "db"
                     const chaveAlerta = `${alerta.evento_id}-${minuto}`
 
                     if (alertasEnviadosRef.current.has(chaveAlerta)) {
-                        return
-                    }
-
-                    try {
-                        const { data: evento, error } = await supabaseClient
-                            .from("eventos_calendario")
-                            .select("tipo, turma_id, autor_id")
-                            .eq("id", alerta.evento_id)
-                            .single()
-
-                        if (error || !evento) {
-                            return
-                        }
-
-                        if (!deveAlertarEvento(evento as any)) {
-                            return
-                        }
-                    } catch {
                         return
                     }
 
@@ -194,7 +176,7 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
         return () => {
             void supabaseClient.removeChannel(channel)
         }
-    }, [deveAlertarEvento])
+    }, [perfil?.id])
 
 
 
