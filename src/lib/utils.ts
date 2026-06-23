@@ -202,6 +202,35 @@ export function formatarDataRelativa(dataIso: string) {
   })
 }
 
+export function formatarDataUltimaMensagem(dataIso: string) {
+  const data = new Date(dataIso)
+
+  if (Number.isNaN(data.getTime())) {
+    return ""
+  }
+
+  const hoje = new Date()
+  const ontem = new Date(hoje)
+  ontem.setDate(hoje.getDate() - 1)
+
+  if (data.toDateString() === hoje.toDateString()) {
+    return data.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  if (data.toDateString() === ontem.toDateString()) {
+    return "Ontem"
+  }
+
+  return data.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  })
+}
+
 export function obterSetLocalStorage(chave: string) {
   if (typeof window === "undefined") {
     return new Set<string>()

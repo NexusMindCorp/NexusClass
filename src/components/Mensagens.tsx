@@ -29,7 +29,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatarDataRelativa, obterChaveDataLocal } from "@/lib/utils";
+import {
+  formatarDataRelativa,
+  formatarDataUltimaMensagem,
+  obterChaveDataLocal,
+} from "@/lib/utils";
 
 export function Mensagens({
   perfil,
@@ -158,12 +162,9 @@ export function Mensagens({
                         {info.nome}
                       </span>
                       <span className="text-[10px] text-muted-foreground">
-                        {new Date(
+                        {formatarDataUltimaMensagem(
                           conversa.dataUltimaMensagem,
-                        ).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
