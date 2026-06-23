@@ -11,6 +11,7 @@ import {
   Trash2,
   User2,
   AlertTriangle,
+  ArrowLeft,
 } from "lucide-react";
 import { PerfilAvatar } from "./PerfilAvatar";
 import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario";
@@ -67,12 +68,6 @@ export function Mensagens({
   };
 
   useEffect(() => {
-    if (chatAtivoId) {
-      setContatoAtivo(chatAtivoId);
-    }
-  }, [chatAtivoId]);
-
-  useEffect(() => {
     if (contatoAtivo && naoLidasDoContatoAtivo > 0) {
       void marcarComoLidas(contatoAtivo);
     }
@@ -115,9 +110,11 @@ export function Mensagens({
   };
 
   return (
-    <div className="flex h-[75vh] min-h-0 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-sm mx-auto">
+    <div className="mx-auto flex h-[calc(100dvh-5.5rem)] min-h-[28rem] w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-sm md:h-[75vh]">
       {/* BARRA LATERAL: Lista de Conversas */}
-      <div className="flex min-h-0 w-1/3 min-w-[250px] flex-col border-r border-border bg-muted/20">
+      <div
+        className={`${contatoAtivo ? "hidden md:flex" : "flex"} min-h-0 w-full flex-col bg-muted/20 md:w-1/3 md:min-w-[250px] md:border-r md:border-border`}
+      >
         <div className="shrink-0 p-4 border-b border-border bg-card">
           <h2 className="text-lg font-bold flex items-center gap-2 text-foreground">
             <MessageCircle className="h-5 w-5 text-primary" />
@@ -188,11 +185,23 @@ export function Mensagens({
       </div>
 
       {/* ÁREA PRINCIPAL: O Chat Ativo */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background/50">
+      <div
+        className={`${contatoAtivo ? "flex" : "hidden md:flex"} min-h-0 min-w-0 flex-1 flex-col bg-background/50`}
+      >
         {contatoAtivo && infoContatoAtivo ? (
           <>
             {/* Cabeçalho do Chat */}
-            <div className="z-10 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-4 shadow-sm">
+            <div className="z-10 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-2 shadow-sm sm:gap-3 sm:px-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+                onClick={() => setContatoAtivo(null)}
+                aria-label="Voltar para as conversas"
+                title="Voltar para as conversas"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
               <PerfilAvatar
                 classNameAvatar="h-10 w-10 rounded-full object-cover"
                 classNameDiv="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
@@ -200,7 +209,7 @@ export function Mensagens({
                 tipo="usuario"
                 palavra={infoContatoAtivo.nome}
               />
-              <span className="font-bold text-foreground">
+              <span className="min-w-0 truncate font-bold text-foreground">
                 {infoContatoAtivo.nome}
               </span>
               <DropdownMenu>
@@ -236,7 +245,7 @@ export function Mensagens({
             {/* Balões de Mensagem */}
             <div
               ref={mensagensScrollRef}
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4"
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4"
             >
               <div className="flex min-h-full flex-col gap-3">
                 {mensagensDoChat.length === 0 ? (
@@ -265,7 +274,7 @@ export function Mensagens({
                           className={`flex flex-col ${souEu ? "items-end" : "items-start"}`}
                         >
                           <div
-                            className={`max-w-[75%] px-4 py-2 rounded-2xl ${
+                            className={`max-w-[85%] px-4 py-2 rounded-2xl sm:max-w-[75%] ${
                               souEu
                                 ? "bg-primary text-primary-foreground rounded-tr-sm"
                                 : "bg-muted-foreground/30 border border-border text-foreground rounded-tl-sm shadow-sm"
@@ -290,7 +299,7 @@ export function Mensagens({
             </div>
 
             {/* Input de Envio */}
-            <div className="shrink-0 p-3 bg-card border-t border-border">
+            <div className="shrink-0 border-t border-border bg-card p-2 sm:p-3">
               <form onSubmit={handleEnviar} className="flex gap-2 items-center">
                 <Input
                   value={texto}

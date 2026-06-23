@@ -177,7 +177,9 @@ export const ChatBot = forwardRef(function ChatBot(
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full flex cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white"
+          className={`${usuario.acessouOq === "mensagens" ? "hidden md:flex" : "flex"} w-14 h-14 rounded-full cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white`}
+          aria-label="Abrir assistente virtual"
+          title="Abrir assistente virtual"
           style={{
             backgroundImage:
               "linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)",

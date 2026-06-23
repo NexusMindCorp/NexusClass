@@ -66,7 +66,7 @@ export function BoxAgendamento({
   );
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-lg shadow-black/5">
+    <div className="min-w-0 space-y-4 rounded-xl border border-border bg-card p-3 shadow-lg shadow-black/5 sm:p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold text-foreground">Novo evento</p>
         <span className="rounded-md border border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground">
@@ -149,8 +149,8 @@ export function BoxAgendamento({
           <Label htmlFor="horario-evento" className="text-foreground">
             Horário (opcional)
           </Label>
-          <div className="inline-flex items-center gap-2 rounded-xl border border-input bg-background px-2 py-2 shadow-sm">
-            <div className="flex h-10 items-center gap-2 rounded-lg bg-muted px-2">
+          <div className="flex w-full max-w-sm items-center gap-1.5 rounded-xl border border-input bg-background p-1.5 shadow-sm sm:gap-2 sm:px-2 sm:py-2">
+            <div className="flex h-10 min-w-0 flex-1 items-center gap-1 rounded-lg bg-muted px-1.5 sm:gap-2 sm:px-2">
               <Clock3 className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Select
                 value={horaInicial}
@@ -159,7 +159,7 @@ export function BoxAgendamento({
                   setHorario(`${novaHora}:${minutoFinal}`);
                 }}
               >
-                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
+                <SelectTrigger className="h-8 min-w-0 flex-1 border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
                   <SelectValue placeholder="Hora" />
                 </SelectTrigger>
                 <SelectContent
@@ -185,7 +185,7 @@ export function BoxAgendamento({
 
             <span className="text-sm font-medium text-muted-foreground">:</span>
 
-            <div className="flex h-10 items-center rounded-lg bg-muted px-2">
+            <div className="flex h-10 min-w-0 flex-1 items-center rounded-lg bg-muted px-1.5 sm:px-2">
               <Select
                 value={minutoInicial}
                 onValueChange={(novoMinuto) => {
@@ -193,7 +193,7 @@ export function BoxAgendamento({
                   setHorario(`${horaFinal}:${novoMinuto}`);
                 }}
               >
-                <SelectTrigger className="h-8 w-[4.5rem] border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
+                <SelectTrigger className="h-8 min-w-0 flex-1 border-0 bg-transparent px-1 text-foreground shadow-none ring-0 focus:ring-0 cursor-pointer dark:bg-transparent">
                   <SelectValue placeholder="Min" />
                 </SelectTrigger>
                 <SelectContent
@@ -234,18 +234,18 @@ export function BoxAgendamento({
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-end gap-2 pt-1">
+      <div className="grid grid-cols-2 gap-2 pt-1 sm:flex sm:flex-wrap sm:justify-end">
         <Button
           onClick={cancelaAgendamento}
           variant="outline"
-          className="border-border bg-background text-foreground hover:bg-muted cursor-pointer transition-colors"
+          className="w-full border-border bg-background text-foreground hover:bg-muted cursor-pointer transition-colors sm:w-auto"
         >
           Cancelar
         </Button>
         <Button
           onClick={adicionarEvento}
           disabled={!titulo.trim() || salvandoEvento || !usaSupabase}
-          className="cursor-pointer transition-colors"
+          className="w-full cursor-pointer transition-colors sm:w-auto"
         >
           {salvandoEvento ? "Salvando..." : "Marcar evento"}
         </Button>

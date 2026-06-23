@@ -68,7 +68,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
         </div>
       )}
       {props.usuario.acessouOq === "calendario" && (
-        <div className="w-full flex items-center justify-center p-4">
+        <div className="flex min-w-0 w-full items-center justify-center p-0 sm:p-4">
           <Calendario
             perfil={props.perfil}
             inscricoes={props.usuario.inscricoes}
@@ -90,7 +90,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
         </div>
       )}
       {props.usuario.acessouOq === "mensagens" && (
-        <div className="w-full flex items-center justify-center p-4">
+        <div className="flex min-w-0 w-full items-center justify-center p-0 sm:p-4">
           <Mensagens
             perfil={props.perfil}
             chatAtivoId={props.usuario.chatAtivoId}

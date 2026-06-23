@@ -46,10 +46,10 @@ export function Calendario({
   const isMaster = perfil?.role === "master";
 
   return (
-    <Card className="mx-auto h-fit w-full max-w-5xl border-border bg-card text-card-foreground shadow-2xl backdrop-blur-sm">
-      <CardContent className="space-y-5 p-4 md:p-5">
-        <div className="grid gap-4 xl:grid-cols-[auto_1fr] xl:items-start">
-          <div className="rounded-xl border border-border bg-background p-2 shadow-sm md:p-3">
+    <Card className="mx-auto h-fit w-full max-w-5xl gap-0 overflow-hidden border-border bg-card py-0 text-card-foreground shadow-2xl backdrop-blur-sm">
+      <CardContent className="min-w-0 space-y-4 p-2 sm:p-4 md:p-5">
+        <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(280px,auto)_minmax(0,1fr)] lg:items-start xl:gap-4">
+          <div className="min-w-0 rounded-xl border border-border bg-background p-1 shadow-sm sm:p-2 md:p-3">
             <Calendar
               mode="single"
               selected={date}
@@ -70,11 +70,15 @@ export function Calendario({
                   "rounded-md bg-[linear-gradient(135deg,rgba(139,92,246,0.24)_0%,rgba(236,72,153,0.24)_100%)] text-foreground [&_button]:border [&_button]:border-primary/50 [&_button]:bg-transparent [&_button]:hover:bg-primary/15",
               }}
               classNames={{
-                weekdays: "flex gap-1",
-                week: "flex w-full gap-1 mt-2",
+                root: "w-full",
+                months: "relative flex w-full flex-col",
+                month: "flex w-full flex-col gap-3",
+                month_grid: "w-full border-collapse",
+                weekdays: "flex gap-0.5 sm:gap-1",
+                week: "mt-1.5 flex w-full gap-0.5 sm:mt-2 sm:gap-1",
               }}
               fixedWeeks
-              className="p-2 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(11)]"
+              className="w-full p-1 [--cell-size:--spacing(8)] sm:p-2 sm:[--cell-size:--spacing(9)] md:[--cell-size:--spacing(10)]"
             />
             <div className="flex flex-wrap gap-2 px-2 pb-1 pt-2 text-[11px] text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
@@ -92,7 +96,7 @@ export function Calendario({
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-3 sm:space-y-4">
             {!mostrarBoxAgendamento || !comparaDataHj(date) ? (
               <div className="rounded-xl border border-dashed border-border bg-muted/50 p-4">
                 <p className="text-sm text-muted-foreground">
@@ -142,7 +146,7 @@ export function Calendario({
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2 border-t border-border p-4 md:p-5">
+      <CardFooter className="grid grid-cols-2 gap-2 border-t border-border p-3 sm:flex sm:flex-wrap sm:p-4 md:p-5">
         {[
           { label: "Hoje", value: 0 },
           { label: "Amanhã", value: 1 },
@@ -154,7 +158,7 @@ export function Calendario({
             key={preset.value}
             variant="outline"
             size="sm"
-            className="min-w-[100px] flex-1 border-border bg-background text-foreground hover:bg-muted transition-colors cursor-pointer"
+            className="min-w-0 border-border bg-background text-foreground transition-colors hover:bg-muted sm:min-w-[100px] sm:flex-1 cursor-pointer"
             onClick={() => selecionarDataRelativa(preset.value)}
           >
             {preset.label}
