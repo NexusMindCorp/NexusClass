@@ -44,7 +44,10 @@ create index if not exists idx_eventos_calendario_turma_id
 create index if not exists idx_eventos_calendario_tipo_data
   on public.eventos_calendario (tipo, data);
 
-create or replace function public.usuario_pode_acessar_evento_calendario(
+create schema if not exists internal;
+grant usage on schema internal to authenticated, service_role;
+
+create or replace function internal.usuario_pode_acessar_evento_calendario(
   evento_autor_id uuid,
   evento_tipo text,
   evento_turma_id uuid
@@ -91,7 +94,7 @@ as $$
     );
 $$;
 
-create or replace function public.usuario_pode_criar_evento_turma(
+create or replace function internal.usuario_pode_criar_evento_turma(
   evento_turma_id uuid
 )
 returns boolean
@@ -119,7 +122,7 @@ as $$
     );
 $$;
 
-create or replace function public.usuario_pode_remover_evento_calendario(
+create or replace function internal.usuario_pode_remover_evento_calendario(
   evento_autor_id uuid,
   evento_tipo text,
   evento_turma_id uuid
@@ -153,13 +156,13 @@ as $$
     );
 $$;
 
-revoke all on function public.usuario_pode_acessar_evento_calendario(uuid, text, uuid) from public;
-revoke all on function public.usuario_pode_criar_evento_turma(uuid) from public;
-revoke all on function public.usuario_pode_remover_evento_calendario(uuid, text, uuid) from public;
+revoke all on function internal.usuario_pode_acessar_evento_calendario(uuid, text, uuid) from public, anon;
+revoke all on function internal.usuario_pode_criar_evento_turma(uuid) from public, anon;
+revoke all on function internal.usuario_pode_remover_evento_calendario(uuid, text, uuid) from public, anon;
 
-grant execute on function public.usuario_pode_acessar_evento_calendario(uuid, text, uuid) to authenticated;
-grant execute on function public.usuario_pode_criar_evento_turma(uuid) to authenticated;
-grant execute on function public.usuario_pode_remover_evento_calendario(uuid, text, uuid) to authenticated;
+grant execute on function internal.usuario_pode_acessar_evento_calendario(uuid, text, uuid) to authenticated, service_role;
+grant execute on function internal.usuario_pode_criar_evento_turma(uuid) to authenticated, service_role;
+grant execute on function internal.usuario_pode_remover_evento_calendario(uuid, text, uuid) to authenticated, service_role;
 
 alter table public.eventos_calendario enable row level security;
 alter table public.alertas_calendario enable row level security;
@@ -194,12 +197,16 @@ begin
 end;
 $$;
 
+drop function if exists public.usuario_pode_acessar_evento_calendario(uuid, text, uuid);
+drop function if exists public.usuario_pode_criar_evento_turma(uuid);
+drop function if exists public.usuario_pode_remover_evento_calendario(uuid, text, uuid);
+
 create policy "Calendario: visualizar eventos autorizados"
 on public.eventos_calendario
 for select
 to authenticated
 using (
-  public.usuario_pode_acessar_evento_calendario(autor_id, tipo, turma_id)
+  internal.usuario_pode_acessar_evento_calendario(autor_id, tipo, turma_id)
 );
 
 create policy "Calendario: criar eventos autorizados"
@@ -213,7 +220,7 @@ with check (
     or
     (
       tipo = 'turma'
-      and public.usuario_pode_criar_evento_turma(turma_id)
+      and internal.usuario_pode_criar_evento_turma(turma_id)
     )
   )
 );
@@ -223,7 +230,7 @@ on public.eventos_calendario
 for delete
 to authenticated
 using (
-  public.usuario_pode_remover_evento_calendario(autor_id, tipo, turma_id)
+  internal.usuario_pode_remover_evento_calendario(autor_id, tipo, turma_id)
 );
 
 create policy "Calendario: visualizar alertas autorizados"
@@ -235,7 +242,7 @@ using (
     select 1
     from public.eventos_calendario evento
     where evento.id = alertas_calendario.evento_id
-      and public.usuario_pode_acessar_evento_calendario(
+      and internal.usuario_pode_acessar_evento_calendario(
         evento.autor_id,
         evento.tipo,
         evento.turma_id
