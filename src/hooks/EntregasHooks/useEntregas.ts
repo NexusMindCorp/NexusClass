@@ -10,7 +10,6 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
 
-    // Carregar a entrega própria (se for aluno) ou todas (se for professor/master)
     const carregarDados = useCallback(async () => {
         if (!hasSupabaseConfig || !supabase || !atividadeId) return;
 
@@ -27,7 +26,7 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
                 if (error) throw error;
                 setEntregaPropria(data);
             } else {
-                // Professor ou Admin: carrega todas as entregas com o perfil do aluno
+
                 const { data, error } = await supabase
                     .from("entregas_atividades")
                     .select(`
@@ -57,24 +56,23 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
         }
     }, [atividadeId, perfil.id, perfil.role]);
 
-    // Fazer upload do anexo e salvar a entrega no banco
     const enviarEntrega = async (file: File) => {
         if (!hasSupabaseConfig || !supabase) return;
 
         setUploading(true);
         try {
-            // Evita caracteres especiais no nome do arquivo
+   
             const nomeLimpo = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
             const caminhoArquivo = `${atividadeId}/${perfil.id}/${Date.now()}-${nomeLimpo}`;
 
-            // 1. Upload do arquivo para o bucket
+         
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from("entregas_atividades")
                 .upload(caminhoArquivo, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            // 2. Salva ou atualiza a entrega no banco
+         
             const { error: dbError } = await supabase
                 .from("entregas_atividades")
                 .upsert({
@@ -98,7 +96,7 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
         }
     };
 
-    // Dar nota/feedback (Professor/Master)
+
     const avaliarEntrega = async (alunoId: string, nota: number, feedback: string) => {
         if (!hasSupabaseConfig || !supabase) return;
 
@@ -121,7 +119,7 @@ export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
         }
     };
 
-    // Obter link público/assinado do arquivo de entrega
+
     const obterLinkArquivo = async (caminho: string): Promise<string | null> => {
         if (!hasSupabaseConfig || !supabase) return null;
         try {

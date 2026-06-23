@@ -28,7 +28,7 @@ type BoxAtividadeProps = {
   ) => Promise<void>;
 };
 
-// Auxiliar para extrair URLs limpas da coluna anexo_url
+
 export function obterUrlsAnexo(anexoUrl: string | null): string[] {
   if (!anexoUrl) return [];
   try {

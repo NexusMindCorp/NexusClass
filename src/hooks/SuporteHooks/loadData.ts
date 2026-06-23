@@ -21,7 +21,7 @@ import type { sendContactEmailParams } from "@/hooks/SuporteHooks/type";
           const fileExt = file.name.split('.').pop();
           const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
           
-          // Faz o upload para o bucket 'anexos_suporte'
+         
           const { error: uploadError } = await supabase.storage
             .from('anexos_suporte')
             .upload(fileName, file);
@@ -30,7 +30,6 @@ import type { sendContactEmailParams } from "@/hooks/SuporteHooks/type";
             throw new Error("Erro ao fazer upload do anexo: " + uploadError.message);
           }
     
-          // Pega a URL pública da imagem recém-upada
           const { data: publicUrlData } = supabase.storage
             .from('anexos_suporte')
             .getPublicUrl(fileName);

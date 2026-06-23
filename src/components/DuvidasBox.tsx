@@ -56,7 +56,7 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
     }
   };
 
-  // Filtrar dúvidas conforme o papel do usuário logado
+
   const duvidasFiltradas = duvidas.filter((d) => {
     if (!perfil) return false;
     if (perfil.role === "master") return true;

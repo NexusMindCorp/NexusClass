@@ -5,7 +5,7 @@ import type { PerfilUsuario, TurmaProfessor } from "./type"
 import { carregamentoDados } from "./carregamentoDados"
 
 export function useAuth() {
-    // Control user id to avoid redundant fetches and loadings
+
     const lastUserIdRef = useRef<string | null>(null)
     const isMountedRef = useRef(true)
 
@@ -35,10 +35,10 @@ export function useAuth() {
             isInitialLoad = false
         })
 
-        // Escuta mudanças de estado de autenticação
+
       
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, sessionAtualizada) => {
-            // Ignora o primeiro disparo se for INITIAL_SESSION ou SIGNED_IN redundante com a carga inicial
+
             if (isInitialLoad && (event === "INITIAL_SESSION" || event === "SIGNED_IN")) {
                 return
             }

@@ -201,7 +201,7 @@ export function BoxEntregaAtividade({
             )}
           </div>
         ) : (
-          // Caso não tenha entregue
+     
           <div className="space-y-3">
             <input
               ref={fileInputRef}

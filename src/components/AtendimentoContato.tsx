@@ -58,7 +58,7 @@ export function AtendimentoContato({
       setMensagem("");
       setArquivos([]);
     } catch (err) {
-      // O erro é tratado no hook pai (useMural)
+
     } finally {
       setLoading(false);
     }

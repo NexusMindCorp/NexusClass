@@ -15,7 +15,7 @@ export const ChatBot = forwardRef(function ChatBot(
     perfil: PerfilUsuario | null;
     materiasProfessor: string[];
   }>();
-  // Log for debugging end-to-end subject passing
+
   const {
     isHelpMode,
     isOpen,
@@ -30,7 +30,7 @@ export const ChatBot = forwardRef(function ChatBot(
   } = useChatBox({ usuario, perfil, materiasProfessor, listaEscolar });
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Expor função de abrir com modo ajuda
+ 
   useImperativeHandle(
     ref,
     () => ({

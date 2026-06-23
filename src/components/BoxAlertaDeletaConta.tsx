@@ -16,7 +16,7 @@ export function BoxAlertaDeletaConta({
   const [carregando, setCarregando] = useState(false);
 
   const handleConfirmarDelecao = async () => {
-    // 1. Validação do texto de segurança
+  
     if (textoConfirmacao !== "DELETAR") {
       return toast.error("Você deve digitar DELETAR para confirmar.");
     }
@@ -30,7 +30,7 @@ export function BoxAlertaDeletaConta({
     setCarregando(true);
 
     try {
-      // 2. Valida a senha do usuário tentando fazer login de confirmação
+      
       const { error: authError } = await supabase.auth.signInWithPassword({
         email: perfil.email,
         password: senhaConfirmacao,
@@ -40,7 +40,7 @@ export function BoxAlertaDeletaConta({
         throw new Error("Senha atual incorreta. Confirme suas credenciais.");
       }
 
-      // 3. Obtém as credenciais e o token da sessão atual
+  
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -51,7 +51,7 @@ export function BoxAlertaDeletaConta({
         throw new Error("Credenciais do Supabase não encontradas.");
       }
 
-      // 4. Invoca a Edge Function no backend via fetch nativo, passando apikey na URL para passar pelo preflight CORS
+
       const response = await fetch(
         `${supabaseUrl}/functions/v1/deletar-conta?apikey=${supabaseKey}`,
         {
@@ -72,10 +72,9 @@ export function BoxAlertaDeletaConta({
 
       toast.success("Sua conta foi deletada definitivamente.");
 
-      // 4. Encerra a sessão localmente
+     
       await supabase.auth.signOut();
 
-      // 5. Recarrega a página para atualizar o estado de autenticação geral da aplicação
       window.location.reload();
     } catch (error: any) {
       console.error("Erro na deleção de conta:", error);

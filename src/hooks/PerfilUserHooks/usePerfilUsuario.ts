@@ -20,8 +20,6 @@ export function usePerfilUsuario({ nomeUsuario, currentUserProfile }: usePerfilU
                 try {
                     setLoading(true)
                     setError(null)
-                    
-                    // Buscar apenas as colunas necessárias para o perfil
                     const { data, error: fetchError } = await supabase
                         .from("perfis")
                         .select("id, nome, email, bio, foto_url, role, created_at")
@@ -54,10 +52,10 @@ export function usePerfilUsuario({ nomeUsuario, currentUserProfile }: usePerfilU
             }
         }, [nomeUsuario])
     
-        // Determina se o perfil pesquisado pertence ao usuário logado
+
         const ehProprioUsuario = perfilAlvo && currentUserProfile && perfilAlvo.id === currentUserProfile.id
     
-        // Cor baseada nas iniciais do usuário
+
         const corAvatar = getCorNomeUsuario(nomeUsuario || "U")
     
         return { perfilAlvo, loading, error, ehProprioUsuario, corAvatar }
