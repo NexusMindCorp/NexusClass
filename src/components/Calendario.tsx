@@ -54,6 +54,7 @@ export function Calendario({
           <div className="min-w-0 rounded-xl border border-border bg-background p-1 shadow-sm sm:p-2 md:p-3">
             <Calendar
               mode="single"
+              required
               selected={date}
               onSelect={selecionarDataCalendario}
               month={currentMonth}

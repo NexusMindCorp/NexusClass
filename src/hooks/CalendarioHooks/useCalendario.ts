@@ -253,12 +253,13 @@ export function useCalendario({ perfil, inscricoes, turmasGlobais }: UseCalendar
   }
 
   const selecionarDataCalendario = (novaData: Date | undefined) => {
-    setDateState(novaData ?? hojeLocal())
-    setMostrarBoxAgendamento(Boolean(novaData))
+    const dataSelecionada = novaData ?? date
 
-    if (novaData) {
-      setCurrentMonth(new Date(novaData.getFullYear(), novaData.getMonth(), 1))
-    }
+    setDateState(dataSelecionada)
+    setMostrarBoxAgendamento(true)
+    setCurrentMonth(
+      new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth(), 1)
+    )
   }
 
   const cancelarAgendamento = () => {
