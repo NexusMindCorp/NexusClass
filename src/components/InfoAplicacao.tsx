@@ -126,20 +126,20 @@ const atores: CardItem[] = [
 
 const metricasProjeto = [
   {
-    valor: "3",
-    rotulo: "perfis de usuario",
+    valor: "+300",
+    rotulo: "commits no GitHub",
   },
   {
-    valor: "6+",
-    rotulo: "modulos centrais",
+    valor: "+130h",
+    rotulo: "estimadas pelo Git",
   },
   {
-    valor: "Full-stack",
-    rotulo: "React + Supabase",
+    valor: "30",
+    rotulo: "dias com atividade",
   },
   {
-    valor: "IA",
-    rotulo: "assistente contextual",
+    valor: "2",
+    rotulo: "desenvolvedores",
   },
 ];
 
@@ -330,7 +330,10 @@ export function InfoAplicacao() {
               Modelagem de Sistemas
             </Badge>
             <Badge variant="outline" className="info-hero-badge">
-              LMS Full-stack
+              GitHub + Vercel
+            </Badge>
+            <Badge variant="outline" className="info-hero-badge">
+              Supabase
             </Badge>
           </div>
 
@@ -650,7 +653,7 @@ export function InfoAplicacao() {
           className="gap-2 border border-border shadow-sm transition-colors hover:bg-primary/10 hover:text-primary cursor-pointer"
         >
           <a
-            href="https://github.com/NexusMindCorp/NexusClassWeb"
+            href="https://github.com/NexusMindCorp/NexusClass"
             target="_blank"
             rel="noopener noreferrer"
           >
