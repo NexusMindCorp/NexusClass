@@ -197,6 +197,76 @@
   }
 }
 
+@layer InfoAplicacao {
+  .info-apresentacao {
+    @apply w-full max-w-6xl space-y-5 rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm transition-colors md:p-6;
+  }
+
+  .info-slide-card {
+    @apply rounded-lg border border-border bg-muted/30 p-4 shadow-sm transition-colors hover:bg-muted/45;
+  }
+
+  .info-slide-destaque {
+    @apply bg-primary/5 hover:bg-primary/10;
+  }
+
+  .info-section-header {
+    @apply mb-4 flex items-start gap-3;
+  }
+
+  .info-section-icon {
+    @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-primary/25 bg-primary/10 text-primary;
+  }
+
+  .info-mini-card {
+    @apply flex gap-3 rounded-md border border-border bg-background/60 p-3 transition-colors hover:border-primary/35 hover:bg-background;
+  }
+
+  .info-mini-icon {
+    @apply mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/10 text-primary;
+  }
+
+  .info-architecture-grid {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-4;
+  }
+
+  .info-architecture-step {
+    @apply rounded-md border border-border bg-background/60 p-3 transition-colors hover:border-primary/35 hover:bg-background;
+  }
+
+  .info-architecture-step span {
+    @apply mb-3 inline-flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-xs font-bold text-primary;
+  }
+
+  .info-architecture-step strong {
+    @apply block text-sm font-semibold text-foreground;
+  }
+
+  .info-architecture-step p {
+    @apply mt-1 text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .info-demo-step {
+    @apply flex items-start gap-3 rounded-md border border-border bg-background/60 p-3 text-sm text-foreground/90 transition-colors hover:border-primary/35 hover:bg-background;
+  }
+
+  .info-demo-step span {
+    @apply flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary;
+  }
+
+  .info-demo-step p {
+    @apply leading-relaxed;
+  }
+
+  .info-limit-item {
+    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .info-dev-card {
+    @apply flex items-center gap-4 rounded-lg border border-border bg-background/60 p-4 transition-all hover:border-primary/50 hover:bg-background;
+  }
+}
+
 @layer Mural {
   .mural-navegacao {
     @apply grid w-full grid-cols-2 items-center gap-1 rounded-xl border border-white/15 bg-black/35 p-1 shadow-lg backdrop-blur-md sm:flex sm:w-auto sm:flex-wrap sm:justify-end;
