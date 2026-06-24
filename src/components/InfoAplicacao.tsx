@@ -9,7 +9,6 @@ import {
   Zap,
   Cloud,
   Terminal,
-  Info,
   ShieldCheck,
   Users,
   Workflow,
@@ -25,6 +24,11 @@ import {
   XCircle,
   FileWarning,
   Lightbulb,
+  Bot,
+  Component,
+  MousePointerClick,
+  PlugZap,
+  RadioTower,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -97,7 +101,7 @@ const tecnologias: BadgeItem[] = [
   },
   {
     nome: "shadcn/ui",
-    icone: Info,
+    icone: Component,
     cor: "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
   },
 ];
@@ -205,7 +209,7 @@ const funcionalidadesImplementadas: CardItem[] = [
   {
     titulo: "Assistente Tigreso",
     descricao: "Chatbot integrado ao Gemini, que consulta o contexto da plataforma, como eventos, atividades, posts e dúvidas.",
-    icone: Sparkles,
+    icone: Bot,
   },
 ];
 
@@ -238,7 +242,7 @@ const qualidadeUx: CardItem[] = [
   {
     titulo: "Usabilidade",
     descricao: "Temas claro/escuro, feedback por toasts, badges de notificacao e layout com navegação latéral.",
-    icone: CheckCircle2,
+    icone: MousePointerClick,
   },
 ];
 
@@ -251,7 +255,7 @@ const conexaoSistema: CardItem[] = [
   {
     titulo: "Supabase SDK",
     descricao: "O cliente centraliza chamadas de login, consultas, inserts, updatés, Storage e realtime.",
-    icone: Server,
+    icone: PlugZap,
   },
   {
     titulo: "Banco PostgreSQL",
@@ -261,7 +265,7 @@ const conexaoSistema: CardItem[] = [
   {
     titulo: "Segurança e tempo real",
     descricao: "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensíveis.",
-    icone: ShieldCheck,
+    icone: RadioTower,
   },
 ];
 
