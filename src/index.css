@@ -178,6 +178,20 @@
   }
 }
 
+@layer Sidebar {
+  [data-collapsible="icon"] [data-sidebar="group"] {
+    @apply px-1;
+  }
+
+  [data-collapsible="icon"] .sidebar-turma-button {
+    @apply mx-auto flex size-9 items-center justify-center p-0;
+  }
+
+  [data-collapsible="icon"] .sidebar-turma-button > div {
+    @apply m-0 h-7 w-7 ml-1.5;
+  }
+}
+
 @layer Mensagens {
   .mensagens-dialog-exclusao {
     @apply border-border bg-card text-card-foreground shadow-2xl;

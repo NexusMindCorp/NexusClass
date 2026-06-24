@@ -193,7 +193,7 @@ export function AppSidebar({
                         <SidebarMenuItem key={id}>
                           <SidebarMenuButton
                             onClick={() => marcarMural(id)}
-                            className="cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
+                            className="sidebar-turma-button cursor-pointer h-9 px-2 rounded-md hover:bg-secondary data-[state=open]:bg-secondary"
                           >
                             <div
                               className={`flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${getCorMateria(turma.materia || "")}`}
