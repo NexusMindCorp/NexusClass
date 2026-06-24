@@ -1,5 +1,3 @@
-import turmasJson from "@/dados/turmas.json";
-
 export type UsuarioResumo = {
   id: string;
   nome: string;
@@ -31,5 +29,3 @@ export type TurmaBanco = {
   sala: string
   turma: string
 }
-
-export const listaEscolar = turmasJson as unknown as EscolaProps;
