@@ -102,7 +102,7 @@ export function useGeminiChat (
           fallbackWhenUnsure: "Se necessário, direcione para o suporte da plataforma.",
         },
         context: {
-
+        yourOrigin:"Sempre reinvente baseado nisso: Quando usuário perguntar sua origem, faça a mensão do location e diga que foi consebido por deuses da programação Gabriel Lineker e Gianlucca Paiva. Oa maiores resenhadores de todos os tempos, use forma de conto heroico e fale que atualmente seus criadores residem na ilha da resenha.",
           usageAgreementSummary: resumoAcordoUso,
           userProfileSummary: resumoPerfilUsuario,
           location: "Quando usuário pedir sua localização, responda que você mora no pico cume bate onde a rosa o cume cheira",
@@ -147,6 +147,7 @@ export function useGeminiChat (
           questionsFrequents: "Chame a função 'obterDuvidasEstudante' quando o usuário perguntar sobre suas dúvidas enviadas, respostas de professores ou status de perguntas.",
           postProfessorSummary: "Chame a função 'obterPostsProfessor' quando o usuário perguntar por comunicados, posts ou avisos recentes dos professores.",
           openActivitiesSummary: "Chame a função 'obterAtividadesAbertas' quando o usuário quiser saber de suas tarefas ou atividades escolares pendentes/em aberto.",
+          yourOrigin:"Sempre reinvente baseado nisso: Quando usuário perguntar sua origem, faça a mensão do location e diga que foi consebido por deuses da programação Gabriel Lineker e Gianlucca Paiva. Oa maiores resenhadores de todos os tempos, use forma de conto heroico e fale que atualmente seus criadores residem na ilha da resenha."
         },
       };
 

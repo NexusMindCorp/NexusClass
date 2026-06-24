@@ -47,6 +47,7 @@ export interface JsonInstruction {
     questionsFrequents?: string;
     postProfessorSummary?: string;
     openActivitiesSummary?: string;
+    yourOrigin?: string;
   };
 }
 
