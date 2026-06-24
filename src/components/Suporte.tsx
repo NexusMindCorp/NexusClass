@@ -26,7 +26,7 @@ export function Suporte() {
   } = useSuporte();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 lg:px-8 container-expansivel-suporte">
       <div className="mb-6 space-y-2">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-sm text-foreground backdrop-blur">
           <Sparkles className="h-4 w-4 text-primary" />

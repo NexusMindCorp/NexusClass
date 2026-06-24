@@ -48,7 +48,7 @@ export function Calendario({
   const isMaster = perfil?.role === "master";
 
   return (
-    <Card className="mx-auto h-fit w-full max-w-5xl gap-0 overflow-hidden border-border bg-card py-0 text-card-foreground shadow-2xl backdrop-blur-sm">
+    <Card className="mx-auto h-fit w-full max-w-5xl gap-0 overflow-hidden border-border bg-card py-0 text-card-foreground shadow-2xl backdrop-blur-sm container-expansivel-calendario">
       <CardContent className="min-w-0 space-y-4 p-2 sm:p-4 md:p-5">
         <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(280px,auto)_minmax(0,1fr)] lg:items-start xl:gap-4">
           <div className="min-w-0 rounded-xl border border-border bg-background p-1 shadow-sm sm:p-2 md:p-3">

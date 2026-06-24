@@ -481,3 +481,57 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(139, 92, 246, 0.3) transparent; 
 }
+
+/* --- COLLAPSED SIDEBAR RESPONSO-EXPANSIVE CONTAINERS --- */
+.container-expansivel-mural,
+.container-expansivel-duvidas,
+.container-expansivel-calendario,
+.container-expansivel-mensagens,
+.container-expansivel-suporte,
+.container-expansivel-privacidade,
+.container-expansivel-configuracoes,
+.container-expansivel-configuracoes-interna,
+.container-expansivel-alunos {
+  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sidebar COLLAPSED overrides (when sidebar is closed, expand them to occupy more space) */
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-mural {
+  max-width: 56rem !important; /* expands from max-w-3xl (48rem) to max-w-4xl (56rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-duvidas {
+  max-width: 56rem !important; /* expands from max-w-3xl (48rem) to max-w-4xl (56rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-calendario {
+  max-width: 75rem !important; /* expands from max-w-5xl (64rem) to max-w-6xl (72rem) or 75rem */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-mensagens {
+  max-width: 75rem !important; /* expands from max-w-5xl (64rem) to max-w-6xl (72rem) or 75rem */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-suporte {
+  max-width: 80rem !important; /* expands from max-w-6xl (72rem) to max-w-7xl (80rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-privacidade {
+  max-width: 72rem !important; /* expands from max-w-4xl (56rem) to max-w-6xl (72rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-configuracoes {
+  max-width: 56rem !important; /* expands from max-w-3xl (48rem) to max-w-4xl (56rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-configuracoes-interna {
+  max-width: 72rem !important; /* expands from max-w-4xl (56rem) to max-w-6xl (72rem) */
+}
+.peer[data-state="collapsed"] ~ .pagina-principal .container-expansivel-alunos {
+  max-width: 72rem !important; /* expands from max-w-4xl (56rem) to max-w-6xl (72rem) */
+}
+
+/* Adjust grid-turmas grid-template-columns when sidebar is collapsed */
+@media (min-width: 1024px) {
+  .peer[data-state="collapsed"] ~ .pagina-principal .grid-turmas {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1280px) {
+  .peer[data-state="collapsed"] ~ .pagina-principal .grid-turmas {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}

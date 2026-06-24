@@ -30,7 +30,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
         )}
       {(props.usuario.acessouOq === "principal" ||
         props.usuario.acessouOq === "pesquisar") && (
-        <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="display grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 grid-turmas">
           {props.listaEscolar.turmas &&
             Object.entries(props.listaEscolar.turmas)
               .filter(
@@ -118,7 +118,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
 
       {props.usuario.acessouOq === "configuracoesAvancadas" && (
         <div className="w-full flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl">
+          <div className="w-full max-w-3xl container-expansivel-configuracoes">
             <ConfiguracoesAvancadas
               estaInscrito={props.estaInscrito}
               usuario={props.usuario}

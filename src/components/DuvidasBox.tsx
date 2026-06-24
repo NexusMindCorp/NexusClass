@@ -85,7 +85,7 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
     );
   }
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-6 min-h-screen pb-16">
+    <div className="mx-auto w-full max-w-3xl space-y-6 min-h-screen pb-16 container-expansivel-duvidas">
       <div className="flex flex-col gap-1.5 border-b border-border/60 pb-4">
         <h2 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
           <MessageSquare className="h-6 w-6 text-primary" />

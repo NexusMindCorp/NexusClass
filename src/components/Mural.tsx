@@ -72,7 +72,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
   } = useMural(materia, perfil);
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-1 min-h-screen pb-16">
+    <div className="mx-auto w-full max-w-3xl space-y-1 min-h-screen pb-16 container-expansivel-mural">
       {nomePerfilParaVer && (
         <BoxPerfilUsuario
           nomeUsuario={nomePerfilParaVer}

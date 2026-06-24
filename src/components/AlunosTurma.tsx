@@ -129,7 +129,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
   return (
     <>
       {renderiarModal}
-      <div className="space-y-4 max-w-4xl mx-auto pb-8">
+      <div className="space-y-4 max-w-4xl mx-auto pb-8 container-expansivel-alunos">
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-lg font-medium flex items-center gap-2">

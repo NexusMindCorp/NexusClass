@@ -13,7 +13,7 @@ type AcordoPrivacidadeProps = {
 
 export function AcordoPrivacidade({ acionarAjuda }: AcordoPrivacidadeProps) {
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4 container-expansivel-privacidade">
       <Card className="bg-card text-card-foreground border-border shadow-2xl">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">

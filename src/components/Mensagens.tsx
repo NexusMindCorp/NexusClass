@@ -114,7 +114,7 @@ export function Mensagens({
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-5.5rem)] min-h-[28rem] w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-sm md:h-[75vh]">
+    <div className="mx-auto flex h-[calc(100dvh-5.5rem)] min-h-[28rem] w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-card shadow-sm md:h-[75vh] container-expansivel-mensagens">
       {/* BARRA LATERAL: Lista de Conversas */}
       <div
         className={`${contatoAtivo ? "hidden md:flex" : "flex"} min-h-0 w-full flex-col bg-muted/20 md:w-1/3 md:min-w-[250px] md:border-r md:border-border`}

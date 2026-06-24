@@ -37,7 +37,7 @@ export function ConfiguracoesAvancadas({
   };
 
   return isAluno ? (
-    <div className="w-full max-w-4xl mx-auto space-y-8 pb-10">
+    <div className="w-full max-w-4xl mx-auto space-y-8 pb-10 container-expansivel-configuracoes-interna">
       <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-sm transition-colors">
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-shrink-0">
