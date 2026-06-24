@@ -400,107 +400,6 @@ export function InfoAplicacao() {
 
       <section className="info-slide-card">
         <SectionHeader
-          icone={Server}
-          titulo="Arquitetura do Software"
-          descricao="Cliente-servidor multi-camadas, com SPA em React e backend em nuvem via Supabase."
-        />
-        <div className="info-architecture-grid">
-          <div className="info-architecture-step">
-            <span>01</span>
-            <strong>Apresentacao</strong>
-            <p>React, TypeScript, Tailwind e shadcn/ui no navegador.</p>
-          </div>
-          <div className="info-architecture-step">
-            <span>02</span>
-            <strong>Controle</strong>
-            <p>Hooks customizados organizam estado, navegacao e regras.</p>
-          </div>
-          <div className="info-architecture-step">
-            <span>03</span>
-            <strong>Backend</strong>
-            <p>Supabase fornece Auth, Postgres, Storage e Realtime.</p>
-          </div>
-          <div className="info-architecture-step">
-            <span>04</span>
-            <strong>Servicos</strong>
-            <p>Gemini AI, Vercel, GitHub e automacoes no banco.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="info-flow-card">
-        <div>
-          <SectionHeader
-            icone={Workflow}
-            titulo="Fluxo Principal do Produto"
-            descricao="Como a experiencia se organiza do acesso inicial ate a persistencia dos dados."
-          />
-        </div>
-        <div className="info-flow-grid">
-          {fluxoProduto.map((item, index) => (
-            <div key={item.etapa} className="info-flow-step">
-              <span>{index + 1}</span>
-              <strong>{item.etapa}</strong>
-              <p>{item.detalhe}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={Database}
-          titulo="Conexao Front-end, Back-end e Banco"
-          descricao="Como os dados saem da interface, passam pelo Supabase e retornam para o usuario."
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {conexaoSistema.map((item) => (
-            <InfoCard key={item.titulo} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={Users}
-          titulo="Atores do Sistema"
-          descricao="A interface e os acessos mudam conforme o papel do usuario autenticado."
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          {atores.map((item) => (
-            <InfoCard key={item.titulo} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={ClipboardList}
-          titulo="Funcionalidades Implementadas"
-          descricao="Parte pratica que deve ser demonstrada ao professor durante a simulacao."
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {funcionalidadesImplementadas.map((item) => (
-            <InfoCard key={item.titulo} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={ShieldCheck}
-          titulo="Interface, UX e Qualidade Tecnica"
-          descricao="Criterios de correcao ligados a experiencia do usuario, seguranca, desempenho e manutenibilidade."
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {qualidadeUx.map((item) => (
-            <InfoCard key={item.titulo} item={item} />
-          ))}
-        </div>
-      </section>
-
-      <section className="info-slide-card">
-        <SectionHeader
           icone={Workflow}
           titulo="Como foi feito"
           descricao="O projeto saiu de um prototipo simples e evoluiu ate uma aplicacao hospedada, persistente e integrada."
@@ -539,6 +438,107 @@ export function InfoAplicacao() {
               storage e tempo real ficam concentrados no Supabase.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="info-slide-card">
+        <SectionHeader
+          icone={Users}
+          titulo="Atores do Sistema"
+          descricao="A interface e os acessos mudam conforme o papel do usuario autenticado."
+        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {atores.map((item) => (
+            <InfoCard key={item.titulo} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="info-slide-card">
+        <SectionHeader
+          icone={Server}
+          titulo="Arquitetura do Software"
+          descricao="Cliente-servidor multi-camadas, com SPA em React e backend em nuvem via Supabase."
+        />
+        <div className="info-architecture-grid">
+          <div className="info-architecture-step">
+            <span>01</span>
+            <strong>Apresentacao</strong>
+            <p>React, TypeScript, Tailwind e shadcn/ui no navegador.</p>
+          </div>
+          <div className="info-architecture-step">
+            <span>02</span>
+            <strong>Controle</strong>
+            <p>Hooks customizados organizam estado, navegacao e regras.</p>
+          </div>
+          <div className="info-architecture-step">
+            <span>03</span>
+            <strong>Backend</strong>
+            <p>Supabase fornece Auth, Postgres, Storage e Realtime.</p>
+          </div>
+          <div className="info-architecture-step">
+            <span>04</span>
+            <strong>Servicos</strong>
+            <p>Gemini AI, Vercel, GitHub e automacoes no banco.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="info-slide-card">
+        <SectionHeader
+          icone={Database}
+          titulo="Conexao Front-end, Back-end e Banco"
+          descricao="Como os dados saem da interface, passam pelo Supabase e retornam para o usuario."
+        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {conexaoSistema.map((item) => (
+            <InfoCard key={item.titulo} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="info-flow-card">
+        <div>
+          <SectionHeader
+            icone={Workflow}
+            titulo="Fluxo Principal do Produto"
+            descricao="Como a experiencia se organiza do acesso inicial ate a persistencia dos dados."
+          />
+        </div>
+        <div className="info-flow-grid">
+          {fluxoProduto.map((item, index) => (
+            <div key={item.etapa} className="info-flow-step">
+              <span>{index + 1}</span>
+              <strong>{item.etapa}</strong>
+              <p>{item.detalhe}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="info-slide-card">
+        <SectionHeader
+          icone={ClipboardList}
+          titulo="Funcionalidades Implementadas"
+          descricao="Parte pratica que deve ser demonstrada ao professor durante a simulacao."
+        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {funcionalidadesImplementadas.map((item) => (
+            <InfoCard key={item.titulo} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="info-slide-card">
+        <SectionHeader
+          icone={ShieldCheck}
+          titulo="Interface, UX e Qualidade Tecnica"
+          descricao="Criterios de correcao ligados a experiencia do usuario, seguranca, desempenho e manutenibilidade."
+        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {qualidadeUx.map((item) => (
+            <InfoCard key={item.titulo} item={item} />
+          ))}
         </div>
       </section>
 
