@@ -90,11 +90,6 @@ const tecnologias: BadgeItem[] = [
     cor: "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20",
   },
   {
-    nome: "Supabase Auth",
-    icone: Lock,
-    cor: "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20",
-  },
-  {
     nome: "Realtime",
     icone: Bell,
     cor: "text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
