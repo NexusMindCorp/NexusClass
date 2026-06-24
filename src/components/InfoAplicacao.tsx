@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { InfoCard, SectionHeader } from "./InfoAplicacao/InfoElementos";
+import { InfoCard, SectionHeader } from "../hooks/InfoAplicacao/InfoElementos";
 import {
   atores,
   conexaoSistema,
@@ -29,7 +29,7 @@ import {
   metricasProjeto,
   qualidadeUx,
   tecnologias,
-} from "./InfoAplicacao/config";
+} from "../hooks/InfoAplicacao/config";
 
 export function InfoAplicacao() {
   return (
