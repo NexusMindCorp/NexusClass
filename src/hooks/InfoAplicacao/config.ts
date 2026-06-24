@@ -214,9 +214,9 @@ export const funcionalidadesImplementadas: CardItem[] = [
     icone: CalendarDays,
   },
   {
-    titulo: "Assistente Tigreso",
+    titulo: "Assistentes: Tigreso e Falcão Peregrino",
     descricao:
-      "Chatbot integrado ao Gemini, com consulta ao contexto da plataforma: eventos, atividades, posts e dúvidas.",
+      "Chatbot integrado ao Gemini, com consulta ao contexto da plataforma: eventos, atividades, posts e dúvidas, além de auxilio sobre os termos de uso.",
     icone: Bot,
   },
 ];
