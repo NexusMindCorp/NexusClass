@@ -50,7 +50,7 @@ const devs = [
   {
     nome: "Gianlucca Paiva",
     iniciais: "GP",
-    cargo: "Full-stack e requisitos",
+    cargo: "Full-stack, requisitos e segurança",
     github: "https://github.com/gianluccapaiva",
     corGradiente: "bg-gradient-to-br from-purple-600 to-pink-500",
   },
@@ -109,17 +109,20 @@ const tecnologias: BadgeItem[] = [
 const atores: CardItem[] = [
   {
     titulo: "Aluno",
-    descricao: "Inscreve-se em turmas, acompanha murais, envia atividades, tira dúvidas, usa mensagens, calendário e o Tigreso.",
+    descricao:
+      "Inscreve-se em turmas, acompanha murais, envia atividades, tira dúvidas, usa mensagens, calendário e o Tigreso.",
     icone: User,
   },
   {
     titulo: "Professor",
-    descricao: "Gerencia turmas, publica avisos, cria atividades, acompanha entregas, atribui nota e responde dúvidas.",
+    descricao:
+      "Gerencia turmas, publica avisos, cria atividades, acompanha entregas, atribui notas e responde dúvidas.",
     icone: BookOpenCheck,
   },
   {
     titulo: "Gestão / Master",
-    descricao: "Tem visão administrativa ampliada para apoiar a organização das turmas e a demonstração do sistema.",
+    descricao:
+      "Tem visão administrativa ampliada para apoiar a organização das turmas e a demonstração do sistema.",
     icone: ShieldCheck,
   },
 ];
@@ -134,7 +137,7 @@ const metricasProjeto = [
     rotulo: "estimadas pelo Git",
   },
   {
-    valor: "30",
+    valor: "+30",
     rotulo: "dias com atividade",
   },
   {
@@ -146,7 +149,7 @@ const metricasProjeto = [
 const fluxoProduto = [
   {
     etapa: "Login",
-    detalhe: "Supabase Auth valida a sessão e carrega o perfil.",
+    detalhe: "O Supabase Auth valida a sessão e carrega o perfil.",
   },
   {
     etapa: "Turmas",
@@ -154,11 +157,13 @@ const fluxoProduto = [
   },
   {
     etapa: "Interação",
-    detalhe: "Mural, atividades, dúvidas, chat e calendário concentram o uso diário.",
+    detalhe:
+      "Mural, atividades, dúvidas, chat e calendário concentram o uso diário.",
   },
   {
     etapa: "Persistência",
-    detalhe: "PostgreSQL, Storage e Realtime mantêm os dados sincronizados.",
+    detalhe:
+      "PostgreSQL, Storage e Realtime mantêm os dados sincronizados.",
   },
 ];
 
@@ -166,49 +171,58 @@ const implantacaoEtapas = [
   {
     titulo: "Protótipo",
     plataforma: "GitHub Pages",
-    detalhe: "Publicação inicial da SPA enquanto o projeto ainda era majoritariamente front-end.",
+    detalhe:
+      "Publicação inicial da SPA enquanto o projeto ainda era majoritariamente front-end.",
   },
   {
     titulo: "Versão final",
     plataforma: "Vercel",
-    detalhe: "Build automatizado do Vite, variáveis de ambiente e deploy integrado ao GitHub.",
+    detalhe:
+      "Build automatizado do Vite, variáveis de ambiente e deploy integrado ao GitHub.",
   },
   {
     titulo: "Backend",
     plataforma: "Supabase",
-    detalhe: "Auth, PostgreSQL, Storage, Realtime, triggers e Edge Function fora da camada de hospedagem.",
+    detalhe:
+      "Auth, PostgreSQL, Storage, Realtime, triggers e Edge Function fora da camada de hospedagem.",
   },
 ];
 
 const funcionalidadesImplementadas: CardItem[] = [
   {
     titulo: "Autenticação e sessões",
-    descricao: "Login, cadastro, logout, rotas protegidas e carregamento do perfil autenticado, via Supabase Auth.",
+    descricao:
+      "Login, cadastro, logout, rotas protegidas e carregamento do perfil autenticado via Supabase Auth.",
     icone: Lock,
   },
   {
     titulo: "Turmas e inscrições",
-    descricao: "Listagem dinâmica de turmas, pesquisa, entrada em turmas e controle de inscrição por usuário.",
+    descricao:
+      "Listagem dinâmica de turmas, pesquisa, entrada em turmas e controle de inscrição por usuário.",
     icone: Users,
   },
   {
     titulo: "Mural e atividades",
-    descricao: "Avisos por turma, criação de atividades, anexos, entregas de alunos e avaliação com nota e feedback.",
+    descricao:
+      "Avisos por turma, criação de atividades, anexos, entregas de alunos e avaliação com nota e feedback.",
     icone: ClipboardList,
   },
   {
-    titulo: "Comúnicação",
-    descricao: "Mensagens privadas em tempo real, dúvidas entre aluno e professor, suporte, denúncias e indicadores visuais.",
+    titulo: "Comunicação",
+    descricao:
+      "Mensagens privadas em tempo real, dúvidas entre aluno e professor, suporte, denúncias e indicadores visuais.",
     icone: MessageCircle,
   },
   {
     titulo: "Calendário e alertas",
-    descricao: "Eventos pessoais e de turma, lembretes de compromissos e notificações para o usuário durante o uso.",
+    descricao:
+      "Eventos pessoais e de turma, lembretes de compromissos e notificações para o usuário durante o uso.",
     icone: CalendarDays,
   },
   {
     titulo: "Assistente Tigreso",
-    descricao: "Chatbot integrado ao Gemini, que consulta o contexto da plataforma, como eventos, atividades, posts e dúvidas.",
+    descricao:
+      "Chatbot integrado ao Gemini que consulta o contexto da plataforma, como eventos, atividades, posts e dúvidas.",
     icone: Bot,
   },
 ];
@@ -216,32 +230,38 @@ const funcionalidadesImplementadas: CardItem[] = [
 const qualidadeUx: CardItem[] = [
   {
     titulo: "Responsividade",
-    descricao: "Interface adaptada para desktop e mobile, com sidebar responsiva e componentes reutilizáveis.",
+    descricao:
+      "Interface adaptada para desktop e mobile, com sidebar responsiva e componentes reutilizáveis.",
     icone: MonitorSmartphone,
   },
   {
     titulo: "Segurança",
-    descricao: "Acesso protegido por autenticação, RLS no banco e operações sensíveis concentradas no Supabase.",
+    descricao:
+      "Acesso protegido por autenticação, RLS no banco e operações sensíveis concentradas no Supabase.",
     icone: ShieldCheck,
   },
   {
     titulo: "Persistência",
-    descricao: "Dados dinâmicos gravados em PostgreSQL na nuvem, substituindo a dependência de arquivos locais.",
+    descricao:
+      "Dados dinâmicos gravados em PostgreSQL na nuvem, substituindo a dependência de arquivos locais.",
     icone: Database,
   },
   {
     titulo: "Manutenibilidade",
-    descricao: "TypeScript, separação por componentes e hooks customizados para organizar o estado e as regras de interface.",
+    descricao:
+      "TypeScript, separação por componentes e hooks customizados para organizar o estado e as regras de interface.",
     icone: Code2,
   },
   {
     titulo: "Desempenho",
-    descricao: "SPA com Vite e React, transições internas rápidas e uso de localStorage para estados visuais não críticos.",
+    descricao:
+      "SPA com Vite e React, transições internas rápidas e uso de localStorage para estados visuais não críticos.",
     icone: Zap,
   },
   {
     titulo: "Usabilidade",
-    descricao: "Temas claro/escuro, feedback por toasts, badges de notificacao e layout com navegação latéral.",
+    descricao:
+      "Temas claro/escuro, feedback por toasts, badges de notificação e layout com navegação lateral.",
     icone: MousePointerClick,
   },
 ];
@@ -249,22 +269,26 @@ const qualidadeUx: CardItem[] = [
 const conexaoSistema: CardItem[] = [
   {
     titulo: "Frontend SPA",
-    descricao: "A interface roda no navegador, com React Router, componentes reutilizáveis e troca interna de telas.",
+    descricao:
+      "A interface roda no navegador, com React Router, componentes reutilizáveis e troca interna de telas.",
     icone: MonitorSmartphone,
   },
   {
     titulo: "Supabase SDK",
-    descricao: "O cliente centraliza chamadas de login, consultas, inserts, updatés, Storage e realtime.",
+    descricao:
+      "O cliente centraliza chamadas de login, consultas, inserts, updates, Storage e Realtime.",
     icone: PlugZap,
   },
   {
     titulo: "Banco PostgreSQL",
-    descricao: "As entidades principais ficam em tabelas como perfis, turmas, mural, atividades, entregas e mensagens.",
+    descricao:
+      "As entidades principais ficam em tabelas como perfis, turmas, mural, atividades, entregas e mensagens.",
     icone: Database,
   },
   {
     titulo: "Segurança e tempo real",
-    descricao: "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensíveis.",
+    descricao:
+      "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensíveis.",
     icone: RadioTower,
   },
 ];
@@ -343,7 +367,7 @@ export function InfoAplicacao() {
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Plataforma educacional web para aproximar alunos, professores e
-              gestão, reunindo comúnicação, atividades, calendário, suporte e
+              gestão, reunindo comunicação, atividades, calendário, suporte e
               inteligência artificial em uma experiência única.
             </p>
           </div>
@@ -376,7 +400,7 @@ export function InfoAplicacao() {
               A ideia surgiu a partir da participação dos desenvolvedores no
               projeto externo <strong>GET SI</strong>, no qual a equipe atua no
               desenvolvimento de uma aplicação mobile para o Jardim Botânico. Ao
-              entrarem nesse projeto, o monitor <strong>Igor Knop</strong>,
+              entrarem nesse projeto, o monitor <strong>Igor Knop</strong>{" "}
               auxiliou no aprendizado das tecnologias usadas na aplicação,
               preparando a dupla para operar melhor com React, TypeScript,
               componentes, integração com serviços externos e organização de
@@ -394,7 +418,11 @@ export function InfoAplicacao() {
 
           <div className="info-story-highlight">
             <strong>Principais evoluções</strong>
-            <span>Autenticação real, banco em nuvem, turmas dinâmicas, mural, atividades com entregas, chat interno, calendário, suporte, dúvidas e assistente de IA integrado.</span>
+            <span>
+              Autenticação real, banco em nuvem, turmas dinâmicas, mural,
+              atividades com entregas, chat interno, calendário, suporte,
+              dúvidas e assistente de IA integrado.
+            </span>
           </div>
         </div>
       </section>
@@ -521,7 +549,7 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={ClipboardList}
           titulo="Funcionalidades Implementadas"
-          descricao="Parte prática que deve ser demonstrada ao professor durante a simulacao."
+          descricao="Parte prática que deve ser demonstrada ao professor durante a simulação."
         />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {funcionalidadesImplementadas.map((item) => (
@@ -593,15 +621,24 @@ export function InfoAplicacao() {
           <div className="info-disclaimer-grid">
             <div className="info-disclaimer-item">
               <CheckCircle2 className="h-4 w-4" />
-              <span>Usuários, turmas, mensagens e exemplos foram criados apenas para demonstrar o funcionamento do sistema.</span>
+              <span>
+                Usuários, turmas, mensagens e exemplos foram criados apenas para
+                demonstrar o funcionamento do sistema.
+              </span>
             </div>
             <div className="info-disclaimer-item">
               <CheckCircle2 className="h-4 w-4" />
-              <span>Alguns nomes e imagens usam personagens, referências de filmes e séries ou dados inventados para ilustração.</span>
+              <span>
+                Alguns nomes e imagens usam personagens, referências de filmes e
+                séries ou dados inventados para ilustração.
+              </span>
             </div>
             <div className="info-disclaimer-item">
               <XCircle className="h-4 w-4" />
-              <span>Nenhuma conta representa uma pessoa real, cadastro institucional ou informação oficial de ensino.</span>
+              <span>
+                Nenhuma conta representa uma pessoa real, cadastro institucional
+                ou informação oficial de ensino.
+              </span>
             </div>
           </div>
         </div>
@@ -624,7 +661,7 @@ export function InfoAplicacao() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="truncaté font-semibold text-foreground transition-colors group-hover:text-primary">
+                <h4 className="truncate font-semibold text-foreground transition-colors group-hover:text-primary">
                   {dev.nome}
                 </h4>
                 <p className="text-xs text-muted-foreground">{dev.cargo}</p>
