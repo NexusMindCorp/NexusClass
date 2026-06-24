@@ -52,7 +52,7 @@ export function InfoAplicacao() {
             <h1 className="text-gradient text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
               NexusClass
             </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+            <p className="mt-3 max-w-4xl text-base leading-relaxed text-muted-foreground md:text-lg">
               Plataforma educacional web para aproximar alunos, professores e
               gestão, reunindo comunicação, atividades, calendário, suporte e
               inteligência artificial em uma experiência única.
@@ -82,7 +82,7 @@ export function InfoAplicacao() {
           descricao="O NexusClass nasceu como uma forma de aplicar, em um sistema próprio, as tecnologias aprendidas em um projeto externo."
         />
         <div className="info-story-grid">
-          <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
+          <div className="space-y-3 text-base leading-relaxed text-foreground/90">
             <p>
               A ideia surgiu a partir da participação dos desenvolvedores no
               projeto externo <strong>GET SI</strong>, no qual a equipe atua no
@@ -131,6 +131,23 @@ export function InfoAplicacao() {
               sistema a partir dos requisitos, casos de uso, diagramas UML e
               validação constante com a aplicação funcionando.
             </p>
+            <div className="info-process-list">
+              <div>
+                <span>01</span>
+                <strong>Organização</strong>
+                <p>Kanban e fluxo de tarefas.</p>
+              </div>
+              <div>
+                <span>02</span>
+                <strong>Modelagem</strong>
+                <p>Requisitos, casos de uso e UML.</p>
+              </div>
+              <div>
+                <span>03</span>
+                <strong>Validação</strong>
+                <p>Testes na aplicação funcionando.</p>
+              </div>
+            </div>
           </div>
 
           <div className="info-build-panel">
@@ -150,7 +167,7 @@ export function InfoAplicacao() {
               ))}
             </div>
             <p className="info-build-note">
-              A interface fica hospedada no Vercel; autenticação, banco, Storage
+              A interface fica hospedada na Vercel; autenticação, banco, Storage
               e tempo real ficam concentrados no Supabase.
             </p>
           </div>

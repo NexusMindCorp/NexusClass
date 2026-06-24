@@ -199,11 +199,11 @@
 
 @layer InfoAplicacao {
   .info-apresentacao {
-    @apply w-full max-w-6xl space-y-5 rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm transition-colors md:p-6;
+    @apply w-full max-w-[90rem] space-y-5 rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm transition-colors md:p-7;
   }
 
   .info-hero {
-    @apply grid gap-5 rounded-lg border border-border bg-muted/25 p-5 shadow-sm md:grid-cols-[1fr_22rem] md:items-end md:p-6;
+    @apply grid gap-5 rounded-lg border border-border bg-muted/25 p-5 shadow-sm md:grid-cols-[1fr_24rem] md:items-end md:p-7;
   }
 
   .info-hero-badge {
@@ -231,7 +231,7 @@
   }
 
   .info-slide-card {
-    @apply rounded-lg border border-border bg-muted/30 p-4 shadow-sm transition-colors hover:bg-muted/45;
+    @apply rounded-lg border border-border bg-muted/30 p-5 shadow-sm transition-colors hover:bg-muted/45;
   }
 
   .info-slide-destaque {
@@ -243,7 +243,7 @@
   }
 
   .info-story-highlight {
-    @apply flex flex-col justify-center rounded-md border border-primary/25 bg-background/70 p-4 text-sm shadow-sm;
+    @apply flex flex-col justify-center rounded-md border border-primary/25 bg-background/70 p-4 text-base shadow-sm;
   }
 
   .info-story-highlight strong {
@@ -283,11 +283,11 @@
   }
 
   .info-architecture-step strong {
-    @apply block text-sm font-semibold text-foreground;
+    @apply block text-base font-semibold text-foreground;
   }
 
   .info-architecture-step p {
-    @apply mt-1 text-sm leading-relaxed text-muted-foreground;
+    @apply mt-1 text-sm leading-relaxed text-muted-foreground md:text-[15px];
   }
 
   .info-flow-card {
@@ -308,19 +308,19 @@
   }
 
   .info-flow-step strong {
-    @apply block text-sm font-semibold text-foreground;
+    @apply block text-base font-semibold text-foreground;
   }
 
   .info-flow-step p {
-    @apply mt-1 text-sm leading-relaxed text-muted-foreground;
+    @apply mt-1 text-sm leading-relaxed text-muted-foreground md:text-[15px];
   }
 
   .info-build-grid {
-    @apply grid grid-cols-1 gap-4 lg:grid-cols-[0.9fr_1.4fr];
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.55fr] lg:items-stretch;
   }
 
   .info-build-panel {
-    @apply rounded-md border border-border bg-background/60 p-4 transition-colors hover:border-primary/35 hover:bg-background;
+    @apply flex flex-col rounded-md border border-border bg-background/60 p-4 transition-colors hover:border-primary/35 hover:bg-background;
   }
 
   .info-build-panel-header {
@@ -328,15 +328,35 @@
   }
 
   .info-build-panel-header strong {
-    @apply text-sm font-bold text-foreground;
+    @apply text-base font-bold text-foreground;
   }
 
   .info-build-panel p {
-    @apply text-sm leading-relaxed text-muted-foreground;
+    @apply text-sm leading-relaxed text-muted-foreground md:text-[15px];
+  }
+
+  .info-process-list {
+    @apply mt-4 grid gap-2;
+  }
+
+  .info-process-list div {
+    @apply grid grid-cols-[2rem_1fr] gap-x-3 rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5;
+  }
+
+  .info-process-list span {
+    @apply row-span-2 flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-xs font-bold text-primary;
+  }
+
+  .info-process-list strong {
+    @apply text-sm font-bold leading-tight text-foreground;
+  }
+
+  .info-process-list p {
+    @apply mt-0.5 text-xs leading-relaxed text-muted-foreground;
   }
 
   .info-build-note {
-    @apply mt-3 rounded-md border border-primary/20 bg-primary/5 p-3;
+    @apply mt-5 rounded-md border border-primary/20 bg-primary/5 p-3;
   }
 
   .info-deploy-timeline {
@@ -344,19 +364,19 @@
   }
 
   .info-deploy-step {
-    @apply rounded-md border border-border bg-muted/30 p-3 transition-colors hover:border-primary/35 hover:bg-muted/45;
+    @apply rounded-md border border-border bg-muted/30 p-3 transition-colors hover:border-primary/35 hover:bg-muted/45 md:min-h-40;
   }
 
   .info-deploy-step strong {
-    @apply block text-sm font-bold text-primary;
+    @apply block text-base font-bold text-primary;
   }
 
   .info-deploy-step em {
-    @apply mt-0.5 block text-xs font-semibold not-italic text-foreground;
+    @apply mt-0.5 block text-sm font-semibold not-italic text-foreground;
   }
 
   .info-deploy-step p {
-    @apply mt-2 text-xs leading-relaxed text-muted-foreground;
+    @apply mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px];
   }
 
   .info-demo-step {
@@ -372,7 +392,7 @@
   }
 
   .info-limit-item {
-    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground;
+    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground md:text-[15px];
   }
 
   .info-disclaimer-grid {
@@ -380,7 +400,7 @@
   }
 
   .info-disclaimer-item {
-    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:border-primary/35 hover:bg-background;
+    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:border-primary/35 hover:bg-background md:text-[15px];
   }
 
   .info-disclaimer-item svg {

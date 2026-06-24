@@ -16,9 +16,9 @@ export function SectionHeader({
         <Icone className="h-5 w-5" />
       </div>
       <div>
-        <h2 className="text-lg font-bold text-foreground">{titulo}</h2>
+        <h2 className="text-xl font-bold text-foreground">{titulo}</h2>
         {descricao && (
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-base leading-relaxed text-muted-foreground">
             {descricao}
           </p>
         )}
@@ -36,8 +36,8 @@ export function InfoCard({ item }: { item: CardItem }) {
         <Icone className="h-4 w-4" />
       </div>
       <div>
-        <h3 className="text-sm font-semibold text-foreground">{item.titulo}</h3>
-        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+        <h3 className="text-base font-semibold text-foreground">{item.titulo}</h3>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-[15px]">
           {item.descricao}
         </p>
       </div>
