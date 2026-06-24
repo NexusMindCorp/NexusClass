@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   XCircle,
   FileWarning,
+  Lightbulb,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -104,17 +105,17 @@ const tecnologias: BadgeItem[] = [
 const atores: CardItem[] = [
   {
     titulo: "Aluno",
-    descricao: "Inscreve-se em turmas, acompanha murais, envia atividades, tira duvidas, usa mensagens, calendario e o Tigreso.",
+    descricao: "Inscreve-se em turmas, acompanha murais, envia atividades, tira dúvidas, usa mensagens, calendário e o Tigreso.",
     icone: User,
   },
   {
     titulo: "Professor",
-    descricao: "Gerencia turmas, publica avisos, cria atividades, acompanha entregas, atribui nota e responde duvidas.",
+    descricao: "Gerencia turmas, publica avisos, cria atividades, acompanha entregas, atribui nota e responde dúvidas.",
     icone: BookOpenCheck,
   },
   {
-    titulo: "Gestao / Master",
-    descricao: "Tem visao administrativa ampliada para apoiar a organizacao das turmas e a demonstracao do sistema.",
+    titulo: "Gestão / Master",
+    descricao: "Tem visão administrativa ampliada para apoiar a organização das turmas e a demonstração do sistema.",
     icone: ShieldCheck,
   },
 ];
@@ -141,19 +142,19 @@ const metricasProjeto = [
 const fluxoProduto = [
   {
     etapa: "Login",
-    detalhe: "Supabase Auth valida a sessao e carrega o perfil.",
+    detalhe: "Supabase Auth valida a sessão e carrega o perfil.",
   },
   {
     etapa: "Turmas",
-    detalhe: "O usuario encontra disciplinas e controla inscricoes.",
+    detalhe: "O usuário encontra disciplinas e controla inscrições.",
   },
   {
-    etapa: "Interacao",
-    detalhe: "Mural, atividades, duvidas, chat e calendario concentram o uso diario.",
+    etapa: "Interação",
+    detalhe: "Mural, atividades, dúvidas, chat e calendário concentram o uso diário.",
   },
   {
-    etapa: "Persistencia",
-    detalhe: "PostgreSQL, Storage e Realtime mantem os dados sincronizados.",
+    etapa: "Persistência",
+    detalhe: "PostgreSQL, Storage e Realtime mantêm os dados sincronizados.",
   },
 ];
 
@@ -161,12 +162,12 @@ const implantacaoEtapas = [
   {
     titulo: "Protótipo",
     plataforma: "GitHub Pages",
-    detalhe: "Publicacao inicial da SPA enquanto o projeto ainda era majoritariamente front-end.",
+    detalhe: "Publicação inicial da SPA enquanto o projeto ainda era majoritariamente front-end.",
   },
   {
-    titulo: "Versao final",
+    titulo: "Versão final",
     plataforma: "Vercel",
-    detalhe: "Build automatizado do Vite, variaveis de ambiente e deploy integrado ao GitHub.",
+    detalhe: "Build automatizado do Vite, variáveis de ambiente e deploy integrado ao GitHub.",
   },
   {
     titulo: "Backend",
@@ -177,33 +178,33 @@ const implantacaoEtapas = [
 
 const funcionalidadesImplementadas: CardItem[] = [
   {
-    titulo: "Autenticacao e sessoes",
-    descricao: "Login, cadastro, logout, rotas protegidas e carregamento do perfil autenticado via Supabase Auth.",
+    titulo: "Autenticação e sessões",
+    descricao: "Login, cadastro, logout, rotas protegidas e carregamento do perfil autenticado, via Supabase Auth.",
     icone: Lock,
   },
   {
-    titulo: "Turmas e inscricoes",
-    descricao: "Listagem dinamica de turmas, pesquisa, entrada em turmas e controle de inscricao por usuario.",
+    titulo: "Turmas e inscrições",
+    descricao: "Listagem dinâmica de turmas, pesquisa, entrada em turmas e controle de inscrição por usuário.",
     icone: Users,
   },
   {
     titulo: "Mural e atividades",
-    descricao: "Avisos por turma, criacao de atividades, anexos, entregas de alunos e avaliacao com nota e feedback.",
+    descricao: "Avisos por turma, criação de atividades, anexos, entregas de alunos e avaliação com nota e feedback.",
     icone: ClipboardList,
   },
   {
-    titulo: "Comunicacao",
-    descricao: "Mensagens privadas em tempo real, duvidas aluno-professor, suporte, denuncias e indicadores visuais.",
+    titulo: "Comúnicação",
+    descricao: "Mensagens privadas em tempo real, dúvidas entre aluno e professor, suporte, denúncias e indicadores visuais.",
     icone: MessageCircle,
   },
   {
-    titulo: "Calendario e alertas",
-    descricao: "Eventos pessoais e de turma, lembretes de compromissos e notificacoes para o usuario durante o uso.",
+    titulo: "Calendário e alertas",
+    descricao: "Eventos pessoais e de turma, lembretes de compromissos e notificações para o usuário durante o uso.",
     icone: CalendarDays,
   },
   {
     titulo: "Assistente Tigreso",
-    descricao: "Chatbot integrado ao Gemini que consulta contexto da plataforma, como eventos, atividades, posts e duvidas.",
+    descricao: "Chatbot integrado ao Gemini, que consulta o contexto da plataforma, como eventos, atividades, posts e dúvidas.",
     icone: Sparkles,
   },
 ];
@@ -211,32 +212,32 @@ const funcionalidadesImplementadas: CardItem[] = [
 const qualidadeUx: CardItem[] = [
   {
     titulo: "Responsividade",
-    descricao: "Interface adaptada para desktop e mobile, com sidebar responsiva e componentes reutilizaveis.",
+    descricao: "Interface adaptada para desktop e mobile, com sidebar responsiva e componentes reutilizáveis.",
     icone: MonitorSmartphone,
   },
   {
-    titulo: "Seguranca",
-    descricao: "Acesso protegido por autenticacao, RLS no banco e operacoes sensiveis concentradas no Supabase.",
+    titulo: "Segurança",
+    descricao: "Acesso protegido por autenticação, RLS no banco e operações sensíveis concentradas no Supabase.",
     icone: ShieldCheck,
   },
   {
-    titulo: "Persistencia",
-    descricao: "Dados dinamicos gravados em PostgreSQL na nuvem, substituindo a dependencia de arquivos locais.",
+    titulo: "Persistência",
+    descricao: "Dados dinâmicos gravados em PostgreSQL na nuvem, substituindo a dependência de arquivos locais.",
     icone: Database,
   },
   {
     titulo: "Manutenibilidade",
-    descricao: "TypeScript, separacao por componentes e hooks customizados para organizar estado e regras de interface.",
+    descricao: "TypeScript, separação por componentes e hooks customizados para organizar o estado e as regras de interface.",
     icone: Code2,
   },
   {
     titulo: "Desempenho",
-    descricao: "SPA com Vite e React, transicoes internas rapidas e uso de localStorage para estados visuais nao criticos.",
+    descricao: "SPA com Vite e React, transições internas rápidas e uso de localStorage para estados visuais não críticos.",
     icone: Zap,
   },
   {
     titulo: "Usabilidade",
-    descricao: "Temas claro/escuro, feedback por toasts, badges de notificacao e layout com navegacao lateral.",
+    descricao: "Temas claro/escuro, feedback por toasts, badges de notificacao e layout com navegação latéral.",
     icone: CheckCircle2,
   },
 ];
@@ -244,12 +245,12 @@ const qualidadeUx: CardItem[] = [
 const conexaoSistema: CardItem[] = [
   {
     titulo: "Frontend SPA",
-    descricao: "A interface roda no navegador com React Router, componentes reutilizaveis e troca interna de telas.",
+    descricao: "A interface roda no navegador, com React Router, componentes reutilizáveis e troca interna de telas.",
     icone: MonitorSmartphone,
   },
   {
     titulo: "Supabase SDK",
-    descricao: "O cliente centraliza chamadas de login, consultas, inserts, updates, storage e realtime.",
+    descricao: "O cliente centraliza chamadas de login, consultas, inserts, updatés, Storage e realtime.",
     icone: Server,
   },
   {
@@ -258,17 +259,17 @@ const conexaoSistema: CardItem[] = [
     icone: Database,
   },
   {
-    titulo: "Seguranca e tempo real",
-    descricao: "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensiveis.",
+    titulo: "Segurança e tempo real",
+    descricao: "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensíveis.",
     icone: ShieldCheck,
   },
 ];
 
 const limitacoes = [
-  "Nao realiza aulas ao vivo ou streaming interno.",
-  "Nao processa pagamentos, mensalidades ou boletos.",
-  "Nao substitui sistemas academicos oficiais da instituicao.",
-  "Nao emite diplomas, historicos escolares ou diarios oficiais.",
+  "Não realiza aulas ao vivo ou streaming interno.",
+  "Não processa pagamentos, mensalidades ou boletos.",
+  "Não substitui sistemas acadêmicos oficiais da instituição.",
+  "Não emite diplomas, históricos escolares ou diários oficiais.",
 ];
 
 function SectionHeader({
@@ -338,8 +339,8 @@ export function InfoAplicacao() {
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Plataforma educacional web para aproximar alunos, professores e
-              gestao, reunindo comunicacao, atividades, calendario, suporte e
-              inteligencia artificial em uma experiencia unica.
+              gestão, reunindo comúnicação, atividades, calendário, suporte e
+              inteligência artificial em uma experiência única.
             </p>
           </div>
 
@@ -361,34 +362,35 @@ export function InfoAplicacao() {
 
       <section className="info-slide-card info-slide-destaque">
         <SectionHeader
-          icone={Info}
+          icone={Lightbulb}
           titulo="Ideia e Escopo"
-          descricao="O NexusClass nasceu como uma forma de aplicar, em um sistema proprio, as tecnologias aprendidas em um projeto externo."
+          descricao="O NexusClass nasceu como uma forma de aplicar, em um sistema próprio, as tecnologias aprendidas em um projeto externo."
         />
         <div className="info-story-grid">
           <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
             <p>
-              A ideia surgiu a partir da participacao dos desenvolvedores no
-              projeto externo <strong>Get SI</strong>, no qual a equipe atua no
-              desenvolvimento de uma aplicacao mobile para o Jardim Botanico. Ao
-              entrar nesse projeto, o monitor <strong>Igor Knop</strong> auxiliou
-              no aprendizado das tecnologias usadas na aplicacao, preparando a
-              dupla para operar melhor com React, TypeScript, componentes,
-              integracao com servicos externos e organizacao de projeto.
+              A ideia surgiu a partir da participação dos desenvolvedores no
+              projeto externo <strong>GET SI</strong>, no qual a equipe atua no
+              desenvolvimento de uma aplicação mobile para o Jardim Botânico. Ao
+              entrarem nesse projeto, o monitor <strong>Igor Knop</strong>,
+              auxiliou no aprendizado das tecnologias usadas na aplicação,
+              preparando a dupla para operar melhor com React, TypeScript,
+              componentes, integração com serviços externos e organização de
+              projeto.
             </p>
             <p>
-              Como forma de demonstrar esse aprendizado de maneira pratica, o
-              NexusClass comecou como uma tentativa de emular um ambiente no
+              Como forma de demonstrar esse aprendizado de maneira prática, o
+              NexusClass começou como uma tentativa de emular um ambiente no
               estilo Google Classroom, inicialmente mais simples e focado em
               gerenciamento de estado. Depois, a disciplina de Modelagem de
-              Sistemas abriu espaco para transformar esse prototipo em uma
-              aplicacao full-stack mais completa.
+              Sistemas abriu espaço para transformar esse protótipo em uma
+              aplicação full-stack mais completa.
             </p>
           </div>
 
           <div className="info-story-highlight">
-            <strong>Principais evolucoes</strong>
-            <span>Autenticacao real, banco em nuvem, turmas dinamicas, mural, atividades com entregas, chat interno, calendario, suporte, duvidas e assistente de IA integrado.</span>
+            <strong>Principais evoluções</strong>
+            <span>Autenticação real, banco em nuvem, turmas dinâmicas, mural, atividades com entregas, chat interno, calendário, suporte, dúvidas e assistente de IA integrado.</span>
           </div>
         </div>
       </section>
@@ -397,7 +399,7 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Workflow}
           titulo="Como foi feito"
-          descricao="O projeto saiu de um prototipo simples e evoluiu ate uma aplicacao hospedada, persistente e integrada."
+          descricao="O projeto saiu de um protótipo simples e evoluiu até se tornar uma aplicação hospedada, persistente e integrada."
         />
         <div className="info-build-grid">
           <div className="info-build-panel">
@@ -408,14 +410,14 @@ export function InfoAplicacao() {
             <p>
               A equipe usou Kanban para organizar o fluxo de tarefas e evoluiu o
               sistema a partir dos requisitos, casos de uso, diagramas UML e
-              validacao constante com a aplicacao funcionando.
+              validação constante com a aplicação funcionando.
             </p>
           </div>
 
           <div className="info-build-panel">
             <div className="info-build-panel-header">
               <Cloud className="h-4 w-4" />
-              <strong>Deploy e implantacao</strong>
+              <strong>Deploy e implantação</strong>
             </div>
             <div className="info-deploy-timeline">
               {implantacaoEtapas.map((etapa) => (
@@ -429,8 +431,8 @@ export function InfoAplicacao() {
               ))}
             </div>
             <p className="info-build-note">
-              A interface fica hospedada na Vercel; autenticacao, banco,
-              storage e tempo real ficam concentrados no Supabase.
+              A interface fica hospedada na Vercel; autenticação, banco,
+              Storage e tempo real ficam concentrados no Supabase.
             </p>
           </div>
         </div>
@@ -440,7 +442,7 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Users}
           titulo="Atores do Sistema"
-          descricao="A interface e os acessos mudam conforme o papel do usuario autenticado."
+          descricao="A interface e os acessos mudam conforme o papel do usuário autenticado."
         />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           {atores.map((item) => (
@@ -453,18 +455,18 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Server}
           titulo="Arquitetura do Software"
-          descricao="Cliente-servidor multi-camadas, com SPA em React e backend em nuvem via Supabase."
+          descricao="Cliente-servidor multicamadas, com SPA em React e backend em nuvem via Supabase."
         />
         <div className="info-architecture-grid">
           <div className="info-architecture-step">
             <span>01</span>
-            <strong>Apresentacao</strong>
+            <strong>Apresentação</strong>
             <p>React, TypeScript, Tailwind e shadcn/ui no navegador.</p>
           </div>
           <div className="info-architecture-step">
             <span>02</span>
             <strong>Controle</strong>
-            <p>Hooks customizados organizam estado, navegacao e regras.</p>
+            <p>Hooks customizados organizam estado, navegação e regras.</p>
           </div>
           <div className="info-architecture-step">
             <span>03</span>
@@ -473,8 +475,8 @@ export function InfoAplicacao() {
           </div>
           <div className="info-architecture-step">
             <span>04</span>
-            <strong>Servicos</strong>
-            <p>Gemini AI, Vercel, GitHub e automacoes no banco.</p>
+            <strong>Serviços</strong>
+            <p>Gemini AI, Vercel, GitHub e automações no banco.</p>
           </div>
         </div>
       </section>
@@ -482,8 +484,8 @@ export function InfoAplicacao() {
       <section className="info-slide-card">
         <SectionHeader
           icone={Database}
-          titulo="Conexao Front-end, Back-end e Banco"
-          descricao="Como os dados saem da interface, passam pelo Supabase e retornam para o usuario."
+          titulo="Conexão entre Front-end, Back-end e Banco de Dados"
+          descricao="Como os dados saem da interface, passam pelo Supabase e retornam para o usuário."
         />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {conexaoSistema.map((item) => (
@@ -497,7 +499,7 @@ export function InfoAplicacao() {
           <SectionHeader
             icone={Workflow}
             titulo="Fluxo Principal do Produto"
-            descricao="Como a experiencia se organiza do acesso inicial ate a persistencia dos dados."
+            descricao="Como a experiência se organiza, do acesso inicial até a persistência dos dados."
           />
         </div>
         <div className="info-flow-grid">
@@ -515,7 +517,7 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={ClipboardList}
           titulo="Funcionalidades Implementadas"
-          descricao="Parte pratica que deve ser demonstrada ao professor durante a simulacao."
+          descricao="Parte prática que deve ser demonstrada ao professor durante a simulacao."
         />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {funcionalidadesImplementadas.map((item) => (
@@ -527,8 +529,8 @@ export function InfoAplicacao() {
       <section className="info-slide-card">
         <SectionHeader
           icone={ShieldCheck}
-          titulo="Interface, UX e Qualidade Tecnica"
-          descricao="Criterios de correcao ligados a experiencia do usuario, seguranca, desempenho e manutenibilidade."
+          titulo="Interface, UX e Qualidade Técnica"
+          descricao="Critérios de correção ligados à experiência do usuário, segurança, desempenho e manutenibilidade."
         />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {qualidadeUx.map((item) => (
@@ -541,7 +543,7 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Terminal}
           titulo="Tecnologias Adotadas"
-          descricao="Pilha principal usada para frontend, backend, persistencia, IA e deploy."
+          descricao="Pilha principal usada para front-end, back-end, persistência, IA e deploy."
         />
 
         <div className="flex flex-wrap gap-2.5">
@@ -565,8 +567,8 @@ export function InfoAplicacao() {
         <div className="info-slide-card">
           <SectionHeader
             icone={XCircle}
-            titulo="Limitacoes de Escopo"
-            descricao="O sistema foca no LMS simplificado e deixa fora funcoes institucionais mais amplas."
+            titulo="Limitações de Escopo"
+            descricao="O sistema foca em um LMS simplificado e deixa de fora funções institucionais mais amplas."
           />
           <div className="space-y-2">
             {limitacoes.map((item) => (
@@ -582,20 +584,20 @@ export function InfoAplicacao() {
           <SectionHeader
             icone={FileWarning}
             titulo="Disclaimer dos Dados"
-            descricao="Os dados exibidos na demonstracao existem apenas para fins academicos e de teste."
+            descricao="Os dados exibidos na demonstração existem apenas para fins acadêmicos e de teste."
           />
           <div className="info-disclaimer-grid">
             <div className="info-disclaimer-item">
               <CheckCircle2 className="h-4 w-4" />
-              <span>Usuarios, turmas, mensagens e exemplos foram criados apenas para demonstrar o funcionamento do sistema.</span>
+              <span>Usuários, turmas, mensagens e exemplos foram criados apenas para demonstrar o funcionamento do sistema.</span>
             </div>
             <div className="info-disclaimer-item">
               <CheckCircle2 className="h-4 w-4" />
-              <span>Alguns nomes e imagens usam personagens, referencias de filmes e series ou dados inventados para ilustracao.</span>
+              <span>Alguns nomes e imagens usam personagens, referências de filmes e séries ou dados inventados para ilustração.</span>
             </div>
             <div className="info-disclaimer-item">
               <XCircle className="h-4 w-4" />
-              <span>Nenhuma conta representa uma pessoa real, cadastro institucional ou informacao oficial de ensino.</span>
+              <span>Nenhuma conta representa uma pessoa real, cadastro institucional ou informação oficial de ensino.</span>
             </div>
           </div>
         </div>
@@ -618,7 +620,7 @@ export function InfoAplicacao() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <h4 className="truncate font-semibold text-foreground transition-colors group-hover:text-primary">
+                <h4 className="truncaté font-semibold text-foreground transition-colors group-hover:text-primary">
                   {dev.nome}
                 </h4>
                 <p className="text-xs text-muted-foreground">{dev.cargo}</p>
@@ -639,7 +641,7 @@ export function InfoAplicacao() {
       </section>
 
       <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-5 text-xs text-muted-foreground sm:flex-row">
-        <span>Desenvolvido para fins academicos.</span>
+        <span>Desenvolvido para fins acadêmicos.</span>
 
         <Button
           variant="outline"
@@ -653,7 +655,7 @@ export function InfoAplicacao() {
             rel="noopener noreferrer"
           >
             <Github className="h-4 w-4" />
-            Repositorio no GitHub
+            Repositório no GitHub
             <ExternalLink className="h-3 w-3 opacity-60" />
           </a>
         </Button>
