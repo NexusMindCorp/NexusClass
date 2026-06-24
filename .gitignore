@@ -27,3 +27,5 @@ dist-ssr
 .env
 
 .agents
+
+naoComitar
