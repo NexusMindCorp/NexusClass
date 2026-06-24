@@ -14,21 +14,20 @@ import {
   Users,
   Workflow,
   ClipboardList,
-  Presentation,
   MonitorSmartphone,
   MessageCircle,
   CalendarDays,
   BookOpenCheck,
-  Search,
   Bell,
   Server,
   Lock,
-  PlayCircle,
   CheckCircle2,
   XCircle,
+  FileWarning,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 
 type CardItem = {
   titulo: string;
@@ -125,36 +124,59 @@ const atores: CardItem[] = [
   },
 ];
 
-const topicosApresentacao: CardItem[] = [
+const metricasProjeto = [
   {
-    titulo: "Ideia e escopo",
-    descricao: "Apresentar o problema educacional, os atores do LMS e o que ficou dentro ou fora do sistema.",
-    icone: Info,
+    valor: "3",
+    rotulo: "perfis de usuario",
   },
   {
-    titulo: "Arquitetura",
-    descricao: "Explicar a SPA React, o modelo cliente-servidor, as camadas e o papel do Supabase.",
-    icone: Server,
+    valor: "6+",
+    rotulo: "modulos centrais",
   },
   {
-    titulo: "Tecnologias",
-    descricao: "Mostrar linguagens, frameworks, bibliotecas, banco, BaaS, IA, deploy e versionamento.",
-    icone: Terminal,
+    valor: "Full-stack",
+    rotulo: "React + Supabase",
   },
   {
-    titulo: "Conexao com backend",
-    descricao: "Detalhar como o front-end conversa com Auth, PostgreSQL, Storage, Realtime e Edge Functions.",
-    icone: Database,
+    valor: "IA",
+    rotulo: "assistente contextual",
+  },
+];
+
+const fluxoProduto = [
+  {
+    etapa: "Login",
+    detalhe: "Supabase Auth valida a sessao e carrega o perfil.",
   },
   {
-    titulo: "Funcionalidades",
-    descricao: "Demonstrar o que esta implementado: turmas, mural, atividades, duvidas, mensagens, calendario e IA.",
-    icone: ClipboardList,
+    etapa: "Turmas",
+    detalhe: "O usuario encontra disciplinas e controla inscricoes.",
   },
   {
-    titulo: "Simulacao",
-    descricao: "Executar um fluxo real em sala, mostrando a aplicacao funcionando com usuarios autenticados.",
-    icone: PlayCircle,
+    etapa: "Interacao",
+    detalhe: "Mural, atividades, duvidas, chat e calendario concentram o uso diario.",
+  },
+  {
+    etapa: "Persistencia",
+    detalhe: "PostgreSQL, Storage e Realtime mantem os dados sincronizados.",
+  },
+];
+
+const implantacaoEtapas = [
+  {
+    titulo: "Protótipo",
+    plataforma: "GitHub Pages",
+    detalhe: "Publicacao inicial da SPA enquanto o projeto ainda era majoritariamente front-end.",
+  },
+  {
+    titulo: "Versao final",
+    plataforma: "Vercel",
+    detalhe: "Build automatizado do Vite, variaveis de ambiente e deploy integrado ao GitHub.",
+  },
+  {
+    titulo: "Backend",
+    plataforma: "Supabase",
+    detalhe: "Auth, PostgreSQL, Storage, Realtime, triggers e Edge Function fora da camada de hospedagem.",
   },
 ];
 
@@ -247,15 +269,6 @@ const conexaoSistema: CardItem[] = [
   },
 ];
 
-const demonstracao = [
-  "Entrar com um usuario autenticado e apresentar a tela principal.",
-  "Mostrar turmas, pesquisa e inscricao/desinscricao.",
-  "Abrir uma turma, visualizar mural, atividades, entregas e duvidas.",
-  "Demonstrar mensagens em tempo real e indicadores de nao lidas.",
-  "Criar ou visualizar eventos no calendario e alertas.",
-  "Abrir o Tigreso e perguntar sobre atividades ou eventos.",
-];
-
 const limitacoes = [
   "Nao realiza aulas ao vivo ou streaming interno.",
   "Nao processa pagamentos, mensalidades ou boletos.",
@@ -310,35 +323,40 @@ function InfoCard({ item }: { item: CardItem }) {
 export function InfoAplicacao() {
   return (
     <div className="info-apresentacao">
-      <div className="flex flex-col justify-between gap-4 border-b border-border pb-5 md:flex-row md:items-center">
-        <div>
-          <span className="mb-2 inline-flex w-fit items-center gap-2 rounded-md border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Presentation className="h-3.5 w-3.5" />
-            Trabalho de Modelagem de Sistemas
-          </span>
-          <h1 className="text-gradient text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
-            NexusClass
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground md:text-base">
-            LMS simplificado para aproximar alunos, professores e gestao em uma
-            plataforma web com comunicacao, atividades, calendario e IA.
-          </p>
+      <section className="info-hero">
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline" className="info-hero-badge">
+              Modelagem de Sistemas
+            </Badge>
+            <Badge variant="outline" className="info-hero-badge">
+              LMS Full-stack
+            </Badge>
+          </div>
+
+          <div>
+            <h1 className="text-gradient text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
+              NexusClass
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground md:text-base">
+              Plataforma educacional web para aproximar alunos, professores e
+              gestao, reunindo comunicacao, atividades, calendario, suporte e
+              inteligencia artificial em uma experiencia unica.
+            </p>
+          </div>
+
+          <div className="info-hero-actions">
+            <Badge className="rounded-md px-3 py-1">v{__APP_VERSION__}</Badge>
+            <span>React SPA + Supabase + Gemini AI</span>
+          </div>
         </div>
 
-        <span className="w-fit rounded-md border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          v{__APP_VERSION__}
-        </span>
-      </div>
-
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={Presentation}
-          titulo="Base da Apresentacao"
-          descricao="Topicos exigidos no enunciado da Parte 2 e usados como roteiro desta tela."
-        />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {topicosApresentacao.map((item) => (
-            <InfoCard key={item.titulo} item={item} />
+        <div className="info-metrics-grid">
+          {metricasProjeto.map((metrica) => (
+            <div key={metrica.rotulo} className="info-metric-card">
+              <strong>{metrica.valor}</strong>
+              <span>{metrica.rotulo}</span>
+            </div>
           ))}
         </div>
       </section>
@@ -347,15 +365,34 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Info}
           titulo="Ideia e Escopo"
-          descricao="O NexusClass evoluiu de um prototipo front-end para uma aplicacao full-stack voltada a gestao de aprendizagem."
+          descricao="O NexusClass nasceu como uma forma de aplicar, em um sistema proprio, as tecnologias aprendidas em um projeto externo."
         />
-        <p className="text-sm leading-relaxed text-foreground/90">
-          A aplicacao centraliza recursos de sala de aula que normalmente ficam
-          espalhados: turmas, mural de avisos, atividades, entregas, duvidas,
-          mensagens privadas, calendario e suporte. O diferencial do projeto e
-          integrar esses fluxos a um assistente virtual, o Tigreso, capaz de
-          orientar o usuario com base no contexto da plataforma.
-        </p>
+        <div className="info-story-grid">
+          <div className="space-y-3 text-sm leading-relaxed text-foreground/90">
+            <p>
+              A ideia surgiu a partir da participacao dos desenvolvedores no
+              projeto externo <strong>Get SI</strong>, no qual a equipe atua no
+              desenvolvimento de uma aplicacao mobile para o Jardim Botanico. Ao
+              entrar nesse projeto, o monitor <strong>Igor Knop</strong> auxiliou
+              no aprendizado das tecnologias usadas na aplicacao, preparando a
+              dupla para operar melhor com React, TypeScript, componentes,
+              integracao com servicos externos e organizacao de projeto.
+            </p>
+            <p>
+              Como forma de demonstrar esse aprendizado de maneira pratica, o
+              NexusClass comecou como uma tentativa de emular um ambiente no
+              estilo Google Classroom, inicialmente mais simples e focado em
+              gerenciamento de estado. Depois, a disciplina de Modelagem de
+              Sistemas abriu espaco para transformar esse prototipo em uma
+              aplicacao full-stack mais completa.
+            </p>
+          </div>
+
+          <div className="info-story-highlight">
+            <strong>Principais evolucoes</strong>
+            <span>Autenticacao real, banco em nuvem, turmas dinamicas, mural, atividades com entregas, chat interno, calendario, suporte, duvidas e assistente de IA integrado.</span>
+          </div>
+        </div>
       </section>
 
       <section className="info-slide-card">
@@ -385,6 +422,25 @@ export function InfoAplicacao() {
             <strong>Servicos</strong>
             <p>Gemini AI, Vercel, GitHub e automacoes no banco.</p>
           </div>
+        </div>
+      </section>
+
+      <section className="info-flow-card">
+        <div>
+          <SectionHeader
+            icone={Workflow}
+            titulo="Fluxo Principal do Produto"
+            descricao="Como a experiencia se organiza do acesso inicial ate a persistencia dos dados."
+          />
+        </div>
+        <div className="info-flow-grid">
+          {fluxoProduto.map((item, index) => (
+            <div key={item.etapa} className="info-flow-step">
+              <span>{index + 1}</span>
+              <strong>{item.etapa}</strong>
+              <p>{item.detalhe}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -444,30 +500,42 @@ export function InfoAplicacao() {
         <SectionHeader
           icone={Workflow}
           titulo="Como foi feito"
-          descricao="Complemento do documento de requisitos: processo, modelagem, responsabilidades e deploy."
+          descricao="O projeto saiu de um prototipo simples e evoluiu ate uma aplicacao hospedada, persistente e integrada."
         />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <InfoCard
-            item={{
-              titulo: "Processo",
-              descricao: "Kanban para fluxo continuo, priorizacao visual e divisao de tarefas em equipe reduzida.",
-              icone: Workflow,
-            }}
-          />
-          <InfoCard
-            item={{
-              titulo: "Modelagem",
-              descricao: "Requisitos, casos de uso, diagramas UML, modelo ER e validacao com a implementacao.",
-              icone: ClipboardList,
-            }}
-          />
-          <InfoCard
-            item={{
-              titulo: "Deploy",
-              descricao: "Versionamento no GitHub e publicacao da SPA em ambiente web para demonstracao.",
-              icone: Cloud,
-            }}
-          />
+        <div className="info-build-grid">
+          <div className="info-build-panel">
+            <div className="info-build-panel-header">
+              <Workflow className="h-4 w-4" />
+              <strong>Processo e modelagem</strong>
+            </div>
+            <p>
+              A equipe usou Kanban para organizar o fluxo de tarefas e evoluiu o
+              sistema a partir dos requisitos, casos de uso, diagramas UML e
+              validacao constante com a aplicacao funcionando.
+            </p>
+          </div>
+
+          <div className="info-build-panel">
+            <div className="info-build-panel-header">
+              <Cloud className="h-4 w-4" />
+              <strong>Deploy e implantacao</strong>
+            </div>
+            <div className="info-deploy-timeline">
+              {implantacaoEtapas.map((etapa) => (
+                <div key={etapa.titulo} className="info-deploy-step">
+                  <div>
+                    <strong>{etapa.plataforma}</strong>
+                    <em>{etapa.titulo}</em>
+                  </div>
+                  <p>{etapa.detalhe}</p>
+                </div>
+              ))}
+            </div>
+            <p className="info-build-note">
+              A interface fica hospedada na Vercel; autenticacao, banco,
+              storage e tempo real ficam concentrados no Supabase.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -495,22 +563,6 @@ export function InfoAplicacao() {
         </div>
       </section>
 
-      <section className="info-slide-card">
-        <SectionHeader
-          icone={PlayCircle}
-          titulo="Roteiro de Demonstracao"
-          descricao="Sequencia sugerida para apresentar a aplicacao funcionando em sala."
-        />
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {demonstracao.map((item, index) => (
-            <div key={item} className="info-demo-step">
-              <span>{index + 1}</span>
-              <p>{item}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.8fr]">
         <div className="info-slide-card">
           <SectionHeader
@@ -530,16 +582,24 @@ export function InfoAplicacao() {
 
         <div className="info-slide-card">
           <SectionHeader
-            icone={Search}
-            titulo="Conexao com a Disciplina"
-            descricao="A apresentacao evidencia atores, requisitos, arquitetura, tecnologias e funcionamento."
+            icone={FileWarning}
+            titulo="Disclaimer dos Dados"
+            descricao="Os dados exibidos na demonstracao existem apenas para fins academicos e de teste."
           />
-          <p className="text-sm leading-relaxed text-foreground/90">
-            Para Modelagem de Sistemas, o NexusClass demonstra a ligacao entre
-            requisitos, modelagem, banco de dados e produto final. A arquitetura
-            escolhida permite explicar claramente as responsabilidades de cada
-            camada e simular os principais casos de uso implementados.
-          </p>
+          <div className="info-disclaimer-grid">
+            <div className="info-disclaimer-item">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Usuarios, turmas, mensagens e exemplos foram criados apenas para demonstrar o funcionamento do sistema.</span>
+            </div>
+            <div className="info-disclaimer-item">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Alguns nomes e imagens usam personagens, referencias de filmes e series ou dados inventados para ilustracao.</span>
+            </div>
+            <div className="info-disclaimer-item">
+              <XCircle className="h-4 w-4" />
+              <span>Nenhuma conta representa uma pessoa real, cadastro institucional ou informacao oficial de ensino.</span>
+            </div>
+          </div>
         </div>
       </section>
 

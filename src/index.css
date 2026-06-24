@@ -202,12 +202,56 @@
     @apply w-full max-w-6xl space-y-5 rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm transition-colors md:p-6;
   }
 
+  .info-hero {
+    @apply grid gap-5 rounded-lg border border-border bg-muted/25 p-5 shadow-sm md:grid-cols-[1fr_22rem] md:items-end md:p-6;
+  }
+
+  .info-hero-badge {
+    @apply rounded-md border-primary/25 bg-primary/10 text-primary hover:bg-primary/15;
+  }
+
+  .info-hero-actions {
+    @apply flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground;
+  }
+
+  .info-metrics-grid {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .info-metric-card {
+    @apply rounded-md border border-border bg-background/70 p-4 transition-colors hover:border-primary/40 hover:bg-background;
+  }
+
+  .info-metric-card strong {
+    @apply block text-xl font-extrabold text-foreground;
+  }
+
+  .info-metric-card span {
+    @apply mt-1 block text-xs font-medium uppercase tracking-wide text-muted-foreground;
+  }
+
   .info-slide-card {
     @apply rounded-lg border border-border bg-muted/30 p-4 shadow-sm transition-colors hover:bg-muted/45;
   }
 
   .info-slide-destaque {
     @apply bg-primary/5 hover:bg-primary/10;
+  }
+
+  .info-story-grid {
+    @apply grid gap-4 lg:grid-cols-[1fr_18rem] lg:items-stretch;
+  }
+
+  .info-story-highlight {
+    @apply flex flex-col justify-center rounded-md border border-primary/25 bg-background/70 p-4 text-sm shadow-sm;
+  }
+
+  .info-story-highlight strong {
+    @apply text-base font-bold text-foreground;
+  }
+
+  .info-story-highlight span {
+    @apply mt-2 leading-relaxed text-muted-foreground;
   }
 
   .info-section-header {
@@ -246,6 +290,75 @@
     @apply mt-1 text-sm leading-relaxed text-muted-foreground;
   }
 
+  .info-flow-card {
+    @apply rounded-lg border border-primary/20 bg-primary/5 p-4 shadow-sm transition-colors hover:bg-primary/10;
+  }
+
+  .info-flow-grid {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-4;
+  }
+
+  .info-flow-step {
+    @apply relative rounded-md border border-border bg-background/70 p-3 transition-colors hover:border-primary/40 hover:bg-background;
+  }
+
+  .info-flow-step span {
+    @apply mb-3 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground;
+    background-image: none !important;
+  }
+
+  .info-flow-step strong {
+    @apply block text-sm font-semibold text-foreground;
+  }
+
+  .info-flow-step p {
+    @apply mt-1 text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .info-build-grid {
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-[0.9fr_1.4fr];
+  }
+
+  .info-build-panel {
+    @apply rounded-md border border-border bg-background/60 p-4 transition-colors hover:border-primary/35 hover:bg-background;
+  }
+
+  .info-build-panel-header {
+    @apply mb-3 flex items-center gap-2 text-primary;
+  }
+
+  .info-build-panel-header strong {
+    @apply text-sm font-bold text-foreground;
+  }
+
+  .info-build-panel p {
+    @apply text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .info-build-note {
+    @apply mt-3 rounded-md border border-primary/20 bg-primary/5 p-3;
+  }
+
+  .info-deploy-timeline {
+    @apply grid grid-cols-1 gap-2 md:grid-cols-3;
+  }
+
+  .info-deploy-step {
+    @apply rounded-md border border-border bg-muted/30 p-3 transition-colors hover:border-primary/35 hover:bg-muted/45;
+  }
+
+  .info-deploy-step strong {
+    @apply block text-sm font-bold text-primary;
+  }
+
+  .info-deploy-step em {
+    @apply mt-0.5 block text-xs font-semibold not-italic text-foreground;
+  }
+
+  .info-deploy-step p {
+    @apply mt-2 text-xs leading-relaxed text-muted-foreground;
+  }
+
   .info-demo-step {
     @apply flex items-start gap-3 rounded-md border border-border bg-background/60 p-3 text-sm text-foreground/90 transition-colors hover:border-primary/35 hover:bg-background;
   }
@@ -260,6 +373,18 @@
 
   .info-limit-item {
     @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground;
+  }
+
+  .info-disclaimer-grid {
+    @apply grid grid-cols-1 gap-2;
+  }
+
+  .info-disclaimer-item {
+    @apply flex items-start gap-2 rounded-md border border-border bg-background/60 p-3 text-sm leading-relaxed text-muted-foreground transition-colors hover:border-primary/35 hover:bg-background;
+  }
+
+  .info-disclaimer-item svg {
+    @apply mt-0.5 shrink-0 text-primary;
   }
 
   .info-dev-card {
