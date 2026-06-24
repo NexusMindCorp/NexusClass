@@ -174,7 +174,7 @@ export const ChatBot = forwardRef(function ChatBot(
       )}
 
       {/* Botão de Abrir */}
-      {!isOpen && (
+      {!isOpen && usuario.acessouOq !== "info" && (
         <button
           onClick={() => setIsOpen(true)}
           className={`${usuario.acessouOq === "mensagens" ? "hidden md:flex" : "flex"} w-14 h-14 rounded-full cursor-pointer items-center justify-center shadow-lg hover:shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 hover:brightness-105 active:scale-95 transition-all duration-300 text-white`}
