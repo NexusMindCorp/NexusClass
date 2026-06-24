@@ -5,6 +5,7 @@ import {
   Sparkles,
   Layers,
   Database,
+  Mail,
   User,
   Zap,
   Cloud,
@@ -85,9 +86,19 @@ const tecnologias: BadgeItem[] = [
     cor: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
   },
   {
+    nome: "Supabase Auth",
+    icone: Lock,
+    cor: "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20",
+  },
+  {
     nome: "Vercel",
     icone: Cloud,
     cor: "text-neutral-700 dark:text-neutral-400 bg-neutral-500/10 border-neutral-500/20",
+  },
+  {
+    nome: "Resend",
+    icone: Mail,
+    cor: "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
   },
   {
     nome: "Gemini AI",
@@ -110,7 +121,7 @@ const atores: CardItem[] = [
   {
     titulo: "Aluno",
     descricao:
-      "Inscreve-se em turmas, acompanha murais, envia atividades, tira dúvidas, usa mensagens, calendário e o Tigreso.",
+      "Inscreve-se em turmas, acompanha murais, envia atividades, tira dúvidas e usa mensagens, calendário e o Tigreso.",
     icone: User,
   },
   {
@@ -210,7 +221,7 @@ const funcionalidadesImplementadas: CardItem[] = [
   {
     titulo: "Comunicação",
     descricao:
-      "Mensagens privadas em tempo real, dúvidas entre aluno e professor, suporte, denúncias e indicadores visuais.",
+      "Mensagens privadas em tempo real, dúvidas entre aluno e professor, suporte, denúncias, e-mails administrativos e indicadores visuais.",
     icone: MessageCircle,
   },
   {
@@ -222,7 +233,7 @@ const funcionalidadesImplementadas: CardItem[] = [
   {
     titulo: "Assistente Tigreso",
     descricao:
-      "Chatbot integrado ao Gemini que consulta o contexto da plataforma, como eventos, atividades, posts e dúvidas.",
+      "Chatbot integrado ao Gemini, com consulta ao contexto da plataforma: eventos, atividades, posts e dúvidas.",
     icone: Bot,
   },
 ];
@@ -463,7 +474,7 @@ export function InfoAplicacao() {
               ))}
             </div>
             <p className="info-build-note">
-              A interface fica hospedada na Vercel; autenticação, banco,
+              A interface fica hospedada no Vercel; autenticação, banco,
               Storage e tempo real ficam concentrados no Supabase.
             </p>
           </div>
@@ -508,7 +519,7 @@ export function InfoAplicacao() {
           <div className="info-architecture-step">
             <span>04</span>
             <strong>Serviços</strong>
-            <p>Gemini AI, Vercel, GitHub e automações no banco.</p>
+            <p>Gemini AI, Vercel, Resend, GitHub e automações no banco.</p>
           </div>
         </div>
       </section>
@@ -578,14 +589,14 @@ export function InfoAplicacao() {
           descricao="Pilha principal usada para front-end, back-end, persistência, IA e deploy."
         />
 
-        <div className="flex flex-wrap gap-2.5">
+        <div className="info-tech-grid">
           {tecnologias.map((tech) => {
             const Icone = tech.icone;
 
             return (
               <div
                 key={tech.nome}
-                className={`flex cursor-default items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-transform hover:scale-[1.03] ${tech.cor}`}
+                className={`info-tech-chip ${tech.cor}`}
               >
                 <Icone className="h-4 w-4 shrink-0" />
                 <span>{tech.nome}</span>

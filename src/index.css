@@ -387,6 +387,18 @@
     @apply mt-0.5 shrink-0 text-primary;
   }
 
+  .info-tech-grid {
+    @apply grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5;
+  }
+
+  .info-tech-chip {
+    @apply flex min-h-10 cursor-default items-center justify-center gap-2 rounded-md border px-3 py-2 text-center text-sm font-medium transition-transform hover:scale-[1.03];
+  }
+
+  .info-tech-chip span {
+    @apply min-w-0 truncate;
+  }
+
   .info-dev-card {
     @apply flex items-center gap-4 rounded-lg border border-border bg-background/60 p-4 transition-all hover:border-primary/50 hover:bg-background;
   }
