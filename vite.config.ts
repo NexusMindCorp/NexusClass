@@ -1,3 +1,4 @@
+/// 
 import path from "path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
@@ -15,6 +16,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        "@ts": path.resolve(__dirname, "./testes")
       },
     },
     define: {
@@ -24,5 +26,11 @@ export default defineConfig(({ mode }) => {
       '__KEY_SUPABASE__': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
       '__BASE_URL__': JSON.stringify(base)
     },
+    // Adicionando a configuração do Vitest aqui:
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./setupTests.ts'],
+      globals: true
+    }
   }
 })

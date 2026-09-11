@@ -5,7 +5,7 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom/vitest"],
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
@@ -31,5 +31,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "referenciaGlobal"]
+  // 2. Adicionada a pasta "testes" aqui no include:
+  "include": ["src", "referenciaGlobal", "setupTests.ts", "testes"]
 }
