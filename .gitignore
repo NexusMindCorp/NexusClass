@@ -31,3 +31,8 @@ dist-ssr
 
 naoComitar
 graphify-out
+
+# Governanca local do agente
+AGENTS.md
+relatorios
+coverage

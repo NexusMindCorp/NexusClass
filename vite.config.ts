@@ -30,7 +30,12 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       setupFiles: ['./setupTests.ts'],
-      globals: true
+      globals: true,
+      coverage: {
+        provider: 'v8',
+        include: ['src/lib/**', 'src/patterns/**'],
+        reporter: ['text', 'json-summary']
+      }
     }
   }
 })
