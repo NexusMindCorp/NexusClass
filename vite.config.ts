@@ -33,8 +33,8 @@ export default defineConfig(({ mode }) => {
       globals: true,
       coverage: {
         provider: 'v8',
-        include: ['src/lib/**', 'src/patterns/**'],
-        reporter: ['text', 'json-summary']
+        include: ['src/lib/**/*.{ts,tsx}', 'src/patterns/**/*.{ts,tsx}'],
+        reporter: ['text', 'json-summary', 'html']
       }
     }
   }

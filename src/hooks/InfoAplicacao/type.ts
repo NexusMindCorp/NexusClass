@@ -35,3 +35,59 @@ export type ImplantacaoEtapa = {
   plataforma: string;
   detalhe: string;
 };
+
+export type TipoApresentacao = "modelagem" | "engenharia";
+
+export type StatusFaseItem =
+  | "Concluído"
+  | "Em Andamento"
+  | "Planejado"
+  | "Descartado";
+
+export type PadraoCatalogoItem = {
+  id: string;
+  nome: string;
+  categoria:
+    | "Criacional"
+    | "Estrutural"
+    | "Comportamental"
+    | "Anti-Decisão (Overengineering)";
+  fase: string;
+  status: StatusFaseItem;
+  responsavel: string;
+  ondeAplicado: string;
+  problemaAntes: string;
+  solucaoDepois: string;
+  codigoAntes: string;
+  codigoDepois: string;
+  beneficioQualidade: string;
+};
+
+export type FaseRoadmapItem = {
+  fase: string;
+  titulo: string;
+  status: StatusFaseItem;
+  responsavel: string;
+  entregas: string;
+  evidenciaTeste: string;
+};
+
+export type CamadaTesteItem = {
+  nivelRbt: string;
+  camada: string;
+  ferramenta: string;
+  alvos: string;
+  tecnicas: string;
+  status: StatusFaseItem;
+};
+
+export type SnapshotCoberturaItem = {
+  etapa: string;
+  responsavel: string;
+  testes: string;
+  statements: string;
+  branches: string;
+  functions: string;
+  lines: string;
+  destaque?: boolean;
+};

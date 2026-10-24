@@ -10,6 +10,6 @@ always_on: true
 1. **Planejado:** spec criada em `.agents/features/<slug>.md` (a partir do template) antes de qualquer código.
 2. **Em Andamento:** código + testes; tabela em `INICIALIZACAO.md` atualizada.
 3. **Concluído:** `npx tsc -b --noEmit` limpo, testes da feature passando, sem regressão nos testes existentes.
-4. **Registro e Passagem de Bastão (Handoff de Saída):** atualizar `.docs/DOCUMENTACAO_APRESENTACAO.md` (incluindo o bloco *Ponto de Retomada* no topo) e registrar o relatório em `relatorios/<mes-ano>/` detalhando o que foi concluído e o que o próximo membro/fase deve consumir.
+4. **Registro e Passagem de Bastão (Handoff de Saída):** atualizar `.docs/DOCUMENTACAO_APRESENTACAO.md` (incluindo o bloco *Ponto de Retomada* no topo), atualizar os dados dos slides interativos em `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts` (status da fase, autor, cobertura e código antes/depois) e registrar o relatório em `relatorios/<mes-ano>/` detalhando o que foi concluído e o que o próximo membro/fase deve consumir.
 
 Refatoração deve preservar comportamento observável; qualquer mudança funcional exige aval.

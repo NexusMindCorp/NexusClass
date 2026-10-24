@@ -36,11 +36,12 @@ Convenções: ver `.agents/rules/testing-policy.md`. Testes em `testes/` (alias 
 | 3 | Strategy (pesquisa/dúvidas) | Condicionais removidas; testes por estratégia |
 | 4 | Observer (Realtime) | Toasts/badges via subject; sem regressão |
 | 5 | Documentar Singleton e Proxy; atualizar diagrama `out/diagramas/diagrama_classes_detalhado.puml` com estereótipos | Diagrama + doc |
-| 6 | Testes de componente + E2E + cobertura final + limpeza da árvore Git | Relatório antes/depois + pastas internas ocultadas do repo final |
+| 6 | Testes de componente + E2E + cobertura final | Relatório antes/depois |
+| 7 | **Apresentação Interativa DCC061 na aplicação (`InfoAplicacao.tsx`)** + limpeza final da árvore Git | Seletor na aba *Informações* (`Modelagem de Sistemas` vs `Engenharia de Software`) mantendo identidade visual (`info-slide-card`, `InfoCard`, cores) com slides de Design Patterns (Antes/Depois) e Testes/Cobertura + pastas internas ocultadas do repo final |
 
 Cada fase: spec em `.agents/features/`, ADR em `.agents/decisions/`, entrada em `DOCUMENTACAO_APRESENTACAO.md`.
 - **Regra de Continuidade entre Fases (Trabalho em Dupla):** Como as fases são divididas entre os integrantes da dupla via Git, **toda atualização ou início de nova fase deve obrigatoriamente consultar o estado deixado pelo processo anterior** (bloco *Ponto de Retomada* em `.docs/DOCUMENTACAO_APRESENTACAO.md` + último relatório em `relatorios/<mes-ano>/` + suíte de testes existente) e continuar a partir dali, garantindo que novas implementações consumam os contratos, mocks e padrões já estabelecidos sem retrabalho nem regressão.
-- **Limpeza Final pós-Fase 6 (Ocultar Governança na Entrega):** Durante as Fases 0 a 6, `.agents/`, `.docs/`, `relatorios/` e `AGENTS.md` ficam rastreados no Git para sincronizar a dupla. Ao concluir a Fase 6, executar:
+- **Limpeza Final pós-Fase 7 (Ocultar Governança na Entrega):** Durante as Fases 0 a 7, `.agents/`, `.docs/`, `relatorios/` e `AGENTS.md` ficam rastreados no Git para sincronizar a dupla. Ao concluir a Fase 7, executar:
   ```bash
   git rm -r --cached .agents .docs relatorios AGENTS.md
   ```
