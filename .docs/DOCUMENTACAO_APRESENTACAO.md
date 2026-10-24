@@ -8,7 +8,7 @@
 | Campo | Estado Atual |
 |:---|:---|
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-10-24 |
-| **Última etapa concluída** | **Fase 0 Concluída** + **Slides Interativos DCC061 (`InfoAplicacao.tsx`) ativos**: `setupTests.ts` blindado com stubs globais; 25 novos testes unitários em `testes/lib/utils.spec.ts` (total 28 testes passando); cobertura de `src/lib` subiu de **4.27%** para **98.29%** (`utils.ts` e `assetPath.ts` com **100%**). |
+| **Última etapa concluída** | **Fase 0 Concluída** + **Slides Interativos DCC061 (`InfoAplicacao.tsx`) ativos**: `setupTests.ts` blindado com stubs globais; `getBadgeStatusStyle` migrada para `src/lib/utils.ts`; 26 novos testes unitários em `testes/lib/utils.spec.ts` (total 29 testes passando); cobertura de `src/lib` subiu de **4.27%** para **98.36%** (`utils.ts` e `assetPath.ts` com **100%**). |
 | **Último relatório** | `relatorios/2026-10/2026-10-24-fase-0-base-testes-e-slides.md` (Autor: Gabriel Lineker) |
 | **Fase atual / Próximo passo** | **Fase 1 (Planejado → Pronto para Iniciar):** Implementar **Adapter + Factory** para os bots (Tigreso & Falcão) em `src/patterns/adapter/` e `src/patterns/factory/`, refatorar `src/hooks/botsHooks/useChatBot.ts` sem quebrar a UI, criar testes em `testes/patterns/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
 | **Restrições/Contratos ativos** | Globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/`; rodar `npx.cmd vitest run` e `npx.cmd tsc -b --noEmit` ao final de cada alteração de código. |
@@ -16,20 +16,20 @@
 ## Painel de Progresso
 | Fase | Item | Status | Responsável (Última Mod.) | Resultado |
 |:---|:---|:---|:---|:---|
-| 0 | Base de testes (`utils.ts` + `assetPath.ts` + `setupTests.ts`) | **Concluído** | Gabriel Lineker | 28 testes passando (2 suítes); cobertura `src/lib` saltou de **4.27%** para **98.29%** (`utils.ts` 100%) |
+| 0 | Base de testes (`utils.ts` + `assetPath.ts` + `setupTests.ts`) | **Concluído** | Gabriel Lineker | 29 testes passando (2 suítes); cobertura `src/lib` saltou de **4.27%** para **98.36%** (`utils.ts` 100%) |
 | 1 | Adapter + Factory (bots) | Planejado | a definir | — |
 | 2 | Facade (entrega) | Planejado | a definir | — |
 | 3 | Strategy (filtros) | Planejado | a definir | — |
 | 4 | Observer (Realtime) | Planejado | a definir | — |
 | 5 | Singleton / Proxy documentados + diagrama | Planejado | a definir | — |
 | 6 | Testes de componente + E2E | Planejado | a definir | — |
-| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Contínuo)** | Gabriel Lineker | Seletor `Engenharia de Software (DCC061)` vs `Modelagem de Sistemas` implementado e preenchido com Fase 0 + espaços das Fases 1–6 |
+| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gabriel Lineker | Estrutura e seletor prontos; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
 
 ## Métricas (antes → depois)
 | Métrica | Antes (Baseline) | Depois (Pós-Fase 0) |
 |:---|:---|:---|
-| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | **2 arquivos (`button.spec.tsx` + `utils.spec.ts` — 28 testes)** |
-| Cobertura (`src/lib`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.29% / 95.83% / 100% / 98.23%** (`utils.ts` e `assetPath.ts` em **100%**) |
+| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | **2 arquivos (`button.spec.tsx` + `utils.spec.ts` — 29 testes)** |
+| Cobertura (`src/lib`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.36% / 96.15% / 100% / 98.30%** (`utils.ts` e `assetPath.ts` em **100%**) |
 | Acoplamento componente↔Supabase/Gemini | Direto nos hooks | A iniciar desacoplamento na Fase 1 |
 
 ## Registro por Padrão / Teste

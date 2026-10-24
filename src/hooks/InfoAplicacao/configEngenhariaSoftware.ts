@@ -37,11 +37,11 @@ export const ultimaAtualizacaoEngenharia = {
 
 export const metricasEngenharia: MetricaProjeto[] = [
   {
-    valor: "98.29%",
+    valor: "98.36%",
     rotulo: "cobertura em src/lib (era 4.27%)",
   },
   {
-    valor: "28",
+    valor: "29",
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
@@ -297,8 +297,8 @@ export const roadmapFases: FaseRoadmapItem[] = [
     status: "Concluído",
     responsavel: "Gabriel Lineker (GabrielLineker)",
     entregas:
-      "Stubs seguros em setupTests.ts, 25 novos testes cobrindo 100% de src/lib/utils.ts e src/lib/assetPath.ts, e seletor de apresentação DCC061 na aba Informações.",
-    evidenciaTeste: "2 suítes / 28 testes passando · src/lib: 98.29% Stmts / 100% Funcs (utils.ts 100%)",
+      "Stubs seguros em setupTests.ts, 26 novos testes cobrindo 100% de src/lib/utils.ts (incluindo getBadgeStatusStyle) e src/lib/assetPath.ts, e seletor de apresentação DCC061 na aba Informações.",
+    evidenciaTeste: "2 suítes / 29 testes passando · src/lib: 98.36% Stmts / 100% Funcs (utils.ts 100%)",
   },
   {
     fase: "Fase 1",
@@ -406,11 +406,11 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
   {
     etapa: "Pós-Fase 0 (Suíte utils.spec.ts)",
     responsavel: "Gabriel Lineker",
-    testes: "2 suítes (28 testes)",
-    statements: "98.29% (100% em utils.ts)",
-    branches: "95.83% (100% em utils.ts)",
+    testes: "2 suítes (29 testes)",
+    statements: "98.36% (100% em utils.ts)",
+    branches: "96.15% (100% em utils.ts)",
     functions: "100.00%",
-    lines: "98.23% (100% em utils.ts)",
+    lines: "98.30% (100% em utils.ts)",
     destaque: true,
   },
   {

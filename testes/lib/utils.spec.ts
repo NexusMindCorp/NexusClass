@@ -11,6 +11,7 @@ import {
   formatarDataRelativa,
   formatarDataUltimaMensagem,
   formatarErroSupabase,
+  getBadgeStatusStyle,
   getCorMateria,
   getCorNomeUsuario,
   hojeChaveLocal,
@@ -73,6 +74,13 @@ describe('src/lib/utils.ts — Suíte de Testes Unitários Puros (Fase 0)', () =
       expect(corA).toBe(corB);
       expect(corA).toContain('text-white');
       expect(corVazia).toContain('text-white');
+    });
+
+    it('getBadgeStatusStyle() deve retornar o estilo correto para cada status de fase (Tabela de Decisão)', () => {
+      expect(getBadgeStatusStyle('Concluído')).toContain('emerald');
+      expect(getBadgeStatusStyle('Em Andamento')).toContain('amber');
+      expect(getBadgeStatusStyle('Descartado')).toContain('rose');
+      expect(getBadgeStatusStyle('Planejado')).toContain('blue');
     });
   });
 

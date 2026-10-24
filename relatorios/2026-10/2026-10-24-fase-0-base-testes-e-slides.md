@@ -33,10 +33,10 @@
 
 ## 3. Validação e Métricas de Cobertura
 - `npx.cmd tsc -b --noEmit`: **Passou sem erros (0 erros)**.
-- `npm.cmd run test:coverage`: **2 suítes / 28 testes passando em 2.61s**.
+- `npm.cmd run test:coverage`: **2 suítes / 29 testes passando em 2.86s** (incluindo `getBadgeStatusStyle` migrada para `src/lib/utils.ts`).
 - **Evolução de Cobertura (`src/lib`):**
   - **Antes (Baseline):** `4.27% Stmts | 0% Branch | 4% Funcs | 4.42% Lines`
-  - **Depois (Pós-Fase 0):** `98.29% Stmts | 95.83% Branch | 100% Funcs | 98.23% Lines` (`utils.ts` e `assetPath.ts` com **100%** em todas as 4 dimensões).
+  - **Depois (Pós-Fase 0):** `98.36% Stmts | 96.15% Branch | 100% Funcs | 98.30% Lines` (`utils.ts` e `assetPath.ts` com **100%** em todas as 4 dimensões).
 
 ## 4. Handoff / Ponto de Retomada para a Próxima Sessão (Fase 1)
 - **Quem executou esta etapa:** Gabriel Lineker (`GabrielLineker`).

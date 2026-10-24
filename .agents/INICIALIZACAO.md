@@ -29,14 +29,14 @@
 ## Tabela de Features (Plano de Refatoração)
 | Fase | Feature | Status | Responsável (Última Mod.) | Spec |
 |:---|:---|:---|:---|:---|
-| 0 | Base de testes (`utils.ts` + `assetPath.ts` unitários, `setupTests.ts`, slides DCC061) | **Concluído** (2 suítes / 28 testes; `utils.ts` e `assetPath.ts` 100%) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) / [ADR-001](decisions/adr-001-patterns-e-cobertura.md) |
+| 0 | Base de testes (`utils.ts` + `assetPath.ts` unitários, `setupTests.ts`, slides DCC061) | **Concluído** (2 suítes / 29 testes; `utils.ts` e `assetPath.ts` 100%) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) / [ADR-001](decisions/adr-001-patterns-e-cobertura.md) |
 | 1 | Adapter + Factory (Gemini / Tigreso & Falcão) | Planejado | a definir | a criar |
 | 2 | Facade (entrega de atividade) | Planejado | a definir | a criar |
 | 3 | Strategy (filtros de pesquisa e dúvidas) | Planejado | a definir | a criar |
 | 4 | Observer (Realtime → notificações) | Planejado | a definir | a criar |
 | 5 | Documentar Singleton (`supabaseClient`) e Proxy de proteção (`ProtectedRoute`) | Planejado | a definir | a criar |
 | 6 | Testes de componente + E2E (login → entrega) | Planejado | a definir | a criar |
-| 7 | Apresentação Interativa DCC061 na aba Informações (`InfoAplicacao.tsx`) | **Ativo / Atualização Contínua** (Fase 0 preenchida; atualizar a cada fase) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) |
+| 7 | Apresentação Interativa DCC061 na aba Informações (`InfoAplicacao.tsx`) | **Ativo / Refinamento Visual na Fase 7** (corrigir estilizações quebradas ao final das fases) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) |
 | — | Template Method | **Descartado** (forçado; ver plano) | Gabriel Lineker | — |
 
 ## Comandos Operacionais

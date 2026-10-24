@@ -48,20 +48,8 @@ import {
   roadmapFases,
   ultimaAtualizacaoEngenharia,
 } from "../hooks/InfoAplicacao/configEngenhariaSoftware";
-import type { StatusFaseItem, TipoApresentacao } from "../hooks/InfoAplicacao/type";
-
-function getBadgeStatusStyle(status: StatusFaseItem) {
-  switch (status) {
-    case "Concluído":
-      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
-    case "Em Andamento":
-      return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30";
-    case "Descartado":
-      return "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30";
-    default:
-      return "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25";
-  }
-}
+import type { TipoApresentacao } from "../hooks/InfoAplicacao/type";
+import { getBadgeStatusStyle } from "@/lib/utils";
 
 export function InfoAplicacao() {
   const [apresentacaoAtiva, setApresentacaoAtiva] =
