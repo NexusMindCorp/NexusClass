@@ -26,13 +26,8 @@ dist-ssr
 .gh-pages/
 .env
 
-.agents
-.docs
-
 naoComitar
 graphify-out
 
-# Governanca local do agente
-AGENTS.md
-relatorios
+# Cobertura de testes
 coverage
