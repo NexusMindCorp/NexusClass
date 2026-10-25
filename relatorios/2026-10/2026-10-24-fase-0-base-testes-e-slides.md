@@ -12,12 +12,13 @@
 2. **Blindagem do Ambiente de Testes (`setupTests.ts`):**
    - Configurados stubs globais seguros (`__URL_SUPABASE__`, `__KEY_SUPABASE__`, `__API_GEMINI_KEY__`, `__APP_VERSION__`, `__BASE_URL__`) via `vi.stubGlobal`, além de `localStorage.clear()` em `beforeEach` e restauração de timers/mocks em `afterEach`.
 3. **Suíte de Testes Unitários Puros (`testes/lib/utils.spec.ts`):**
-   - Criados **25 novos testes unitários** (totalizando **28 testes** no projeto junto com `button.spec.tsx`) cobrindo **100%** das 24 funções de `src/lib/utils.ts` e `getAssetPath` em `src/lib/assetPath.ts`.
+   - Criados **26 novos testes unitários** (totalizando **29 testes** no projeto junto com `button.spec.tsx`) cobrindo **100%** das 25 funções de `src/lib/utils.ts` (incluindo `getBadgeStatusStyle`, migrada de `InfoAplicacao.tsx` para `utils.ts`) e `getAssetPath` em `src/lib/assetPath.ts`.
    - Aplicadas técnicas de **Fake Timers (`vi.useFakeTimers`)**, **Análise de Valor Limite**, **Particionamento de Equivalência**, **Tabela de Decisão** e **Tolerância a Falhas (`localStorage` corrompido / SSR guard)**.
    - Ajustado `vite.config.ts` para filtrar cobertura em `src/{lib,patterns}/**/*.{ts,tsx}` (eliminando avisos de parse em arquivos `README.md`) e gerar relatório HTML (`coverage/index.html`).
 4. **Apresentação Interativa DCC061 na Aba Informações (`src/components/InfoAplicacao.tsx`):**
    - Implementado seletor no topo da aba *Informações* alternando entre **Engenharia de Software (DCC061)** e **Modelagem de Sistemas** (preservando 100% da apresentação original).
    - Criado arquivo vivo `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts` com métricas Antes vs. Depois, Catálogo Interativo dos 7 Design Patterns + Anti-decisão (*Template Method*), Matriz de Testes RBT, Tabela de Evolução de Cobertura e Roadmap de Fases com Handoff da dupla.
+   - Registrado na **Fase 7** do planejamento que a lapidação/refinamento fino das estilizações da página de Engenharia de Software será feita ao final de todas as fases.
 
 ## 2. Arquivos Tocados
 - `.gitignore`
@@ -26,6 +27,7 @@
 - `.docs/PLANEJAMENTO_REFATORACAO.md`, `.docs/DOCUMENTACAO_APRESENTACAO.md`
 - `setupTests.ts`
 - `vite.config.ts`
+- `src/lib/utils.ts` (adicionada `getBadgeStatusStyle`)
 - `testes/lib/utils.spec.ts` (novo)
 - `src/hooks/InfoAplicacao/type.ts`
 - `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts` (novo)
@@ -39,10 +41,12 @@
   - **Depois (Pós-Fase 0):** `98.36% Stmts | 96.15% Branch | 100% Funcs | 98.30% Lines` (`utils.ts` e `assetPath.ts` com **100%** em todas as 4 dimensões).
 
 ## 4. Handoff / Ponto de Retomada para a Próxima Sessão (Fase 1)
-- **Quem executou esta etapa:** Gabriel Lineker (`GabrielLineker`).
+- **Quem executou a Fase 0:** Gabriel Lineker (`GabrielLineker`).
+- **Próximo Responsável Previsto (Fase 1):** Gianlucca Paiva (`GianluccaPaiva`).
 - **O que está pronto para consumo:**
-  - As variáveis globais (`__API_GEMINI_KEY__`, `__URL_SUPABASE__`, `__KEY_SUPABASE__`) já estão mockadas em `setupTests.ts`, permitindo importar hooks e adaptadores nos testes da Fase 1 sem erro de ambiente.
+  - As variáveis globais (`__API_GEMINI_KEY__`, `__URL_SUPABASE__`, `__KEY_SUPABASE__`, `__APP_VERSION__`, `__BASE_URL__`) já estão mockadas em `setupTests.ts`, permitindo importar hooks e adaptadores nos testes da Fase 1 sem erro de ambiente.
   - O arquivo `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts` já possui os espaços prontos para a **Fase 1 (Adapter + Factory)**.
+  - *Nota sobre `supabaseClient.ts`:* permanece em `0%` de cobertura na Fase 0 propositalmente para seguir a cronologia até as fases de banco/Singleton (**Fases 2 e 5**).
 - **Próximo Passo Exato (Fase 1 — Adapter + Factory nos Bots):**
   1. Criar spec `.agents/features/fase-1-adapter-factory-bots.md` e ADR correspondente em `.agents/decisions/`.
   2. Implementar `IAssistenteIA` + `GeminiAdapter` em `src/patterns/adapter/` e `BotFactory` em `src/patterns/factory/`.

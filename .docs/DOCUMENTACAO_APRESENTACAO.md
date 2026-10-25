@@ -10,7 +10,7 @@
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-10-24 |
 | **Última etapa concluída** | **Fase 0 Concluída** + **Slides Interativos DCC061 (`InfoAplicacao.tsx`) ativos**: `setupTests.ts` blindado com stubs globais; `getBadgeStatusStyle` migrada para `src/lib/utils.ts`; 26 novos testes unitários em `testes/lib/utils.spec.ts` (total 29 testes passando); cobertura de `src/lib` subiu de **4.27%** para **98.36%** (`utils.ts` e `assetPath.ts` com **100%**). |
 | **Último relatório** | `relatorios/2026-10/2026-10-24-fase-0-base-testes-e-slides.md` (Autor: Gabriel Lineker) |
-| **Fase atual / Próximo passo** | **Fase 1 (Planejado → Pronto para Iniciar):** Implementar **Adapter + Factory** para os bots (Tigreso & Falcão) em `src/patterns/adapter/` e `src/patterns/factory/`, refatorar `src/hooks/botsHooks/useChatBot.ts` sem quebrar a UI, criar testes em `testes/patterns/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
+| **Fase atual / Próximo passo** | **Fase 1 (Planejado — Próximo: Gianlucca Paiva):** Implementar **Adapter + Factory** para os bots (Tigreso & Falcão) em `src/patterns/adapter/` e `src/patterns/factory/`, refatorar `src/hooks/botsHooks/useChatBot.ts` sem quebrar a UI, criar testes em `testes/patterns/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
 | **Restrições/Contratos ativos** | Globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/`; rodar `npx.cmd vitest run` e `npx.cmd tsc -b --noEmit` ao final de cada alteração de código. |
 
 ## Painel de Progresso
