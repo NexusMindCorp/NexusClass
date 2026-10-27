@@ -10,7 +10,16 @@
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:utils": "vitest run testes/lib/utils.spec.ts",
+    "test:patterns": "vitest run testes/patterns/",
+    "test:adapter": "vitest run testes/patterns/adapter/",
+    "test:factory": "vitest run testes/patterns/factory/",
+    "test:facade": "vitest run testes/patterns/facade/",
+    "test:strategy": "vitest run testes/patterns/strategy/",
+    "test:observer": "vitest run testes/patterns/observer/",
+    "test:proxy": "vitest run testes/patterns/proxy/"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
