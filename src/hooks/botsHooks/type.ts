@@ -1,6 +1,7 @@
 import type { PerfilUsuario } from "../AuthHooks/type";
 import type { UsuarioProps } from "../GerenciadorHooks/type";
 import type { Tool } from "@google/generative-ai";
+import type { IAssistenteIA } from "@/patterns/adapter/GeminiAdapter";
 
 export interface Message {
   role: 'user' | 'model';
@@ -64,7 +65,7 @@ export type BotConfigProps = {
   minSentences: number;
   maxSentences: number;
   model: string;
-  temperatura:number;
+  temperatura: number;
   maxTokensOutPut: number;
   MAX_RETRIES: number;
   DELAY_BASE: number;
@@ -73,18 +74,19 @@ export type BotConfigProps = {
 };
 
 export type UseGeminiChatProps = {
-  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[] ; listaEscolar?: any };
+  usuario: UsuarioProps & { perfil?: PerfilUsuario | null; materiasProfessor?: string[]; listaEscolar?: any };
   isHelpMode?: boolean;
+  assistente?: IAssistenteIA;
 };
 
-export type UseChatBox= {
+export type UseChatBox = {
   usuario: UsuarioProps;
   perfil?: PerfilUsuario | null;
   materiasProfessor?: string[];
   listaEscolar?: any;
-}
+};
 
 export type ChatBotProps = {
-  usuario: UsuarioProps
+  usuario: UsuarioProps;
   listaEscolar: any;
-}
+};
