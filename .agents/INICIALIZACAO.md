@@ -30,13 +30,13 @@
 | Fase | Feature | Status | Responsável (Última Mod.) | Spec |
 |:---|:---|:---|:---|:---|
 | 0 | Base de testes (`utils.ts` + `assetPath.ts` unitários, `setupTests.ts`, slides DCC061) | **Concluído** (2 suítes / 29 testes; `utils.ts` e `assetPath.ts` 100%) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) / [ADR-001](decisions/adr-001-patterns-e-cobertura.md) |
-| 1 | Adapter + Factory (Gemini / Tigreso & Falcão) | Planejado | a definir | a criar |
+| 1 | Adapter + Factory (Gemini / Tigreso & Falcão) | **Concluído** (4 suítes / 51 testes; `GeminiAdapter.ts` e `BotFactory.ts` 100%) | Gianlucca Paiva | [fase-1-adapter-factory-bots.md](features/fase-1-adapter-factory-bots.md) / [ADR-002](decisions/adr-002-adapter-factory-assistentes-ia.md) |
 | 2 | Facade (entrega de atividade) | Planejado | a definir | a criar |
 | 3 | Strategy (filtros de pesquisa e dúvidas) | Planejado | a definir | a criar |
 | 4 | Observer (Realtime → notificações) | Planejado | a definir | a criar |
 | 5 | Documentar Singleton (`supabaseClient`) e Proxy de proteção (`ProtectedRoute`) | Planejado | a definir | a criar |
 | 6 | Testes de componente + E2E (login → entrega) | Planejado | a definir | a criar |
-| 7 | Apresentação Interativa DCC061 na aba Informações (`InfoAplicacao.tsx`) | **Ativo / Refinamento Visual na Fase 7** (corrigir estilizações quebradas ao final das fases) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) |
+| 7 | Apresentação Interativa DCC061 na aba Informações (`InfoAplicacao.tsx`) | **Ativo / Refinamento Visual na Fase 7** (corrigir estilizações quebradas ao final das fases) | Gianlucca Paiva | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) |
 | — | Template Method | **Descartado** (forçado; ver plano) | Gabriel Lineker | — |
 
 ## Comandos Operacionais
@@ -46,7 +46,8 @@
 | Typecheck | `npx tsc -b --noEmit` |
 | Lint | `npm run lint` |
 | Teste cirúrgico | `npx vitest run <arquivo> --silent` |
-| Todos os testes | `npx vitest run` |
+| Teste por padrão / fase | `npm run test:utils` · `npm run test:adapter` · `npm run test:factory` · `npm run test:facade` · `npm run test:strategy` · `npm run test:observer` · `npm run test:proxy` · `npm run test:patterns` |
+| Todos os testes | `npm run test:run` (ou `npx vitest run`) |
 | Cobertura | `npm run test:coverage` (escopo: `src/lib` e `src/patterns`) |
 | Build | `npm run build` |
 
@@ -55,4 +56,4 @@
 - Vitest: `environment: jsdom`, `globals: true`, setup em `setupTests.ts`.
 - Globais de build: `__API_GEMINI_KEY__`, `__URL_SUPABASE__`, `__KEY_SUPABASE__` (declarados via `define` no Vite; mockar em testes).
 - Hooks por domínio em `src/hooks/<Dominio>Hooks/{use*.ts,type.ts,config.ts}`.
-- Cliente Supabase único: `src/lib/supabaseClient.ts`. Gemini instanciado em `src/hooks/botsHooks/useChatBot.ts`.
+- Cliente Supabase único: `src/lib/supabaseClient.ts`. Assistentes IA via `src/patterns/factory/BotFactory.ts` e `src/patterns/adapter/GeminiAdapter.ts` consumidos em `src/hooks/botsHooks/useChatBot.ts`.

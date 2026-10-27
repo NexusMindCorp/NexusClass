@@ -29,19 +29,19 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 0 Concluída → Próxima: Fase 1 (Adapter + Factory)",
-  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
-  data: "2026-10-24",
+  faseAtual: "Fase 1 Concluída → Próxima: Fase 2 (Facade de Entregas)",
+  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
+  data: "2026-10-27",
   branch: "DesiningTeste",
 };
 
 export const metricasEngenharia: MetricaProjeto[] = [
   {
-    valor: "98.36%",
-    rotulo: "cobertura em src/lib (era 4.27%)",
+    valor: "100%",
+    rotulo: "cobertura em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "29",
+    valor: "51",
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
@@ -49,8 +49,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "Design Patterns GoF catalogados",
   },
   {
-    valor: "Fase 0",
-    rotulo: "concluída (Fases 1 a 6 estruturadas)",
+    valor: "Fase 1",
+    rotulo: "concluída (Adapter + Factory ativos)",
   },
 ];
 
@@ -130,47 +130,48 @@ export const catalogoPadroes: PadraoCatalogoItem[] = [
     nome: "1. Adapter (Wrapper)",
     categoria: "Estrutural",
     fase: "Fase 1",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/patterns/adapter/ + src/hooks/botsHooks/useChatBot.ts",
+      "src/patterns/adapter/GeminiAdapter.ts + src/hooks/botsHooks/useChatBot.ts",
     problemaAntes:
-      "O hook useChatBot instancia diretamente new GoogleGenerativeAI(__API_GEMINI_KEY__), misturando estado React, retry de erro 503 e Function Calling da biblioteca externa. Impossível testar o hook sem rede.",
+      "O hook useChatBot instanciava diretamente new GoogleGenerativeAI(__API_GEMINI_KEY__), misturando estado React, retry de erro 503 e Function Calling da biblioteca externa. Impossível testar o hook sem rede.",
     solucaoDepois:
-      "Criação da interface de domínio IAssistenteIA e da classe GeminiAdapter encapsulando o SDK do Google. O hook passa a depender apenas do contrato abstrato.",
-    codigoAntes: `// Antes: acoplamento direto no hook React
+      "Criação da interface de domínio IAssistenteIA e da classe GeminiAdapter encapsulando o SDK do Google, o loop de Function Calling (4 tools) e o backoff exponencial 503. O hook depende apenas do contrato abstrato.",
+    codigoAntes: `// Antes: acoplamento direto no hook React (useChatBot.ts)
 const genAI = new GoogleGenerativeAI(__API_GEMINI_KEY__);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-const result = await chat.sendMessage(msg);`,
-    codigoDepois: `// Depois: contrato desacoplado e injetável
+const model = genAI.getGenerativeModel({ model: ConfigBot.model, systemInstruction, tools });
+const result = await chatRef.current!.sendMessage(content);`,
+    codigoDepois: `// Depois: contrato desacoplado e injetável (GeminiAdapter.ts)
 export interface IAssistenteIA {
-  enviarMensagem(historico: Msg[], texto: string): Promise<string>;
+  enviarMensagem(texto: string): Promise<string>;
 }
-// Em testes: injeta FakeAssistenteIA sem gastar API`,
+const botText = await assistenteRef.current.enviarMensagem(input);`,
     beneficioQualidade:
-      "Desacopla o fornecedor de IA (permite trocar Gemini ou simular erro 503 em milissegundos nos testes automatizados).",
+      "Desacopla o fornecedor de IA: permite testar useGeminiChat com FakeAssistenteIA e validar retry 503 + Function Calling em milissegundos com vi.useFakeTimers().",
   },
   {
     id: "factory",
     nome: "2. Factory Method / Simple Factory",
     categoria: "Criacional",
     fase: "Fase 1",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/patterns/factory/ + src/hooks/botsHooks/configBot.ts",
+      "src/patterns/factory/BotFactory.ts + src/hooks/botsHooks/useChatBot.ts",
     problemaAntes:
-      "A aplicação possui dois assistentes distintos (Tigreso para dúvidas acadêmicas com Function Calling e Falcão Peregrino para suporte/termos), configurados manualmente por condicionais.",
+      "A aplicação possui dois assistentes distintos (Tigreso para dúvidas acadêmicas com Function Calling e Falcão Peregrino para suporte/termos), montados por condicionais extensas dentro do hook.",
     solucaoDepois:
-      "Centralização da criação em BotFactory.create(tipoBot), retornando o adaptador configurado com prompt de sistema, ferramentas e identidade visual corretos.",
-    codigoAntes: `// Antes: seleção manual espalhada
-const config = tipo === "tigreso" ? configTigreso : configFalcao;
-// Inicialização duplicada de modelo e tools`,
-    codigoDepois: `// Depois: fábrica determinística e testável
-const assistente = BotFactory.create(tipoBot);
-// Teste unitário puro valida que cada tipo gera a config certa`,
+      "Centralização da criação em BotFactory.criarConfig() e BotFactory.criarAssistente(tipoBot, contexto), entregando o GeminiAdapter configurado com prompt de sistema, ferramentas e identidade corretos.",
+    codigoAntes: `// Antes: ternário gigante em useChatBot.ts
+const instructionJson: JsonInstruction = isHelpMode
+  ? { assistant: { name: ConfigBot.nome[1], ... } }
+  : { assistant: { name: ConfigBot.nome[0], ... } };`,
+    codigoDepois: `// Depois: fábrica determinística e testável (BotFactory.ts)
+const tipoBot = BotFactory.resolverTipoBot(isHelpMode);
+assistenteRef.current = BotFactory.criarAssistente(tipoBot, contexto);`,
     beneficioQualidade:
-      "Aplica o Princípio Aberto-Fechado (OCP): adicionar um novo bot tutor não exige alterar o hook principal.",
+      "Aplica o Princípio Aberto-Fechado (OCP) e permite testar unitariamente (Nível 2 RBT) todas as regras de geração de prompt por papel (aluno, professor, master).",
   },
   {
     id: "facade",
@@ -303,11 +304,12 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 1",
     titulo: "Padrões Adapter + Factory (Assistentes IA: Tigreso & Falcão)",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     entregas:
-      "IAssistenteIA, GeminiAdapter e BotFactory em src/patterns/, desacoplando useChatBot do SDK externo.",
-    evidenciaTeste: "Espaço reservado: testes unitários da Factory + testes do Adapter com SDK mockado",
+      "IAssistenteIA, GeminiAdapter e BotFactory em src/patterns/, desacoplando useChatBot.ts do SDK externo e cobrindo Function Calling + retry 503.",
+    evidenciaTeste:
+      "4 suítes / 51 testes passando · GeminiAdapter.ts e BotFactory.ts com 100% de cobertura",
   },
   {
     fase: "Fase 2",
@@ -369,7 +371,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 2 — Lógica Pura (Determinística)",
     camada: "Testes Unitários Puros (Zero I/O)",
     ferramenta: "Vitest + Fake Timers",
-    alvos: "src/lib/utils.ts (24 funções), futuras Strategies (Fase 3) e BotFactory (Fase 1)",
+    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído) e futuras Strategies (Fase 3)",
     tecnicas:
       "Padrão AAA, Particionamento de Equivalência, Análise de Valor Limite, Tabela de Decisão e vi.useFakeTimers()",
     status: "Concluído",
@@ -378,10 +380,10 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 3 — Fronteira / Integração",
     camada: "Testes com Fakes/Mocks na Borda",
     ferramenta: "Vitest + Testing Library",
-    alvos: "GeminiAdapter (Fase 1), EntregaAtividadeFacade (Fase 2), NotificacaoSubject (Fase 4), ProtectedRoute (Fase 6)",
+    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade (Fase 2), NotificacaoSubject (Fase 4), ProtectedRoute (Fase 6)",
     tecnicas:
       "Injeção de dependência, Fakes em memória e Mocks restritos à fronteira externa (SDK Gemini / Supabase)",
-    status: "Planejado",
+    status: "Em Andamento",
   },
   {
     nivelRbt: "Nível 3 — Fluxo Crítico Ponta a Ponta",
@@ -411,16 +413,16 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "96.15% (100% em utils.ts)",
     functions: "100.00%",
     lines: "98.30% (100% em utils.ts)",
-    destaque: true,
   },
   {
     etapa: "Pós-Fase 1 (Adapter + Factory)",
-    responsavel: "A atualizar na Fase 1",
-    testes: "—",
-    statements: "—",
-    branches: "—",
-    functions: "—",
-    lines: "—",
+    responsavel: "Gianlucca Paiva",
+    testes: "4 suítes (51 testes)",
+    statements: "100.00% (lib + patterns)",
+    branches: "100.00% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
+    destaque: true,
   },
   {
     etapa: "Pós-Fase 2 (Facade de Entregas)",
@@ -455,19 +457,19 @@ export const destaquesFaseZero = [
   {
     titulo: "Determinismo Temporal (Fake Timers)",
     detalhe:
-      "Funções como isDataEntregaFutura, comparaDataHj e formatarDataRelativa foram testadas congelando o relógio do sistema (vi.useFakeTimers), evitando testes instáveis (flaky tests) na virada de meia-noite.",
+      "Funções como isDataEntregaFutura, comparaDataHj e formatarDataRelativa (Fase 0) e o backoff exponencial 503 do GeminiAdapter (Fase 1) foram testados congelando o relógio (vi.useFakeTimers), sem flaky tests.",
     icone: Sparkles,
   },
   {
     titulo: "Análise de Valor Limite (Boundary Value)",
     detalhe:
-      "Validação exata nas fronteiras de prazo de entrega (ontem 23:59:59 = expirado, instante exato = expirado, amanhã = válido).",
+      "Validação exata nas fronteiras de prazo de entrega (ontem 23:59:59 = expirado, instante exato = expirado, amanhã = válido) e no limite máximo de retries (MAX_RETRIES = 2).",
     icone: Layers,
   },
   {
-    titulo: "Resiliência e Tolerância a Falhas",
+    titulo: "Resiliência e Desacoplamento (Adapter & Factory)",
     detalhe:
-      "Injeção proposital de JSON corrompido no localStorage e URIs malformadas (%E0%A4%A) para provar que os blocos try/catch retornam fallbacks seguros sem quebrar a tela.",
+      "Injeção de FakeAssistenteIA no hook React e simulação de chamadas de ferramentas (Function Calling) sem gastar franquia da API Gemini nem depender de rede.",
     icone: ShieldAlert,
   },
 ];
