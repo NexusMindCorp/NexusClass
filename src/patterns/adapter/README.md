@@ -1,15 +1,15 @@
-# Adapter
+# Adapter (`GeminiAdapter`)
 
-**Por quê:** `useChatBot.ts` cria `new GoogleGenerativeAI(...)` diretamente. A tela fica presa ao SDK do Gemini e não dá para testar sem rede.
+**Por quê:** `useChatBot.ts` instanciava `new GoogleGenerativeAI(__API_GEMINI_KEY__)` diretamente e misturava estado React com o protocolo de *Function Calling* e *retry* de HTTP 503 da biblioteca externa, impedindo testar o chatbot sem acesso à rede.
 
-**Como funciona:** o app passa a depender de uma interface própria (`IAssistenteIA`); o `GeminiAdapter` traduz essa interface para o SDK (incluindo Function Calling e retry em HTTP 503). Trocar de provedor ou usar um *fake* nos testes não altera o hook.
+**Como funciona:** o hook passa a depender exclusivamente do contrato de domínio `IAssistenteIA` (`enviarMensagem(texto: string): Promise<string>`). A classe `GeminiAdapter` encapsula a sessão `ChatSession` do SDK `@google/generative-ai`, resolve chamadas recursivas de ferramentas (`obterEventosCalendario`, `obterDuvidasEstudante`, `obterAtividadesAbertas`, `obterPostsProfessor`) e aplica *backoff* exponencial em erros `503` / `"high demand"`.
 
-**Exemplo (esboço):**
+**Exemplo de uso:**
 ```ts
-export interface IAssistenteIA {
-  enviarMensagem(texto: string): Promise<string>
-}
-// GeminiAdapter implements IAssistenteIA  → envolve ChatSession do SDK
-// FakeAssistente implements IAssistenteIA → usado em testes
+import { GeminiAdapter, type IAssistenteIA } from "@/patterns/adapter/GeminiAdapter";
+
+const assistente: IAssistenteIA = new GeminiAdapter(adapterConfig, sdkClientOpcional);
+const resposta = await assistente.enviarMensagem("Quais são minhas atividades em aberto?");
 ```
-**Status:** Planejado (Fase 1)
+
+**Status:** Concluído (Fase 1 — Autor: Gianlucca Paiva)
