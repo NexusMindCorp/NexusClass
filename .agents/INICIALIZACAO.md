@@ -37,6 +37,7 @@
 | 5 | Documentar Singleton (`supabaseClient`) e Proxy de proteção (`ProtectedRoute`) | Planejado | a definir | a criar |
 | 6 | Testes de componente + E2E (login → entrega) | Planejado | a definir | a criar |
 | 7 | Apresentação Interativa DCC061 na aba Informações (`InfoAplicacao.tsx`) | **Ativo / Refinamento Visual na Fase 7** (corrigir estilizações quebradas ao final das fases) | Gianlucca Paiva | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) |
+| Infra | Ambiente Docker PostgreSQL (`docker/structure/docker-compose.yml` + `docker/constructionsSQL/`) | **Concluído** (container `nexusclass-db` ativo + conexão SQLTools validada) | Gianlucca Paiva | [infra-docker-postgres-estrutura-banco.md](features/infra-docker-postgres-estrutura-banco.md) / [ADR-003](decisions/adr-003-docker-postgres-estrutura-banco.md) |
 | — | Template Method | **Descartado** (forçado; ver plano) | Gabriel Lineker | — |
 
 ## Comandos Operacionais
