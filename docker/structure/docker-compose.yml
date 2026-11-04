@@ -1,0 +1,28 @@
+name: nexusclass
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: nexusclass-db
+    restart: unless-stopped
+    env_file:
+      - path: ../../.env
+        required: false
+    environment:
+      TZ: America/Sao_Paulo
+      PGPORT: ${POSTGRES_PORT}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - nexusclass_pgdata:/var/lib/postgresql/data
+      - ../constructionsSQL:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p $${POSTGRES_PORT} -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  nexusclass_pgdata:
+    name: nexusclass_pgdata
