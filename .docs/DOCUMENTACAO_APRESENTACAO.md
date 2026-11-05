@@ -7,10 +7,10 @@
 
 | Campo | Estado Atual |
 |:---|:---|
-| **Última modificação por** | **Gianlucca Paiva** (`GianluccaPaiva`) em 2026-11-04 |
-| **Última etapa concluída** | **Infraestrutura Docker PostgreSQL (`docker/structure/docker-compose.yml`) + Fase 1 Concluída (Adapter + Factory nos Bots):** Configurado container `nexusclass-db` (`postgres:17-alpine`) sob o projeto `nexusclass`, com persistência em `nexusclass_pgdata`, variáveis e porta 100% isoladas no `.env`, montagem de `docker/constructionsSQL/` e teste de conexão via SQLTools (`000_teste_conexao.sql`). Na trilha de código, seguem ativos `GeminiAdapter` e `BotFactory` com **4 suítes / 51 testes** passando e **100%** de cobertura em `src/lib` e `src/patterns`. |
-| **Último relatório** | `relatorios/2026-11/2026-11-04-estrutura-docker-postgres.md` (Autor: Gianlucca Paiva) |
-| **Fase atual / Próximo passo** | **Trilha DB Docker:** Criar scripts SQL de estruturação em `docker/constructionsSQL/` via SQLTools. **Trilha DCC061 — Fase 2 (Planejado — Próximo: Gabriel Lineker / Gianlucca Paiva):** Implementar **Facade** (`EntregaAtividadeFacade`) em `src/patterns/facade/` para entrega de atividades, criar testes de integração em `testes/patterns/facade/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
+| **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-05 |
+| **Última etapa concluída** | **Fase 2 Concluída (Padrão Facade — `EntregaAtividadeFacade`):** Implementada a fachada `EntregaAtividadeFacade` (`IEntregaAtividadeFacade`) em `src/patterns/facade/EntregaAtividadeFacade.ts`, desacoplando `src/hooks/EntregasHooks/useEntregas.ts` do par Supabase Storage (`entregas_atividades`) + PostgreSQL (`entregas_atividades`) e eliminando usos de `any`. Criados 15 novos testes em `testes/patterns/facade/entregaAtividadeFacade.spec.ts` (**5 suítes / 66 testes** passando e **100%** de cobertura em `src/lib` e `src/patterns`). |
+| **Último relatório** | `relatorios/2026-11/2026-11-05-fase-2-facade-entregas.md` (Autor: Gabriel Lineker) |
+| **Fase atual / Próximo passo** | **Trilha DCC061 — Fase 3 (Planejado — Próximo: Gabriel Lineker / Gianlucca Paiva):** Implementar **Strategy** (`FiltroStrategy<T>`) em `src/patterns/strategy/` para os filtros de pesquisa de turmas (`usePesquisa`) e dúvidas (`useDuvidas`), criar testes unitários puros em `testes/patterns/strategy/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/`; rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
@@ -18,19 +18,19 @@
 |:---|:---|:---|:---|:---|
 | 0 | Base de testes (`utils.ts` + `assetPath.ts` + `setupTests.ts`) | **Concluído** | Gabriel Lineker | 29 testes passando (2 suítes); cobertura `src/lib` saltou de **4.27%** para **98.36%** (`utils.ts` 100%) |
 | 1 | Adapter + Factory (bots) | **Concluído** | Gianlucca Paiva | 51 testes passando (4 suítes); `GeminiAdapter.ts` e `BotFactory.ts` com **100%** de cobertura; `useChatBot.ts` desacoplado do SDK |
-| 2 | Facade (entrega) | Planejado | a definir | — |
+| 2 | Facade (entrega) | **Concluído** | Gabriel Lineker | 66 testes passando (5 suítes); `EntregaAtividadeFacade.ts` com **100%** de cobertura; `useEntregas.ts` desacoplado de Storage+DB |
 | 3 | Strategy (filtros) | Planejado | a definir | — |
 | 4 | Observer (Realtime) | Planejado | a definir | — |
 | 5 | Singleton / Proxy documentados + diagrama | Planejado | a definir | — |
 | 6 | Testes de componente + E2E | Planejado | a definir | — |
-| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gianlucca Paiva | Atualizado com dados reais da Fase 1; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
+| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gabriel Lineker | Atualizado com dados reais da Fase 2; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
 
 ## Métricas (antes → depois)
-| Métrica | Antes (Baseline) | Pós-Fase 0 | Depois (Pós-Fase 1) |
-|:---|:---|:---|:---|
-| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | 2 arquivos (29 testes) | **4 arquivos (`button`, `utils`, `botFactory`, `geminiAdapter` — 51 testes)** |
-| Cobertura (`src/lib` + `src/patterns`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.36% / 96.15% / 100% / 98.30%** | **100% / 100% / 100% / 100%** (`utils.ts`, `assetPath.ts`, `supabaseClient.ts`, `GeminiAdapter.ts` e `BotFactory.ts` em **100%**) |
-| Acoplamento componente↔Supabase/Gemini | Direto nos hooks | Direto nos hooks | **`useChatBot.ts` desacoplado via `IAssistenteIA` (`GeminiAdapter`) + `BotFactory`** |
+| Métrica | Antes (Baseline) | Pós-Fase 0 | Pós-Fase 1 | Depois (Pós-Fase 2) |
+|:---|:---|:---|:---|:---|
+| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | 2 arquivos (29 testes) | 4 arquivos (51 testes) | **5 arquivos (`button`, `utils`, `botFactory`, `geminiAdapter`, `entregaAtividadeFacade` — 66 testes)** |
+| Cobertura (`src/lib` + `src/patterns`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.36% / 96.15% / 100% / 98.30%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** (`utils.ts`, `assetPath.ts`, `supabaseClient.ts`, `GeminiAdapter.ts`, `BotFactory.ts` e `EntregaAtividadeFacade.ts` em **100%**) |
+| Acoplamento componente↔Supabase/Gemini | Direto nos hooks | Direto nos hooks | `useChatBot.ts` desacoplado via `IAssistenteIA` + `BotFactory` | **`useChatBot.ts` + `useEntregas.ts` desacoplados via `GeminiAdapter`, `BotFactory` e `EntregaAtividadeFacade`** |
 
 ## Registro por Padrão / Teste
 
@@ -60,6 +60,19 @@
 - **Funcionou?** **Sim** — **4 suítes / 51 testes passando** em ~2.1s; `GeminiAdapter.ts` e `BotFactory.ts` atingiram **100%** de cobertura em Statements, Branches, Functions e Lines.
 - **Lições / trade-offs:** Em vez de substituir o SDK por `fetch` manual (como sugerido no rascunho inicial `AnaliseDePossiveisDP.md`, que perderia suporte nativo a `ChatSession` e `functionDeclarations`), encapsular o SDK dentro do `GeminiAdapter` com injeção opcional de `IGeminiSdkClient` preservou 100% das capacidades de *Function Calling* do Tigreso enquanto tornou os testes instantâneos e determinísticos.
 
+### Fase 2 — Padrão Facade (`EntregaAtividadeFacade`) no Subsistema de Entregas e Avaliação
+- **Implementado por:** Gabriel Lineker (`GabrielLineker`)
+- **Por que foi escolhido:** O hook `src/hooks/EntregasHooks/useEntregas.ts` coordenava diretamente dois subsistemas distintos do Supabase — o bucket de arquivos `supabase.storage.from("entregas_atividades")` e a tabela relacional `supabase.from("entregas_atividades")` — misturando higienização de nome de arquivo (`replace(/[^a-zA-Z0-9.-]/g, "_")`), geração de caminho hierárquico, `UPSERT` com `onConflict: "atividade_id,aluno_id"`, normalização do join `perfis` (`aluno_nome`), avaliação docente e links temporários assinados (`createSignedUrl`), além de usar tipagem `any`.
+- **Onde foi aplicado:** `src/patterns/facade/EntregaAtividadeFacade.ts`, `src/patterns/facade/README.md`, `src/hooks/EntregasHooks/useEntregas.ts`, `src/hooks/EntregasHooks/type.ts` e `testes/patterns/facade/entregaAtividadeFacade.spec.ts`.
+- **Antes vs. depois:**
+  - **Antes:** `useEntregas.ts` (152 linhas) fazia chamadas encadeadas diretas a `supabase.storage` e `supabase.from("entregas_atividades")`, possuía 4 usos de `any` e `0%` de testes automatizados.
+  - **Depois:** `EntregaAtividadeFacade` encapsula toda a coordenação entre Storage e PostgreSQL com tipagem estrita (`IEntregaAtividadeFacade`, `IEntregaSupabaseClient`); `useEntregas.ts` cuida apenas do estado React e dos toasts (`sonner`), aceitando injeção opcional da fachada para testes sem rede.
+- **Como contribui para qualidade/manutenção/testabilidade:**
+  - **Testes Unitários Puros (Nível 2 RBT — 3 testes):** Valida `higienizarNomeArquivo`, `construirCaminhoArquivo` e `normalizarEntregasComPerfis` (tratando `perfis` como objeto, array ou nulo → `"Aluno Anônimo"`).
+  - **Testes de Fronteira e Integração (Nível 3 RBT — 12 testes):** Valida o fluxo atômico `upload` + `upsert` (`onConflict: "atividade_id,aluno_id"`), garante que uma falha no Storage aborta a operação antes de gravar no banco, testa consultas por papel (`aluno` vs. `professor`), avaliação docente, `createSignedUrl` e o comportamento completo do hook `useEntregas` com `FakeEntregaFacade` e `toast`.
+- **Funcionou?** **Sim** — **5 suítes / 66 testes passando**; `EntregaAtividadeFacade.ts` atingiu **100%** de cobertura em Statements, Branches, Functions e Lines.
+- **Lições / trade-offs:** Descartamos os erros do rascunho `AnaliseDePossiveisDP.md` (que citava bucket `arquivos_atividades`, tabela `entregas`, `getPublicUrl` e chamada artificial de IA) e modelamos a fachada fielmente sobre o bucket e tabela reais `entregas_atividades` e `createSignedUrl(caminho, 3600)`.
+
 ## Diário de Sessões
 | Data | Autor | Resumo |
 |:---|:---|:---|
@@ -69,6 +82,7 @@
 | 2026-10-24 (2) | Gabriel Lineker (`GabrielLineker`) | **Fase 0 concluída:** `setupTests.ts` configurado com `vi.stubGlobal`; criados 26 testes em `testes/lib/utils.spec.ts` elevando a cobertura de `src/lib` de **4.27%** para **98.36%** (`utils.ts` 100%). Criada apresentação interativa de **Engenharia de Software (DCC061)** na aba Informações (`InfoAplicacao.tsx`) com seletor de disciplina, catálogo interativo de Design Patterns (Antes vs. Depois) e painel de cobertura. |
 | 2026-10-27 | Gianlucca Paiva (`GianluccaPaiva`) | **Fase 1 concluída:** Criados `ADR-002` e spec da Fase 1; implementados `GeminiAdapter` (`IAssistenteIA`) em `src/patterns/adapter/GeminiAdapter.ts` e `BotFactory` em `src/patterns/factory/BotFactory.ts`; refatorado `src/hooks/botsHooks/useChatBot.ts` sem regressão; criados 22 novos testes em `testes/patterns/` (total 4 suítes / 51 testes passando, **100%** de cobertura em `src/lib` e `src/patterns`). Atualizados slides interativos em `configEngenhariaSoftware.ts`. |
 | 2026-11-04 | Gianlucca Paiva (`GianluccaPaiva`) | **Infraestrutura Docker PostgreSQL:** Criados `ADR-003`, spec de infraestrutura, `docker/structure/docker-compose.yml` (projeto `nexusclass`, container `nexusclass-db` com `postgres:17-alpine`, volume persistente `nexusclass_pgdata` e leitura de `docker/constructionsSQL/`) e script `000_teste_conexao.sql` para validação no SQLTools, com credenciais e porta 100% isoladas no `.env`. |
+| 2026-11-05 | Gabriel Lineker (`GabrielLineker`) | **Fase 2 concluída:** Criados `ADR-004` e spec da Fase 2; implementada `EntregaAtividadeFacade` (`IEntregaAtividadeFacade`) em `src/patterns/facade/EntregaAtividadeFacade.ts`; refatorado `src/hooks/EntregasHooks/useEntregas.ts` sem regressão e sem `any`; criados 15 novos testes em `testes/patterns/facade/entregaAtividadeFacade.spec.ts` (total 5 suítes / 66 testes passando, **100%** de cobertura em `src/lib` e `src/patterns`). Atualizados slides interativos em `configEngenhariaSoftware.ts`. |
 
 ## Pontos para a Apresentação (15–20 min)
 - Parte 1: documento-texto (2 temas). Parte 2: demo do código (antes/depois + testes rodando + aba *Informações → Engenharia de Software (DCC061)* dentro da própria aplicação).

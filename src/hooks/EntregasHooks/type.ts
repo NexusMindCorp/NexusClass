@@ -1,4 +1,5 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
+
 export type Entrega = {
     id: string;
     atividade_id: string;
@@ -11,6 +12,10 @@ export type Entrega = {
     created_at: string;
     updated_at: string;
     aluno_nome?: string;
+};
+
+export type EntregaRowComPerfil = Entrega & {
+    perfis?: { nome?: string | null } | Array<{ nome?: string | null }> | null;
 };
 
 export type BoxEntregaAtividadeProps = {

@@ -29,9 +29,9 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 1 Concluída → Próxima: Fase 2 (Facade de Entregas)",
-  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
-  data: "2026-10-27",
+  faseAtual: "Fase 2 Concluída → Próxima: Fase 3 (Strategy de Filtros)",
+  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
+  data: "2026-11-05",
   branch: "DesiningTeste",
 };
 
@@ -41,7 +41,7 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "cobertura em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "51",
+    valor: "66",
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
@@ -49,8 +49,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "Design Patterns GoF catalogados",
   },
   {
-    valor: "Fase 1",
-    rotulo: "concluída (Adapter + Factory ativos)",
+    valor: "Fase 2",
+    rotulo: "concluída (Adapter + Factory + Facade ativos)",
   },
 ];
 
@@ -178,24 +178,26 @@ assistenteRef.current = BotFactory.criarAssistente(tipoBot, contexto);`,
     nome: "3. Facade (Fachada)",
     categoria: "Estrutural",
     fase: "Fase 2",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gabriel Lineker (GabrielLineker)",
     ondeAplicado:
-      "src/patterns/facade/ + src/hooks/AtividadesHooks/useEntregas.ts",
+      "src/patterns/facade/EntregaAtividadeFacade.ts + src/hooks/EntregasHooks/useEntregas.ts",
     problemaAntes:
-      "Submeter uma atividade exige múltiplos passos coordenados: higienizar nome do arquivo, upload no bucket entregas_atividades/{atividade}/{aluno}/{arq}, obter URL pública e fazer UPSERT na tabela entregas.",
+      "Submeter, listar, avaliar e baixar uma atividade exigia coordenar dois subsistemas no hook useEntregas: higienizar nome do arquivo, upload no bucket entregas_atividades/{atividadeId}/{alunoId}/{arq}, UPSERT na tabela entregas_atividades com onConflict: 'atividade_id,aluno_id' e createSignedUrl.",
     solucaoDepois:
-      "EntregaAtividadeFacade.submeter() expõe um único método de alto nível para o componente BoxEntregaAtividade, ocultando a orquestração entre Storage e Postgres.",
-    codigoAntes: `// Antes: hook/componente conhece detalhes de Storage + SQL
-await supabase.storage.from("entregas_atividades").upload(path, file);
-const { data } = supabase.storage.from("entregas_atividades").getPublicUrl(path);
-await supabase.from("entregas").upsert({ ... });`,
-    codigoDepois: `// Depois: fachada única para o subsistema de entrega
-const resultado = await entregaFacade.submeter({
-  atividadeId, alunoId, arquivos, comentario
+      "EntregaAtividadeFacade (contrato IEntregaAtividadeFacade) expõe operações de domínio coesas (submeter, carregarEntregas, avaliar, obterUrlDownload), ocultando a coordenação entre Supabase Storage e PostgreSQL.",
+    codigoAntes: `// Antes: hook conhece detalhes de Storage + SQL (useEntregas.ts)
+const nomeLimpo = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+await supabase.storage.from("entregas_atividades").upload(caminho, file, { upsert: true });
+await supabase.from("entregas_atividades").upsert({ ... }, { onConflict: "atividade_id,aluno_id" });`,
+    codigoDepois: `// Depois: fachada única para o subsistema de entrega (EntregaAtividadeFacade.ts)
+await facade.submeter({
+  atividadeId,
+  alunoId: perfil.id,
+  arquivo: file,
 });`,
     beneficioQualidade:
-      "Reduz o acoplamento entre a UI e o Supabase, permitindo testar toda a regra de negócio de envio/reenvio mockando apenas a borda.",
+      "Reduz o acoplamento entre a UI/Hook e o par Storage+PostgreSQL, elimina usos de 'any' e permite testar upload, reenvio, avaliação e falhas parciais sem rede.",
   },
   {
     id: "strategy",
@@ -314,11 +316,12 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 2",
     titulo: "Padrão Facade (Subsistema de Entrega de Atividades)",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Concluído",
+    responsavel: "Gabriel Lineker (GabrielLineker)",
     entregas:
-      "EntregaAtividadeFacade unificando higienização de arquivo, Supabase Storage e UPSERT em entregas.",
-    evidenciaTeste: "Espaço reservado: testes de integração da Facade com mock na borda do Supabase",
+      "EntregaAtividadeFacade unificando higienização de arquivo, Supabase Storage (upload + createSignedUrl) e PostgreSQL (UPSERT em entregas_atividades, listagem por papel e avaliação docente).",
+    evidenciaTeste:
+      "5 suítes / 66 testes passando · EntregaAtividadeFacade.ts com 100% de cobertura",
   },
   {
     fase: "Fase 3",
@@ -371,7 +374,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 2 — Lógica Pura (Determinística)",
     camada: "Testes Unitários Puros (Zero I/O)",
     ferramenta: "Vitest + Fake Timers",
-    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído) e futuras Strategies (Fase 3)",
+    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído) e futuras Strategies (Fase 3)",
     tecnicas:
       "Padrão AAA, Particionamento de Equivalência, Análise de Valor Limite, Tabela de Decisão e vi.useFakeTimers()",
     status: "Concluído",
@@ -380,7 +383,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 3 — Fronteira / Integração",
     camada: "Testes com Fakes/Mocks na Borda",
     ferramenta: "Vitest + Testing Library",
-    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade (Fase 2), NotificacaoSubject (Fase 4), ProtectedRoute (Fase 6)",
+    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade + useEntregas (Fase 2 - Concluído), NotificacaoSubject (Fase 4), ProtectedRoute (Fase 6)",
     tecnicas:
       "Injeção de dependência, Fakes em memória e Mocks restritos à fronteira externa (SDK Gemini / Supabase)",
     status: "Em Andamento",
@@ -422,16 +425,16 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "100.00% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
-    destaque: true,
   },
   {
     etapa: "Pós-Fase 2 (Facade de Entregas)",
-    responsavel: "A atualizar na Fase 2",
-    testes: "—",
-    statements: "—",
-    branches: "—",
-    functions: "—",
-    lines: "—",
+    responsavel: "Gabriel Lineker",
+    testes: "5 suítes (66 testes)",
+    statements: "100.00% (lib + patterns)",
+    branches: "100.00% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
+    destaque: true,
   },
   {
     etapa: "Pós-Fase 3 (Strategy de Filtros)",
@@ -457,7 +460,7 @@ export const destaquesFaseZero = [
   {
     titulo: "Determinismo Temporal (Fake Timers)",
     detalhe:
-      "Funções como isDataEntregaFutura, comparaDataHj e formatarDataRelativa (Fase 0) e o backoff exponencial 503 do GeminiAdapter (Fase 1) foram testados congelando o relógio (vi.useFakeTimers), sem flaky tests.",
+      "Funções como isDataEntregaFutura, comparaDataHj e formatarDataRelativa (Fase 0), backoff 503 do GeminiAdapter (Fase 1) e timestamps da EntregaAtividadeFacade (Fase 2) foram testados congelando o relógio (vi.useFakeTimers), sem flaky tests.",
     icone: Sparkles,
   },
   {
@@ -467,9 +470,9 @@ export const destaquesFaseZero = [
     icone: Layers,
   },
   {
-    titulo: "Resiliência e Desacoplamento (Adapter & Factory)",
+    titulo: "Resiliência e Desacoplamento (Adapter, Factory & Facade)",
     detalhe:
-      "Injeção de FakeAssistenteIA no hook React e simulação de chamadas de ferramentas (Function Calling) sem gastar franquia da API Gemini nem depender de rede.",
+      "Injeção de FakeAssistenteIA e FakeEntregaFacade nos hooks React, simulando Function Calling e operações de Storage + PostgreSQL sem gastar franquia de API nem depender de rede.",
     icone: ShieldAlert,
   },
 ];

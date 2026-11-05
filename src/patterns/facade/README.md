@@ -1,13 +1,21 @@
-# Facade
+# Facade (`EntregaAtividadeFacade`)
 
-**Por quê:** entregar uma atividade envolve higienizar o nome do arquivo, subir para o bucket `entregas_atividades/{atividade_id}/{aluno_id}/{arquivo}`, fazer `UPSERT` em `entregas_atividades` e tratar reenvio. Isso está misturado no hook/componente.
+**Por quê:** entregar, listar, baixar e avaliar uma atividade exige coordenar dois subsistemas distintos do Supabase — o bucket de armazenamento (`supabase.storage.from("entregas_atividades")`) e o banco relacional (`supabase.from("entregas_atividades")`) — além de higienizar o nome do arquivo, construir o caminho `${atividade_id}/${aluno_id}/${timestamp}-${nomeLimpo}`, tratar o reenvio via `UPSERT` (`onConflict: "atividade_id,aluno_id"`) e normalizar o join `perfis:aluno_id(nome)`. Antes, toda essa lógica estava acoplada dentro do hook `useEntregas.ts`.
 
-**Como funciona:** uma interface simples (`submeter(...)`) esconde Storage + banco. O componente chama só a fachada; as regras de backend (trigger de prazo, RLS) continuam valendo.
+**Como funciona:** a classe `EntregaAtividadeFacade` (contrato `IEntregaAtividadeFacade`) unifica e oculta os subsistemas de Storage e PostgreSQL. O hook `useEntregas` gerencia apenas o estado React (`entregaPropria`, `todasEntregas`, `loading`, `uploading`) e os toasts, delegando toda operação de domínio à fachada.
 
-**Exemplo (esboço):**
+**Exemplo de uso:**
 ```ts
-export const entregaFacade = {
-  submeter: (atividadeId: string, alunoId: string, arquivo: File) => Promise<void>
-}
+import { EntregaAtividadeFacade } from "@/patterns/facade/EntregaAtividadeFacade";
+
+const facade = new EntregaAtividadeFacade();
+
+// Submissão atômica (Storage upload + PostgreSQL upsert)
+await facade.submeter({
+  atividadeId: "ativ-1",
+  alunoId: "aluno-1",
+  arquivo: file,
+});
 ```
-**Status:** Planejado (Fase 2)
+
+**Status:** Concluído (Fase 2 — Autor: Gabriel Lineker)

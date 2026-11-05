@@ -1,152 +1,123 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
-import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import type { Entrega } from "./type";
+import {
+  EntregaAtividadeFacade,
+  type IEntregaAtividadeFacade,
+} from "@/patterns/facade/EntregaAtividadeFacade";
 
-export function useEntregas(atividadeId: string, perfil: PerfilUsuario) {
-    const [entregaPropria, setEntregaPropria] = useState<Entrega | null>(null);
-    const [todasEntregas, setTodasEntregas] = useState<Entrega[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [uploading, setUploading] = useState(false);
+export function useEntregas(
+  atividadeId: string,
+  perfil: PerfilUsuario,
+  facadeInjetada?: IEntregaAtividadeFacade,
+) {
+  const [entregaPropria, setEntregaPropria] = useState<Entrega | null>(null);
+  const [todasEntregas, setTodasEntregas] = useState<Entrega[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-    const carregarDados = useCallback(async () => {
-        if (!hasSupabaseConfig || !supabase || !atividadeId) return;
+  const facade = useMemo<IEntregaAtividadeFacade>(
+    () => facadeInjetada ?? new EntregaAtividadeFacade(),
+    [facadeInjetada],
+  );
 
-        setLoading(true);
-        try {
-            if (perfil.role === "aluno") {
-                const { data, error } = await supabase
-                    .from("entregas_atividades")
-                    .select("*")
-                    .eq("atividade_id", atividadeId)
-                    .eq("aluno_id", perfil.id)
-                    .maybeSingle();
+  const carregarDados = useCallback(async () => {
+    if (!facade.estaDisponivel() || !atividadeId) return;
 
-                if (error) throw error;
-                setEntregaPropria(data);
-            } else {
+    setLoading(true);
+    try {
+      const resultado = await facade.carregarEntregas(atividadeId, perfil);
+      if (perfil.role === "aluno") {
+        setEntregaPropria(resultado.entregaPropria);
+      } else {
+        setTodasEntregas(resultado.todasEntregas);
+      }
+    } catch (err: unknown) {
+      console.error("Erro ao carregar entregas:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [atividadeId, facade, perfil]);
 
-                const { data, error } = await supabase
-                    .from("entregas_atividades")
-                    .select(`
-                        *,
-                        perfis:aluno_id (
-                            nome
-                        )
-                    `)
-                    .eq("atividade_id", atividadeId)
-                    .order("entregue_em", { ascending: false });
+  const enviarEntrega = async (file: File) => {
+    if (!facade.estaDisponivel()) return;
 
-                if (error) throw error;
-                
-                const formatadas: Entrega[] = (data || []).map((d: any) => {
-                    const perf = Array.isArray(d.perfis) ? d.perfis[0] : d.perfis;
-                    return {
-                        ...d,
-                        aluno_nome: perf?.nome || "Aluno Anônimo"
-                    };
-                });
-                setTodasEntregas(formatadas);
-            }
-        } catch (err: any) {
-            console.error("Erro ao carregar entregas:", err);
-        } finally {
-            setLoading(false);
-        }
-    }, [atividadeId, perfil.id, perfil.role]);
+    setUploading(true);
+    try {
+      await facade.submeter({
+        atividadeId,
+        alunoId: perfil.id,
+        arquivo: file,
+      });
 
-    const enviarEntrega = async (file: File) => {
-        if (!hasSupabaseConfig || !supabase) return;
+      toast.success("Atividade entregue com sucesso!");
+      await carregarDados();
+    } catch (err: unknown) {
+      console.error("Erro ao enviar entrega:", err);
+      const mensagem =
+        err && typeof err === "object" && "message" in err && typeof err.message === "string"
+          ? err.message
+          : "";
+      toast.error("Erro ao entregar atividade", {
+        description: mensagem || "Por favor, tente novamente.",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
-        setUploading(true);
-        try {
-   
-            const nomeLimpo = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-            const caminhoArquivo = `${atividadeId}/${perfil.id}/${Date.now()}-${nomeLimpo}`;
+  const avaliarEntrega = async (
+    alunoId: string,
+    nota: number,
+    feedback: string,
+  ) => {
+    if (!facade.estaDisponivel()) return;
 
-         
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from("entregas_atividades")
-                .upload(caminhoArquivo, file, { upsert: true });
+    try {
+      await facade.avaliar({
+        atividadeId,
+        alunoId,
+        nota,
+        feedback,
+      });
 
-            if (uploadError) throw uploadError;
+      toast.success("Avaliação salva com sucesso!");
+      await carregarDados();
+    } catch (err: unknown) {
+      console.error("Erro ao avaliar entrega:", err);
+      const mensagem =
+        err && typeof err === "object" && "message" in err && typeof err.message === "string"
+          ? err.message
+          : undefined;
+      toast.error("Erro ao salvar avaliação", {
+        description: mensagem,
+      });
+    }
+  };
 
-         
-            const { error: dbError } = await supabase
-                .from("entregas_atividades")
-                .upsert({
-                    atividade_id: atividadeId,
-                    aluno_id: perfil.id,
-                    url_anexo: uploadData.path,
-                    entregue_em: new Date().toISOString()
-                }, { onConflict: "atividade_id,aluno_id" });
+  const obterLinkArquivo = async (caminho: string): Promise<string | null> => {
+    if (!facade.estaDisponivel()) return null;
+    try {
+      return await facade.obterUrlDownload(caminho);
+    } catch (err: unknown) {
+      console.error("Erro ao gerar link do arquivo:", err);
+      return null;
+    }
+  };
 
-            if (dbError) throw dbError;
+  useEffect(() => {
+    void carregarDados();
+  }, [carregarDados]);
 
-            toast.success("Atividade entregue com sucesso!");
-            await carregarDados();
-        } catch (err: any) {
-            console.error("Erro ao enviar entrega:", err);
-            toast.error("Erro ao entregar atividade", {
-                description: err.message || "Por favor, tente novamente."
-            });
-        } finally {
-            setUploading(false);
-        }
-    };
-
-
-    const avaliarEntrega = async (alunoId: string, nota: number, feedback: string) => {
-        if (!hasSupabaseConfig || !supabase) return;
-
-        try {
-            const { error } = await supabase
-                .from("entregas_atividades")
-                .update({ nota, feedback, updated_at: new Date().toISOString() })
-                .eq("atividade_id", atividadeId)
-                .eq("aluno_id", alunoId);
-
-            if (error) throw error;
-
-            toast.success("Avaliação salva com sucesso!");
-            await carregarDados();
-        } catch (err: any) {
-            console.error("Erro ao avaliar entrega:", err);
-            toast.error("Erro ao salvar avaliação", {
-                description: err.message
-            });
-        }
-    };
-
-
-    const obterLinkArquivo = async (caminho: string): Promise<string | null> => {
-        if (!hasSupabaseConfig || !supabase) return null;
-        try {
-            const { data, error } = await supabase.storage
-                .from("entregas_atividades")
-                .createSignedUrl(caminho, 3600); 
-
-            if (error) throw error;
-            return data.signedUrl;
-        } catch (err) {
-            console.error("Erro ao gerar link do arquivo:", err);
-            return null;
-        }
-    };
-
-    useEffect(() => {
-        void carregarDados();
-    }, [carregarDados]);
-
-    return {
-        entregaPropria,
-        todasEntregas,
-        loading,
-        uploading,
-        enviarEntrega,
-        avaliarEntrega,
-        obterLinkArquivo,
-        recarregar: carregarDados
-    };
+  return {
+    entregaPropria,
+    todasEntregas,
+    loading,
+    uploading,
+    enviarEntrega,
+    avaliarEntrega,
+    obterLinkArquivo,
+    recarregar: carregarDados,
+  };
 }
