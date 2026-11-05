@@ -29,8 +29,8 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 4 Concluída → Próxima: Fase 5 (Singleton & Proxy Documentados)",
-  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
+  faseAtual: "Fase 5 Concluída → Próxima: Fase 6 (Testes de Componente + E2E)",
+  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
   data: "2026-11-05",
   branch: "DesiningTeste",
 };
@@ -45,12 +45,12 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
-    valor: "7",
-    rotulo: "Design Patterns GoF catalogados",
+    valor: "7 / 7",
+    rotulo: "Design Patterns GoF concluídos e modelados em UML",
   },
   {
-    valor: "Fase 4",
-    rotulo: "concluída (Adapter + Factory + Facade + Strategy + Observer ativos)",
+    valor: "Fase 5",
+    rotulo: "concluída (7 padrões GoF ativos/documentados + Diagrama UML)",
   },
 ];
 
@@ -260,21 +260,23 @@ const desconectar = conectarCanaisMuralRealtime(supabase, muralSubject, { turmaI
     nome: "6 & 7. Singleton e Proxy (Documentados)",
     categoria: "Estrutural",
     fase: "Fase 5",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/lib/supabaseClient.ts (Singleton) + ProtectedRoute / BoxRestrito (Protection Proxy)",
+      "src/lib/supabaseClient.ts (Singleton) + ProtectedRoute.tsx / BoxRestrito.tsx (Protection Proxy) + out/diagramas/diagrama_classes_detalhado.puml",
     problemaAntes:
-      "Criar classes extras para Singleton ou Proxy quando o código já os implementa idiomaticamente em ES Modules e React Router seria duplicação desnecessária.",
+      "Criar classes extras para Singleton ou Proxy quando o código já os implementa idiomaticamente em ES Modules e React Router seria duplicação desnecessária (overengineering).",
     solucaoDepois:
-      "Catalogação arquitetural formal em src/patterns/singleton e src/patterns/proxy + atualização do diagrama UML com estereótipos <<Singleton>> e <<Proxy>> + testes de rota protegida.",
+      "Catalogação arquitetural formal em src/patterns/singleton e src/patterns/proxy (ADR-007) + atualização do diagrama UML com estereótipos <<Singleton>>, <<Proxy>>, <<Adapter>>, <<Factory>>, <<Facade>>, <<Strategy>> e <<Observer>>.",
     codigoAntes: `// Já existente no projeto (Singleton via ES Module cache)
+export const hasSupabaseConfig = Boolean(__URL_SUPABASE__ && __KEY_SUPABASE__);
 export const supabase = createClient(__URL_SUPABASE__, __KEY_SUPABASE__);`,
-    codigoDepois: `// Protection Proxy já existente em ProtectedRoute.tsx
+    codigoDepois: `// Protection Proxy em ProtectedRoute.tsx + BoxRestrito.tsx
+if (loading) return <Spinner />;
 if (!session) return <Navigate to="/login" replace />;
-return <Outlet />; // + Testes automatizados de bloqueio/redirecionamento`,
+return <Outlet context={{ session, perfil, materiasProfessor, atualizarPerfilLocal }} />;`,
     beneficioQualidade:
-      "Demonstra maturidade de engenharia: reconhecer padrões nativos já presentes na arquitetura sem inflar o código.",
+      "Demonstra maturidade de engenharia: reconhecer padrões nativos já presentes na arquitetura sem inflar o código e manter o diagrama UML sincronizado.",
   },
   {
     id: "template-method-descartado",
@@ -354,11 +356,12 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 5",
     titulo: "Documentação Singleton & Proxy + Diagrama de Classes UML",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     entregas:
-      "Documentação técnica dos padrões nativos existentes e atualização do diagrama PlantUML com estereótipos.",
-    evidenciaTeste: "Espaço reservado: revisão arquitetural e validação de contratos",
+      "Catalogação formal de supabaseClient.ts (Singleton ES Module) e ProtectedRoute/BoxRestrito (Protection Proxy) em src/patterns/ + atualização de diagrama_classes_detalhado.puml com os 7 estereótipos GoF.",
+    evidenciaTeste:
+      "ADR-007 + Diagrama PlantUML atualizado + supabaseClient.ts com 100% de cobertura (7 suítes / 89 testes)",
   },
   {
     fase: "Fase 6",
@@ -462,11 +465,20 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "100.00% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
+  },
+  {
+    etapa: "Pós-Fase 5 (Singleton/Proxy + Diagrama UML)",
+    responsavel: "Gianlucca Paiva",
+    testes: "7 suítes (89 testes)",
+    statements: "100.00% (lib + patterns)",
+    branches: "100.00% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
     destaque: true,
   },
   {
-    etapa: "Pós-Fase 5 e 6 (Singleton/Proxy + Componentes + E2E Final)",
-    responsavel: "A atualizar nas Fases 5–6",
+    etapa: "Pós-Fase 6 (Componentes + E2E Final)",
+    responsavel: "A atualizar na Fase 6",
     testes: "—",
     statements: "—",
     branches: "—",
