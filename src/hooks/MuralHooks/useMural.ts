@@ -3,6 +3,12 @@ import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import{ extrairUrlsAnexo, obterNomeArquivoDoUrl } from '@/lib/utils';
+import {
+    NotificacaoSubject,
+    ToastNotificacaoObserver,
+    StateRefreshObserver,
+    conectarCanaisMuralRealtime,
+} from "@/patterns/observer/NotificacaoSubject";
 import type { Post, Atividade } from "./type";
 
 export function useMural(turmaId: string, perfil: PerfilUsuario) {
@@ -597,78 +603,30 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
 useEffect(() => {
         if (!hasSupabaseConfig || !supabase || !turmaId || !perfil) return;
 
-
-        const channelPosts = supabase
-            .channel('realtime:mural_posts')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'mural_posts',
-                    filter: `turma_id=eq.${turmaId}`
-                },
-                (payload) => {
-              
-                    if (payload.new.autor_id !== perfil.id) {
-                        toast('O mural foi atualizado!', {
-                            description: 'Uma nova publicação foi adicionada.',
-                            action: {
-                                label: 'Carregar',
-                                onClick: () => void carregarPosts(),
-                            },
-                        });
-                    }
-                }
-            )
-            .subscribe();
-
-       
-        const channelAtividades = supabase
-            .channel('realtime:atividades')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'atividades',
-                    filter: `turma_id=eq.${turmaId}`
-                },
-                (payload) => {
-
-                    if (payload.new.professor_id !== perfil.id) {
-                        toast('Novas atividades!', {
-                            description: 'Uma nova atividade foi postada na turma.',
-                            action: {
-                                label: 'Carregar',
-                                onClick: () => void carregarAtividades(),
-                            },
-                        });
-                    }
-                }
-            )
-            .subscribe();
-
-        const channelEntregas = supabase
-            .channel('realtime:entregas-mural')
-            .on(
-                'postgres_changes',
-                {
-                    event: '*',
-                    schema: 'public',
-                    table: 'entregas_atividades',
-                    filter: `aluno_id=eq.${perfil.id}`
-                },
-                () => {
-                    void carregarAtividades();
-                }
-            )
-            .subscribe();
+        const muralSubject = new NotificacaoSubject();
+        const cancelarToastObserver = muralSubject.inscrever(
+            new ToastNotificacaoObserver({
+                usuarioIdAtual: perfil.id,
+                toastFn: toast,
+                aoCarregarPosts: () => void carregarPosts(),
+                aoCarregarAtividades: () => void carregarAtividades(),
+            })
+        );
+        const cancelarRefreshObserver = muralSubject.inscrever(
+            new StateRefreshObserver({
+                usuarioIdAtual: perfil.id,
+                aoRecarregarAtividades: () => void carregarAtividades(),
+            })
+        );
+        const desconectarCanais = conectarCanaisMuralRealtime(supabase, muralSubject, {
+            turmaId,
+            alunoId: perfil.id,
+        });
 
         return () => {
-            supabase.removeChannel(channelPosts);
-            supabase.removeChannel(channelAtividades);
-            supabase.removeChannel(channelEntregas);
+            cancelarToastObserver();
+            cancelarRefreshObserver();
+            desconectarCanais();
         };
     }, [turmaId, perfil?.id, carregarPosts, carregarAtividades, hasSupabaseConfig, supabase]);
 

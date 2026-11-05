@@ -7,10 +7,10 @@
 
 | Campo | Estado Atual |
 |:---|:---|
-| **Última modificação por** | **Gianlucca Paiva** (`GianluccaPaiva`) em 2026-11-05 |
-| **Última etapa concluída** | **Fase 3 Concluída (Padrão Strategy — `FiltroStrategy`):** Implementado o contrato `FiltroStrategy<T, Contexto>` e as estratégias concretas de pesquisa de turmas e da Central de Dúvidas em `src/patterns/strategy/FiltroStrategy.ts`, desacoplando e unificando os filtros em `usePesquisa.ts`, `Pesquisar.tsx`, `useDuvidas.ts`, `DuvidasBox.tsx` e `AppSidebar.tsx`. Criados 12 novos testes em `testes/patterns/strategy/filtroStrategy.spec.ts` (**6 suítes / 78 testes** passando e **100%** de cobertura em `src/lib` e `src/patterns`). |
-| **Último relatório** | `relatorios/2026-11/2026-11-05-fase-3-strategy-filtros.md` (Autor: Gianlucca Paiva) |
-| **Fase atual / Próximo passo** | **Trilha DCC061 — Fase 4 (Planejado — Próximo: Gabriel Lineker / Gianlucca Paiva):** Implementar **Observer** (`NotificacaoSubject` + Observers de Toast/Badge/Refresh) em `src/patterns/observer/` para centralizar os canais Supabase Realtime dispersos, criar testes unitários em `testes/patterns/observer/` e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
+| **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-05 |
+| **Última etapa concluída** | **Fase 4 Concluída (Padrão Observer — `NotificacaoSubject`):** Implementado `NotificacaoSubject`, `ToastNotificacaoObserver`, `StateRefreshObserver`, `BadgeCounterObserver` e conectores Realtime em `src/patterns/observer/NotificacaoSubject.ts`, centralizando e desacoplando os 5 canais Supabase Realtime em `useMural.ts` (`mural_posts`, `atividades`, `entregas_atividades`), `useGerenciador.ts` (`alertas_calendario`) e `useMensagens.ts` (`mensagens`). Criados 11 novos testes em `testes/patterns/observer/notificacaoObserver.spec.ts` (**7 suítes / 89 testes** passando e **100%** de cobertura em `src/lib` e `src/patterns`). |
+| **Último relatório** | `relatorios/2026-11/2026-11-05-fase-4-observer-realtime.md` (Autor: Gabriel Lineker) |
+| **Fase atual / Próximo passo** | **Trilha DCC061 — Fase 5 (Planejado — Próximo: Gabriel Lineker / Gianlucca Paiva):** Documentar formalmente o **Singleton** (`src/lib/supabaseClient.ts`) e o **Protection Proxy** (`ProtectedRoute` / `BoxRestrito`) em `src/patterns/singleton/` e `src/patterns/proxy/`, atualizar o diagrama de classes `out/diagramas/diagrama_classes_detalhado.puml` com estereótipos dos padrões e atualizar este documento + `src/hooks/InfoAplicacao/configEngenhariaSoftware.ts`. |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/`; rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
@@ -20,17 +20,17 @@
 | 1 | Adapter + Factory (bots) | **Concluído** | Gianlucca Paiva | 51 testes passando (4 suítes); `GeminiAdapter.ts` e `BotFactory.ts` com **100%** de cobertura; `useChatBot.ts` desacoplado do SDK |
 | 2 | Facade (entrega) | **Concluído** | Gabriel Lineker | 66 testes passando (5 suítes); `EntregaAtividadeFacade.ts` com **100%** de cobertura; `useEntregas.ts` desacoplado de Storage+DB |
 | 3 | Strategy (filtros) | **Concluído** | Gianlucca Paiva | 78 testes passando (6 suítes); `FiltroStrategy.ts` com **100%** de cobertura; condicionais e duplicações removidas de `Pesquisar`, `DuvidasBox` e `AppSidebar` |
-| 4 | Observer (Realtime) | Planejado | a definir | — |
+| 4 | Observer (Realtime) | **Concluído** | Gabriel Lineker | 89 testes passando (7 suítes); `NotificacaoSubject.ts` com **100%** de cobertura; 5 canais Realtime desacoplados em `useMural`, `useGerenciador` e `useMensagens` |
 | 5 | Singleton / Proxy documentados + diagrama | Planejado | a definir | — |
 | 6 | Testes de componente + E2E | Planejado | a definir | — |
-| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gianlucca Paiva | Atualizado com dados reais da Fase 3; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
+| 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gabriel Lineker | Atualizado com dados reais da Fase 4; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
 
 ## Métricas (antes → depois)
-| Métrica | Antes (Baseline) | Pós-Fase 0 | Pós-Fase 1 | Pós-Fase 2 | Depois (Pós-Fase 3) |
-|:---|:---|:---|:---|:---|:---|
-| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | 2 arquivos (29 testes) | 4 arquivos (51 testes) | 5 arquivos (66 testes) | **6 arquivos (`button`, `utils`, `botFactory`, `geminiAdapter`, `entregaAtividadeFacade`, `filtroStrategy` — 78 testes)** |
-| Cobertura (`src/lib` + `src/patterns`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.36% / 96.15% / 100% / 98.30%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** (`utils.ts`, `assetPath.ts`, `supabaseClient.ts`, `GeminiAdapter.ts`, `BotFactory.ts`, `EntregaAtividadeFacade.ts` e `FiltroStrategy.ts` em **100%**) |
-| Acoplamento componente↔Supabase/Gemini/Regras | Direto nos hooks/componentes | Direto nos hooks/componentes | `useChatBot.ts` desacoplado via `IAssistenteIA` + `BotFactory` | `useChatBot.ts` + `useEntregas.ts` desacoplados | **`useChatBot.ts`, `useEntregas.ts`, `usePesquisa.ts` e `useDuvidas.ts` desacoplados via `GeminiAdapter`, `BotFactory`, `EntregaAtividadeFacade` e `FiltroStrategy`** |
+| Métrica | Antes (Baseline) | Pós-Fase 0 | Pós-Fase 1 | Pós-Fase 2 | Pós-Fase 3 | Depois (Pós-Fase 4) |
+|:---|:---|:---|:---|:---|:---|:---|
+| Testes automatizados | 1 arquivo (`button.spec.tsx` — 3 testes) | 2 arquivos (29 testes) | 4 arquivos (51 testes) | 5 arquivos (66 testes) | 6 arquivos (78 testes) | **7 arquivos (`button`, `utils`, `botFactory`, `geminiAdapter`, `entregaAtividadeFacade`, `filtroStrategy`, `notificacaoObserver` — 89 testes)** |
+| Cobertura (`src/lib` + `src/patterns`) — Stmts / Branch / Funcs / Lines | **4.27% / 0% / 4% / 4.42%** | **98.36% / 96.15% / 100% / 98.30%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** | **100% / 100% / 100% / 100%** (`utils.ts`, `assetPath.ts`, `supabaseClient.ts`, `GeminiAdapter.ts`, `BotFactory.ts`, `EntregaAtividadeFacade.ts`, `FiltroStrategy.ts` e `NotificacaoSubject.ts` em **100%**) |
+| Acoplamento componente↔Supabase/Gemini/Regras | Direto nos hooks/componentes | Direto nos hooks/componentes | `useChatBot.ts` desacoplado via `IAssistenteIA` + `BotFactory` | `useChatBot.ts` + `useEntregas.ts` desacoplados | `useChatBot.ts`, `useEntregas.ts`, `usePesquisa.ts` e `useDuvidas.ts` desacoplados | **`useChatBot.ts`, `useEntregas.ts`, `usePesquisa.ts`, `useDuvidas.ts`, `useMural.ts`, `useGerenciador.ts` e `useMensagens.ts` desacoplados via `GeminiAdapter`, `BotFactory`, `EntregaAtividadeFacade`, `FiltroStrategy` e `NotificacaoSubject`** |
 
 ## Registro por Padrão / Teste
 
@@ -86,6 +86,19 @@
 - **Funcionou?** **Sim** — **6 suítes / 78 testes passando**; `FiltroStrategy.ts` atingiu **100%** de cobertura em Statements, Branches, Functions e Lines.
 - **Lições / trade-offs:** Extrair tanto o filtro de status quanto o filtro de visibilidade por papel para estratégias permitiu eliminar simultaneamente os condicionais de `DuvidasBox.tsx` e a duplicação em `AppSidebar.tsx`.
 
+### Fase 4 — Padrão Observer (`NotificacaoSubject`) nos Canais e Notificações Realtime
+- **Implementado por:** Gabriel Lineker (`GabrielLineker`)
+- **Por que foi escolhido:** O sistema possuía 5 canais Supabase Realtime (`realtime:mural_posts`, `realtime:atividades`, `realtime:entregas-mural`, `alertas-calendario-5-min` e `chat-nexusclass`) dispersos em 3 hooks (`useMural.ts`, `useGerenciador.ts`, `useMensagens.ts`), onde cada hook acoplava a infraestrutura WebSocket, as regras de negócio de filtragem/deduplicação e os efeitos visuais (`toast` Sonner e atualização de estado/badges).
+- **Onde foi aplicado:** `src/patterns/observer/NotificacaoSubject.ts`, `src/patterns/observer/README.md`, `src/hooks/MuralHooks/useMural.ts`, `src/hooks/GerenciadorHooks/useGerenciador.ts`, `src/hooks/MensagensHooks/useMensagens.ts` e `testes/patterns/observer/notificacaoObserver.spec.ts`.
+- **Antes vs. depois:**
+  - **Antes:** 5 blocos `.channel(...).on('postgres_changes', ...)` espalhados em 3 hooks com verificações de autoria, deduplicação de alertas por `Set<string>`, reconciliação de mensagens com `localStorage` e chamadas diretas a `toast()` dentro dos callbacks do WebSocket (`0%` de testes unitários).
+  - **Depois:** `NotificacaoSubject` publica `EventoNotificacaoRealtime` para observadores desacoplados (`ToastNotificacaoObserver`, `StateRefreshObserver`, `BadgeCounterObserver`), enquanto conectores de borda (`conectarCanaisMuralRealtime`, `conectarCanalAlertasCalendarioRealtime`, `conectarCanalMensagensRealtime`) traduzem eventos do Supabase e retornam funções de *cleanup* seguras.
+- **Como contribui para qualidade/manutenção/testabilidade:**
+  - **Testes Unitários do Subject e Observers (Nível 2/3 RBT — 9 testes):** Valida broadcast 1-para-N, desinscrição via retorno de `inscrever`, filtragem de autoria própria nos toasts do mural e de atividades, deduplicação de alertas de calendário (`${evento_id}-${minutos_antes ?? "db"}`), reconciliação imutável de `INSERT`/`UPDATE` de mensagens e contagem reativa de badges/não lidas.
+  - **Testes de Fronteira dos 5 Canais Realtime (Nível 3 RBT — 2 testes):** Simula disparos de `postgres_changes` nos 5 canais com `ClienteRealtimeFake` e verifica o `removeChannel` no desmontar, sem depender de WebSocket real.
+- **Funcionou?** **Sim** — **7 suítes / 89 testes passando**; `NotificacaoSubject.ts` atingiu **100%** de cobertura em Statements, Branches, Functions e Lines.
+- **Lições / trade-offs:** Tipar os conectores Realtime com uma interface estrutural mínima (`ClienteRealtimeLike<TCanal>`) permitiu passar a instância real `supabase` nos hooks sem nenhum `any` ou *type cast*, ao mesmo tempo em que possibilitou injetar um fake determinístico nos testes.
+
 ## Diário de Sessões
 | Data | Autor | Resumo |
 |:---|:---|:---|
@@ -97,6 +110,7 @@
 | 2026-11-04 | Gianlucca Paiva (`GianluccaPaiva`) | **Infraestrutura Docker PostgreSQL:** Criados `ADR-003`, spec de infraestrutura, `docker/structure/docker-compose.yml` (projeto `nexusclass`, container `nexusclass-db` com `postgres:17-alpine`, volume persistente `nexusclass_pgdata` e leitura de `docker/constructionsSQL/`) e script `000_teste_conexao.sql` para validação no SQLTools, com credenciais e porta 100% isoladas no `.env`. |
 | 2026-11-05 | Gabriel Lineker (`GabrielLineker`) | **Fase 2 concluída:** Criados `ADR-004` e spec da Fase 2; implementada `EntregaAtividadeFacade` (`IEntregaAtividadeFacade`) em `src/patterns/facade/EntregaAtividadeFacade.ts`; refatorado `src/hooks/EntregasHooks/useEntregas.ts` sem regressão e sem `any`; criados 15 novos testes em `testes/patterns/facade/entregaAtividadeFacade.spec.ts` (total 5 suítes / 66 testes passando, **100%** de cobertura em `src/lib` e `src/patterns`). Atualizados slides interativos em `configEngenhariaSoftware.ts`. |
 | 2026-11-05 (2) | Gianlucca Paiva (`GianluccaPaiva`) | **Fase 3 concluída:** Criados `ADR-005` e spec da Fase 3; implementado `FiltroStrategy` e estratégias concretas de turmas e dúvidas em `src/patterns/strategy/FiltroStrategy.ts`; refatorados `usePesquisa.ts`, `Pesquisar.tsx`, `useDuvidas.ts`, `DuvidasBox.tsx` e `AppSidebar.tsx` eliminando condicionais e duplicações; criados 12 novos testes em `testes/patterns/strategy/filtroStrategy.spec.ts` (total 6 suítes / 78 testes passando, **100%** de cobertura em `src/lib` e `src/patterns`). Atualizados slides interativos em `configEngenhariaSoftware.ts`. |
+| 2026-11-05 (3) | Gabriel Lineker (`GabrielLineker`) | **Fase 4 concluída:** Criados `ADR-006` e spec da Fase 4; implementados `NotificacaoSubject`, `ToastNotificacaoObserver`, `StateRefreshObserver`, `BadgeCounterObserver` e conectores Realtime em `src/patterns/observer/NotificacaoSubject.ts`; refatorados `useMural.ts`, `useGerenciador.ts` e `useMensagens.ts` sem regressão; criados 11 novos testes em `testes/patterns/observer/notificacaoObserver.spec.ts` (total 7 suítes / 89 testes passando, **100%** de cobertura em `src/lib` e `src/patterns`). Atualizados slides interativos em `configEngenhariaSoftware.ts`. |
 
 ## Pontos para a Apresentação (15–20 min)
 - Parte 1: documento-texto (2 temas). Parte 2: demo do código (antes/depois + testes rodando + aba *Informações → Engenharia de Software (DCC061)* dentro da própria aplicação).

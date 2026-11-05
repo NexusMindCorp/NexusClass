@@ -29,8 +29,8 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 3 Concluída → Próxima: Fase 4 (Observer Realtime)",
-  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
+  faseAtual: "Fase 4 Concluída → Próxima: Fase 5 (Singleton & Proxy Documentados)",
+  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
   data: "2026-11-05",
   branch: "DesiningTeste",
 };
@@ -41,7 +41,7 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "cobertura em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "78",
+    valor: "89",
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
@@ -49,8 +49,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "Design Patterns GoF catalogados",
   },
   {
-    valor: "Fase 3",
-    rotulo: "concluída (Adapter + Factory + Facade + Strategy ativos)",
+    valor: "Fase 4",
+    rotulo: "concluída (Adapter + Factory + Facade + Strategy + Observer ativos)",
   },
 ];
 
@@ -233,24 +233,27 @@ const filtradas = estrategia.filtrar(base, { estaInscrito });`,
     nome: "5. Observer (Pub/Sub)",
     categoria: "Comportamental",
     fase: "Fase 4",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gabriel Lineker (GabrielLineker)",
     ondeAplicado:
-      "src/patterns/observer/ + canais Supabase Realtime",
+      "src/patterns/observer/NotificacaoSubject.ts + useMural.ts, useGerenciador.ts e useMensagens.ts",
     problemaAntes:
-      "Cinco canais Realtime dispersos (mural, atividades, entregas, mensagens, alertas) disparam toasts e atualizações de estado cada um à sua maneira.",
+      "Cinco canais Realtime dispersos (mural_posts, atividades, entregas_atividades, alertas_calendario, mensagens) acoplavam WebSocket, regras de autoria/deduplicação e chamadas diretas de toast/estado.",
     solucaoDepois:
-      "NotificacaoSubject centraliza os eventos recebidos e notifica múltiplos Observers desacoplados (ToastObserver, BadgeCounterObserver, StateRefreshObserver).",
-    codigoAntes: `// Antes: canal acoplado diretamente ao efeito visual
-supabase.channel("mural").on("postgres_changes", ..., (payload) => {
-  toast.info("Novo post!");
-  setNaoLidos((n) => n + 1);
-});`,
-    codigoDepois: `// Depois: Subject notifica lista de Observers inscritos
-notificacaoSubject.notify({ tipo: "NOVO_POST", payload });
-// Observers reagem independentemente (toast, badge, som/estado)`,
+      "NotificacaoSubject centraliza a publicação de EventoNotificacaoRealtime e notifica Observers especializados (ToastNotificacaoObserver, StateRefreshObserver e BadgeCounterObserver) conectados por adaptadores de canal com cleanup seguro.",
+    codigoAntes: `// Antes: canal acoplado diretamente ao efeito visual e deduplicação inline
+supabase.channel("realtime:mural_posts").on("postgres_changes", ..., (payload) => {
+  if (payload.new.autor_id !== perfil.id) {
+    toast("O mural foi atualizado!", { action: { label: "Carregar", onClick: carregarPosts } });
+  }
+}).subscribe();`,
+    codigoDepois: `// Depois: Subject + Observers desacoplados e testáveis sem WebSocket ativo
+const cancelarToast = muralSubject.inscrever(
+  new ToastNotificacaoObserver({ usuarioIdAtual: perfil.id, toastFn: toast, aoCarregarPosts })
+);
+const desconectar = conectarCanaisMuralRealtime(supabase, muralSubject, { turmaId, alunoId: perfil.id });`,
     beneficioQualidade:
-      "Permite testar a reação de múltiplos consumidores a um único evento em tempo real sem depender de WebSocket ativo.",
+      "Desacopla a origem Realtime dos efeitos visuais/estado: permite testar broadcast 1-para-N, deduplicação de alertas e reconciliação de mensagens em 44ms com 100% de cobertura.",
   },
   {
     id: "singleton-proxy",
@@ -341,11 +344,12 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 4",
     titulo: "Padrão Observer (Centralização de Notificações Realtime)",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Concluído",
+    responsavel: "Gabriel Lineker (GabrielLineker)",
     entregas:
-      "NotificacaoSubject notificando observers de Toast e Badges a partir de eventos em tempo real.",
-    evidenciaTeste: "Espaço reservado: testes unitários de inscrição, desinscrição e disparo do Subject",
+      "NotificacaoSubject, ToastNotificacaoObserver, StateRefreshObserver, BadgeCounterObserver e conectores Realtime em src/patterns/observer/NotificacaoSubject.ts, desacoplando os 5 canais em useMural, useGerenciador e useMensagens.",
+    evidenciaTeste:
+      "7 suítes / 89 testes passando · NotificacaoSubject.ts com 100% de cobertura",
   },
   {
     fase: "Fase 5",
@@ -380,7 +384,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 2 — Lógica Pura (Determinística)",
     camada: "Testes Unitários Puros (Zero I/O)",
     ferramenta: "Vitest + Fake Timers",
-    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído) e FiltroStrategy (Fase 3 - Concluído)",
+    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído), FiltroStrategy (Fase 3 - Concluído) e helpers puros de NotificacaoSubject (Fase 4 - Concluído)",
     tecnicas:
       "Padrão AAA, Particionamento de Equivalência, Análise de Valor Limite, Tabela de Decisão e vi.useFakeTimers()",
     status: "Concluído",
@@ -389,7 +393,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 3 — Fronteira / Integração",
     camada: "Testes com Fakes/Mocks na Borda",
     ferramenta: "Vitest + Testing Library",
-    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade + useEntregas (Fase 2 - Concluído), NotificacaoSubject (Fase 4), ProtectedRoute (Fase 6)",
+    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade + useEntregas (Fase 2 - Concluído), NotificacaoSubject + 5 canais Realtime (Fase 4 - Concluído), ProtectedRoute (Fase 6)",
     tecnicas:
       "Injeção de dependência, Fakes em memória e Mocks restritos à fronteira externa (SDK Gemini / Supabase)",
     status: "Em Andamento",
@@ -449,11 +453,20 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "100.00% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
+  },
+  {
+    etapa: "Pós-Fase 4 (Observer Realtime)",
+    responsavel: "Gabriel Lineker",
+    testes: "7 suítes (89 testes)",
+    statements: "100.00% (lib + patterns)",
+    branches: "100.00% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
     destaque: true,
   },
   {
-    etapa: "Pós-Fase 4 a 6 (Observer + Componentes + Final)",
-    responsavel: "A atualizar nas Fases 4–6",
+    etapa: "Pós-Fase 5 e 6 (Singleton/Proxy + Componentes + E2E Final)",
+    responsavel: "A atualizar nas Fases 5–6",
     testes: "—",
     statements: "—",
     branches: "—",
@@ -476,9 +489,9 @@ export const destaquesFaseZero = [
     icone: Layers,
   },
   {
-    titulo: "Resiliência e Desacoplamento (Adapter, Factory & Facade)",
+    titulo: "Resiliência e Desacoplamento (Adapter, Factory, Facade & Observer)",
     detalhe:
-      "Injeção de FakeAssistenteIA e FakeEntregaFacade nos hooks React, simulando Function Calling e operações de Storage + PostgreSQL sem gastar franquia de API nem depender de rede.",
+      "Injeção de FakeAssistenteIA, FakeEntregaFacade e ClienteRealtimeFake nos módulos, simulando Function Calling, Storage + PostgreSQL e WebSocket Realtime sem gastar franquia de API nem depender de rede.",
     icone: ShieldAlert,
   },
 ];

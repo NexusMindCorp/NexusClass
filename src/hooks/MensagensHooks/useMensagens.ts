@@ -2,13 +2,16 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
-import type { Mensagem, ConversaResumo} from "@/hooks/MensagensHooks/type"
+import type { Mensagem, ConversaResumo } from "@/hooks/MensagensHooks/type"
 import { obterSetLocalStorage, salvarSetLocalStorage } from "@/lib/utils"
 import {
+    NotificacaoSubject,
+    StateRefreshObserver,
+    calcularTotalMensagensNaoLidas,
+    conectarCanalMensagensRealtime,
+} from "@/patterns/observer/NotificacaoSubject"
+import {
     ASSUNTO_MENSAGEM_PADRAO,
-    CANAL_MENSAGENS,
-    EVENTO_REALTIME_MENSAGENS,
-    SCHEMA_REALTIME_MENSAGENS,
     TABELA_MENSAGENS,
     chaveMensagensLidas,
     chaveMensagensOcultas,
@@ -49,8 +52,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
                     }))
                 setMensagens(historico)
             }
-        } catch (error: any) {
-            console.error("Erro ao carregar mensagens:", error)
+        } catch {
             toast.error("Erro no Chat", { description: "Não foi possível carregar seu histórico de conversas." })
         } finally {
             setLoadingChat(false)
@@ -73,8 +75,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
 
             if (error) throw error
 
-        } catch (error: any) {
-            console.error("Erro ao enviar mensagem:", error)
+        } catch (error: unknown) {
             toast.error("Mensagem não enviada", { description: "Verifique sua conexão e tente novamente." })
             throw error
         }
@@ -103,7 +104,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         )
 
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from(TABELA_MENSAGENS)
                 .update({ lida: true })
                 .eq("remetente_id", contatoId)
@@ -112,11 +113,8 @@ export function useMensagens(perfil: PerfilUsuario | null) {
                 .select("id")
 
             if (error) throw error
-            if (!data || data.length === 0) {
-                console.warn("Nenhuma mensagem pendente precisou ser atualizada.")
-            }
-        } catch (error) {
-            console.error("Erro ao marcar mensagens como lidas:", error)
+        } catch {
+            // Falha silenciosa na sincronização de leitura em background
         }
     }, [perfil?.id])
 
@@ -153,42 +151,23 @@ export function useMensagens(perfil: PerfilUsuario | null) {
     useEffect(() => {
         if (!supabase || !hasSupabaseConfig || !perfil?.id) return
 
-        const canalMensagens = supabase
-            .channel(CANAL_MENSAGENS)
-            .on(
-                "postgres_changes",
-                {
-                    event: EVENTO_REALTIME_MENSAGENS,
-                    schema: SCHEMA_REALTIME_MENSAGENS,
-                    table: TABELA_MENSAGENS,
-                },
-                (payload) => {
-                    const mensagemRecebida = payload.new as Mensagem
-                    const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
-                    const novaMensagem = {
-                        ...mensagemRecebida,
-                        lida: mensagemRecebida.lida || idsLidos.has(mensagemRecebida.id),
-                    }
-                    if (novaMensagem.remetente_id === perfil.id || novaMensagem.destinatario_id === perfil.id) {
-                        if (payload.eventType === "INSERT") {
-                            setMensagens((prevMensagens) => {
-                                if (prevMensagens.some((msg) => msg.id === novaMensagem.id)) return prevMensagens
-                                return [...prevMensagens, novaMensagem]
-                            })
-                        } else if (payload.eventType === "UPDATE") {
-                            setMensagens((prevMensagens) =>
-                                prevMensagens.map((msg) =>
-                                    msg.id === novaMensagem.id ? novaMensagem : msg
-                                )
-                            )
-                        }
-                    }
-                }
-            )
-            .subscribe()
+        const mensagensSubject = new NotificacaoSubject()
+        const cancelarRefreshObserver = mensagensSubject.inscrever(
+            new StateRefreshObserver({
+                usuarioIdAtual: perfil.id,
+                obterIdsMensagensLidas: (usuarioId) =>
+                    obterSetLocalStorage(chaveMensagensLidas(usuarioId)),
+                aoAtualizarMensagens: setMensagens,
+            })
+        )
+        const desconectarCanal = conectarCanalMensagensRealtime(
+            supabase,
+            mensagensSubject
+        )
 
         return () => {
-            void supabase.removeChannel(canalMensagens)
+            cancelarRefreshObserver()
+            desconectarCanal()
         }
 
     }, [perfil?.id])
@@ -226,9 +205,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
     return {
         mensagens,
         conversas,
-        totalMensagensNaoLidas: mensagens.filter(
-            (msg) => !msg.lida && msg.destinatario_id === perfil?.id
-        ).length,
+        totalMensagensNaoLidas: calcularTotalMensagensNaoLidas(mensagens, perfil?.id),
         loadingChat,
         enviarMensagem,
         marcarComoLidas,

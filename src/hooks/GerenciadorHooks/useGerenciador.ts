@@ -3,7 +3,12 @@ import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { montarDataEvento } from "@/lib/utils"
-import type { OpcoesTela,PayloadAlertaCalendario, UsuarioProps } from "./type"
+import {
+    NotificacaoSubject,
+    ToastNotificacaoObserver,
+    conectarCanalAlertasCalendarioRealtime,
+} from "@/patterns/observer/NotificacaoSubject"
+import type { OpcoesTela, UsuarioProps } from "./type"
 import { ESTADO_INICIAL_USUARIO } from "./config"
 import { useCarregarData } from "./carregarData"
 
@@ -105,9 +110,10 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
                 };
             });
 
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const mensagemErro = error instanceof Error ? error.message : "Por favor, verifique sua conexão.";
             toast.error("Erro ao atualizar inscrição", {
-                description: error.message || "Por favor, verifique sua conexão.",
+                description: mensagemErro,
             });
         }
     };
@@ -146,39 +152,24 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
             return
         }
         const supabaseClient = supabase
-        const channel = supabaseClient
-            .channel("alertas-calendario-5-min")
-            .on(
-                "postgres_changes",
-                {
-                    event: "INSERT",
-                    schema: "public",
-                    table: "alertas_calendario",
-                },
-                (payload) => {
-                    const alerta = payload.new as PayloadAlertaCalendario
-                    const minuto = alerta.minutos_antes ?? "db"
-                    const chaveAlerta = `${alerta.evento_id}-${minuto}`
-
-                    if (alertasEnviadosRef.current.has(chaveAlerta)) {
-                        return
-                    }
-
-                    alertasEnviadosRef.current.add(chaveAlerta)
-                    toast.warning(alerta.mensagem || "Um evento comeca em 5 minutos.", {
-                        description: alerta.titulo_evento,
-                        duration: 12000,
-                    })
-                }
-            )
-            .subscribe()
+        const alertasSubject = new NotificacaoSubject()
+        const cancelarToastObserver = alertasSubject.inscrever(
+            new ToastNotificacaoObserver({
+                usuarioIdAtual: perfil?.id ?? "",
+                toastFn: toast,
+                alertasEnviados: alertasEnviadosRef.current,
+            })
+        )
+        const desconectarCanal = conectarCanalAlertasCalendarioRealtime(
+            supabaseClient,
+            alertasSubject
+        )
 
         return () => {
-            void supabaseClient.removeChannel(channel)
+            cancelarToastObserver()
+            desconectarCanal()
         }
     }, [perfil?.id])
-
-
 
     useEffect(() => {
         if (!hasSupabaseConfig || !supabase) {
