@@ -29,8 +29,8 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 2 Concluída → Próxima: Fase 3 (Strategy de Filtros)",
-  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
+  faseAtual: "Fase 3 Concluída → Próxima: Fase 4 (Observer Realtime)",
+  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
   data: "2026-11-05",
   branch: "DesiningTeste",
 };
@@ -41,7 +41,7 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "cobertura em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "66",
+    valor: "78",
     rotulo: "testes automatizados passando (eram 3)",
   },
   {
@@ -49,8 +49,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "Design Patterns GoF catalogados",
   },
   {
-    valor: "Fase 2",
-    rotulo: "concluída (Adapter + Factory + Facade ativos)",
+    valor: "Fase 3",
+    rotulo: "concluída (Adapter + Factory + Facade + Strategy ativos)",
   },
 ];
 
@@ -204,24 +204,29 @@ await facade.submeter({
     nome: "4. Strategy (Estratégia)",
     categoria: "Comportamental",
     fase: "Fase 3",
-    status: "Planejado",
-    responsavel: "A definir (Gabriel / Gianlucca)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/patterns/strategy/ + usePesquisa.ts e useDuvidas.ts",
+      "src/patterns/strategy/FiltroStrategy.ts + usePesquisa.ts, Pesquisar.tsx, useDuvidas.ts, DuvidasBox.tsx e AppSidebar.tsx",
     problemaAntes:
-      "Os filtros de turmas (Inscritas, Disponíveis, Todas + termo de busca) e de dúvidas (Todos, Pendente, Resolvida) usam blocos condicionais acoplados dentro dos hooks.",
+      "Os filtros de turmas (Inscritas, Disponíveis, Todas + termo de busca) e da Central de Dúvidas (papel + Todos, Pendente, Resolvida) estavam fragmentados e duplicados em condicionais dentro dos componentes visuais.",
     solucaoDepois:
-      "Interface FiltroStrategy<T> com estratégias concretas puras e intercambiáveis em tempo de execução conforme a aba selecionada pelo usuário.",
-    codigoAntes: `// Antes: condicionais aninhadas no hook
-if (filtro === "inscritas") return turmas.filter(...);
-else if (filtro === "disponiveis") return turmas.filter(...);`,
-    codigoDepois: `// Depois: estratégia pura injetada
-export interface FiltroStrategy<T> {
-  filtrar(itens: T[], contexto?: FiltroContexto): T[];
+      "Contrato genérico FiltroStrategy<T, Contexto> com estratégias concretas puras e composições declarativas para turmas (filtrarEOrdenarTurmas) e dúvidas (filtrarDuvidasPorPerfilEStatus).",
+    codigoAntes: `// Antes: condicionais espalhadas e duplicadas em Pesquisar.tsx / DuvidasBox.tsx
+const turmasParaExibir = turmasBase.filter(([key]) => {
+  if (isProfessor && !inscrito) return false;
+  if (isAluno && abaAtiva === "minhas" && !inscrito) return false;
+  if (isAluno && abaAtiva === "disponiveis" && inscrito) return false;
+  return true;
+});`,
+    codigoDepois: `// Depois: estratégias puras selecionadas por papel/aba e compostas sem if/else na UI
+export interface FiltroStrategy<T, Contexto = void> {
+  filtrar(itens: readonly T[], contexto: Contexto): T[];
 }
-const filtradas = estrategias[abaAtiva].filtrar(turmas, { busca });`,
+const estrategia = obterEstrategiaFiltroTurma(abaAtiva, role);
+const filtradas = estrategia.filtrar(base, { estaInscrito });`,
     beneficioQualidade:
-      "Transforma regras de filtragem em classes/funções puras de Nível 2 RBT, 100% testáveis sem precisar renderizar componentes React.",
+      "Transforma regras de filtragem em classes/funções puras de Nível 2 RBT, elimina duplicação entre DuvidasBox e AppSidebar e atinge 100% de cobertura unitária.",
   },
   {
     id: "observer",
@@ -326,11 +331,12 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 3",
     titulo: "Padrão Strategy (Filtros de Pesquisa de Turmas e Dúvidas)",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     entregas:
-      "Estratégias concretas de filtragem substituindo condicionais em usePesquisa e useDuvidas.",
-    evidenciaTeste: "Espaço reservado: testes unitários determinísticos para cada estratégia",
+      "FiltroStrategy<T, Contexto> e estratégias concretas em src/patterns/strategy/FiltroStrategy.ts, desacoplando e unificando filtros em usePesquisa, Pesquisar, useDuvidas, DuvidasBox e AppSidebar.",
+    evidenciaTeste:
+      "6 suítes / 78 testes passando · FiltroStrategy.ts com 100% de cobertura",
   },
   {
     fase: "Fase 4",
@@ -374,7 +380,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 2 — Lógica Pura (Determinística)",
     camada: "Testes Unitários Puros (Zero I/O)",
     ferramenta: "Vitest + Fake Timers",
-    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído) e futuras Strategies (Fase 3)",
+    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído) e FiltroStrategy (Fase 3 - Concluído)",
     tecnicas:
       "Padrão AAA, Particionamento de Equivalência, Análise de Valor Limite, Tabela de Decisão e vi.useFakeTimers()",
     status: "Concluído",
@@ -434,16 +440,16 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "100.00% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
-    destaque: true,
   },
   {
     etapa: "Pós-Fase 3 (Strategy de Filtros)",
-    responsavel: "A atualizar na Fase 3",
-    testes: "—",
-    statements: "—",
-    branches: "—",
-    functions: "—",
-    lines: "—",
+    responsavel: "Gianlucca Paiva",
+    testes: "6 suítes (78 testes)",
+    statements: "100.00% (lib + patterns)",
+    branches: "100.00% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
+    destaque: true,
   },
   {
     etapa: "Pós-Fase 4 a 6 (Observer + Componentes + Final)",

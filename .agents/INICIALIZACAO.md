@@ -32,7 +32,7 @@
 | 0 | Base de testes (`utils.ts` + `assetPath.ts` unitários, `setupTests.ts`, slides DCC061) | **Concluído** (2 suítes / 29 testes; `utils.ts` e `assetPath.ts` 100%) | Gabriel Lineker | [fase-0-base-testes-e-slides-dcc061.md](features/fase-0-base-testes-e-slides-dcc061.md) / [ADR-001](decisions/adr-001-patterns-e-cobertura.md) |
 | 1 | Adapter + Factory (Gemini / Tigreso & Falcão) | **Concluído** (4 suítes / 51 testes; `GeminiAdapter.ts` e `BotFactory.ts` 100%) | Gianlucca Paiva | [fase-1-adapter-factory-bots.md](features/fase-1-adapter-factory-bots.md) / [ADR-002](decisions/adr-002-adapter-factory-assistentes-ia.md) |
 | 2 | Facade (entrega de atividade) | **Concluído** (5 suítes / 66 testes; `EntregaAtividadeFacade.ts` 100%) | Gabriel Lineker | [fase-2-facade-entregas.md](features/fase-2-facade-entregas.md) / [ADR-004](decisions/adr-004-facade-entrega-atividades.md) |
-| 3 | Strategy (filtros de pesquisa e dúvidas) | Planejado | a definir | a criar |
+| 3 | Strategy (filtros de pesquisa e dúvidas) | **Concluído** (6 suítes / 78 testes; `FiltroStrategy.ts` 100%) | Gianlucca Paiva | [fase-3-strategy-filtros.md](features/fase-3-strategy-filtros.md) / [ADR-005](decisions/adr-005-strategy-filtros-pesquisa-duvidas.md) |
 | 4 | Observer (Realtime → notificações) | Planejado | a definir | a criar |
 | 5 | Documentar Singleton (`supabaseClient`) e Proxy de proteção (`ProtectedRoute`) | Planejado | a definir | a criar |
 | 6 | Testes de componente + E2E (login → entrega) | Planejado | a definir | a criar |
@@ -57,4 +57,4 @@
 - Vitest: `environment: jsdom`, `globals: true`, setup em `setupTests.ts`.
 - Globais de build: `__API_GEMINI_KEY__`, `__URL_SUPABASE__`, `__KEY_SUPABASE__` (declarados via `define` no Vite; mockar em testes).
 - Hooks por domínio em `src/hooks/<Dominio>Hooks/{use*.ts,type.ts,config.ts}`.
-- Cliente Supabase único: `src/lib/supabaseClient.ts`. Assistentes IA via `src/patterns/factory/BotFactory.ts` e `src/patterns/adapter/GeminiAdapter.ts` consumidos em `src/hooks/botsHooks/useChatBot.ts`. Entregas de atividades via `src/patterns/facade/EntregaAtividadeFacade.ts` consumida em `src/hooks/EntregasHooks/useEntregas.ts`.
+- Cliente Supabase único: `src/lib/supabaseClient.ts`. Assistentes IA via `src/patterns/factory/BotFactory.ts` e `src/patterns/adapter/GeminiAdapter.ts` consumidos em `src/hooks/botsHooks/useChatBot.ts`. Entregas de atividades via `src/patterns/facade/EntregaAtividadeFacade.ts` consumida em `src/hooks/EntregasHooks/useEntregas.ts`. Filtros de turmas e dúvidas via `src/patterns/strategy/FiltroStrategy.ts` consumidos em `src/hooks/PesquisaHooks/usePesquisa.ts` e `src/hooks/DuvidaHooks/useDuvidas.ts`.
