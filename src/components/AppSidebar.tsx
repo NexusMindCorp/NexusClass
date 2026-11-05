@@ -63,7 +63,7 @@ export function AppSidebar({
   mostrarIndicadorMensagens,
   mostrarIndicadorDuvidas,
 }: AppSidebarProps) {
-  const { duvidas } = useDuvidas(perfil);
+  const { totalDuvidasPendentes } = useDuvidas(perfil);
   const isMaster = perfil?.role === "master";
   const tituloTurmas = isMaster ? "Todas as Turmas" : "Minhas Turmas";
   const turmasParaExibir = isMaster
@@ -73,16 +73,6 @@ export function AppSidebar({
       );
 
   const isNovoAluno = perfil?.role === "aluno" && turmasParaExibir.length === 0;
-
-  // Calcular quantidade de dúvidas pendentes
-  const duvidasPendentes = duvidas.filter((d) => {
-    if (!perfil) return false;
-    if (d.resolvido) return false;
-    if (perfil.role === "master") return true;
-    if (perfil.role === "professor") return d.prof_id === perfil.id;
-    return d.aluno_id === perfil.id;
-  });
-  const totalDuvidasPendentes = duvidasPendentes.length;
 
   return (
     <Sidebar collapsible="icon">

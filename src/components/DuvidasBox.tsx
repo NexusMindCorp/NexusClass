@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas";
 import type { Duvida, DuvidasBoxProps } from "@/hooks/DuvidaHooks/type";
 import { Card } from "@/components/ui/card";
@@ -31,15 +31,19 @@ import {
 } from "./ui/dropdown-menu";
 
 export function DuvidasBox({ perfil }: DuvidasBoxProps) {
-  const { duvidas, loading, deletarDuvida, responderDuvida } =
-    useDuvidas(perfil);
+  const {
+    loading,
+    setFiltro,
+    duvidasFiltradasPorStatus,
+    deletarDuvida,
+    responderDuvida,
+  } = useDuvidas(perfil);
   const [duvidaSelecionada, setDuvidaSelecionada] = useState<Duvida | null>(
     null,
   );
   const [textoResposta, setTextoResposta] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [enviandoResposta, setEnviandoResposta] = useState(false);
-  const [filtro, setFiltro] = useState("todas");
 
   const handleEnviarResposta = async () => {
     if (!duvidaSelecionada || !textoResposta.trim()) return;
@@ -55,24 +59,6 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
       setEnviandoResposta(false);
     }
   };
-
-
-  const duvidasFiltradas = duvidas.filter((d) => {
-    if (!perfil) return false;
-    if (perfil.role === "master") return true;
-    if (perfil.role === "professor") return d.prof_id === perfil.id;
-    return d.aluno_id === perfil.id;
-  });
-
-  useEffect(() => {
-    setFiltro("todas");
-  }, [perfil]);
-
-  const duvidasFiltradasPorStatus = duvidasFiltradas.filter((d) => {
-    if (filtro === "pendentes") return !d.resolvido;
-    if (filtro === "resolvidas") return d.resolvido;
-    return true;
-  });
 
   if (loading) {
     return (

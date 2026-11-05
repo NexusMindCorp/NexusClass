@@ -23,7 +23,6 @@ import { usePesquisa } from "@/hooks/PesquisaHooks/usePesquisa";
 import type { PesquisarProps } from "@/hooks/PesquisaHooks/type";
 
 export function Pesquisar(props: PesquisarProps) {
-  const [abaAtiva, setAbaAtiva] = useState("minhas");
   const [turmaParaInscrever, setTurmaParaInscrever] = useState<{
     key: string;
     materia: string;
@@ -35,42 +34,17 @@ export function Pesquisar(props: PesquisarProps) {
     setTextoPesquisa,
     aberto,
     mudarAberturaSheet,
-    turmasFiltradas,
+    abaAtiva,
+    setAbaAtiva,
+    turmasOrdenadas,
   } = usePesquisa({
     aoFecharPesquisa: props.voltarPrincipal,
     turmas: props.turmas,
+    perfil: props.perfil,
+    estaInscrito: props.estaInscrito,
   });
 
   const isAluno = props.perfil?.role === "aluno";
-  const isProfessor = props.perfil?.role === "professor";
-
-  const turmasBase =
-    textoPesquisa.trim() === ""
-      ? Object.entries(props.turmas).sort((a, b) =>
-          a[1].materia.localeCompare(b[1].materia),
-        )
-      : turmasFiltradas;
-
-  const turmasParaExibir = turmasBase.filter(([key]) => {
-    const inscrito = props.estaInscrito(key);
-
-    if (isProfessor && !inscrito) return false;
-
-    if (isAluno) {
-      if (abaAtiva === "minhas" && !inscrito) return false;
-      if (abaAtiva === "disponiveis" && inscrito) return false;
-    }
-    return true;
-  });
-
-  const turmasOrdenadas = turmasParaExibir.sort(([keyA], [keyB]) => {
-    const inscritoA = props.estaInscrito(keyA);
-    const inscritoB = props.estaInscrito(keyB);
-
-    if (inscritoA && !inscritoB) return -1;
-    if (!inscritoA && inscritoB) return 1;
-    return 0;
-  });
 
   const handleConfirmarInscricao = async () => {
     if (!turmaParaInscrever) return;

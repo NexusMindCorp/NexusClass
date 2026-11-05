@@ -1,36 +1,57 @@
-import { useState, useMemo } from "react"
-import type { UsePesquisaProps } from "@/hooks/PesquisaHooks/type"
+import { useState, useMemo } from "react";
+import type { UsePesquisaProps } from "@/hooks/PesquisaHooks/type";
+import {
+  filtrarEOrdenarTurmas,
+  filtroTurmaPorTextoStrategy,
+  type AbaFiltroTurma,
+} from "@/patterns/strategy/FiltroStrategy";
 
-export function usePesquisa({ aoFecharPesquisa, turmas }: UsePesquisaProps) {
-    const [textoPesquisa, setTextoPesquisa] = useState("")
-    const [aberto, setAberto] = useState(true)
+export function usePesquisa({
+  aoFecharPesquisa,
+  turmas,
+  perfil,
+  estaInscrito,
+  abaInicial = "minhas",
+}: UsePesquisaProps) {
+  const [textoPesquisa, setTextoPesquisa] = useState("");
+  const [aberto, setAberto] = useState(true);
+  const [abaAtiva, setAbaAtivaState] = useState<AbaFiltroTurma>(abaInicial);
 
-    const mudarAberturaSheet = (estaAberto: boolean) => {
-        setAberto(estaAberto)
-        if (!estaAberto) {
-            aoFecharPesquisa()
-        }
+  const setAbaAtiva = (novaAba: string) => {
+    setAbaAtivaState(novaAba as AbaFiltroTurma);
+  };
+
+  const mudarAberturaSheet = (estaAberto: boolean) => {
+    setAberto(estaAberto);
+    if (!estaAberto) {
+      aoFecharPesquisa();
     }
+  };
 
-    const turmasFiltradas = useMemo(() => {
-        if (!textoPesquisa.trim()) return []
+  const turmasFiltradas = useMemo(() => {
+    return filtroTurmaPorTextoStrategy.filtrar(
+      Object.entries(turmas),
+      textoPesquisa,
+    );
+  }, [textoPesquisa, turmas]);
 
-        const consulta = textoPesquisa.toLowerCase()
-        return Object.entries(turmas).filter(([_, turma]) => {
-            return (
-                turma.materia.toLowerCase().includes(consulta) ||
-                turma.professor.toLowerCase().includes(consulta) ||
-                turma.sala.toLowerCase().includes(consulta) ||
-                turma.turma.toLowerCase().includes(consulta)
-            )
-        })
-    }, [textoPesquisa, turmas])
+  const turmasOrdenadas = useMemo(() => {
+    return filtrarEOrdenarTurmas(turmas, {
+      textoPesquisa,
+      abaAtiva,
+      role: perfil?.role,
+      estaInscrito,
+    });
+  }, [turmas, textoPesquisa, abaAtiva, perfil?.role, estaInscrito]);
 
-    return {
-        textoPesquisa,
-        setTextoPesquisa,
-        aberto,
-        mudarAberturaSheet,
-        turmasFiltradas,
-    }
+  return {
+    textoPesquisa,
+    setTextoPesquisa,
+    aberto,
+    mudarAberturaSheet,
+    abaAtiva,
+    setAbaAtiva,
+    turmasFiltradas,
+    turmasOrdenadas,
+  };
 }
