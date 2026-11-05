@@ -1,39 +1,181 @@
 @startuml
 skinparam handwritten false
+skinparam packageStyle rectangle
 skinparam class {
     BackgroundColor White
     ArrowColor #7C3AED
     BorderColor #DB2777
+    StereotypeFontColor #6D28D9
+    StereotypeFontSize 11
 }
 
-class LayoutPrincipal {
-    +chatBotRefRef : MutableRefObject
-    +perfil : PerfilUsuario
-    +usuario : UsuarioProps
-    +listaEscolar : EscolaProps
-    +atualizarPerfilLocal() : void
-    +abrirChatComAjuda() : void
-    +render()
+' ============================================================================
+' 1. CAMADA DE INFRAESTRUTURA & SINGLETON (Fase 5)
+' ============================================================================
+package "Infraestrutura & Singleton (src/lib)" {
+    class supabaseClient <<Singleton>> {
+        +hasSupabaseConfig : boolean
+        +supabase : SupabaseClient
+    }
 }
 
-class GerenciadorTelas {
-    +usuario : UsuarioProps
-    +listaEscolar : EscolaProps
-    +perfil : PerfilUsuario
-    +mudarInscricao() : void
-    +estaInscrito() : boolean
-    +marcarMural() : void
-    +navegarPara() : void
-    +render()
+' ============================================================================
+' 2. CAMADA DE PADRÕES DE PROJETO GoF (src/patterns)
+' ============================================================================
+package "Design Patterns GoF (src/patterns)" {
+    interface IAssistenteIA <<Adapter>> {
+        +enviarMensagem(texto: string) : Promise<string>
+    }
+
+    class GeminiAdapter <<Adapter>> {
+        -config : GeminiAdapterConfig
+        -sdkClient : IGeminiSdkClient
+        -chatSession : IGeminiChatSession | null
+        +enviarMensagem(texto: string) : Promise<string>
+    }
+
+    class BotFactory <<Factory>> {
+        +{static} resolverTipoBot(isHelpMode?: boolean) : TipoBot
+        +{static} montarResumoPerfil(perfil?: PerfilUsuario | null) : string
+        +{static} montarResumoInscricoes(contexto?: BotUsuarioContexto) : string
+        +{static} criarInstructionJson(tipo: TipoBot, contexto?: BotUsuarioContexto) : JsonInstruction
+        +{static} criarConfig(tipo: TipoBot, contexto?: BotUsuarioContexto) : BotInstanceConfig
+        +{static} criarAssistente(tipo: TipoBot, contexto?: BotUsuarioContexto, sdkClient?: IGeminiSdkClient) : IAssistenteIA
+    }
+
+    interface IEntregaAtividadeFacade <<Facade>> {
+        +estaDisponivel() : boolean
+        +carregarEntregas(atividadeId: string, perfil: PerfilUsuario) : Promise<ResultadoCarregamentoEntregas>
+        +submeter(dados: DadosSubmissaoEntrega) : Promise<ResultadoSubmissaoEntrega>
+        +avaliar(dados: DadosAvaliacaoEntrega) : Promise<void>
+        +obterUrlDownload(caminho: string, expiraEmSegundos?: number) : Promise<string | null>
+    }
+
+    class EntregaAtividadeFacade <<Facade>> {
+        -client : IEntregaSupabaseClient | null
+        -configurado : boolean
+        +{static} higienizarNomeArquivo(nomeOriginal: string) : string
+        +{static} construirCaminhoArquivo(atividadeId: string, alunoId: string, nome: string, ts?: number) : string
+        +{static} normalizarEntregasComPerfis(registros: EntregaBancoComPerfil[]) : Entrega[]
+        +estaDisponivel() : boolean
+        +carregarEntregas(atividadeId: string, perfil: PerfilUsuario) : Promise<ResultadoCarregamentoEntregas>
+        +submeter(dados: DadosSubmissaoEntrega) : Promise<ResultadoSubmissaoEntrega>
+        +avaliar(dados: DadosAvaliacaoEntrega) : Promise<void>
+        +obterUrlDownload(caminho: string, expiraEmSegundos?: number) : Promise<string | null>
+    }
+
+    interface "FiltroStrategy<T, Contexto>" as FiltroStrategy <<Strategy>> {
+        +filtrar(itens: readonly T[], contexto: Contexto) : T[]
+    }
+
+    class FiltroTurmaPorTextoStrategy <<Strategy>> {
+        +filtrar(itens: readonly TurmaEntry[], textoPesquisa: string) : TurmaEntry[]
+    }
+
+    class FiltroTurmasInscritasStrategy <<Strategy>> {
+        +filtrar(itens: readonly TurmaEntry[], contexto: ContextoFiltroTurma) : TurmaEntry[]
+    }
+
+    class FiltroTurmasDisponiveisStrategy <<Strategy>> {
+        +filtrar(itens: readonly TurmaEntry[], contexto: ContextoFiltroTurma) : TurmaEntry[]
+    }
+
+    class FiltroTodasTurmasStrategy <<Strategy>> {
+        +filtrar(itens: readonly TurmaEntry[]) : TurmaEntry[]
+    }
+
+    class FiltroDuvidasPorPerfilStrategy <<Strategy>> {
+        +filtrar(itens: readonly Duvida[], perfil: PerfilUsuario | null) : Duvida[]
+    }
+
+    class FiltroDuvidasPendentesStrategy <<Strategy>> {
+        +filtrar(itens: readonly Duvida[]) : Duvida[]
+    }
+
+    class FiltroDuvidasResolvidasStrategy <<Strategy>> {
+        +filtrar(itens: readonly Duvida[]) : Duvida[]
+    }
+
+    class FiltroTodasDuvidasStrategy <<Strategy>> {
+        +filtrar(itens: readonly Duvida[]) : Duvida[]
+    }
+
+    interface "NotificacaoObserver<E>" as NotificacaoObserver <<Observer>> {
+        +atualizar(evento: E) : void
+    }
+
+    class "NotificacaoSubject<E>" as NotificacaoSubject <<Observer>> {
+        -observers : Set<NotificacaoObserver<E>>
+        +totalObservers : number
+        +inscrever(observer: NotificacaoObserver<E>) : () => void
+        +desinscrever(observer: NotificacaoObserver<E>) : void
+        +notificar(evento: E) : void
+        +limparObservers() : void
+    }
+
+    class ToastNotificacaoObserver <<Observer>> {
+        +atualizar(evento: EventoNotificacaoRealtime) : void
+    }
+
+    class StateRefreshObserver <<Observer>> {
+        +atualizar(evento: EventoNotificacaoRealtime) : void
+    }
+
+    class BadgeCounterObserver <<Observer>> {
+        +totalNaoLidos : number
+        +atualizar(evento: EventoNotificacaoRealtime) : void
+        +resetar() : void
+    }
 }
 
-class ProtectedRoute {
-    +session : Session
-    +loading : boolean
-    +perfil : PerfilUsuario
-    +render()
+' ============================================================================
+' 3. CAMADA DE CONTROLE DE ACESSO / PROTECTION PROXY & LAYOUT
+' ============================================================================
+package "Controle de Acesso & Layout (src/components & src/Layout)" {
+    class ProtectedRoute <<Proxy>> {
+        +session : Session | null
+        +loading : boolean
+        +perfil : PerfilUsuario | null
+        +render()
+    }
+
+    class BoxRestrito <<Proxy>> {
+        +titulo : string
+        +mensagem : string
+        +render()
+    }
+
+    class ConfiguracoesAvancadas {
+        +perfil : PerfilUsuario
+        +isAluno : boolean
+        +render()
+    }
+
+    class LayoutPrincipal {
+        +chatBotRef : MutableRefObject
+        +perfil : PerfilUsuario
+        +usuario : UsuarioProps
+        +listaEscolar : EscolaProps
+        +atualizarPerfilLocal() : void
+        +abrirChatComAjuda() : void
+        +render()
+    }
+
+    class GerenciadorTelas {
+        +usuario : UsuarioProps
+        +listaEscolar : EscolaProps
+        +perfil : PerfilUsuario
+        +mudarInscricao() : void
+        +estaInscrito() : boolean
+        +marcarMural() : void
+        +navegarPara() : void
+        +render()
+    }
 }
 
+' ============================================================================
+' 4. CAMADA DE COMPONENTES E HOOKS DE DOMÍNIO
+' ============================================================================
 class useAuth {
     +session : Session | null
     +loading : boolean
@@ -47,7 +189,7 @@ class useGerenciador {
     +usuario : UsuarioProps
     +pedirAjuda : boolean
     +loadingInscricoes : boolean
-    +mudarInscricao(turmaId: string) : Promise
+    +mudarInscricao(turmaId: string) : Promise<void>
     +estaInscrito(materia: string) : boolean
     +marcarMural(key: string) : void
     +navegarPara(tela: OpcoesTela) : void
@@ -59,12 +201,12 @@ class useEscolaDados {
     +listaEscolar : EscolaProps
     +carregandoEscola : boolean
     +erroEscola : string | null
-    +carregar() : Promise
+    +carregar() : Promise<void>
 }
 
 class ChatBot {
     +usuario : UsuarioProps
-    +listaEscolar : any
+    +listaEscolar : EscolaProps
     +perfil : PerfilUsuario
     +materiasProfessor : string[]
     +scrollRef : MutableRefObject
@@ -84,19 +226,14 @@ class useChatBox {
 class useGeminiChat {
     +messages : Message[]
     +loading : boolean
-    +chatRef : MutableRefObject
-    +sendMessage(input: string) : Promise
+    +sendMessage(input: string) : Promise<void>
 }
 
 class CarregamentoDados {
-    +resumoEventosCalendario : string
-    +perguntasFrequentes : string
-    +resumoAtividadesAbertas : string
-    +resumoPostProfessor : string
-    +carregarPostsProfessor() : Promise
-    +perguntas() : Promise
-    +carregarResumoEventos() : Promise
-    +carregarAtividadesAbertas() : Promise
+    +carregarPostsProfessor() : Promise<PostMural[]>
+    +perguntas() : Promise<DuvidaEstudante[]>
+    +carregarResumoEventos() : Promise<EventoCalendario[]>
+    +carregarAtividadesAbertas() : Promise<AtividadeAberta[]>
 }
 
 class Mural {
@@ -104,91 +241,91 @@ class Mural {
     +perfil : PerfilUsuario
     +render()
 }
+
 class useMural {
     +posts : Post[]
+    +atividades : Atividade[]
     +loading : boolean
-    +comentarioInputs : Record
-    +criarPost(conteudo: string, arquivoUrl?: string) : Promise
-    +deletarPost(postId: string) : Promise
-    +criarComentario(postId: string) : Promise
-    +deletarComentario(comentarioId: string) : Promise
+    +criarPost(conteudo: string) : Promise<void>
+    +deletarPost(postId: string) : Promise<void>
+    +criarComentario(postId: string) : Promise<void>
+    +deletarComentario(comentarioId: string) : Promise<void>
 }
 
 class Calendario {
     +perfil : PerfilUsuario
-    +inscricoes : Record
-    +turmasGlobais : Record
+    +inscricoes : Record<string, boolean>
+    +turmasGlobais : Record<string, TurmaProps>
     +render()
 }
+
 class useCalendario {
     +eventos : Evento[]
     +loading : boolean
-    +novoEvento : NovoEvento
-    +carregarEventos() : Promise
-    +criarEvento() : Promise
-    +deletarEvento(id: string) : Promise
+    +carregarEventos() : Promise<void>
+    +criarEvento() : Promise<void>
+    +deletarEvento(id: string) : Promise<void>
 }
 
 class Mensagens {
     +perfil : PerfilUsuario
     +render()
 }
+
 class useMensagens {
     +conversas : Conversa[]
-    +chatAtivo : Chat | null
     +mensagens : Mensagem[]
+    +totalNaoLidas : number
     +loading : boolean
-    +enviarMensagem(texto: string) : Promise
-    +selecionarChat(id: string) : void
-    +iniciarConversa(destinatarioId: string) : Promise
+    +enviarMensagem(texto: string) : Promise<void>
 }
 
 class DuvidasBox {
     +perfil : PerfilUsuario
     +render()
 }
+
 class useDuvidas {
     +duvidas : Duvida[]
+    +filtro : StatusFiltroDuvida
+    +duvidasFiltradasPorStatus : Duvida[]
+    +totalDuvidasPendentes : number
     +loading : boolean
-    +novaDuvida : NovaDuvida
-    +criarDuvida() : Promise
-    +resolverDuvida(id: string) : Promise
-    +responderDuvida(id: string, resposta: string) : Promise
+    +setFiltro(novoFiltro: StatusFiltroDuvida) : void
+    +deletarDuvida(id: string) : Promise<void>
+    +responderDuvida(id: string, resposta: string) : Promise<void>
 }
 
 class Suporte {
     +render()
 }
+
 class useSuporte {
-    +tickets : Ticket[]
     +loading : boolean
-    +criarTicket(assunto: string, mensagem: string) : Promise
-    +denunciarUsuario(alunoId: string, motivo: string) : Promise
+    +enviarMensagemSuporte() : Promise<void>
 }
 
 class Pesquisar {
-    +turmas : Record
-    +aoFecharPesquisa : () => void
+    +turmas : Record<string, TurmaProps>
+    +perfil : PerfilUsuario
     +render()
 }
+
 class usePesquisa {
-    +termoPesquisa : string
-    +resultados : Turma[]
-    +pesquisar(termo: string) : void
+    +textoPesquisa : string
+    +abaAtiva : AbaFiltroTurma
+    +turmasFiltradas : TurmaEntry[]
+    +turmasOrdenadas : TurmaEntry[]
+    +setTextoPesquisa(texto: string) : void
+    +setAbaAtiva(aba: string) : void
 }
 
 class TurmaCard {
     +materia : string
     +professor : string
-    +banners : string
-    +fotoProfessor : string
     +sala : string
     +turma : string
     +inscrito : boolean
-    +compacto : boolean
-    +modoPesquisa : boolean
-    +clickMural() : void
-    +clickInscrito() : void
     +perfil : PerfilUsuario
     +render()
 }
@@ -196,11 +333,11 @@ class TurmaCard {
 class BoxPerfilUsuario {
     +render()
 }
+
 class usePerfilUsuario {
     +perfilEditado : PerfilUsuario
     +loading : boolean
-    +salvarAlteracoes() : Promise
-    +deletarConta() : Promise
+    +salvarAlteracoes() : Promise<void>
 }
 
 class BoxEntregaAtividade {
@@ -208,28 +345,77 @@ class BoxEntregaAtividade {
     +perfil : PerfilUsuario
     +render()
 }
+
 class useEntregas {
-    +entregas : Entrega[]
+    +entregaPropria : Entrega | null
+    +todasEntregas : Entrega[]
     +loading : boolean
-    +novaEntrega : NovaEntrega
-    +enviarEntrega() : Promise
-    +avaliarEntrega(entregaId: string, nota: number) : Promise
+    +uploading : boolean
+    +enviarEntrega(file: File) : Promise<void>
+    +avaliarEntrega(alunoId: string, nota: number, feedback: string) : Promise<void>
+    +obterLinkArquivo(caminho: string) : Promise<string | null>
 }
 
-%% Relations Layout & Routing
-ProtectedRoute "1" ..> "1" useAuth : autentica
-ProtectedRoute "1" *-- "0..1" LayoutPrincipal : renderiza
+' ============================================================================
+' 5. RELACIONAMENTOS ENTRE PADRÕES, HOOKS E COMPONENTES
+' ============================================================================
+
+' Relações Protection Proxy & Layout
+ProtectedRoute "1" ..> "1" useAuth : verifica sessão
+ProtectedRoute "1" *-- "0..1" LayoutPrincipal : protege / renderiza
+ConfiguracoesAvancadas "1" *-- "0..1" BoxRestrito : exibe se role != aluno
 LayoutPrincipal "1" ..> "1" useGerenciador : consome
 LayoutPrincipal "1" ..> "1" useEscolaDados : carrega dados com
 LayoutPrincipal "1" *-- "1" GerenciadorTelas : renderiza
 LayoutPrincipal "1" *-- "0..1" ChatBot : renderiza
 
-%% Relations ChatBot
+' Relações Adapter & Factory (Fase 1)
+GeminiAdapter ..|> IAssistenteIA : implementa
+BotFactory ..> GeminiAdapter : instancia
+BotFactory ..> IAssistenteIA : cria
+GeminiAdapter ..> CarregamentoDados : executa tools via
 ChatBot "1" ..> "1" useChatBox : gerencia estado com
 useChatBox "1" ..> "1" useGeminiChat : comunica via
-useGeminiChat "1" ..> "1" CarregamentoDados : carrega dados com
+useGeminiChat "1" ..> "1" BotFactory : obtém bot de
+useGeminiChat "1" ..> "1" IAssistenteIA : consome
 
-%% Relations Features & Router
+' Relações Facade (Fase 2)
+EntregaAtividadeFacade ..|> IEntregaAtividadeFacade : implementa
+EntregaAtividadeFacade ..> supabaseClient : coordena Storage + DB
+BoxEntregaAtividade "1" ..> "1" useEntregas : gerencia entregas com
+useEntregas "1" ..> "1" IEntregaAtividadeFacade : delega submissão/avaliação
+
+' Relações Strategy (Fase 3)
+FiltroTurmaPorTextoStrategy ..|> FiltroStrategy
+FiltroTurmasInscritasStrategy ..|> FiltroStrategy
+FiltroTurmasDisponiveisStrategy ..|> FiltroStrategy
+FiltroTodasTurmasStrategy ..|> FiltroStrategy
+FiltroDuvidasPorPerfilStrategy ..|> FiltroStrategy
+FiltroDuvidasPendentesStrategy ..|> FiltroStrategy
+FiltroDuvidasResolvidasStrategy ..|> FiltroStrategy
+FiltroTodasDuvidasStrategy ..|> FiltroStrategy
+usePesquisa "1" ..> "1..*" FiltroStrategy : filtra turmas com
+useDuvidas "1" ..> "1..*" FiltroStrategy : filtra dúvidas com
+
+' Relações Observer (Fase 4)
+ToastNotificacaoObserver ..|> NotificacaoObserver
+StateRefreshObserver ..|> NotificacaoObserver
+BadgeCounterObserver ..|> NotificacaoObserver
+NotificacaoSubject "1" o-- "0..*" NotificacaoObserver : notifica
+useMural "1" ..> "1" NotificacaoSubject : inscreve observers em
+useGerenciador "1" ..> "1" NotificacaoSubject : inscreve alertas em
+useMensagens "1" ..> "1" NotificacaoSubject : inscreve chat em
+
+' Relações Singleton (Fase 5)
+useAuth ..> supabaseClient : usa instância única
+useMural ..> supabaseClient : usa instância única
+useGerenciador ..> supabaseClient : usa instância única
+useMensagens ..> supabaseClient : usa instância única
+useDuvidas ..> supabaseClient : usa instância única
+useCalendario ..> supabaseClient : usa instância única
+useSuporte ..> supabaseClient : usa instância única
+
+' Relações Componentes e Telas
 GerenciadorTelas "1" *-- "0..1" Mural : exibe
 GerenciadorTelas "1" *-- "0..1" Calendario : exibe
 GerenciadorTelas "1" *-- "0..1" Mensagens : exibe
@@ -237,6 +423,7 @@ GerenciadorTelas "1" *-- "0..1" DuvidasBox : exibe
 GerenciadorTelas "1" *-- "0..1" Suporte : exibe
 GerenciadorTelas "1" *-- "0..1" Pesquisar : exibe
 GerenciadorTelas "1" *-- "0..1" BoxPerfilUsuario : exibe
+GerenciadorTelas "1" *-- "0..1" ConfiguracoesAvancadas : exibe
 GerenciadorTelas "1" *-- "0..*" TurmaCard : renderiza
 Pesquisar "1" *-- "0..*" TurmaCard : renderiza
 Mural "1" *-- "0..*" BoxEntregaAtividade : renderiza
@@ -248,6 +435,5 @@ DuvidasBox "1" ..> "1" useDuvidas : gerencia dúvidas com
 Suporte "1" ..> "1" useSuporte : gerencia tickets com
 Pesquisar "1" ..> "1" usePesquisa : busca turmas com
 BoxPerfilUsuario "1" ..> "1" usePerfilUsuario : atualiza dados com
-BoxEntregaAtividade "1" ..> "1" useEntregas : gerencia entregas com
 
 @enduml
