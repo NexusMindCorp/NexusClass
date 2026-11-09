@@ -19,7 +19,8 @@
     "test:facade": "vitest run testes/patterns/facade/",
     "test:strategy": "vitest run testes/patterns/strategy/",
     "test:observer": "vitest run testes/patterns/observer/",
-    "test:proxy": "vitest run testes/patterns/proxy/"
+    "test:proxy": "vitest run testes/patterns/proxy/",
+    "constructDocker": "docker compose --env-file .env -f docker/structure/docker-compose.yml up -d"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
