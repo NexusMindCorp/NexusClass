@@ -1,14 +1,8 @@
--- ============================================================================
--- DCC060 - Banco de Dados (2026.3) - Grupo 24: Sistema NexusClass
--- Arquivo: 01_esquema.sql
--- Descrição: Criação das 18 tabelas do esquema lógico com todas as restrições
---            de integridade (PK, FK com ação referencial, NOT NULL, UNIQUE, CHECK).
--- Compatibilidade: PostgreSQL 14 ou superior (executa do zero em banco vazio).
--- ============================================================================
+
 SET
     client_encoding = 'UTF8';
 
--- Limpeza preventiva para garantir execução limpa a partir de qualquer estado
+
 DROP TABLE IF EXISTS Ticket_Suporte_Anexo CASCADE;
 
 DROP TABLE IF EXISTS Ticket_Suporte CASCADE;
