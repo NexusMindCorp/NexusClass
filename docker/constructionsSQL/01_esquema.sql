@@ -79,7 +79,7 @@ CREATE TABLE
 -- ----------------------------------------------------------------------------
 CREATE TABLE
     Perfil (
-        id_perfil SERIAL,
+        id_perfil UUID NOT NULL,
         role VARCHAR(20) NOT NULL DEFAULT 'aluno',
         nome VARCHAR(150) NOT NULL,
         email VARCHAR(180) NOT NULL,
@@ -89,6 +89,7 @@ CREATE TABLE
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT pk_perfil PRIMARY KEY (id_perfil),
+            CONSTRAINT fk_perfil_auth_users FOREIGN KEY (id_perfil) REFERENCES auth.users (id) ON DELETE CASCADE,
             CONSTRAINT uq_perfil_email UNIQUE (email),
             CONSTRAINT ck_perfil_role CHECK (role IN ('aluno', 'professor', 'master'))
     );
@@ -98,7 +99,7 @@ CREATE TABLE
 -- ----------------------------------------------------------------------------
 CREATE TABLE
     Professor_Turma (
-        id_professor INTEGER NOT NULL,
+        id_professor UUID NOT NULL,
         id_turma INTEGER NOT NULL,
         created_at TIMESTAMP
         WITH
@@ -113,7 +114,7 @@ CREATE TABLE
 -- ----------------------------------------------------------------------------
 CREATE TABLE
     Aluno_Turma (
-        id_aluno INTEGER NOT NULL,
+        id_aluno UUID NOT NULL,
         id_turma INTEGER NOT NULL,
         situacao VARCHAR(20) NOT NULL DEFAULT 'ativa',
         created_at TIMESTAMP
@@ -137,7 +138,7 @@ CREATE TABLE
         WITH
             TIME ZONE NOT NULL,
             id_turma INTEGER NOT NULL,
-            id_professor INTEGER NOT NULL,
+            id_professor UUID NOT NULL,
             CONSTRAINT pk_atividade PRIMARY KEY (id_atividade),
             CONSTRAINT fk_atividade_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_atividade_professor FOREIGN KEY (id_professor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE RESTRICT
@@ -149,10 +150,11 @@ CREATE TABLE
 CREATE TABLE
     Atividade_Anexo (
         id_anexo SERIAL,
-        url TEXT NOT NULL,
+        id_objeto_storage UUID NOT NULL,
         id_atividade INTEGER NOT NULL,
         CONSTRAINT pk_atividade_anexo PRIMARY KEY (id_anexo),
-        CONSTRAINT fk_ativ_anexo_atividade FOREIGN KEY (id_atividade) REFERENCES Atividade (id_atividade) ON UPDATE CASCADE ON DELETE CASCADE
+        CONSTRAINT fk_ativ_anexo_atividade FOREIGN KEY (id_atividade) REFERENCES Atividade (id_atividade) ON UPDATE CASCADE ON DELETE CASCADE,
+        CONSTRAINT fk_ativ_anexo_storage FOREIGN KEY (id_objeto_storage) REFERENCES storage.objects (id) ON DELETE CASCADE
     );
 
 -- ----------------------------------------------------------------------------
@@ -161,14 +163,14 @@ CREATE TABLE
 CREATE TABLE
     Entrega_Atividade (
         id_entrega SERIAL,
-        entrega_url TEXT NOT NULL,
+        id_objeto_storage UUID NOT NULL,
         nota NUMERIC(5, 2),
         feedback TEXT,
         entregue_em TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             id_atividade INTEGER NOT NULL,
-            id_aluno INTEGER NOT NULL,
+            id_aluno UUID NOT NULL,
             CONSTRAINT pk_entrega_atividade PRIMARY KEY (id_entrega),
             CONSTRAINT uq_entrega_atividade_aluno UNIQUE (id_atividade, id_aluno),
             CONSTRAINT ck_entrega_nota_intervalo CHECK (
@@ -179,7 +181,8 @@ CREATE TABLE
                 )
             ),
             CONSTRAINT fk_entrega_atividade FOREIGN KEY (id_atividade) REFERENCES Atividade (id_atividade) ON UPDATE CASCADE ON DELETE CASCADE,
-            CONSTRAINT fk_entrega_aluno FOREIGN KEY (id_aluno) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
+            CONSTRAINT fk_entrega_aluno FOREIGN KEY (id_aluno) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
+            CONSTRAINT fk_entrega_storage FOREIGN KEY (id_objeto_storage) REFERENCES storage.objects (id) ON DELETE CASCADE
     );
 
 -- ----------------------------------------------------------------------------
@@ -195,9 +198,9 @@ CREATE TABLE
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            id_aluno INTEGER NOT NULL,
+            id_aluno UUID NOT NULL,
             id_turma INTEGER NOT NULL,
-            id_professor INTEGER,
+            id_professor UUID,
             CONSTRAINT pk_duvida PRIMARY KEY (id_duvida),
             CONSTRAINT fk_duvida_aluno FOREIGN KEY (id_aluno) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_duvida_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -210,10 +213,11 @@ CREATE TABLE
 CREATE TABLE
     Duvida_Anexo (
         id_anexo SERIAL,
-        url TEXT NOT NULL,
+        id_objeto_storage UUID NOT NULL,
         id_duvida INTEGER NOT NULL,
         CONSTRAINT pk_duvida_anexo PRIMARY KEY (id_anexo),
-        CONSTRAINT fk_duvida_anexo_duvida FOREIGN KEY (id_duvida) REFERENCES Duvida (id_duvida) ON UPDATE CASCADE ON DELETE CASCADE
+        CONSTRAINT fk_duvida_anexo_duvida FOREIGN KEY (id_duvida) REFERENCES Duvida (id_duvida) ON UPDATE CASCADE ON DELETE CASCADE,
+        CONSTRAINT fk_duvida_anexo_storage FOREIGN KEY (id_objeto_storage) REFERENCES storage.objects (id) ON DELETE CASCADE
     );
 
 -- ----------------------------------------------------------------------------
@@ -227,7 +231,7 @@ CREATE TABLE
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             id_turma INTEGER NOT NULL,
-            id_autor INTEGER NOT NULL,
+            id_autor UUID NOT NULL,
             CONSTRAINT pk_mural_post PRIMARY KEY (id_post),
             CONSTRAINT fk_mural_post_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_mural_post_autor FOREIGN KEY (id_autor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
@@ -244,7 +248,7 @@ CREATE TABLE
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             id_post INTEGER NOT NULL,
-            id_autor INTEGER NOT NULL,
+            id_autor UUID NOT NULL,
             CONSTRAINT pk_comentario_mural PRIMARY KEY (id_comentario),
             CONSTRAINT fk_comentario_post FOREIGN KEY (id_post) REFERENCES Mural_Post (id_post) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_comentario_autor FOREIGN KEY (id_autor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
@@ -261,7 +265,7 @@ CREATE TABLE
         data DATE NOT NULL,
         horario TIME WITHOUT TIME ZONE NOT NULL,
         tipo VARCHAR(20) NOT NULL DEFAULT 'pessoal',
-        id_autor INTEGER NOT NULL,
+        id_autor UUID NOT NULL,
         id_turma INTEGER,
         CONSTRAINT pk_evento_calendario PRIMARY KEY (id_evento),
         CONSTRAINT ck_evento_tipo CHECK (tipo IN ('pessoal', 'turma')),
@@ -308,8 +312,8 @@ CREATE TABLE
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            id_remetente INTEGER NOT NULL,
-            id_destinatario INTEGER NOT NULL,
+            id_remetente UUID NOT NULL,
+            id_destinatario UUID NOT NULL,
             CONSTRAINT pk_mensagem PRIMARY KEY (id_mensagem),
             CONSTRAINT ck_mensagem_autoria_distinta CHECK (id_remetente <> id_destinatario),
             CONSTRAINT fk_mensagem_remetente FOREIGN KEY (id_remetente) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -329,9 +333,9 @@ CREATE TABLE
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            id_autor INTEGER NOT NULL,
-            id_denunciado INTEGER NOT NULL,
-            id_master INTEGER,
+            id_autor UUID NOT NULL,
+            id_denunciado UUID NOT NULL,
+            id_master UUID,
             CONSTRAINT pk_denuncia PRIMARY KEY (id_denuncia),
             CONSTRAINT ck_denuncia_status CHECK (status IN ('pendente', 'em_analise', 'resolvido')),
             CONSTRAINT ck_denuncia_partes_distintas CHECK (id_autor <> id_denunciado),
@@ -353,8 +357,8 @@ CREATE TABLE
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            id_perfil INTEGER NOT NULL,
-            id_master INTEGER,
+            id_perfil UUID NOT NULL,
+            id_master UUID,
             CONSTRAINT pk_ticket_suporte PRIMARY KEY (id_suporte),
             CONSTRAINT ck_ticket_status CHECK (status IN ('pendente', 'em_analise', 'resolvido')),
             CONSTRAINT fk_ticket_perfil FOREIGN KEY (id_perfil) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -367,8 +371,21 @@ CREATE TABLE
 CREATE TABLE
     Ticket_Suporte_Anexo (
         id_anexo SERIAL,
-        url TEXT NOT NULL,
+        id_objeto_storage UUID NOT NULL,
         id_suporte INTEGER NOT NULL,
         CONSTRAINT pk_ticket_suporte_anexo PRIMARY KEY (id_anexo),
-        CONSTRAINT fk_ticket_anexo_suporte FOREIGN KEY (id_suporte) REFERENCES Ticket_Suporte (id_suporte) ON UPDATE CASCADE ON DELETE CASCADE
+        CONSTRAINT fk_ticket_anexo_suporte FOREIGN KEY (id_suporte) REFERENCES Ticket_Suporte (id_suporte) ON UPDATE CASCADE ON DELETE CASCADE,
+        CONSTRAINT fk_ticket_anexo_storage FOREIGN KEY (id_objeto_storage) REFERENCES storage.objects (id) ON DELETE CASCADE
     );
+
+-- ----------------------------------------------------------------------------
+-- 19. Buckets do Supabase Storage
+-- ----------------------------------------------------------------------------
+INSERT INTO
+    storage.buckets (id, name, public)
+VALUES
+    ('anexos_atividades', 'anexos_atividades', FALSE),
+    ('entregas_atividades', 'entregas_atividades', FALSE),
+    ('duvidasalunostoprofessor', 'duvidasalunostoprofessor', FALSE),
+    ('anexos_suporte', 'anexos_suporte', FALSE)
+ON CONFLICT (id) DO NOTHING;
