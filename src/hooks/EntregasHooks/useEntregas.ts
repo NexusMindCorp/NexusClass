@@ -11,6 +11,7 @@ export function useEntregas(
   atividadeId: string,
   perfil: PerfilUsuario,
   facadeInjetada?: IEntregaAtividadeFacade,
+  dataEntregaAtividade?: string | null,
 ) {
   const [entregaPropria, setEntregaPropria] = useState<Entrega | null>(null);
   const [todasEntregas, setTodasEntregas] = useState<Entrega[]>([]);
@@ -27,7 +28,11 @@ export function useEntregas(
 
     setLoading(true);
     try {
-      const resultado = await facade.carregarEntregas(atividadeId, perfil);
+      const resultado = await facade.carregarEntregas(
+        atividadeId,
+        perfil,
+        dataEntregaAtividade,
+      );
       if (perfil.role === "aluno") {
         setEntregaPropria(resultado.entregaPropria);
       } else {
@@ -38,7 +43,7 @@ export function useEntregas(
     } finally {
       setLoading(false);
     }
-  }, [atividadeId, facade, perfil]);
+  }, [atividadeId, dataEntregaAtividade, facade, perfil]);
 
   const enviarEntrega = async (file: File) => {
     if (!facade.estaDisponivel()) return;

@@ -28,7 +28,7 @@ import { PerfilAvatar } from "./PerfilAvatar";
 import type { AlunosTurmaProps, tableRowProps } from "@/hooks/AlunosHooks/type";
 
 export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
-  const { opcaoSelecionada, nomeAluno, handleOptionSelect } = useOptionAlunos();
+  const { opcaoSelecionada, nomeAluno, idAluno, handleOptionSelect } = useOptionAlunos();
   const listaSemUsuario = turma.alunos.filter(
     (aluno) => aluno.id !== perfil.id,
   );
@@ -100,7 +100,7 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
               <DropdownMenuItem
                 className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                 disabled={!podeDenunciar}
-                onSelect={() => handleOptionSelect("Denunciar", nome)}
+                onSelect={() => handleOptionSelect("Denunciar", nome, id)}
               >
                 <AlertCircle className="mr-2 h-4 w-4" />
                 Denunciar
@@ -116,6 +116,8 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
     opcaoSelecionada === "Denunciar" && nomeAluno ? (
       <BoxDenunciaAluno
         aluno={nomeAluno}
+        alunoId={idAluno}
+        autorId={perfil.id}
         onClose={() => handleOptionSelect(null)}
       />
     ) : opcaoSelecionada === "Ver Perfil" && nomeAluno ? (

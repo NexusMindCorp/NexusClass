@@ -28,7 +28,7 @@ export function BoxEntregaAtividade({
     enviarEntrega,
     avaliarEntrega,
     obterLinkArquivo,
-  } = useEntregas(atividadeId, perfil);
+  } = useEntregas(atividadeId, perfil, undefined, dataEntregaAtividade);
 
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(
     null,
@@ -104,12 +104,7 @@ export function BoxEntregaAtividade({
               <div className="flex items-center gap-2.5 truncate max-w-[70%]">
                 <Paperclip className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="text-sm font-medium truncate text-foreground">
-                  {entregaPropria.url_anexo
-                    ? entregaPropria.url_anexo
-                        .split("/")
-                        .pop()
-                        ?.replace(/^\d+-/, "")
-                    : "Arquivo entregue"}
+                  {entregaPropria.nome_arquivo || "Arquivo entregue"}
                 </span>
               </div>
 
@@ -128,7 +123,7 @@ export function BoxEntregaAtividade({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDownload(entregaPropria.url_anexo)}
+                  onClick={() => handleDownload(entregaPropria.caminho_arquivo)}
                   className="h-8 w-8 p-0 cursor-pointer"
                   title="Baixar arquivo entregue"
                 >
@@ -315,7 +310,7 @@ export function BoxEntregaAtividade({
                   <Button
                     variant="outline"
                     size="xs"
-                    onClick={() => handleDownload(ent.url_anexo)}
+                    onClick={() => handleDownload(ent.caminho_arquivo)}
                     className="h-7 px-2 cursor-pointer flex items-center gap-1 text-[11px]"
                   >
                     <Download className="h-3 w-3" />

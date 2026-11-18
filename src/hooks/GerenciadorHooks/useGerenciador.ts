@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
+import { escolaTurmaRepository, extrairMensagemErroRepo } from "@/repositories"
 import { toast } from "sonner"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { montarDataEvento } from "@/lib/utils"
@@ -71,31 +72,24 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
             toast.error("Erro de autenticação", { description: "Sessão inválida ou não configurada." })
             return
         }
-        const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
-        const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
-        const jaIncrito = usuario.inscricoes[turmaId];
+        if (perfil.role !== "aluno") {
+            toast.error("Ação não permitida", {
+                description: "Apenas alunos podem alterar inscrições em turmas (vínculos de professores são geridos pela coordenação).",
+            })
+            return
+        }
+        const jaInscrito = usuario.inscricoes[turmaId];
 
         try {
-            if (jaIncrito) {
-                const { error } = await supabase
-                    .from(tabelaAssociativa)
-                    .delete()
-                    .eq(colunaFiltro, perfil.id)
-                    .eq("turma_id", turmaId)
-
-                if (error) throw error
-                toast.success("Desinscrição realizada", { description: "Você foi desinscrito desta turma." })
-            } else {
-                const { error } = await supabase
-                    .from(tabelaAssociativa)
-                    .insert({
-                        [colunaFiltro]: perfil.id,
-                        turma_id: turmaId,
-                    })
-
-                if (error) throw error
-                toast.success("Inscrição realizada", { description: "Você foi inscrito nesta turma." })
-            }
+            await escolaTurmaRepository.alternarMatriculaAluno(perfil.id, turmaId, jaInscrito);
+            toast.success(
+                jaInscrito ? "Desinscrição realizada" : "Inscrição realizada",
+                {
+                    description: jaInscrito
+                        ? "Você foi desinscrito desta turma."
+                        : "Você foi inscrito nesta turma.",
+                },
+            );
 
             setUsuario((anterior) => {
                 const proximasInscricoes = {
@@ -111,9 +105,8 @@ export function useGerenciador(perfil: PerfilUsuario | null) {
             });
 
         } catch (error: unknown) {
-            const mensagemErro = error instanceof Error ? error.message : "Por favor, verifique sua conexão.";
             toast.error("Erro ao atualizar inscrição", {
-                description: mensagemErro,
+                description: extrairMensagemErroRepo(error, "Por favor, verifique sua conexão."),
             });
         }
     };

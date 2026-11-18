@@ -1,6 +1,6 @@
 import { useState } from "react"
-// IMPORTANTE: Ajuste o caminho de importação do seu cliente Supabase
 import { supabase } from "@/lib/supabaseClient"
+import { comunicacaoRepository, extrairMensagemErroRepo, perfilRepository } from "@/repositories"
 
 const defaultMotivos = [
   "Bullying/Assédio",
@@ -12,6 +12,8 @@ const defaultMotivos = [
   "Outro",
 ]
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export function useDenuncia() {
   const [motivos] = useState<string[]>(defaultMotivos)
   const [motivoSelecionado, setMotivoSelecionado] = useState<string>(motivos[0])
@@ -21,33 +23,46 @@ export function useDenuncia() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  async function submit(aluno: string) {
+  async function submit(alvo: string, idAutor?: string) {
     setSending(true)
     setError(null)
     setSuccess(false)
-    
-    try {
-      const { error: supabaseError } = await supabase
-        .from('denuncias')
-        .insert([
-          { 
-            aluno_denunciado: aluno, 
-            motivo: motivoSelecionado,
-            descricao: detalhes || "Nenhum detalhe adicional fornecido.",
-            status: 'pendente'
-          }
-        ])
 
-      if (supabaseError) {
-        throw new Error(supabaseError.message)
+    try {
+      const autorResolvido =
+        idAutor ||
+        (await supabase.auth.getUser()).data.user?.id
+
+      if (!autorResolvido) {
+        throw new Error("Usuário não autenticado para registrar denúncia.")
       }
+
+      let idDenunciado = alvo
+      if (!UUID_REGEX.test(alvo)) {
+        const perfilAlvo = await perfilRepository.buscarPorNome(alvo)
+        if (!perfilAlvo) {
+          throw new Error("Usuário denunciado não encontrado.")
+        }
+        idDenunciado = perfilAlvo.id
+      }
+
+      await comunicacaoRepository.criarDenuncia({
+        idAutor: autorResolvido,
+        idDenunciado,
+        motivo: motivoSelecionado,
+        descricao: detalhes,
+      })
 
       setSuccess(true)
       setDetalhes("")
       setMotivoSelecionado(motivos[0])
-
-    } catch (err: any) {
-      setError(err?.message || "Erro de conexão ao enviar denúncia. Tente novamente.")
+    } catch (err: unknown) {
+      setError(
+        extrairMensagemErroRepo(
+          err,
+          "Erro de conexão ao enviar denúncia. Tente novamente.",
+        ),
+      )
       setSuccess(false)
       throw err
     } finally {

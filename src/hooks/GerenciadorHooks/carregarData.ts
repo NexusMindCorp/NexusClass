@@ -1,101 +1,105 @@
 import { formatarDataLocal } from "@/lib/utils";
+import { comunicacaoRepository, escolaTurmaRepository } from "@/repositories";
 import { useCallback } from "react";
 import type { EventoCalendarioNotificacao, UseCarregarDataProps } from "./type";
-export function useCarregarData({ hasSupabaseConfig, supabase, perfil, setLoadingInscricoes, setUsuario, toast }: UseCarregarDataProps) {
-        const buscarMatriculasDoUsuario = useCallback(async () => {
-            if (!hasSupabaseConfig || !supabase || !perfil?.id) {
-                setLoadingInscricoes(false);
-                return;
-            }
 
-            setLoadingInscricoes(true);
-            const tabelaAssociativa = perfil.role === "aluno" ? "aluno_turma" : "professor_turma";
-            const colunaFiltro = perfil.role === "aluno" ? "aluno_id" : "professor_id";
+export function useCarregarData({
+  hasSupabaseConfig,
+  supabase,
+  perfil,
+  setLoadingInscricoes,
+  setUsuario,
+  toast,
+}: UseCarregarDataProps) {
+  const buscarMatriculasDoUsuario = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+      setLoadingInscricoes(false);
+      return;
+    }
 
-            try {
-                const { data, error } = await supabase
-                    .from(tabelaAssociativa)
-                    .select("turma_id")
-                    .eq(colunaFiltro, perfil.id)
+    setLoadingInscricoes(true);
 
-                if (error) throw error
+    try {
+      const idsTurmas = await escolaTurmaRepository.listarIdsTurmasPorPapel(
+        perfil.id,
+        perfil.role,
+      );
 
-                const novasInscricoes: Record<string, boolean> = {}
-                const listaIds: string[] = []
+      const novasInscricoes: Record<string, boolean> = {};
+      for (const idTurma of idsTurmas) {
+        novasInscricoes[idTurma] = true;
+      }
 
-                if (data) {
-                    data.forEach((item: any) => {
-                        novasInscricoes[item.turma_id] = true
-                        listaIds.push(item.turma_id)
-                    })
-                }
+      setUsuario((anterior: Record<string, unknown>) => ({
+        ...anterior,
+        inscricoes: novasInscricoes,
+        listaDosInscritos: idsTurmas,
+      }));
+    } catch {
+      toast.error("Erro ao carregar inscrições", {
+        description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
+      });
+    } finally {
+      setLoadingInscricoes(false);
+    }
+  }, [hasSupabaseConfig, supabase, perfil?.id, perfil?.role, setLoadingInscricoes, setUsuario, toast]);
 
-                setUsuario((anterior: any) => ({
-                    ...anterior,
-                    inscricoes: novasInscricoes,
-                    listaDosInscritos: listaIds,
-                }))
-            } catch (error: any) {
-                toast.error("Erro ao carregar inscrições", {
-                    description: "Não conseguimos buscar suas inscrições. Tente recarregar a página.",
-                })
-            } finally {
-                setLoadingInscricoes(false);
-            }
-    }, [perfil]);
+  const verificarLembretesLocais = async (
+    _supabaseClient: unknown,
+    deveAlertarEvento: (evento: EventoCalendarioNotificacao) => boolean,
+    montarDataEvento: (data: string, horario: string) => Date | null,
+    alertasEnviadosRef: { current: Set<string> },
+  ) => {
+    if (!perfil?.id) return;
 
-        const verificarLembretesLocais = async (supabaseClient: any, deveAlertarEvento: any, montarDataEvento: any, alertasEnviadosRef: any) => {
-            const agora = new Date()
-            const hoje = formatarDataLocal(agora)
-            const amanha = formatarDataLocal(new Date(agora.getTime() + 24 * 60 * 60 * 1000))
+    const agora = new Date();
+    const hoje = formatarDataLocal(agora);
+    const amanha = formatarDataLocal(new Date(agora.getTime() + 24 * 60 * 60 * 1000));
 
-            const { data, error } = await supabaseClient
-                .from("eventos_calendario")
-                .select("id,titulo,data,horario,tipo,turma_id,autor_id")
-                .not("horario", "is", null)
-                .gte("data", hoje)
-                .lte("data", amanha)
+    try {
+      const idsTurmas = await escolaTurmaRepository.listarIdsTurmasPorPapel(
+        perfil.id,
+        perfil.role,
+      );
+      const eventos = await comunicacaoRepository.listarEventos(
+        perfil,
+        idsTurmas,
+        hoje,
+      );
 
-            if (error || !data) {
-                return
-            }
+      for (const evento of eventos) {
+        if (evento.data > amanha) continue;
+        if (!deveAlertarEvento(evento)) continue;
 
-            for (const evento of data as EventoCalendarioNotificacao[]) {
-                if (!deveAlertarEvento(evento)) {
-                    continue
-                }
+        const dataEvento = montarDataEvento(evento.data, evento.horario);
+        if (!dataEvento) continue;
 
-                const dataEvento = montarDataEvento(evento.data, evento.horario)
-                if (!dataEvento) {
-                    continue
-                }
+        const diferencaMs = dataEvento.getTime() - agora.getTime();
+        if (diferencaMs <= 0) continue;
 
-                const diferencaMs = dataEvento.getTime() - agora.getTime()
-                if (diferencaMs <= 0) {
-                    continue
-                }
+        const diferencaMinutos = diferencaMs / 60000;
 
-                const diferencaMinutos = diferencaMs / 60000
+        for (const alvo of [5, 1]) {
+          const dentroDaJanela = diferencaMinutos <= alvo && diferencaMinutos > alvo - 1;
+          if (!dentroDaJanela) continue;
 
-                for (const alvo of [5, 1]) {
-                    const dentroDaJanela = diferencaMinutos <= alvo && diferencaMinutos > alvo - 1
-                    if (!dentroDaJanela) {
-                        continue
-                    }
+          const chaveAlerta = `${evento.id}-${alvo}`;
+          if (alertasEnviadosRef.current.has(chaveAlerta)) continue;
 
-                    const chaveAlerta = `${evento.id}-${alvo}`
-                    if (alertasEnviadosRef.current.has(chaveAlerta)) {
-                        continue
-                    }
-
-                    alertasEnviadosRef.current.add(chaveAlerta)
-                    toast.warning(`Lembrete: "${evento.titulo}" comeca em ${alvo} minuto${alvo === 1 ? "" : "s"}.`, {
-                        description: evento.titulo,
-                        duration: 12000,
-                    })
-                }
-            }
+          alertasEnviadosRef.current.add(chaveAlerta);
+          toast.warning(
+            `Lembrete: "${evento.titulo}" comeca em ${alvo} minuto${alvo === 1 ? "" : "s"}.`,
+            {
+              description: evento.titulo,
+              duration: 12000,
+            },
+          );
         }
-    return{ buscarMatriculasDoUsuario, verificarLembretesLocais }
+      }
+    } catch {
+      // Falha silenciosa na verificação local de lembretes
+    }
+  };
 
+  return { buscarMatriculasDoUsuario, verificarLembretesLocais };
 }

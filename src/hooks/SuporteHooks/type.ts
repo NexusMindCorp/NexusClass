@@ -17,6 +17,6 @@ export type FormField = {
 export type sendContactEmailParams = {
   formElement: HTMLFormElement,
   files: File[],
-  perfil?: { nome: string; email: string } | null
-  supabase: any
+  perfil?: { id?: string; nome: string; email: string } | null
+  supabase?: unknown
 }

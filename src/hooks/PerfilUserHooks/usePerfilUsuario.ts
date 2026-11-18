@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
-import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
+import { hasSupabaseConfig } from "@/lib/supabaseClient"
+import { perfilRepository } from "@/repositories"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { getCorNomeUsuario } from "@/lib/utils"
 import type { usePerfilUsuarioProps } from "./type"
@@ -11,7 +12,7 @@ export function usePerfilUsuario({ nomeUsuario, currentUserProfile }: usePerfilU
             let isMounted = true
     
             const carregarPerfil = async () => {
-                if (!hasSupabaseConfig || !supabase) {
+                if (!hasSupabaseConfig) {
                     setError("Supabase não configurado.")
                     setLoading(false)
                     return
@@ -20,20 +21,12 @@ export function usePerfilUsuario({ nomeUsuario, currentUserProfile }: usePerfilU
                 try {
                     setLoading(true)
                     setError(null)
-                    const { data, error: fetchError } = await supabase
-                        .from("perfis")
-                        .select("id, nome, email, bio, foto_url, role, created_at")
-                        .eq("nome", nomeUsuario)
-                        .maybeSingle()
-    
-                    if (fetchError) {
-                        throw fetchError
-                    }
+                    const data = await perfilRepository.buscarPorNome(nomeUsuario)
     
                     if (!data) {
                         setError("Perfil não encontrado.")
                     } else if (isMounted) {
-                        setPerfilAlvo(data as PerfilUsuario)
+                        setPerfilAlvo(data)
                     }
                 } catch (err: any) {
                     console.error("Erro ao buscar perfil:", err)

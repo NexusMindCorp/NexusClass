@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useDenuncia } from "@/hooks/DenunciaHooks/useDenuncia";
 import type { BoxDenunciaAlunoProps } from "@/hooks/DenunciaHooks/type";
 
-export function BoxDenunciaAluno({ aluno, onClose }: BoxDenunciaAlunoProps) {
+export function BoxDenunciaAluno({ aluno, alunoId, autorId, onClose }: BoxDenunciaAlunoProps) {
   const {
     motivos,
     motivoSelecionado,
@@ -19,7 +19,7 @@ export function BoxDenunciaAluno({ aluno, onClose }: BoxDenunciaAlunoProps) {
 
   async function handleConfirm() {
     try {
-      await submit(aluno);
+      await submit(alunoId || aluno, autorId);
       onClose();
     } catch (err) {
       console.error("Erro ao enviar denúncia", err);

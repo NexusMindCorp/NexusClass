@@ -3,7 +3,8 @@ import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { Duvida, DuvidaRegistroBanco } from "@/hooks/DuvidaHooks/type";
-import { extrairUrlsAnexo, obterNomeArquivoDoUrl } from "@/lib/utils";
+import { mapDuvida } from "@/lib/db/mappers";
+import { duvidaRepository, extrairMensagemErroRepo } from "@/repositories";
 import {
   filtrarDuvidasPorPerfilEStatus,
   filtroDuvidasPendentesStrategy,
@@ -11,30 +12,8 @@ import {
   type StatusFiltroDuvida,
 } from "@/patterns/strategy/FiltroStrategy";
 
-function extrairMensagemErro(err: unknown, padrao: string): string {
-  if (err instanceof Error && err.message) {
-    return err.message;
-  }
-  if (typeof err === "object" && err !== null && "message" in err) {
-    const msg = (err as { message?: unknown }).message;
-    if (typeof msg === "string" && msg.length > 0) {
-      return msg;
-    }
-  }
-  return padrao;
-}
-
 export function normalizarDuvida(d: DuvidaRegistroBanco): Duvida {
-  const alunoData = Array.isArray(d.aluno) ? d.aluno[0] : d.aluno;
-  const profData = Array.isArray(d.professor) ? d.professor[0] : d.professor;
-  const turmaData = Array.isArray(d.turma) ? d.turma[0] : d.turma;
-
-  return {
-    ...d,
-    aluno: alunoData || undefined,
-    professor: profData || undefined,
-    turma: turmaData || undefined,
-  };
+  return mapDuvida(d);
 }
 
 export function useDuvidas(
@@ -69,36 +48,11 @@ export function useDuvidas(
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("duvidasalunostoprofessor")
-        .select(`
-          id,
-          aluno_id,
-          prof_id,
-          turma_id,
-          assunto,
-          descricao,
-          anexo_url,
-          created_at,
-          resolvido,
-          resposta,
-          aluno:aluno_id (nome, email, foto_url),
-          professor:prof_id (nome),
-          turma:turma_id (materia, turma)
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      if (data) {
-        const formatadas: Duvida[] = (data as unknown as DuvidaRegistroBanco[]).map(
-          normalizarDuvida,
-        );
-        setDuvidas(formatadas);
-      }
+      const formatadas = await duvidaRepository.listarTodas();
+      setDuvidas(formatadas);
     } catch (err: unknown) {
       toast.error("Erro ao carregar dúvidas", {
-        description: extrairMensagemErro(err, "Tente novamente mais tarde."),
+        description: extrairMensagemErroRepo(err, "Tente novamente mais tarde."),
       });
     } finally {
       setLoading(false);
@@ -108,34 +62,16 @@ export function useDuvidas(
   const deletarDuvida = async (duvidaId: string) => {
     if (!hasSupabaseConfig || !supabase) return;
 
+    const duvidaExistente = duvidas.find((d) => d.id === duvidaId);
+    if (!duvidaExistente) return;
+
     try {
-      const duvidaExistente = duvidas.find((d) => d.id === duvidaId);
-      if (duvidaExistente?.anexo_url) {
-        const urls = extrairUrlsAnexo(duvidaExistente.anexo_url);
-        if (urls.length > 0) {
-          const caminhosParaDeletar = urls
-            .map(obterNomeArquivoDoUrl)
-            .filter(Boolean);
-          if (caminhosParaDeletar.length > 0) {
-            await supabase.storage
-              .from("duvidasalunostoprofessor")
-              .remove(caminhosParaDeletar);
-          }
-        }
-      }
-
-      const { error } = await supabase
-        .from("duvidasalunostoprofessor")
-        .delete()
-        .eq("id", duvidaId);
-
-      if (error) throw error;
-
+      await duvidaRepository.excluir(duvidaExistente);
       setDuvidas((prev) => prev.filter((d) => d.id !== duvidaId));
       toast.success("Dúvida excluída com sucesso!");
     } catch (err: unknown) {
       toast.error("Erro ao excluir dúvida", {
-        description: extrairMensagemErro(err, "Tente novamente."),
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
       });
     }
   };
@@ -144,16 +80,7 @@ export function useDuvidas(
     if (!hasSupabaseConfig || !supabase) return;
 
     try {
-      const { error } = await supabase
-        .from("duvidasalunostoprofessor")
-        .update({
-          resposta: respostaText,
-          resolvido: true,
-        })
-        .eq("id", duvidaId);
-
-      if (error) throw error;
-
+      await duvidaRepository.responder(duvidaId, respostaText);
       setDuvidas((prev) =>
         prev.map((d) =>
           d.id === duvidaId
@@ -164,7 +91,7 @@ export function useDuvidas(
       toast.success("Dúvida respondida com sucesso!");
     } catch (err: unknown) {
       toast.error("Erro ao responder dúvida", {
-        description: extrairMensagemErro(err, "Tente novamente."),
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
       });
       throw err;
     }

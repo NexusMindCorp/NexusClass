@@ -1,659 +1,385 @@
 import { useState, useEffect, useCallback } from "react";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
+import type { AnexoRef } from "@/lib/db/mappers";
 import { supabase, hasSupabaseConfig } from "@/lib/supabaseClient";
-import { toast } from "sonner";
-import{ extrairUrlsAnexo, obterNomeArquivoDoUrl } from '@/lib/utils';
 import {
-    NotificacaoSubject,
-    ToastNotificacaoObserver,
-    StateRefreshObserver,
-    conectarCanaisMuralRealtime,
+  atividadeRepository,
+  duvidaRepository,
+  extrairMensagemErroRepo,
+  muralRepository,
+} from "@/repositories";
+import { toast } from "sonner";
+import {
+  NotificacaoSubject,
+  ToastNotificacaoObserver,
+  StateRefreshObserver,
+  conectarCanaisMuralRealtime,
 } from "@/patterns/observer/NotificacaoSubject";
 import type { Post, Atividade } from "./type";
 
 export function useMural(turmaId: string, perfil: PerfilUsuario) {
-    const [posts, setPosts] = useState<{ posts: Post[]; boxAberto: boolean; tipoAmostar: "atividade" | "mural" | "contato" | "alunos" }>({
-        posts: [],
-        boxAberto: false,
-        tipoAmostar: "mural",
-    });
-    const [atividades, setAtividades] = useState<Atividade[]>([]);
-    const [atividadesEntregues, setAtividadesEntregues] = useState<Set<string>>(new Set());
-    const [loadingAtividades, setLoadingAtividades] = useState(false);
-    const [conteudo, setConteudo] = useState("");
-    const [assunto, setAssunto] = useState("");
-    const [opcaoSelecionada, setOpcaoSelecionada] = useState<"mural" | "atividade" | "contato" | "alunos">("mural");
-    const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<Record<string, boolean>>({});
+  const [posts, setPosts] = useState<{
+    posts: Post[];
+    boxAberto: boolean;
+    tipoAmostar: "atividade" | "mural" | "contato" | "alunos";
+  }>({
+    posts: [],
+    boxAberto: false,
+    tipoAmostar: "mural",
+  });
+  const [atividades, setAtividades] = useState<Atividade[]>([]);
+  const [atividadesEntregues, setAtividadesEntregues] = useState<Set<string>>(
+    new Set(),
+  );
+  const [loadingAtividades, setLoadingAtividades] = useState(false);
+  const [conteudo, setConteudo] = useState("");
+  const [assunto, setAssunto] = useState("");
+  const [opcaoSelecionada, setOpcaoSelecionada] = useState<
+    "mural" | "atividade" | "contato" | "alunos"
+  >("mural");
+  const [atividadesEntregasAbertas, setAtividadesEntregasAbertas] = useState<
+    Record<string, boolean>
+  >({});
 
-    const mudarAberturaBox = (boxAberto: boolean) =>
-        setPosts((anterior) => ({ ...anterior, boxAberto }));
-    const alternarAreaEntrega = (id: string) => {
-        setAtividadesEntregasAbertas((prev) => ({
-        ...prev,
-        [id]: !prev[id],
-        }));
+  const mudarAberturaBox = (boxAberto: boolean) =>
+    setPosts((anterior) => ({ ...anterior, boxAberto }));
+
+  const alternarAreaEntrega = (id: string) => {
+    setAtividadesEntregasAbertas((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
-    const carregarPosts = useCallback(async () => {
-        if (!hasSupabaseConfig || !supabase || !turmaId) return;
-
-        try {
-            const { data, error } = await supabase
-                .from("mural_posts")
-                .select(`
-                    id,
-                    conteudo,
-                    created_at,
-                    perfis:autor_id (
-                        id,
-                        nome,
-                        email,
-                        bio,
-                        foto_url,
-                        role,
-                        created_at
-                    )
-                `)
-                .eq("turma_id", turmaId)
-                .order("created_at", { ascending: true });
-
-            if (error) throw error;
-
-            if (data) {
-                const postsFormatados: Post[] = data.map((p: any) => {
-                    const perfilAutor = Array.isArray(p.perfis) ? p.perfis[0] : p.perfis;
-                    return {
-                        id: p.id,
-                        Nome: perfilAutor?.nome || "Anônimo",
-                        conteudo: p.conteudo,
-                        data: new Date(p.created_at).toLocaleString("pt-BR"),
-                        autor: perfilAutor ? (perfilAutor as PerfilUsuario) : null,
-                    };
-                });
-
-                setPosts((anterior) => ({
-                    ...anterior,
-                    posts: postsFormatados,
-                }));
-            }
-        } catch (err: any) {
-            console.error("Erro ao carregar posts:", err);
-            toast.error("Erro ao carregar posts", {
-                description: "Não foi possível carregar as publicações do mural."
-            });
-        }
-    }, [turmaId]);
-
-    const carregarAtividades = useCallback(async () => {
-        if (!hasSupabaseConfig || !supabase || !turmaId) return;
-
-        try {
-            setLoadingAtividades(true);
-            const { data, error } = await supabase
-                .from("atividades")
-                .select(`
-                    id,
-                    turma_id,
-                    professor_id,
-                    titulo,
-                    descricao,
-                    data_entrega,
-                    created_at,
-                    anexo_url,
-                    perfis:professor_id (
-                        nome
-                    )
-                `)
-                .eq("turma_id", turmaId)
-                .order("created_at", { ascending: false });
-
-            if (error) throw error;
-
-            if (data) {
-                const atividadesFormatadas: Atividade[] = data.map((a: any) => {
-                    const perfilProf = Array.isArray(a.perfis) ? a.perfis[0] : a.perfis;
-                    return {
-                        id: a.id,
-                        turma_id: a.turma_id,
-                        professor_id: a.professor_id,
-                        titulo: a.titulo,
-                        descricao: a.descricao,
-                        data_entrega: a.data_entrega,
-                        created_at: a.created_at,
-                        anexo_url: a.anexo_url,
-                        professor_nome: perfilProf?.nome || "Professor",
-                    };
-                });
-                setAtividades(atividadesFormatadas);
-            }
-
-            // Carrega as entregas realizadas pelo aluno para identificar o status
-            if (perfil?.role === "aluno" && perfil?.id) {
-                const { data: entregas, error: errEntregas } = await supabase
-                    .from("entregas_atividades")
-                    .select("atividade_id")
-                    .eq("aluno_id", perfil.id);
-                
-                if (!errEntregas && entregas) {
-                    setAtividadesEntregues(new Set(entregas.map((e: any) => e.atividade_id)));
-                }
-            }
-        } catch (err: any) {
-            console.error("Erro ao carregar atividades:", err);
-            toast.error("Erro ao carregar atividades", {
-                description: "Não foi possível carregar as atividades da turma."
-            });
-        } finally {
-            setLoadingAtividades(false);
-        }
-    }, [turmaId, perfil?.role, perfil?.id]);
-
-    useEffect(() => {
-        void carregarPosts();
-        void carregarAtividades();
-    }, [carregarPosts, carregarAtividades]);
-
-    const handlePublicar = async () => {
-        if (!conteudo.trim()) return;
-
-        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
-            toast.error("Erro de autenticação", {
-                description: "Não foi possível salvar a publicação."
-            });
-            return;
-        }
-
-        try {
-            const { data, error } = await supabase
-                .from("mural_posts")
-                .insert({
-                    turma_id: turmaId,
-                    autor_id: perfil.id,
-                    conteudo: conteudo.trim(),
-                })
-                .select(`
-                    id,
-                    conteudo,
-                    created_at,
-                    perfis:autor_id (
-                        id,
-                        nome,
-                        email,
-                        bio,
-                        foto_url,
-                        role,
-                        created_at
-                    )
-                `)
-                .single();
-
-            if (error) throw error;
-
-            const perfilAutor = Array.isArray(data.perfis) ? data.perfis[0] : data.perfis;
-            const novoPost: Post = {
-                id: data.id,
-                Nome: perfilAutor?.nome || perfil.nome,
-                conteudo: data.conteudo,
-                data: new Date(data.created_at).toLocaleString("pt-BR"),
-                autor: perfilAutor ? (perfilAutor as PerfilUsuario) : perfil,
-            };
-
-            setPosts((anterior) => ({
-                ...anterior,
-                posts: [...anterior.posts, novoPost],
-            }));
-            setConteudo("");
-            mudarAberturaBox(false);
-            abrirMural();
-            toast.success("Publicado com sucesso!");
-        } catch (err: any) {
-            console.error("Erro ao criar post:", err);
-            toast.error("Erro ao publicar", {
-                description: err.message || "Tente novamente."
-            });
-        }
-    };
-
-    const publicarAtividade = async (titulo: string, descricao: string, dataEntrega: string | null, arquivos: File[]) => {
-        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
-            toast.error("Erro de autenticação", {
-                description: "Não foi possível salvar a atividade."
-            });
-            return;
-        }
-
-        try {
-            const urls: string[] = [];
-
-            if (arquivos && arquivos.length > 0) {
-                for (const file of arquivos) {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('anexos_atividades')
-                        .upload(fileName, file);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: publicUrlData } = supabase.storage
-                        .from('anexos_atividades')
-                        .getPublicUrl(fileName);
-
-                    if (publicUrlData?.publicUrl) {
-                        urls.push(publicUrlData.publicUrl);
-                    }
-                }
-            }
-
-            const anexoUrl = urls.length > 0 ? JSON.stringify(urls) : null;
-
-            const { data, error } = await supabase
-                .from("atividades")
-                .insert({
-                    turma_id: turmaId,
-                    professor_id: perfil.id,
-                    titulo: titulo.trim(),
-                    descricao: descricao.trim(),
-                    data_entrega: dataEntrega ? new Date(dataEntrega).toISOString() : null,
-                    anexo_url: anexoUrl,
-                })
-                .select(`
-                    id,
-                    turma_id,
-                    professor_id,
-                    titulo,
-                    descricao,
-                    data_entrega,
-                    created_at,
-                    anexo_url,
-                    perfis:professor_id (
-                        nome
-                    )
-                `)
-                .single();
-
-            if (error) throw error;
-
-            const perfilProf = Array.isArray(data.perfis) ? data.perfis[0] : data.perfis;
-            const novaAtividade: Atividade = {
-                id: data.id,
-                turma_id: data.turma_id,
-                professor_id: data.professor_id,
-                titulo: data.titulo,
-                descricao: data.descricao,
-                data_entrega: data.data_entrega,
-                created_at: data.created_at,
-                anexo_url: data.anexo_url,
-                professor_nome: perfilProf?.nome || perfil.nome,
-            };
-
-            setAtividades((anterior) => [novaAtividade, ...anterior]);
-            toast.success("Atividade criada com sucesso!");
-        } catch (err: any) {
-            console.error("Erro ao criar atividade:", err);
-            toast.error("Erro ao criar atividade", {
-                description: err.message || "Tente novamente."
-            });
-            throw err;
-        }
-    };
-
-    const deletarAtividade = async (atividadeId: string) => {
-        if (!hasSupabaseConfig || !supabase) return;
-
-        try {
-            // 1. Deletar os arquivos de entrega dos alunos no storage
-            const { data: entregas, error: erroEntregas } = await supabase
-                .from("entregas_atividades")
-                .select("url_anexo")
-                .eq("atividade_id", atividadeId);
-
-            if (!erroEntregas && entregas && entregas.length > 0) {
-                const caminhosEntregas = entregas
-                    .map((ent) => ent.url_anexo)
-                    .filter(Boolean) as string[];
-                
-                if (caminhosEntregas.length > 0) {
-                    const { error: errorDeletarEntregasStorage } = await supabase.storage
-                        .from("entregas_atividades")
-                        .remove(caminhosEntregas);
-                    if (errorDeletarEntregasStorage) {
-                        console.error("Erro ao deletar arquivos de entregas no storage:", errorDeletarEntregasStorage);
-                    }
-                }
-            }
-
-            // 2. Deletar os arquivos vinculados a esta atividade do storage (Professor)
-            const atividadeExistente = atividades.find((a) => a.id === atividadeId);
-            if (atividadeExistente) {
-                const urlsOriginais = extrairUrlsAnexo(atividadeExistente.anexo_url);
-                if (urlsOriginais.length > 0) {
-                    const caminhosParaDeletar = urlsOriginais.map(obterNomeArquivoDoUrl).filter(Boolean);
-                    if (caminhosParaDeletar.length > 0) {
-                        const { error: deleteStorageError } = await supabase.storage
-                            .from('anexos_atividades')
-                            .remove(caminhosParaDeletar);
-                        if (deleteStorageError) {
-                            console.error("Erro ao deletar arquivos do storage:", deleteStorageError);
-                            toast.error("Erro ao remover arquivos do storage", {
-                                description: deleteStorageError.message
-                            });
-                        }
-                    }
-                }
-            }
-
-            // 3. Deletar a atividade do banco de dados (o que deleta os registros da tabela entregas em cascata)
-            const { error } = await supabase
-                .from("atividades")
-                .delete()
-                .eq("id", atividadeId);
-
-            if (error) throw error;
-
-            setAtividades((anterior) => anterior.filter((a) => a.id !== atividadeId));
-            toast.success("Atividade excluída com sucesso!");
-        } catch (err: any) {
-            console.error("Erro ao excluir atividade:", err);
-            toast.error("Erro ao excluir atividade", {
-                description: err.message || "Tente novamente."
-            });
-        }
-    };
-
-    const editarAtividade = async (
-        atividadeId: string,
-        titulo: string,
-        descricao: string,
-        dataEntrega: string | null,
-        arquivos: File[],
-        urlsMantidas: string[]
-    ) => {
-        if (!hasSupabaseConfig || !supabase) return;
-
-        try {
-            // Obter arquivos que foram removidos pelo usuário na edição
-            const atividadeExistente = atividades.find((a) => a.id === atividadeId);
-            if (atividadeExistente) {
-                const urlsOriginais = extrairUrlsAnexo(atividadeExistente.anexo_url);
-                const urlsRemovidas = urlsOriginais.filter((url) => !urlsMantidas.includes(url));
-                
-                if (urlsRemovidas.length > 0) {
-                    const caminhosParaDeletar = urlsRemovidas.map(obterNomeArquivoDoUrl).filter(Boolean);
-                    if (caminhosParaDeletar.length > 0) {
-                        const { error: deleteStorageError } = await supabase.storage
-                            .from('anexos_atividades')
-                            .remove(caminhosParaDeletar);
-                        if (deleteStorageError) {
-                            console.error("Erro ao deletar arquivos do storage:", deleteStorageError);
-                            toast.error("Erro ao remover arquivos antigos do storage", {
-                                description: deleteStorageError.message
-                            });
-                        }
-                    }
-                }
-            }
-
-            const novasUrls: string[] = [];
-
-            if (arquivos && arquivos.length > 0) {
-                for (const file of arquivos) {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('anexos_atividades')
-                        .upload(fileName, file);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: publicUrlData } = supabase.storage
-                        .from('anexos_atividades')
-                        .getPublicUrl(fileName);
-
-                    if (publicUrlData?.publicUrl) {
-                        novasUrls.push(publicUrlData.publicUrl);
-                    }
-                }
-            }
-
-            const urlsFinais = [...urlsMantidas, ...novasUrls];
-            const anexoUrl = urlsFinais.length > 0 ? JSON.stringify(urlsFinais) : null;
-
-            const { data, error } = await supabase
-                .from("atividades")
-                .update({
-                    titulo: titulo.trim(),
-                    descricao: descricao.trim(),
-                    data_entrega: dataEntrega ? new Date(dataEntrega).toISOString() : null,
-                    anexo_url: anexoUrl,
-                })
-                .eq("id", atividadeId)
-                .select(`
-                    id,
-                    turma_id,
-                    professor_id,
-                    titulo,
-                    descricao,
-                    data_entrega,
-                    created_at,
-                    anexo_url,
-                    perfis:professor_id (
-                        nome
-                    )
-                `)
-                .single();
-
-            if (error) throw error;
-
-            const perfilProf = Array.isArray(data.perfis) ? data.perfis[0] : data.perfis;
-            const atividadeAtualizada: Atividade = {
-                id: data.id,
-                turma_id: data.turma_id,
-                professor_id: data.professor_id,
-                titulo: data.titulo,
-                descricao: data.descricao,
-                data_entrega: data.data_entrega,
-                created_at: data.created_at,
-                anexo_url: data.anexo_url,
-                professor_nome: perfilProf?.nome || perfil.nome,
-            };
-
-            setAtividades((anterior) =>
-                anterior.map((a) => (a.id === atividadeId ? atividadeAtualizada : a))
-            );
-            toast.success("Atividade atualizada com sucesso!");
-        } catch (err: any) {
-            console.error("Erro ao atualizar atividade:", err);
-            toast.error("Erro ao atualizar atividade", {
-                description: err.message || "Tente novamente."
-            });
-            throw err;
-        }
-    };
-
-    const handleCancelar = () => {
-        setConteudo("");
-        setAssunto("");
-        mudarAberturaBox(false);
-        abrirMural();
-    };
-
-    const abrirMural = () => {
-        setPosts((anterior) => ({ ...anterior, tipoAmostar: "mural" }));
-        setOpcaoSelecionada("mural");
-    };
-
-    const abrirAtividades = () => {
-        setPosts((anterior) => ({ ...anterior, tipoAmostar: "atividade" }));
-        setOpcaoSelecionada("atividade");
-    };
-
-    const abrirContato = () => {
-        setPosts((anterior) => ({ ...anterior, tipoAmostar: "contato", boxAberto: true }));
-        setOpcaoSelecionada("contato");
-    };
-
-    const enviarMensagemContato = async (assuntoText: string, mensagemText: string, arquivos: File[]) => {
-        if (!hasSupabaseConfig || !supabase || !perfil?.id) {
-            toast.error("Erro de autenticação", {
-                description: "Não foi possível enviar a mensagem."
-            });
-            return;
-        }
-
-        try {
-            // 1. Buscar o professor da turma
-            const { data: profRel, error: profRelError } = await supabase
-                .from("professor_turma")
-                .select("professor_id")
-                .eq("turma_id", turmaId)
-                .maybeSingle();
-
-            if (profRelError || !profRel) {
-                throw new Error("Professor desta turma não encontrado.");
-            }
-
-            // 2. Upload de arquivos para o bucket 'duvidasalunostoprofessor'
-            const urls: string[] = [];
-            if (arquivos && arquivos.length > 0) {
-                for (const file of arquivos) {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('duvidasalunostoprofessor')
-                        .upload(fileName, file);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: publicUrlData } = supabase.storage
-                        .from('duvidasalunostoprofessor')
-                        .getPublicUrl(fileName);
-
-                    if (publicUrlData?.publicUrl) {
-                        urls.push(publicUrlData.publicUrl);
-                    }
-                }
-            }
-
-            const anexoUrl = urls.length > 0 ? JSON.stringify(urls) : null;
-
-            // 3. Inserir na tabela duvidasalunostoprofessor
-            const { error: insertError } = await supabase
-                .from("duvidasalunostoprofessor")
-                .insert({
-                    aluno_id: perfil.id,
-                    prof_id: profRel.professor_id,
-                    turma_id: turmaId,
-                    assunto: assuntoText.trim(),
-                    descricao: mensagemText.trim(),
-                    anexo_url: anexoUrl,
-                    resolvido: false,
-                });
-
-            if (insertError) throw insertError;
-
-            toast.success("Mensagem enviada com sucesso!");
-            setConteudo("");
-            setAssunto("");
-            setPosts((anterior) => ({ ...anterior, boxAberto: false }));
-            abrirMural();
-        } catch (err: any) {
-            console.error("Erro ao enviar mensagem:", err);
-            toast.error("Erro ao enviar mensagem", {
-                description: err.message || "Tente novamente."
-            });
-            throw err;
-        }
-    };
-
-    const abrirAlunos = () => {
-        setPosts((anterior) => ({ ...anterior, tipoAmostar: "alunos" }));
-        setOpcaoSelecionada("alunos");
-    };
-
-    const deletarPost = async (postId: string) => {
-        if (!hasSupabaseConfig || !supabase) return;
-
-        try {
-            const { error } = await supabase
-                .from("mural_posts")
-                .delete()
-                .eq("id", postId);
-
-            if (error) throw error;
-
-            setPosts((anterior) => ({
-                ...anterior,
-                posts: anterior.posts.filter((p) => p.id !== postId),
-            }));
-            toast.success("Publicação excluída com sucesso!");
-        } catch (err: any) {
-            console.error("Erro ao excluir post:", err);
-            toast.error("Erro ao excluir", {
-                description: err.message || "Tente novamente."
-            });
-        }
-    };
-
-    useEffect(() => {
-        carregarPosts();
-        carregarAtividades();
-    }, [carregarPosts, carregarAtividades]);
-
-useEffect(() => {
-        if (!hasSupabaseConfig || !supabase || !turmaId || !perfil) return;
-
-        const muralSubject = new NotificacaoSubject();
-        const cancelarToastObserver = muralSubject.inscrever(
-            new ToastNotificacaoObserver({
-                usuarioIdAtual: perfil.id,
-                toastFn: toast,
-                aoCarregarPosts: () => void carregarPosts(),
-                aoCarregarAtividades: () => void carregarAtividades(),
-            })
+  const carregarPosts = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase || !turmaId) return;
+
+    try {
+      const postsFormatados = await muralRepository.listarPosts(turmaId);
+      setPosts((anterior) => ({
+        ...anterior,
+        posts: postsFormatados,
+      }));
+    } catch (err: unknown) {
+      console.error("Erro ao carregar posts:", err);
+      toast.error("Erro ao carregar posts", {
+        description: "Não foi possível carregar as publicações do mural.",
+      });
+    }
+  }, [turmaId]);
+
+  const carregarAtividades = useCallback(async () => {
+    if (!hasSupabaseConfig || !supabase || !turmaId) return;
+
+    try {
+      setLoadingAtividades(true);
+      const atividadesFormatadas =
+        await atividadeRepository.listarPorTurma(turmaId);
+      setAtividades(atividadesFormatadas);
+
+      if (perfil?.role === "aluno" && perfil?.id) {
+        const entregues = await atividadeRepository.listarEntregasDoAluno(
+          perfil.id,
         );
-        const cancelarRefreshObserver = muralSubject.inscrever(
-            new StateRefreshObserver({
-                usuarioIdAtual: perfil.id,
-                aoRecarregarAtividades: () => void carregarAtividades(),
-            })
-        );
-        const desconectarCanais = conectarCanaisMuralRealtime(supabase, muralSubject, {
-            turmaId,
-            alunoId: perfil.id,
-        });
+        setAtividadesEntregues(entregues);
+      }
+    } catch (err: unknown) {
+      console.error("Erro ao carregar atividades:", err);
+      toast.error("Erro ao carregar atividades", {
+        description: "Não foi possível carregar as atividades da turma.",
+      });
+    } finally {
+      setLoadingAtividades(false);
+    }
+  }, [turmaId, perfil?.role, perfil?.id]);
 
-        return () => {
-            cancelarToastObserver();
-            cancelarRefreshObserver();
-            desconectarCanais();
-        };
-    }, [turmaId, perfil?.id, carregarPosts, carregarAtividades, hasSupabaseConfig, supabase]);
+  useEffect(() => {
+    void carregarPosts();
+    void carregarAtividades();
+  }, [carregarPosts, carregarAtividades]);
 
-    return {
-        opcaoSelecionada,
-        posts,
-        atividades,
-        atividadesEntregues,
-        loadingAtividades,
+  const abrirMural = () => {
+    setPosts((anterior) => ({ ...anterior, tipoAmostar: "mural" }));
+    setOpcaoSelecionada("mural");
+  };
+
+  const abrirAtividades = () => {
+    setPosts((anterior) => ({ ...anterior, tipoAmostar: "atividade" }));
+    setOpcaoSelecionada("atividade");
+  };
+
+  const abrirContato = () => {
+    setPosts((anterior) => ({
+      ...anterior,
+      tipoAmostar: "contato",
+      boxAberto: true,
+    }));
+    setOpcaoSelecionada("contato");
+  };
+
+  const abrirAlunos = () => {
+    setPosts((anterior) => ({ ...anterior, tipoAmostar: "alunos" }));
+    setOpcaoSelecionada("alunos");
+  };
+
+  const handlePublicar = async () => {
+    if (!conteudo.trim()) return;
+
+    if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+      toast.error("Erro de autenticação", {
+        description: "Não foi possível salvar a publicação.",
+      });
+      return;
+    }
+
+    try {
+      const novoPost = await muralRepository.criarPost(
+        turmaId,
+        perfil.id,
         conteudo,
-        setConteudo,
-        assunto,
-        setAssunto,
-        mudarAberturaBox,
-        handlePublicar,
-        handleCancelar,
-        abrirMural,
-        abrirAtividades,
-        abrirContato,
-        enviarMensagemContato,
-        abrirAlunos,
-        deletarPost,
-        publicarAtividade,
-        deletarAtividade,
-        carregarAtividades,
-        editarAtividade,
-        atividadesEntregasAbertas,
-        alternarAreaEntrega,
+      );
+      setPosts((anterior) => ({
+        ...anterior,
+        posts: [...anterior.posts, novoPost],
+      }));
+      setConteudo("");
+      mudarAberturaBox(false);
+      abrirMural();
+      toast.success("Publicado com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao criar post:", err);
+      toast.error("Erro ao publicar", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+    }
+  };
+
+  const publicarAtividade = async (
+    titulo: string,
+    descricao: string,
+    dataEntrega: string | null,
+    arquivos: File[],
+  ) => {
+    if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+      toast.error("Erro de autenticação", {
+        description: "Não foi possível salvar a atividade.",
+      });
+      return;
+    }
+
+    if (!dataEntrega) {
+      toast.error("Data de entrega obrigatória", {
+        description: "Informe a data e hora limite para entrega da atividade.",
+      });
+      return;
+    }
+
+    try {
+      const novaAtividade = await atividadeRepository.criar(
+        {
+          idTurma: turmaId,
+          idProfessor: perfil.id,
+          titulo,
+          descricao,
+          dataEntrega,
+        },
+        arquivos,
+      );
+
+      setAtividades((anterior) => [novaAtividade, ...anterior]);
+      toast.success("Atividade criada com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao criar atividade:", err);
+      toast.error("Erro ao criar atividade", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+      throw err;
+    }
+  };
+
+  const deletarAtividade = async (atividadeId: string) => {
+    if (!hasSupabaseConfig || !supabase) return;
+
+    const atividadeExistente = atividades.find((a) => a.id === atividadeId);
+    if (!atividadeExistente) return;
+
+    try {
+      await atividadeRepository.excluir(atividadeExistente);
+      setAtividades((anterior) => anterior.filter((a) => a.id !== atividadeId));
+      toast.success("Atividade excluída com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao excluir atividade:", err);
+      toast.error("Erro ao excluir atividade", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+    }
+  };
+
+  const editarAtividade = async (
+    atividadeId: string,
+    titulo: string,
+    descricao: string,
+    dataEntrega: string | null,
+    arquivos: File[],
+    anexosMantidos: AnexoRef[],
+  ) => {
+    if (!hasSupabaseConfig || !supabase) return;
+
+    if (!dataEntrega) {
+      toast.error("Data de entrega obrigatória", {
+        description: "Informe a data e hora limite para entrega da atividade.",
+      });
+      return;
+    }
+
+    const atividadeExistente = atividades.find((a) => a.id === atividadeId);
+    const idsMantidos = new Set(anexosMantidos.map((a) => a.idObjeto));
+    const anexosRemovidos = (atividadeExistente?.anexos ?? []).filter(
+      (a) => !idsMantidos.has(a.idObjeto),
+    );
+
+    try {
+      const atividadeAtualizada = await atividadeRepository.editar(
+        atividadeId,
+        { titulo, descricao, dataEntrega },
+        arquivos,
+        anexosRemovidos,
+        anexosMantidos,
+      );
+
+      setAtividades((anterior) =>
+        anterior.map((a) => (a.id === atividadeId ? atividadeAtualizada : a)),
+      );
+      toast.success("Atividade atualizada com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao atualizar atividade:", err);
+      toast.error("Erro ao atualizar atividade", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+      throw err;
+    }
+  };
+
+  const handleCancelar = () => {
+    setConteudo("");
+    setAssunto("");
+    mudarAberturaBox(false);
+    abrirMural();
+  };
+
+  const enviarMensagemContato = async (
+    assuntoText: string,
+    mensagemText: string,
+    arquivos: File[],
+  ) => {
+    if (!hasSupabaseConfig || !supabase || !perfil?.id) {
+      toast.error("Erro de autenticação", {
+        description: "Não foi possível enviar a mensagem.",
+      });
+      return;
+    }
+
+    try {
+      await duvidaRepository.criar(
+        {
+          idAluno: perfil.id,
+          idTurma: turmaId,
+          assunto: assuntoText,
+          descricao: mensagemText,
+        },
+        arquivos,
+      );
+
+      toast.success("Mensagem enviada com sucesso!");
+      setConteudo("");
+      setAssunto("");
+      setPosts((anterior) => ({ ...anterior, boxAberto: false }));
+      abrirMural();
+    } catch (err: unknown) {
+      console.error("Erro ao enviar mensagem:", err);
+      toast.error("Erro ao enviar mensagem", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+      throw err;
+    }
+  };
+
+  const deletarPost = async (postId: string) => {
+    if (!hasSupabaseConfig || !supabase) return;
+
+    try {
+      await muralRepository.excluirPost(postId);
+      setPosts((anterior) => ({
+        ...anterior,
+        posts: anterior.posts.filter((p) => p.id !== postId),
+      }));
+      toast.success("Publicação excluída com sucesso!");
+    } catch (err: unknown) {
+      console.error("Erro ao excluir post:", err);
+      toast.error("Erro ao excluir", {
+        description: extrairMensagemErroRepo(err, "Tente novamente."),
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!hasSupabaseConfig || !supabase || !turmaId || !perfil) return;
+
+    const muralSubject = new NotificacaoSubject();
+    const cancelarToastObserver = muralSubject.inscrever(
+      new ToastNotificacaoObserver({
+        usuarioIdAtual: perfil.id,
+        toastFn: toast,
+        aoCarregarPosts: () => void carregarPosts(),
+        aoCarregarAtividades: () => void carregarAtividades(),
+      }),
+    );
+    const cancelarRefreshObserver = muralSubject.inscrever(
+      new StateRefreshObserver({
+        usuarioIdAtual: perfil.id,
+        aoRecarregarAtividades: () => void carregarAtividades(),
+      }),
+    );
+    const desconectarCanais = conectarCanaisMuralRealtime(
+      supabase,
+      muralSubject,
+      {
+        turmaId,
+        alunoId: perfil.id,
+      },
+    );
+
+    return () => {
+      cancelarToastObserver();
+      cancelarRefreshObserver();
+      desconectarCanais();
     };
+  }, [turmaId, perfil, carregarPosts, carregarAtividades]);
+
+  return {
+    opcaoSelecionada,
+    posts,
+    atividades,
+    atividadesEntregues,
+    loadingAtividades,
+    conteudo,
+    setConteudo,
+    assunto,
+    setAssunto,
+    mudarAberturaBox,
+    handlePublicar,
+    handleCancelar,
+    abrirMural,
+    abrirAtividades,
+    abrirContato,
+    enviarMensagemContato,
+    abrirAlunos,
+    deletarPost,
+    publicarAtividade,
+    deletarAtividade,
+    carregarAtividades,
+    editarAtividade,
+    atividadesEntregasAbertas,
+    alternarAreaEntrega,
+  };
 }

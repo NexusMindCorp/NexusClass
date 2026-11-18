@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient"
+import { comunicacaoRepository } from "@/repositories"
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type"
 import { toast } from "sonner"
 import type { Mensagem, ConversaResumo } from "@/hooks/MensagensHooks/type"
@@ -11,8 +12,6 @@ import {
     conectarCanalMensagensRealtime,
 } from "@/patterns/observer/NotificacaoSubject"
 import {
-    ASSUNTO_MENSAGEM_PADRAO,
-    TABELA_MENSAGENS,
     chaveMensagensLidas,
     chaveMensagensOcultas,
 } from "@/hooks/MensagensHooks/config"
@@ -33,25 +32,17 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         setLoadingChat(true)
 
         try {
-            const { data, error } = await supabase
-                .from(TABELA_MENSAGENS)
-                .select("*")
-                .or(`remetente_id.eq.${perfil.id},destinatario_id.eq.${perfil.id}`)
-                .order("created_at", { ascending: true })
+            const data = await comunicacaoRepository.listarMensagens(perfil.id)
 
-            if (error) throw error
-
-            if (data) {
-                const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
-                const idsOcultos = obterSetLocalStorage(chaveMensagensOcultas(perfil.id))
-                const historico = (data as Mensagem[])
-                    .filter((mensagem) => !idsOcultos.has(mensagem.id))
-                    .map((mensagem) => ({
-                        ...mensagem,
-                        lida: mensagem.lida || idsLidos.has(mensagem.id),
-                    }))
-                setMensagens(historico)
-            }
+            const idsLidos = obterSetLocalStorage(chaveMensagensLidas(perfil.id))
+            const idsOcultos = obterSetLocalStorage(chaveMensagensOcultas(perfil.id))
+            const historico = data
+                .filter((mensagem) => !idsOcultos.has(mensagem.id))
+                .map((mensagem) => ({
+                    ...mensagem,
+                    lida: mensagem.lida || idsLidos.has(mensagem.id),
+                }))
+            setMensagens(historico)
         } catch {
             toast.error("Erro no Chat", { description: "Não foi possível carregar seu histórico de conversas." })
         } finally {
@@ -63,18 +54,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         if (!hasSupabaseConfig || !supabase || !perfil?.id || !conteudoTexto.trim()) return
 
         try {
-            const { error } = await supabase
-                .from(TABELA_MENSAGENS)
-                .insert({
-                    remetente_id: perfil.id,
-                    destinatario_id: destinatarioId,
-                    conteudo: conteudoTexto.trim(),
-                    lida: false,
-                    assunto: ASSUNTO_MENSAGEM_PADRAO,
-                })
-
-            if (error) throw error
-
+            await comunicacaoRepository.enviarMensagem(perfil.id, destinatarioId, conteudoTexto)
         } catch (error: unknown) {
             toast.error("Mensagem não enviada", { description: "Verifique sua conexão e tente novamente." })
             throw error
@@ -104,15 +84,7 @@ export function useMensagens(perfil: PerfilUsuario | null) {
         )
 
         try {
-            const { error } = await supabase
-                .from(TABELA_MENSAGENS)
-                .update({ lida: true })
-                .eq("remetente_id", contatoId)
-                .eq("destinatario_id", perfil.id)
-                .eq("lida", false)
-                .select("id")
-
-            if (error) throw error
+            await comunicacaoRepository.marcarMensagensComoLidas(contatoId, perfil.id)
         } catch {
             // Falha silenciosa na sincronização de leitura em background
         }

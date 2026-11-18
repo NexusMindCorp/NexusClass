@@ -11,7 +11,6 @@ import {
   MessageSquare,
   Funnel,
 } from "lucide-react";
-import { obterUrlsAnexo, obterNomeArquivoDoUrl } from "./BoxAtividade";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -132,7 +131,7 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
       <div className="space-y-4">
         {duvidasFiltradasPorStatus.length > 0 ? (
           duvidasFiltradasPorStatus.map((duvida) => {
-            const attachments = obterUrlsAnexo(duvida.anexo_url);
+            const attachments = duvida.anexos ?? [];
             const isProfessor = perfil?.role === "professor";
             const isMaster = perfil?.role === "master";
             const isOwner = perfil?.id === duvida.aluno_id;
@@ -220,18 +219,16 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
                       Arquivos Anexados
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {attachments.map((url, idx) => (
+                      {attachments.map((anexo) => (
                         <a
-                          key={idx}
-                          href={url}
+                          key={anexo.idObjeto}
+                          href={anexo.urlAssinada ?? "#"}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border bg-background text-xs text-foreground hover:bg-muted transition-colors max-w-xs truncate"
                         >
                           <Paperclip className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="truncate">
-                            {obterNomeArquivoDoUrl(url)}
-                          </span>
+                          <span className="truncate">{anexo.nome}</span>
                           <Download className="h-3 w-3 ml-0.5 text-muted-foreground shrink-0" />
                         </a>
                       ))}

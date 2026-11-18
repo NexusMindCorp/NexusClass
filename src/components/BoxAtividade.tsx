@@ -6,6 +6,7 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, X, Upload, Paperclip, Trash2 } from "lucide-react";
 import type { Atividade } from "@/hooks/MuralHooks/type";
+import type { AnexoRef } from "@/lib/db/mappers";
 
 type BoxAtividadeProps = {
   materia: string;
@@ -24,36 +25,9 @@ type BoxAtividadeProps = {
     descricao: string,
     dataEntrega: string | null,
     arquivos: File[],
-    urlsMantidas: string[],
+    anexosMantidos: AnexoRef[],
   ) => Promise<void>;
 };
-
-
-export function obterUrlsAnexo(anexoUrl: string | null): string[] {
-  if (!anexoUrl) return [];
-  try {
-    if (anexoUrl.startsWith("[") && anexoUrl.endsWith("]")) {
-      const parsed = JSON.parse(anexoUrl);
-      if (Array.isArray(parsed)) return parsed;
-    }
-    return [anexoUrl];
-  } catch {
-    return [anexoUrl];
-  }
-}
-
-export function obterNomeArquivoDoUrl(url: string): string {
-  try {
-    const decoded = decodeURIComponent(url);
-    const parts = decoded.split("/");
-    const lastPart = parts[parts.length - 1];
-
-    const cleanName = lastPart.replace(/^\d+-[a-z0-9]+-/, "");
-    return cleanName || lastPart;
-  } catch {
-    return "Arquivo Anexo";
-  }
-}
 
 export function BoxAtividade({
   materia,
@@ -67,7 +41,7 @@ export function BoxAtividade({
   const [descricao, setDescricao] = useState("");
   const [dataEntrega, setDataEntrega] = useState("");
   const [arquivos, setArquivos] = useState<File[]>([]);
-  const [urlsMantidas, setUrlsMantidas] = useState<string[]>([]);
+  const [anexosMantidos, setAnexosMantidos] = useState<AnexoRef[]>([]);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -75,7 +49,7 @@ export function BoxAtividade({
     if (atividadeParaEditar && aberto) {
       setTitulo(atividadeParaEditar.titulo);
       setDescricao(atividadeParaEditar.descricao);
-      setUrlsMantidas(obterUrlsAnexo(atividadeParaEditar.anexo_url));
+      setAnexosMantidos(atividadeParaEditar.anexos ?? []);
 
       if (atividadeParaEditar.data_entrega) {
         const date = new Date(atividadeParaEditar.data_entrega);
@@ -93,7 +67,7 @@ export function BoxAtividade({
       setDescricao("");
       setDataEntrega("");
       setArquivos([]);
-      setUrlsMantidas([]);
+      setAnexosMantidos([]);
     }
   }, [atividadeParaEditar, aberto]);
 
@@ -110,12 +84,12 @@ export function BoxAtividade({
     setArquivos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const removerUrlMantida = (urlToRemove: string) => {
-    setUrlsMantidas((prev) => prev.filter((url) => url !== urlToRemove));
+  const removerAnexoMantido = (idObjeto: string) => {
+    setAnexosMantidos((prev) => prev.filter((item) => item.idObjeto !== idObjeto));
   };
 
   const handleConfirm = async () => {
-    if (!titulo.trim() || !descricao.trim()) return;
+    if (!titulo.trim() || !descricao.trim() || !dataEntrega) return;
 
     try {
       setLoading(true);
@@ -124,18 +98,18 @@ export function BoxAtividade({
           atividadeParaEditar.id,
           titulo,
           descricao,
-          dataEntrega || null,
+          dataEntrega,
           arquivos,
-          urlsMantidas,
+          anexosMantidos,
         );
       } else {
-        await onPublicar(titulo, descricao, dataEntrega || null, arquivos);
+        await onPublicar(titulo, descricao, dataEntrega, arquivos);
       }
       setTitulo("");
       setDescricao("");
       setDataEntrega("");
       setArquivos([]);
-      setUrlsMantidas([]);
+      setAnexosMantidos([]);
       onClose();
     } catch (err) {
       console.error("Erro ao salvar atividade:", err);
@@ -193,11 +167,13 @@ export function BoxAtividade({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="atividade-data">
-                  Data de Entrega
+                  Data de Entrega *
                 </FieldLabel>
                 <input
                   id="atividade-data"
                   type="datetime-local"
+                  required
+                  aria-invalid={!dataEntrega}
                   value={dataEntrega}
                   onChange={(e) => setDataEntrega(e.target.value)}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
@@ -226,27 +202,27 @@ export function BoxAtividade({
             </div>
 
             {/* Empilhamento de Anexos */}
-            {(urlsMantidas.length > 0 || arquivos.length > 0) && (
+            {(anexosMantidos.length > 0 || arquivos.length > 0) && (
               <div className="space-y-2 pt-2">
                 <FieldLabel>
-                  Arquivos Anexados ({urlsMantidas.length + arquivos.length})
+                  Arquivos Anexados ({anexosMantidos.length + arquivos.length})
                 </FieldLabel>
                 <div className="border border-border/80 rounded-lg bg-muted/20 p-3 max-h-[160px] overflow-y-auto space-y-1.5">
                   {/* Anexos Existentes (Em edição) */}
-                  {urlsMantidas.map((url, i) => (
+                  {anexosMantidos.map((anexo) => (
                     <div
-                      key={`url-${i}`}
+                      key={anexo.idObjeto}
                       className="flex items-center justify-between p-1.5 rounded bg-background border border-border/60 text-xs gap-3"
                     >
                       <span className="flex items-center gap-1.5 truncate text-foreground font-medium">
                         <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        {obterNomeArquivoDoUrl(url)}
+                        {anexo.nome}
                       </span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => removerUrlMantida(url)}
+                        onClick={() => removerAnexoMantido(anexo.idObjeto)}
                         className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -296,7 +272,7 @@ export function BoxAtividade({
           <Button
             className="cursor-pointer"
             onClick={handleConfirm}
-            disabled={!titulo.trim() || !descricao.trim() || loading}
+            disabled={!titulo.trim() || !descricao.trim() || !dataEntrega || loading}
           >
             {loading ? (
               <>

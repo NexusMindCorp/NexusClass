@@ -35,6 +35,7 @@ import { Button } from "./ui/button";
 import { useTheme } from "./provedores/ThemeProvider";
 import { SidebarTrigger } from "./ui/sidebar";
 import { supabase } from "@/lib/supabaseClient";
+import { perfilRepository } from "@/repositories";
 import { toast } from "sonner";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { IndicadoresNotificacao } from "@/hooks/NotificacoesHooks/type";
@@ -92,20 +93,12 @@ export function Navbar({
     setSalvando(true);
 
     try {
-      const { data, error } = await supabase
-        .from("perfis")
-        .update({ foto_url: fotoInput || null, bio: bioInput })
-        .eq("id", perfil.id)
-        .select()
-        .single();
+      const perfilAtualizado = await perfilRepository.atualizarDados(perfil.id, {
+        foto_url: fotoInput || null,
+        bio: bioInput,
+      });
 
-      if (error) throw error;
-
-      if (!data) {
-        throw new Error("Não autorizado. Verifique sua sessão.");
-      }
-
-      atualizarPerfilLocal(data as PerfilUsuario);
+      atualizarPerfilLocal(perfilAtualizado);
 
       toast.success("Perfil atualizado!", {
         description: "Suas informações foram salvas com sucesso.",
