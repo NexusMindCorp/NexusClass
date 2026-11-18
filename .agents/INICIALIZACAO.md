@@ -24,7 +24,7 @@
 | [rules/](rules/) | Políticas: ciclo de vida, infraestrutura, testes, relatórios, segurança, code-guidelines |
 | [features/](features/) | Specs de cada refatoração/padrão (template + 1 por padrão) |
 | [decisions/](decisions/) | ADRs (template + 1 por padrão escolhido) |
-| [troubleshooting/](troubleshooting/) | Guias de erro |
+| [troubleshooting/](troubleshooting/) | Guias de erro: [`supabase-signup-429-rate-limit.md`](troubleshooting/supabase-signup-429-rate-limit.md) · [`vitest-tsc-eperm-sandbox-windows.md`](troubleshooting/vitest-tsc-eperm-sandbox-windows.md) |
 
 ## Tabela de Features (Plano de Refatoração)
 | Fase | Feature | Status | Responsável (Última Mod.) | Spec |
