@@ -147,7 +147,7 @@ export function BoxAgendamento({
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
           <Label htmlFor="horario-evento" className="text-foreground">
-            Horário (opcional)
+            Horário *
           </Label>
           <div className="flex w-full max-w-sm items-center gap-1.5 rounded-xl border border-input bg-background p-1.5 shadow-sm sm:gap-2 sm:px-2 sm:py-2">
             <div className="flex h-10 min-w-0 flex-1 items-center gap-1 rounded-lg bg-muted px-1.5 sm:gap-2 sm:px-2">
@@ -244,7 +244,7 @@ export function BoxAgendamento({
         </Button>
         <Button
           onClick={adicionarEvento}
-          disabled={!titulo.trim() || salvandoEvento || !usaSupabase}
+          disabled={!titulo.trim() || !horario.trim() || salvandoEvento || !usaSupabase}
           className="w-full cursor-pointer transition-colors sm:w-auto"
         >
           {salvandoEvento ? "Salvando..." : "Marcar evento"}

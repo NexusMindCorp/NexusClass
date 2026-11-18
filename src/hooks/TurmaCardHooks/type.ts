@@ -1,5 +1,6 @@
 import type { PerfilUsuario } from '@/hooks/AuthHooks/type';
 export type TurmasProps = {
+  id_escola?: string;
   materia: string;
   professor: string;
   banners: string;

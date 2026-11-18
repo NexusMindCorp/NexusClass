@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas";
+import { pode } from "@/lib/permissoes";
 import type { Duvida, DuvidasBoxProps } from "@/hooks/DuvidaHooks/type";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -134,7 +135,6 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
             const attachments = duvida.anexos ?? [];
             const isProfessor = perfil?.role === "professor";
             const isMaster = perfil?.role === "master";
-            const isOwner = perfil?.id === duvida.aluno_id;
 
             return (
               <Card
@@ -185,7 +185,7 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
                   </div>
 
                   {/* Botão Deletar */}
-                  {(isOwner || isProfessor || isMaster) && (
+                  {pode.excluirDuvida(perfil, duvida) && (
                     <Button
                       variant="ghost"
                       size="sm"

@@ -32,7 +32,10 @@ type VinculoPerfilJoin = {
 
 export interface IEscolaTurmaRepository {
   listarEscolas(): Promise<EscolaResumo[]>;
-  carregarDadosEscola(idEscola?: string | null): Promise<EscolaProps>;
+  carregarDadosEscola(
+    idEscola?: string | null,
+    role?: PerfilUsuario["role"],
+  ): Promise<EscolaProps>;
   listarTurmasProfessor(
     idProfessor: string,
     nomeProfessor: string,
@@ -70,7 +73,14 @@ export class EscolaTurmaRepository implements IEscolaTurmaRepository {
     }));
   }
 
-  async carregarDadosEscola(idEscola?: string | null): Promise<EscolaProps> {
+  async carregarDadosEscola(
+    idEscola?: string | null,
+    role?: PerfilUsuario["role"],
+  ): Promise<EscolaProps> {
+    if (role && role !== "master" && !idEscola) {
+      throw new Error("Usuário sem escola vinculada (RN11).");
+    }
+
     const client = resolverClienteSupabase(this.client);
 
     let escolaQuery = client

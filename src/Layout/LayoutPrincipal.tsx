@@ -17,7 +17,7 @@ export function LayoutPrincipal() {
     atualizarPerfilLocal: (perfilAtualizado: PerfilUsuario) => void
   }>()
   const { usuario, mudarInscricao, estaInscrito, marcarMural, navegarPara, abrirChat, loadingInscricoes } = useGerenciador(perfil)
-  const { listaEscolar } = useEscolaDados(perfil.id_escola)
+  const { listaEscolar } = useEscolaDados(perfil.id_escola, perfil.role)
   const { mensagens, conversas, enviarMensagem, marcarComoLidas, excluirConversa, totalMensagensNaoLidas } = useMensagens(perfil)
   const { indicadoresNotificacao, setIndicadoresNotificacao } = useNotificacoes(perfil.id)
   const chatBotRef = useRef<{ abrirComAjuda: () => void }>(null)

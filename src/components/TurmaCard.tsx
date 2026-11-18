@@ -10,9 +10,11 @@ import {
 import { ButtonGroup } from "./ui/button-group";
 import { PerfilAvatar } from "./PerfilAvatar";
 import type { TurmasProps } from "../hooks/TurmaCardHooks/type";
+import { pode } from "@/lib/permissoes";
 import { Plus } from "lucide-react";
 
 export function TurmaCard({
+  id_escola,
   materia,
   professor,
   banners,
@@ -27,6 +29,7 @@ export function TurmaCard({
   perfil,
 }: TurmasProps) {
   const isMaster = perfil?.role === "master";
+  const podeInscrever = pode.inscreverEmTurma(perfil, { id_escola });
 
   return (
     <Card
@@ -81,7 +84,7 @@ export function TurmaCard({
               </Button>
             </ButtonGroup>
           )
-        ) : (
+        ) : podeInscrever ? (
           <ButtonGroup className={compacto ? "w-full" : ""}>
             <Button
               onClick={() => clickInscrito?.()}
@@ -92,6 +95,10 @@ export function TurmaCard({
               Inscrever-se
             </Button>
           </ButtonGroup>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            Vinculação gerida pela coordenação
+          </span>
         )}
       </CardFooter>
     </Card>

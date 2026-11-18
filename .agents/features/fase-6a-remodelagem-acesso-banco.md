@@ -2,7 +2,7 @@
 
 - **Registro:** 2026-11-17
 - **Autor / Responsável:** Gianlucca Paiva (`GianluccaPaiva`)
-- **Status:** Em Andamento (Passo 6/10 concluído)
+- **Status:** Em Andamento (Passo 7/10 concluído)
 - **Risco (RBT):** Nível 3 (fronteira Supabase: Repositories, Facade, Observer, fluxo de entrega) + Nível 2 (mappers e permissões puros)
 - **Validação:** `npx tsc -b --noEmit` + `npx vitest run` (por passo); testes de RLS reais no Passo 9-B (final)
 - **Plano detalhado:** [`.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md`](../../.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md) · **ADR:** [ADR-009](../decisions/adr-009-camada-acesso-dados-esquema-normalizado.md)
@@ -19,7 +19,7 @@ Adequar a SPA ao esquema de `docker/constructionsSQL/01_esquema.sql` + `04_supab
 | 4 | `AnexoStorageFacade` + `EntregaAtividadeFacade` + 6 Repositories | **Concluído** (0 erros `tsc` nas Facades e Repositories) |
 | 5 | Migração dos hooks (Auth → Escola/Turma → Atividade/Entrega/Mural → Dúvida → Calendário → Mensagens → Denúncia/Suporte → Bots → slides) | **Concluído** (0 erros `tsc` em `src/`; `configEngenhariaSoftware.ts` no Passo 10) |
 | 6 | Observer com canais novos | **Concluído** (configuração declarativa + mapeamento dos payloads do banco) |
-| 7 | `permissoes.ts` (Proxy) + ajustes de UI autorizados | Pendente |
+| 7 | `permissoes.ts` (Proxy) + ajustes de UI autorizados | **Concluído** (`Login` com input direto `id_escola` sem expor lista de escolas, `BoxAgendamento` exigindo horário, `TurmaCard`/`ListagemConteudosInscritos`/`Mural`/`DuvidasBox` alinhados à RLS) |
 | 8 | Edge Function `deletar-conta` | Pendente |
 | 9-A | Testes unitários e de borda (cliente falso) | Pendente |
 | 10 | Doc viva, slides, relatório, UML | Pendente |
@@ -33,7 +33,7 @@ Adequar a SPA ao esquema de `docker/constructionsSQL/01_esquema.sql` + `04_supab
 - Não introduzir bibliotecas novas.
 
 ## 3. UI/UX (consistência arquitetural)
-Mudanças autorizadas pela dupla (Decisão 1): seletor de escola no cadastro (`Login.tsx`); `data_entrega` e `horario` obrigatórios; denúncia por `id_denunciado` (UUID); "Inscrever-se" visível só para aluno. Os demais textos e botões são preservados. Ações negadas pela RLS ficam ocultas via `permissoes.ts`.
+Mudanças autorizadas pela dupla (Decisão 1 + solicitação de 2026-11-17): campo numérico obrigatório `id_escola` no cadastro (`Login.tsx`, sem expor a lista pública de escolas); `data_entrega` e `horario` obrigatórios; denúncia por `id_denunciado` (UUID); "Inscrever-se" visível só para aluno da mesma escola. Os demais textos e botões são preservados. Ações negadas pela RLS ficam ocultas via `permissoes.ts`.
 
 ## 4. Acessibilidade
 O novo seletor de escola usa o `Select` Radix/Shadcn existente (navegação por teclado e `label` associado). Campos que passam a ser obrigatórios recebem `required` + `aria-invalid` na validação.

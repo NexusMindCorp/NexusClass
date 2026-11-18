@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
-import { Eye, EyeClosed, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeClosed, Mail, Lock, User, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { getAssetPath } from "@/lib/assetPath";
 import { capitalizerNomeTodo } from "@/lib/utils";
@@ -17,11 +17,21 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
+  const [idEscola, setIdEscola] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const escolaNum = Number(idEscola.trim());
+    if (!isLogin && (!Number.isInteger(escolaNum) || escolaNum <= 0)) {
+      toast.error("ID da escola inválido", {
+        description: "Informe o código numérico (id_escola) da sua escola.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -37,7 +47,12 @@ export function Login() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { nome } },
+          options: {
+            data: {
+              nome,
+              id_escola: escolaNum,
+            },
+          },
         });
         if (error) throw error;
 
@@ -51,6 +66,12 @@ export function Login() {
 
       if (mensagem === "Invalid login credentials") {
         mensagem = "E-mail ou senha incorretos!";
+      } else if (
+        mensagem.includes("Database error saving new user") ||
+        mensagem.includes("fk_perfil_escola") ||
+        mensagem.includes("ck_perfil_escola_por_role")
+      ) {
+        mensagem = "ID da escola inválido ou não encontrado. Verifique com sua instituição.";
       }
 
       toast.error("Erro no acesso", {
@@ -110,28 +131,54 @@ export function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
-              <div className="space-y-2">
-                <Label
-                  htmlFor="nome"
-                  className="text-white text-sm font-medium"
-                >
-                  Nome completo
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
-                  <Input
-                    id="nome"
-                    type="text"
-                    placeholder="Seu nome"
-                    value={nome}
-                    onChange={(e) =>
-                      setNome(capitalizerNomeTodo(e.target.value))
-                    }
-                    required
-                    className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500"
-                  />
+              <>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="nome"
+                    className="text-white text-sm font-medium"
+                  >
+                    Nome completo
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                    <Input
+                      id="nome"
+                      type="text"
+                      placeholder="Seu nome"
+                      value={nome}
+                      onChange={(e) =>
+                        setNome(capitalizerNomeTodo(e.target.value))
+                      }
+                      required
+                      className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500"
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="id-escola"
+                    className="text-white text-sm font-medium"
+                  >
+                    ID da Escola
+                  </Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
+                    <Input
+                      id="id-escola"
+                      type="number"
+                      min={1}
+                      step={1}
+                      inputMode="numeric"
+                      placeholder="Código (id_escola) da sua escola"
+                      value={idEscola}
+                      onChange={(e) => setIdEscola(e.target.value)}
+                      required
+                      className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500"
+                    />
+                  </div>
+                </div>
+              </>
             )}
 
             <div className="space-y-2">

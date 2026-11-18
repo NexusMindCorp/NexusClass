@@ -35,6 +35,7 @@ import { BoxAtividade } from "./BoxAtividade";
 import { BoxEntregaAtividade } from "./BoxEntregaAtividade";
 import type { Atividade } from "@/hooks/MuralHooks/type";
 import { isDataEntregaFutura } from "@/lib/utils";
+import { pode } from "@/lib/permissoes";
 import type { MuralProps } from "@/hooks/MuralHooks/type";
 
 export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
@@ -185,7 +186,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
       )}
 
       {posts.tipoAmostar === "atividade" &&
-        (perfil.role === "professor" || perfil.role === "master") && (
+        pode.publicarAtividade(perfil, turma) && (
           <Button onClick={() => setBoxAtividadeAberto(true)}>
             <Pencil />
             Postar Atividade
@@ -257,10 +258,8 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                         </DropdownMenuItem>
                       )}
 
-                      {/* Mostrar Excluir se for o autor ou se for professor/master */}
-                      {(post.autor?.id === perfil.id ||
-                        perfil.role === "professor" ||
-                        perfil.role === "master") && (
+                      {/* Mostrar Excluir se for o autor ou se for professor da turma/master */}
+                      {pode.excluirPost(perfil, post, turma) && (
                         <DropdownMenuItem
                           className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                           onSelect={() => deletarPost(post.id)}
@@ -346,8 +345,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       </span>
                     )}
 
-                    {(perfil.role === "professor" ||
-                      perfil.role === "master") && (
+                    {pode.publicarAtividade(perfil, turma) && (
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"

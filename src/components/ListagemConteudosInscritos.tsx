@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { AlertTriangle, LogOut } from "lucide-react";
+import { pode } from "@/lib/permissoes";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -113,21 +114,27 @@ export function ListagemConteudosInscritos({
                     {turma.professor}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-destructive/30 text-destructive  hover:text-destructive-foreground hover:scale-105 hover:shadow-md transition-all duration-200 h-8 cursor-pointer"
-                      onClick={() =>
-                        setTurmaParaSair({
-                          key,
-                          materia: turma.materia,
-                          turma: turma.turma,
-                        })
-                      }
-                      disabled={carregandoAcao === key}
-                    >
-                      {carregandoAcao === key ? "Saindo..." : "Sair da Turma"}
-                    </Button>
+                    {pode.sairDaTurma(usuario) ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-destructive/30 text-destructive  hover:text-destructive-foreground hover:scale-105 hover:shadow-md transition-all duration-200 h-8 cursor-pointer"
+                        onClick={() =>
+                          setTurmaParaSair({
+                            key,
+                            materia: turma.materia,
+                            turma: turma.turma,
+                          })
+                        }
+                        disabled={carregandoAcao === key}
+                      >
+                        {carregandoAcao === key ? "Saindo..." : "Sair da Turma"}
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        Gerido pela coordenação
+                      </span>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

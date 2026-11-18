@@ -1,9 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { hasSupabaseConfig, supabase } from "@/lib/supabaseClient";
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { EscolaProps } from "@/hooks/LeituraDataHooks/type";
 import { escolaTurmaRepository, extrairMensagemErroRepo } from "@/repositories";
 
-export function useEscolaDados(idEscola?: string | null) {
+export function useEscolaDados(
+  idEscola?: string | null,
+  role?: PerfilUsuario["role"],
+) {
   const [listaEscolar, setListaEscolar] = useState<EscolaProps>({
     escola: "",
     ano_letivo: new Date().getFullYear(),
@@ -22,7 +26,7 @@ export function useEscolaDados(idEscola?: string | null) {
     setErroEscola(null);
 
     try {
-      const dados = await escolaTurmaRepository.carregarDadosEscola(idEscola);
+      const dados = await escolaTurmaRepository.carregarDadosEscola(idEscola, role);
       setListaEscolar(dados);
     } catch (error) {
       setErroEscola(
@@ -34,7 +38,7 @@ export function useEscolaDados(idEscola?: string | null) {
     } finally {
       setCarregandoEscola(false);
     }
-  }, [idEscola]);
+  }, [idEscola, role]);
 
   useEffect(() => {
     void carregar();

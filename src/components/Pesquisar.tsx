@@ -124,6 +124,7 @@ export function Pesquisar(props: PesquisarProps) {
                     <TurmaCard
                       key={key}
                       compacto={true}
+                      id_escola={turma.id_escola}
                       materia={turma.materia}
                       banners={turma.banners}
                       professor={turma.professor}
