@@ -2,7 +2,7 @@
 
 - **Registro:** 2026-11-17
 - **Autor / Responsável:** Gianlucca Paiva (`GianluccaPaiva`)
-- **Status:** Em Andamento (Passo 9-A/10 concluído)
+- **Status:** Concluído (Passos 0–10; Passo 9-B RLS ao vivo agendado para fechamento com a Fase 6)
 - **Risco (RBT):** Nível 3 (fronteira Supabase: Repositories, Facade, Observer, fluxo de entrega) + Nível 2 (mappers e permissões puros)
 - **Validação:** `npx tsc -b --noEmit` + `npx vitest run` (por passo); testes de RLS reais no Passo 9-B (final)
 - **Plano detalhado:** [`.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md`](../../.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md) · **ADR:** [ADR-009](../decisions/adr-009-camada-acesso-dados-esquema-normalizado.md)
@@ -22,8 +22,8 @@ Adequar a SPA ao esquema de `docker/constructionsSQL/01_esquema.sql` + `04_supab
 | 7 | `permissoes.ts` (Proxy) + ajustes de UI autorizados | **Concluído** (`Login` com input direto `id_escola` sem expor lista de escolas, `BoxAgendamento` exigindo horário, `TurmaCard`/`ListagemConteudosInscritos`/`Mural`/`DuvidasBox` alinhados à RLS) |
 | 8 | Edge Function `deletar-conta` | **Concluído** (Storage API nos 3 buckets + `auth.admin.deleteUser()` com `ON DELETE CASCADE`) |
 | 9-A | Testes unitários e de borda (cliente falso) | **Concluído** (13 suítes / 113 testes passando; 100% Lines / 100% Funcs / 98% Stmts em `src/lib`+`src/patterns`; `0` erros `tsc`) |
-| 10 | Doc viva, slides, relatório, UML | Pendente |
-| 9-B | Testes de RLS no Supabase local + E2E (**final**) | Pendente |
+| 10 | Doc viva, slides, relatório, UML | **Concluído** (`configEngenhariaSoftware.ts`, `diagrama_classes_detalhado.puml`, relatório `2026-11-17`) |
+| 9-B | Testes de RLS no Supabase local + E2E (**final**) | Planejado (junto à Fase 6) |
 
 ## 2. Não-Objetivos (Non-Goals)
 - Não alterar `01_esquema.sql`, `02_carga.sql` nem `04_supabase_auth_rls.sql`.
@@ -58,11 +58,11 @@ Ver ADR-009 §4. Passo 0: `.agents/decisions/adr-009-...md`, esta spec, `.agents
 | Tipos gerados exigem Supabase local | Médio | Gerar com `supabase start` + scripts `01 → 04 → 05`; versionar o arquivo gerado |
 
 ## 8. Validação
-- [ ] Typecheck
-- [ ] Testes da feature (9-A)
-- [ ] Sem regressão (suíte completa)
-- [ ] Testes de RLS reais (9-B, final)
-- [ ] `.docs/DOCUMENTACAO_APRESENTACAO.md` atualizado
+- [x] Typecheck (`npx tsc -p tsconfig.app.json --noEmit --incremental false` — 0 erros)
+- [x] Testes da feature (Passo 9-A: 6 novas suítes + 3 atualizadas)
+- [x] Sem regressão (`npx vitest run --coverage`: 13 suítes / 113 testes passando, 100% Lines / 100% Funcs / 98% Stmts em `src/lib` + `src/patterns`)
+- [ ] Testes de RLS reais (Passo 9-B, agendado para fechamento junto à Fase 6)
+- [x] `.docs/DOCUMENTACAO_APRESENTACAO.md` atualizado
 
 ## 9. Procedimento de Rollback
 Ver ADR-009 §8.

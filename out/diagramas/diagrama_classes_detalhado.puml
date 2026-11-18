@@ -15,7 +15,75 @@ skinparam class {
 package "Infraestrutura & Singleton (src/lib)" {
     class supabaseClient <<Singleton>> {
         +hasSupabaseConfig : boolean
-        +supabase : SupabaseClient
+        +supabase : SupabaseClient<Database>
+    }
+
+    class DataMappers <<DataMapper>> {
+        +{static} mapPerfil(row) : PerfilUsuario
+        +{static} mapTurmaProps(row, prof, alunos) : TurmaProps
+        +{static} mapAtividade(row, prof, anexos) : Atividade
+        +{static} mapEntrega(row, opcoes) : Entrega
+        +{static} mapDuvida(row, anexos) : Duvida
+        +{static} mapEventoCalendario(row) : EventoCalendario
+        +{static} mapAlertaCalendario(row) : PayloadAlertaCalendario
+        +{static} mapMensagem(row) : Mensagem
+    }
+
+    class permissoes <<Proxy>> {
+        +{static} pode.criarTurma(perfil) : boolean
+        +{static} pode.inscreverEmTurma(perfil, turma) : boolean
+        +{static} pode.sairDaTurma(perfil) : boolean
+        +{static} pode.publicarAtividade(perfil, turma) : boolean
+        +{static} pode.excluirPost(perfil, post, turma) : boolean
+        +{static} pode.avaliarEntrega(perfil, turma) : boolean
+        +{static} pode.responderDuvida(perfil, duvida) : boolean
+        +{static} pode.excluirDuvida(perfil, duvida) : boolean
+    }
+}
+
+package "Camada de Acesso a Dados — Repositories (src/repositories)" {
+    class PerfilRepository <<Repository>> {
+        +buscarPorId(idPerfil) : Promise<PerfilUsuario | null>
+        +buscarPorNome(nome) : Promise<PerfilUsuario | null>
+        +atualizarDados(idPerfil, dados) : Promise<PerfilUsuario>
+    }
+
+    class EscolaTurmaRepository <<Repository>> {
+        +listarEscolas() : Promise<EscolaResumo[]>
+        +carregarDadosEscola(idEscola, role) : Promise<EscolaProps>
+        +listarTurmasProfessor(idProf, nome) : Promise<TurmaProfessor[]>
+        +listarIdsTurmasPorPapel(idPerfil, role) : Promise<string[]>
+        +alternarMatriculaAluno(idAluno, idTurma, jaInscrito) : Promise<void>
+    }
+
+    class AtividadeRepository <<Repository>> {
+        +listarPorTurma(idTurma) : Promise<Atividade[]>
+        +criar(dados, arquivos) : Promise<Atividade>
+        +editar(idAtiv, dados, novos, removidos, mantidos) : Promise<Atividade>
+        +excluir(atividade) : Promise<void>
+    }
+
+    class DuvidaRepository <<Repository>> {
+        +listarTodas() : Promise<Duvida[]>
+        +criar(dados, arquivos) : Promise<Duvida>
+        +responder(idDuvida, resposta) : Promise<void>
+        +excluir(duvida) : Promise<void>
+    }
+
+    class MuralRepository <<Repository>> {
+        +listarPosts(idTurma) : Promise<Post[]>
+        +criarPost(idTurma, idAutor, conteudo) : Promise<Post>
+        +excluirPost(idPost) : Promise<void>
+    }
+
+    class ComunicacaoRepository <<Repository>> {
+        +listarEventos(perfil, idsTurmas, dataMinima) : Promise<EventoCalendario[]>
+        +criarEvento(dados) : Promise<EventoCalendario>
+        +excluirEvento(idEvento) : Promise<void>
+        +listarMensagens(idPerfil) : Promise<Mensagem[]>
+        +enviarMensagem(idRemetente, idDestinatario, texto) : Promise<void>
+        +criarDenuncia(dados) : Promise<void>
+        +criarTicketSuporte(dados, arquivos) : Promise<void>
     }
 }
 
@@ -53,15 +121,23 @@ package "Design Patterns GoF (src/patterns)" {
 
     class EntregaAtividadeFacade <<Facade>> {
         -client : IEntregaSupabaseClient | null
-        -configurado : boolean
         +{static} higienizarNomeArquivo(nomeOriginal: string) : string
         +{static} construirCaminhoArquivo(atividadeId: string, alunoId: string, nome: string, ts?: number) : string
-        +{static} normalizarEntregasComPerfis(registros: EntregaBancoComPerfil[]) : Entrega[]
+        +{static} normalizarEntregasComPerfis(registros: EntregaRowComPerfil[]) : Entrega[]
         +estaDisponivel() : boolean
-        +carregarEntregas(atividadeId: string, perfil: PerfilUsuario) : Promise<ResultadoCarregamentoEntregas>
-        +submeter(dados: DadosSubmissaoEntrega) : Promise<ResultadoSubmissaoEntrega>
-        +avaliar(dados: DadosAvaliacaoEntrega) : Promise<void>
+        +carregarEntregas(atividadeId: string, perfil: PerfilUsuario, dataEntrega?: string | null) : Promise<ResultadoCarregamentoEntregas>
+        +submeter(dados: SubmeterEntregaParams) : Promise<ResultadoSubmissaoEntrega>
+        +avaliar(dados: AvaliarEntregaParams) : Promise<void>
         +obterUrlDownload(caminho: string, expiraEmSegundos?: number) : Promise<string | null>
+    }
+
+    class AnexoStorageFacade <<Facade>> {
+        -cfg : ConfigAnexoStorage
+        -client : IAnexoSupabaseClient | null
+        +anexar(idPai: number, arquivos: File[], prefixo: string) : Promise<AnexoRef[]>
+        +listarPorPais(idsPai: number[]) : Promise<Map<number, AnexoRef[]>>
+        +remover(refs: AnexoRef[]) : Promise<void>
+        +urlsAssinadas(refs: AnexoRef[], ttl?: number) : Promise<Record<string, string>>
     }
 
     interface "FiltroStrategy<T, Contexto>" as FiltroStrategy <<Strategy>> {
@@ -406,14 +482,43 @@ useMural "1" ..> "1" NotificacaoSubject : inscreve observers em
 useGerenciador "1" ..> "1" NotificacaoSubject : inscreve alertas em
 useMensagens "1" ..> "1" NotificacaoSubject : inscreve chat em
 
-' Relações Singleton (Fase 5)
-useAuth ..> supabaseClient : usa instância única
-useMural ..> supabaseClient : usa instância única
-useGerenciador ..> supabaseClient : usa instância única
-useMensagens ..> supabaseClient : usa instância única
-useDuvidas ..> supabaseClient : usa instância única
-useCalendario ..> supabaseClient : usa instância única
-useSuporte ..> supabaseClient : usa instância única
+' Relações Repositories, DataMappers, AnexoStorageFacade & Singleton (Fase 6-A)
+PerfilRepository ..> supabaseClient : consulta tipada
+PerfilRepository ..> DataMappers : converte Row
+EscolaTurmaRepository ..> supabaseClient : consulta tipada
+EscolaTurmaRepository ..> DataMappers : converte Row
+AtividadeRepository ..> supabaseClient : consulta tipada
+AtividadeRepository ..> AnexoStorageFacade : anexa/remove 1FN
+AtividadeRepository ..> DataMappers : converte Row
+DuvidaRepository ..> supabaseClient : consulta tipada
+DuvidaRepository ..> AnexoStorageFacade : anexa/remove 1FN
+DuvidaRepository ..> DataMappers : converte Row
+MuralRepository ..> supabaseClient : consulta tipada
+MuralRepository ..> DataMappers : converte Row
+ComunicacaoRepository ..> supabaseClient : consulta tipada
+ComunicacaoRepository ..> AnexoStorageFacade : anexa suporte 1FN
+ComunicacaoRepository ..> DataMappers : converte Row
+AnexoStorageFacade ..> supabaseClient : Storage privado + v_storage_objetos
+
+useAuth ..> PerfilRepository : carrega perfil
+useAuth ..> EscolaTurmaRepository : carrega turmas prof.
+usePerfilUsuario ..> PerfilRepository : busca por nome
+useEscolaDados ..> EscolaTurmaRepository : carrega escola/turmas
+useGerenciador ..> EscolaTurmaRepository : matrícula RN12
+useMural ..> MuralRepository : posts
+useMural ..> AtividadeRepository : atividades
+useMural ..> DuvidaRepository : cria dúvida
+useDuvidas ..> DuvidaRepository : lista/responde/exclui
+useCalendario ..> ComunicacaoRepository : eventos
+useMensagens ..> ComunicacaoRepository : mensagens
+useSuporte ..> ComunicacaoRepository : tickets suporte
+CarregamentoDados ..> MuralRepository : resumo bot
+CarregamentoDados ..> DuvidaRepository : resumo bot
+CarregamentoDados ..> AtividadeRepository : resumo bot
+CarregamentoDados ..> ComunicacaoRepository : resumo bot
+TurmaCard ..> permissoes : valida inscrição
+Mural ..> permissoes : valida ações
+DuvidasBox ..> permissoes : valida exclusão
 
 ' Relações Componentes e Telas
 GerenciadorTelas "1" *-- "0..1" Mural : exibe

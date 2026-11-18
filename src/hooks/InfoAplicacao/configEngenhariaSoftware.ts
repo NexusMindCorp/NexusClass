@@ -29,28 +29,28 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 5 Concluída → Próxima: Fase 6 (Testes de Componente + E2E)",
+  faseAtual: "Fase 6-A Concluída → Próxima: Fase 6 (Componentes + E2E + RLS reais 9-B)",
   ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
-  data: "2026-11-05",
+  data: "2026-11-17",
   branch: "DesiningTeste",
 };
 
 export const metricasEngenharia: MetricaProjeto[] = [
   {
     valor: "100%",
-    rotulo: "cobertura em src/lib e src/patterns (era 4.27%)",
+    rotulo: "linhas/funções (98% Stmts) em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "89",
-    rotulo: "testes automatizados passando (eram 3)",
+    valor: "113",
+    rotulo: "testes passando em 13 suítes (eram 3)",
   },
   {
-    valor: "7 / 7",
-    rotulo: "Design Patterns GoF concluídos e modelados em UML",
+    valor: "7 + 1",
+    rotulo: "padrões GoF + Repository (ADR-009) modelados em UML",
   },
   {
-    valor: "Fase 5",
-    rotulo: "concluída (7 padrões GoF ativos/documentados + Diagrama UML)",
+    valor: "Fase 6-A",
+    rotulo: "concluída (acesso tipado ao esquema normalizado + RLS)",
   },
 ];
 
@@ -181,16 +181,15 @@ assistenteRef.current = BotFactory.criarAssistente(tipoBot, contexto);`,
     status: "Concluído",
     responsavel: "Gabriel Lineker (GabrielLineker)",
     ondeAplicado:
-      "src/patterns/facade/EntregaAtividadeFacade.ts + src/hooks/EntregasHooks/useEntregas.ts",
+      "src/patterns/facade/EntregaAtividadeFacade.ts + AnexoStorageFacade.ts + src/hooks/EntregasHooks/useEntregas.ts",
     problemaAntes:
-      "Submeter, listar, avaliar e baixar uma atividade exigia coordenar dois subsistemas no hook useEntregas: higienizar nome do arquivo, upload no bucket entregas_atividades/{atividadeId}/{alunoId}/{arq}, UPSERT na tabela entregas_atividades com onConflict: 'atividade_id,aluno_id' e createSignedUrl.",
+      "Submeter, listar, avaliar e baixar uma atividade exigia coordenar Storage e SQL diretamente nos hooks, além de duplicar lógica de upload + URL pública em 4 pontos.",
     solucaoDepois:
-      "EntregaAtividadeFacade (contrato IEntregaAtividadeFacade) expõe operações de domínio coesas (submeter, carregarEntregas, avaliar, obterUrlDownload), ocultando a coordenação entre Supabase Storage e PostgreSQL.",
-    codigoAntes: `// Antes: hook conhece detalhes de Storage + SQL (useEntregas.ts)
-const nomeLimpo = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      "EntregaAtividadeFacade e AnexoStorageFacade (1FN genérica) ocultam Storage privado (createSignedUrls + v_storage_objetos), id_objeto_storage, compensação em falha de INSERT e ordem segura no reenvio.",
+    codigoAntes: `// Antes: hook conhece detalhes de Storage + SQL legado
 await supabase.storage.from("entregas_atividades").upload(caminho, file, { upsert: true });
 await supabase.from("entregas_atividades").upsert({ ... }, { onConflict: "atividade_id,aluno_id" });`,
-    codigoDepois: `// Depois: fachada única para o subsistema de entrega (EntregaAtividadeFacade.ts)
+    codigoDepois: `// Depois: Facade 1FN com ordem segura Storage <-> FK CASCADE
 await facade.submeter({
   atividadeId,
   alunoId: perfil.id,
@@ -242,8 +241,8 @@ const filtradas = estrategia.filtrar(base, { estaInscrito });`,
     solucaoDepois:
       "NotificacaoSubject centraliza a publicação de EventoNotificacaoRealtime e notifica Observers especializados (ToastNotificacaoObserver, StateRefreshObserver e BadgeCounterObserver) conectados por adaptadores de canal com cleanup seguro.",
     codigoAntes: `// Antes: canal acoplado diretamente ao efeito visual e deduplicação inline
-supabase.channel("realtime:mural_posts").on("postgres_changes", ..., (payload) => {
-  if (payload.new.autor_id !== perfil.id) {
+supabase.channel("realtime:mural_post").on("postgres_changes", ..., (payload) => {
+  if (payload.new.id_autor !== perfil.id) {
     toast("O mural foi atualizado!", { action: { label: "Carregar", onClick: carregarPosts } });
   }
 }).subscribe();`,
@@ -263,20 +262,42 @@ const desconectar = conectarCanaisMuralRealtime(supabase, muralSubject, { turmaI
     status: "Concluído",
     responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/lib/supabaseClient.ts (Singleton) + ProtectedRoute.tsx / BoxRestrito.tsx (Protection Proxy) + out/diagramas/diagrama_classes_detalhado.puml",
+      "src/lib/supabaseClient.ts (Singleton tipado) + permissoes.ts / ProtectedRoute.tsx / BoxRestrito.tsx (Protection Proxy) + out/diagramas/diagrama_classes_detalhado.puml",
     problemaAntes:
       "Criar classes extras para Singleton ou Proxy quando o código já os implementa idiomaticamente em ES Modules e React Router seria duplicação desnecessária (overengineering).",
     solucaoDepois:
-      "Catalogação arquitetural formal em src/patterns/singleton e src/patterns/proxy (ADR-007) + atualização do diagrama UML com estereótipos <<Singleton>>, <<Proxy>>, <<Adapter>>, <<Factory>>, <<Facade>>, <<Strategy>> e <<Observer>>.",
+      "Catalogação formal em src/patterns/, tipagem estática createClient<Database> e Protection Proxy puro em permissoes.ts espelhando as RLS de 04_supabase_auth_rls.sql.",
     codigoAntes: `// Já existente no projeto (Singleton via ES Module cache)
 export const hasSupabaseConfig = Boolean(__URL_SUPABASE__ && __KEY_SUPABASE__);
-export const supabase = createClient(__URL_SUPABASE__, __KEY_SUPABASE__);`,
-    codigoDepois: `// Protection Proxy em ProtectedRoute.tsx + BoxRestrito.tsx
-if (loading) return <Spinner />;
-if (!session) return <Navigate to="/login" replace />;
-return <Outlet context={{ session, perfil, materiasProfessor, atualizarPerfilLocal }} />;`,
+export const supabase = createClient<Database>(__URL_SUPABASE__, __KEY_SUPABASE__);`,
+    codigoDepois: `// Protection Proxy em permissoes.ts + ProtectedRoute.tsx
+pode.inscreverEmTurma(perfil, turma); // aluno && mesma id_escola (RN12)
+if (!session) return <Navigate to="/login" replace />;`,
     beneficioQualidade:
       "Demonstra maturidade de engenharia: reconhecer padrões nativos já presentes na arquitetura sem inflar o código e manter o diagrama UML sincronizado.",
+  },
+  {
+    id: "repository-mapper",
+    nome: "8. Repository + Data Mapper (ADR-009)",
+    categoria: "Estrutural",
+    fase: "Fase 6-A",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
+    ondeAplicado:
+      "src/repositories/*Repository.ts + src/lib/db/mappers.ts + src/lib/database.types.ts",
+    problemaAntes:
+      "85 chamadas .from()/.storage soltas em 19 arquivos acoplavam hooks ao esquema legado sem tipagem estática, impedindo o TypeScript de detectar renomeações de tabelas/colunas.",
+    solucaoDepois:
+      "6 Repositories por agregado com cliente injetável (Perfil, EscolaTurma, Atividade, Duvida, Mural, Comunicacao) + Data Mappers puros convertendo Row -> Domínio e SERIAL -> string.",
+    codigoAntes: `// Antes: consulta direta acoplada no hook sem tipo
+const { data } = await supabase.from("turmas_escolares").select("*");`,
+    codigoDepois: `// Depois: hook consome contrato do Repository + mappers tipados
+const dados = await escolaTurmaRepository.carregarDadosEscola(
+  perfil.id_escola,
+  perfil.role,
+);`,
+    beneficioQualidade:
+      "Zero erros tsc em toda a SPA, isolamento da borda de persistência para testes unitários sem rede e blindagem de UI contra mudanças de schema.",
   },
   {
     id: "template-method-descartado",
@@ -364,13 +385,23 @@ export const roadmapFases: FaseRoadmapItem[] = [
       "ADR-007 + Diagrama PlantUML atualizado + supabaseClient.ts com 100% de cobertura (7 suítes / 89 testes)",
   },
   {
+    fase: "Fase 6-A",
+    titulo: "Remodelagem de Acesso ao Banco + Repositories + Anexos 1FN (ADR-009)",
+    status: "Concluído",
+    responsavel: "Gianlucca Paiva (GianluccaPaiva)",
+    entregas:
+      "05_supabase_funcoes_realtime.sql, database.types.ts, mappers.ts, permissoes.ts, AnexoStorageFacade, 6 Repositories, migração dos hooks/Observer/Edge Function e 6 novas suítes (RLS reais ao final em 9-B).",
+    evidenciaTeste:
+      "13 suítes / 113 testes passando · 100% Lines / 100% Funcs / 98% Stmts em src/lib + src/patterns · 0 erros tsc",
+  },
+  {
     fase: "Fase 6",
-    titulo: "Testes de Componente (Testing Library) + E2E (Playwright) + Relatório Final",
+    titulo: "Testes de Componente + E2E (Playwright) + RLS reais (Passo 9-B)",
     status: "Planejado",
     responsavel: "A definir na retomada (Handoff)",
     entregas:
-      "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega) e consolidação final de cobertura.",
-    evidenciaTeste: "Espaço reservado: suíte completa unitária + integração + componente + E2E",
+      "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), suíte de integração RLS no Supabase e consolidação final.",
+    evidenciaTeste: "Espaço reservado: suíte completa unitária + integração RLS + componente + E2E",
   },
 ];
 
@@ -474,10 +505,19 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "100.00% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
+  },
+  {
+    etapa: "Pós-Fase 6-A (Esquema Normalizado + Repositories)",
+    responsavel: "Gianlucca Paiva",
+    testes: "13 suítes (113 testes)",
+    statements: "98.00% (lib + patterns)",
+    branches: "92.87% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
     destaque: true,
   },
   {
-    etapa: "Pós-Fase 6 (Componentes + E2E Final)",
+    etapa: "Pós-Fase 6 (Componentes + E2E + RLS Final)",
     responsavel: "A atualizar na Fase 6",
     testes: "—",
     statements: "—",
