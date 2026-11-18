@@ -26,11 +26,13 @@ SELECT setval(pg_get_serial_sequence('Escola', 'id_escola'), 3, true);
 
 -- ----------------------------------------------------------------------------
 -- 2. Carga em Turma (Inclui a turma DCC000 da escola João XXIII)
+-- A DCC002 pertence à escola 1: Ana Paula leciona nela e na DCC000, e cada professor
+-- tem uma única escola (RN12). A MAT101 fica na escola 3 e serve de turma de outra escola nos testes.
 -- ----------------------------------------------------------------------------
 INSERT INTO Turma (id_turma, codigo_acesso, materia, sala, periodo_escolar, banner_url, id_escola) VALUES
     (1, 'DCC000', 'Banco de Dados', 'Sala S301', '2026.3', 'https://nexusclass.edu.br/banners/dcc000.png', 1),
     (2, 'DCC001', 'Estrutura de Dados', 'Sala S302', '2026.3', 'https://nexusclass.edu.br/banners/dcc001.png', 1),
-    (3, 'DCC002', 'Engenharia de Software', 'Sala S205', '2026.3', 'https://nexusclass.edu.br/banners/dcc002.png', 2),
+    (3, 'DCC002', 'Engenharia de Software', 'Sala S205', '2026.3', 'https://nexusclass.edu.br/banners/dcc002.png', 1),
     (4, 'MAT101', 'Cálculo Numérico', 'Sala A104', '2026.3', 'https://nexusclass.edu.br/banners/mat101.png', 3);
 
 SELECT setval(pg_get_serial_sequence('Turma', 'id_turma'), 4, true);
@@ -41,6 +43,8 @@ SELECT setval(pg_get_serial_sequence('Turma', 'id_turma'), 4, true);
 -- IDs 1 a 3: Administradores (Master)
 -- IDs 4 a 7: Professores (Pietro, Ana Paula, Carlos Eduardo, Marcos)
 -- IDs 8 a 13: Alunos nominais (Alice, Alberto, Olegário, Rebeca, Paulo, Mariana)
+-- Coluna id_escola (RN11 e RN12): masters ficam sem escola; Pietro, Ana Paula e Carlos Eduardo
+-- e todos os alunos pertencem à escola 1 (João XXIII); Marcos pertence à escola 3.
 INSERT INTO auth.users (id, email, raw_user_meta_data) VALUES
     ('00000000-0000-0000-0000-000000000001', 'master@nexusclass.edu.br', '{"nome":"Coordenação Geral Nexus","role":"master"}'::jsonb),
     ('00000000-0000-0000-0000-000000000002', 'helena.master@nexusclass.edu.br', '{"nome":"Helena Administradora","role":"master"}'::jsonb),
@@ -65,31 +69,32 @@ SELECT
 FROM generate_series(14, 10013) AS g
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO Perfil (id_perfil, role, nome, email, bio, foto_url) VALUES
-    ('00000000-0000-0000-0000-000000000001', 'master', 'Coordenação Geral Nexus', 'master@nexusclass.edu.br', 'Gestão Educacional e Moderação', 'https://nexusclass.edu.br/avatars/m1.png'),
-    ('00000000-0000-0000-0000-000000000002', 'master', 'Helena Administradora', 'helena.master@nexusclass.edu.br', 'Suporte Técnico Nível 2', 'https://nexusclass.edu.br/avatars/m2.png'),
-    ('00000000-0000-0000-0000-000000000003', 'master', 'Roberto Diretor', 'roberto.master@nexusclass.edu.br', 'Diretoria Acadêmica', 'https://nexusclass.edu.br/avatars/m3.png'),
-    ('00000000-0000-0000-0000-000000000004', 'professor', 'Pietro', 'pietro@nexusclass.edu.br', 'Docente de Banco de Dados', 'https://nexusclass.edu.br/avatars/p1.png'),
-    ('00000000-0000-0000-0000-000000000005', 'professor', 'Ana Paula', 'anapaula@nexusclass.edu.br', 'Docente de Engenharia de Software', 'https://nexusclass.edu.br/avatars/p2.png'),
-    ('00000000-0000-0000-0000-000000000006', 'professor', 'Carlos Eduardo', 'carloseduardo@nexusclass.edu.br', 'Docente de Estrutura de Dados', 'https://nexusclass.edu.br/avatars/p3.png'),
-    ('00000000-0000-0000-0000-000000000007', 'professor', 'Marcos Vinícius', 'marcos@nexusclass.edu.br', 'Docente de Cálculo', 'https://nexusclass.edu.br/avatars/p4.png'),
-    ('00000000-0000-0000-0000-000000000008', 'aluno', 'Alice', 'alice@aluno.nexusclass.edu.br', 'Estudante de Sistemas de Informação', 'https://nexusclass.edu.br/avatars/a1.png'),
-    ('00000000-0000-0000-0000-000000000009', 'aluno', 'Alberto', 'alberto@aluno.nexusclass.edu.br', 'Estudante de Ciência da Computação', 'https://nexusclass.edu.br/avatars/a2.png'),
-    ('00000000-0000-0000-0000-000000000010', 'aluno', 'Olegário', 'olegario@aluno.nexusclass.edu.br', 'Monitor Acadêmico', 'https://nexusclass.edu.br/avatars/a3.png'),
-    ('00000000-0000-0000-0000-000000000011', 'aluno', 'Rebeca', 'rebeca@aluno.nexusclass.edu.br', 'Representante de Turma', 'https://nexusclass.edu.br/avatars/a4.png'),
-    ('00000000-0000-0000-0000-000000000012', 'aluno', 'Paulo', 'paulo@aluno.nexusclass.edu.br', 'Estudante de Graduação', 'https://nexusclass.edu.br/avatars/a5.png'),
-    ('00000000-0000-0000-0000-000000000013', 'aluno', 'Mariana', 'mariana@aluno.nexusclass.edu.br', 'Bolsista de Iniciação Científica', 'https://nexusclass.edu.br/avatars/a6.png')
+INSERT INTO Perfil (id_perfil, role, nome, email, bio, foto_url, id_escola) VALUES
+    ('00000000-0000-0000-0000-000000000001', 'master', 'Coordenação Geral Nexus', 'master@nexusclass.edu.br', 'Gestão Educacional e Moderação', 'https://nexusclass.edu.br/avatars/m1.png', NULL),
+    ('00000000-0000-0000-0000-000000000002', 'master', 'Helena Administradora', 'helena.master@nexusclass.edu.br', 'Suporte Técnico Nível 2', 'https://nexusclass.edu.br/avatars/m2.png', NULL),
+    ('00000000-0000-0000-0000-000000000003', 'master', 'Roberto Diretor', 'roberto.master@nexusclass.edu.br', 'Diretoria Acadêmica', 'https://nexusclass.edu.br/avatars/m3.png', NULL),
+    ('00000000-0000-0000-0000-000000000004', 'professor', 'Pietro', 'pietro@nexusclass.edu.br', 'Docente de Banco de Dados', 'https://nexusclass.edu.br/avatars/p1.png', 1),
+    ('00000000-0000-0000-0000-000000000005', 'professor', 'Ana Paula', 'anapaula@nexusclass.edu.br', 'Docente de Engenharia de Software', 'https://nexusclass.edu.br/avatars/p2.png', 1),
+    ('00000000-0000-0000-0000-000000000006', 'professor', 'Carlos Eduardo', 'carloseduardo@nexusclass.edu.br', 'Docente de Estrutura de Dados', 'https://nexusclass.edu.br/avatars/p3.png', 1),
+    ('00000000-0000-0000-0000-000000000007', 'professor', 'Marcos Vinícius', 'marcos@nexusclass.edu.br', 'Docente de Cálculo', 'https://nexusclass.edu.br/avatars/p4.png', 3),
+    ('00000000-0000-0000-0000-000000000008', 'aluno', 'Alice', 'alice@aluno.nexusclass.edu.br', 'Estudante de Sistemas de Informação', 'https://nexusclass.edu.br/avatars/a1.png', 1),
+    ('00000000-0000-0000-0000-000000000009', 'aluno', 'Alberto', 'alberto@aluno.nexusclass.edu.br', 'Estudante de Ciência da Computação', 'https://nexusclass.edu.br/avatars/a2.png', 1),
+    ('00000000-0000-0000-0000-000000000010', 'aluno', 'Olegário', 'olegario@aluno.nexusclass.edu.br', 'Monitor Acadêmico', 'https://nexusclass.edu.br/avatars/a3.png', 1),
+    ('00000000-0000-0000-0000-000000000011', 'aluno', 'Rebeca', 'rebeca@aluno.nexusclass.edu.br', 'Representante de Turma', 'https://nexusclass.edu.br/avatars/a4.png', 1),
+    ('00000000-0000-0000-0000-000000000012', 'aluno', 'Paulo', 'paulo@aluno.nexusclass.edu.br', 'Estudante de Graduação', 'https://nexusclass.edu.br/avatars/a5.png', 1),
+    ('00000000-0000-0000-0000-000000000013', 'aluno', 'Mariana', 'mariana@aluno.nexusclass.edu.br', 'Bolsista de Iniciação Científica', 'https://nexusclass.edu.br/avatars/a6.png', 1)
 ON CONFLICT (id_perfil) DO NOTHING;
 
 -- Geração de mais 10.000 perfis de alunos (IDs 14 a 10013) para sustentar a carga massiva
-INSERT INTO Perfil (id_perfil, role, nome, email, bio, foto_url)
+INSERT INTO Perfil (id_perfil, role, nome, email, bio, foto_url, id_escola)
 SELECT
     ('00000000-0000-0000-0000-' || lpad(g::text, 12, '0'))::uuid,
     'aluno',
     'Aluno Acadêmico ' || g,
     'aluno' || g || '@aluno.nexusclass.edu.br',
     'Discente matriculado na plataforma NexusClass',
-    'https://nexusclass.edu.br/avatars/default.png'
+    'https://nexusclass.edu.br/avatars/default.png',
+    1
 FROM generate_series(14, 10013) AS g
 ON CONFLICT (id_perfil) DO NOTHING;
 

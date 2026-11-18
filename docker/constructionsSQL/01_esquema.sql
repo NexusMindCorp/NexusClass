@@ -1,4 +1,3 @@
-
 SET
     client_encoding = 'UTF8';
 
@@ -76,6 +75,7 @@ CREATE TABLE
 
 -- ----------------------------------------------------------------------------
 -- 3. Tabela: Perfil (Generalização: Aluno, Professor, Master via Tabela Única)
+-- RN11: aluno e professor pertencem a uma escola; master não pertence a nenhuma.
 -- ----------------------------------------------------------------------------
 CREATE TABLE
     Perfil (
@@ -88,10 +88,16 @@ CREATE TABLE
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            id_escola INTEGER,
             CONSTRAINT pk_perfil PRIMARY KEY (id_perfil),
+            CONSTRAINT fk_perfil_escola FOREIGN KEY (id_escola) REFERENCES Escola (id_escola) ON UPDATE CASCADE ON DELETE RESTRICT,
             CONSTRAINT fk_perfil_auth_users FOREIGN KEY (id_perfil) REFERENCES auth.users (id) ON DELETE CASCADE,
             CONSTRAINT uq_perfil_email UNIQUE (email),
-            CONSTRAINT ck_perfil_role CHECK (role IN ('aluno', 'professor', 'master'))
+            CONSTRAINT ck_perfil_role CHECK (role IN ('aluno', 'professor', 'master')),
+            CONSTRAINT ck_perfil_escola_por_role CHECK (
+                (role = 'master' AND id_escola IS NULL)
+                OR (role IN ('aluno', 'professor') AND id_escola IS NOT NULL)
+            )
     );
 
 -- ----------------------------------------------------------------------------
@@ -389,3 +395,51 @@ VALUES
     ('duvidasalunostoprofessor', 'duvidasalunostoprofessor', FALSE),
     ('anexos_suporte', 'anexos_suporte', FALSE)
 ON CONFLICT (id) DO NOTHING;
+
+-- ----------------------------------------------------------------------------
+-- 20. Gatilhos da RN12: aluno e professor só se vinculam a turmas da própria escola
+--     SECURITY DEFINER para ler Perfil e Turma sem ser bloqueado pelo RLS.
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.fn_valida_escola_aluno_turma()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    IF (SELECT id_escola FROM public.Perfil WHERE id_perfil = NEW.id_aluno)
+       IS DISTINCT FROM
+       (SELECT id_escola FROM public.Turma WHERE id_turma = NEW.id_turma)
+    THEN
+        RAISE EXCEPTION 'Aluno e turma pertencem a escolas diferentes (RN12)';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_aluno_turma_escola ON Aluno_Turma;
+CREATE TRIGGER trg_aluno_turma_escola
+    BEFORE INSERT OR UPDATE ON Aluno_Turma
+    FOR EACH ROW EXECUTE FUNCTION public.fn_valida_escola_aluno_turma();
+
+CREATE OR REPLACE FUNCTION public.fn_valida_escola_professor_turma()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    IF (SELECT id_escola FROM public.Perfil WHERE id_perfil = NEW.id_professor)
+       IS DISTINCT FROM
+       (SELECT id_escola FROM public.Turma WHERE id_turma = NEW.id_turma)
+    THEN
+        RAISE EXCEPTION 'Professor e turma pertencem a escolas diferentes (RN12)';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_professor_turma_escola ON Professor_Turma;
+CREATE TRIGGER trg_professor_turma_escola
+    BEFORE INSERT OR UPDATE ON Professor_Turma
+    FOR EACH ROW EXECUTE FUNCTION public.fn_valida_escola_professor_turma();

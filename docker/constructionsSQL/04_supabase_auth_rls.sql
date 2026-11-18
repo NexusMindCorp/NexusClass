@@ -126,7 +126,11 @@ CREATE POLICY "Perfil: insercao proprio usuario ou master"
     ON public.Perfil FOR INSERT
     TO authenticated
     WITH CHECK (
-        ((SELECT auth.uid()) = id_perfil AND role = 'aluno')
+        (
+            (SELECT auth.uid()) = id_perfil
+            AND role = 'aluno'
+            AND id_escola IS NOT NULL
+        )
         OR EXISTS (
             SELECT 1 FROM public.Perfil p
             WHERE p.id_perfil = (SELECT auth.uid()) AND p.role = 'master'
@@ -149,6 +153,10 @@ CREATE POLICY "Perfil: atualizacao proprio perfil sem escalar role ou master"
             (SELECT auth.uid()) = id_perfil
             AND Perfil.role = (
                 SELECT p.role FROM public.Perfil p
+                WHERE p.id_perfil = (SELECT auth.uid())
+            )
+            AND Perfil.id_escola IS NOT DISTINCT FROM (
+                SELECT p.id_escola FROM public.Perfil p
                 WHERE p.id_perfil = (SELECT auth.uid())
             )
         )
@@ -250,7 +258,16 @@ CREATE POLICY "Aluno_Turma: insercao proprio aluno ou master"
     ON public.Aluno_Turma FOR INSERT
     TO authenticated
     WITH CHECK (
-        (SELECT auth.uid()) = id_aluno
+        (
+            (SELECT auth.uid()) = id_aluno
+            AND EXISTS (
+                SELECT 1
+                FROM public.Perfil p
+                JOIN public.Turma t ON t.id_escola = p.id_escola
+                WHERE p.id_perfil = (SELECT auth.uid())
+                  AND t.id_turma = Aluno_Turma.id_turma
+            )
+        )
         OR EXISTS (
             SELECT 1 FROM public.Perfil p
             WHERE p.id_perfil = (SELECT auth.uid()) AND p.role = 'master'
@@ -269,7 +286,16 @@ CREATE POLICY "Aluno_Turma: atualizacao proprio aluno ou master"
         )
     )
     WITH CHECK (
-        (SELECT auth.uid()) = id_aluno
+        (
+            (SELECT auth.uid()) = id_aluno
+            AND EXISTS (
+                SELECT 1
+                FROM public.Perfil p
+                JOIN public.Turma t ON t.id_escola = p.id_escola
+                WHERE p.id_perfil = (SELECT auth.uid())
+                  AND t.id_turma = Aluno_Turma.id_turma
+            )
+        )
         OR EXISTS (
             SELECT 1 FROM public.Perfil p
             WHERE p.id_perfil = (SELECT auth.uid()) AND p.role = 'master'
