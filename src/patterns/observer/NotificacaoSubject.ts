@@ -1,3 +1,5 @@
+import type { TabelaRow } from "@/lib/database.types";
+import { mapAlertaCalendario, mapMensagem } from "@/lib/db/mappers";
 import type { PayloadAlertaCalendario } from "@/hooks/GerenciadorHooks/type";
 import type { Mensagem } from "@/hooks/MensagensHooks/type";
 import {
@@ -344,6 +346,14 @@ export interface OpcoesCanaisMuralRealtime {
   alunoId: string;
 }
 
+interface DefinicaoCanalMural {
+  nomeCanal: string;
+  filtro: FiltroPostgresChanges;
+  criarEvento: (
+    payload: PayloadPostgresChanges<Record<string, unknown>>,
+  ) => EventoNotificacaoRealtime;
+}
+
 export function conectarCanaisMuralRealtime<
   TCanal extends CanalRealtimeLike = CanalRealtimeLike,
 >(
@@ -353,72 +363,65 @@ export function conectarCanaisMuralRealtime<
 ): () => void {
   const { turmaId, alunoId } = opcoes;
 
-  const channelPosts = supabaseClient
-    .channel("realtime:mural_posts")
-    .on(
-      "postgres_changes",
-      {
+  const definicoes: DefinicaoCanalMural[] = [
+    {
+      nomeCanal: "realtime:mural_post",
+      filtro: {
         event: "INSERT",
         schema: "public",
-        table: "mural_posts",
-        filter: `turma_id=eq.${turmaId}`,
+        table: "mural_post",
+        filter: `id_turma=eq.${turmaId}`,
       },
-      (payload) => {
-        const autorId = String(payload.new.autor_id ?? "");
-        subject.notificar({
-          tipo: "NOVO_POST_MURAL",
-          turmaId,
-          autorId,
-        });
-      },
-    );
-  channelPosts.subscribe();
-
-  const channelAtividades = supabaseClient
-    .channel("realtime:atividades")
-    .on(
-      "postgres_changes",
-      {
+      criarEvento: (payload) => ({
+        tipo: "NOVO_POST_MURAL",
+        turmaId,
+        autorId: String(payload.new.id_autor ?? ""),
+      }),
+    },
+    {
+      nomeCanal: "realtime:atividade",
+      filtro: {
         event: "INSERT",
         schema: "public",
-        table: "atividades",
-        filter: `turma_id=eq.${turmaId}`,
+        table: "atividade",
+        filter: `id_turma=eq.${turmaId}`,
       },
-      (payload) => {
-        const professorId = String(payload.new.professor_id ?? "");
-        subject.notificar({
-          tipo: "NOVA_ATIVIDADE_TURMA",
-          turmaId,
-          professorId,
-        });
-      },
-    );
-  channelAtividades.subscribe();
-
-  const channelEntregas = supabaseClient
-    .channel("realtime:entregas-mural")
-    .on(
-      "postgres_changes",
-      {
+      criarEvento: (payload) => ({
+        tipo: "NOVA_ATIVIDADE_TURMA",
+        turmaId,
+        professorId: String(payload.new.id_professor ?? ""),
+      }),
+    },
+    {
+      nomeCanal: "realtime:entregas-mural",
+      filtro: {
         event: "*",
         schema: "public",
-        table: "entregas_atividades",
-        filter: `aluno_id=eq.${alunoId}`,
+        table: "entrega_atividade",
+        filter: `id_aluno=eq.${alunoId}`,
       },
-      (payload) => {
-        subject.notificar({
-          tipo: "ENTREGA_ATIVIDADE_ATUALIZADA",
-          alunoId,
-          eventType: payload.eventType ?? "*",
-        });
-      },
-    );
-  channelEntregas.subscribe();
+      criarEvento: (payload) => ({
+        tipo: "ENTREGA_ATIVIDADE_ATUALIZADA",
+        alunoId,
+        eventType: payload.eventType ?? "*",
+      }),
+    },
+  ];
+
+  const canais = definicoes.map((definicao) => {
+    const canal = supabaseClient
+      .channel(definicao.nomeCanal)
+      .on("postgres_changes", definicao.filtro, (payload) => {
+        subject.notificar(definicao.criarEvento(payload));
+      });
+    canal.subscribe();
+    return canal;
+  });
 
   return () => {
-    void supabaseClient.removeChannel(channelPosts);
-    void supabaseClient.removeChannel(channelAtividades);
-    void supabaseClient.removeChannel(channelEntregas);
+    for (const canal of canais) {
+      void supabaseClient.removeChannel(canal);
+    }
   };
 }
 
@@ -435,13 +438,13 @@ export function conectarCanalAlertasCalendarioRealtime<
       {
         event: "INSERT",
         schema: "public",
-        table: "alertas_calendario",
+        table: "alerta_calendario",
       },
       (payload) => {
-        const alerta = payload.new as unknown as PayloadAlertaCalendario;
+        const row = payload.new as unknown as TabelaRow<"alerta_calendario">;
         subject.notificar({
           tipo: "ALERTA_CALENDARIO",
-          alerta,
+          alerta: mapAlertaCalendario(row),
         });
       },
     );
@@ -468,11 +471,11 @@ export function conectarCanalMensagensRealtime<
         table: TABELA_MENSAGENS,
       },
       (payload) => {
-        const mensagem = payload.new as unknown as Mensagem;
+        const row = payload.new as unknown as TabelaRow<"mensagem">;
         subject.notificar({
           tipo: "MENSAGEM_CHAT",
           eventType: payload.eventType ?? "INSERT",
-          mensagem,
+          mensagem: mapMensagem(row),
         });
       },
     );
