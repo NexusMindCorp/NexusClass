@@ -23,6 +23,7 @@ export function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
 
     const escolaNum = Number(idEscola.trim());
     if (!isLogin && (!Number.isInteger(escolaNum) || escolaNum <= 0)) {
@@ -44,7 +45,7 @@ export function Login() {
 
         navigate("/", { replace: true });
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -56,15 +57,40 @@ export function Login() {
         });
         if (error) throw error;
 
+        if (!data.session) {
+          toast.success("Conta criada!", {
+            description: "Confirme seu e-mail para fazer login.",
+          });
+          setIsLogin(true);
+          return;
+        }
+
         navigate("/", { replace: true });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const statusErro =
+        error && typeof error === "object" && "status" in error
+          ? Number((error as { status?: unknown }).status)
+          : undefined;
+      const codigoErro =
+        error && typeof error === "object" && "code" in error
+          ? String((error as { code?: unknown }).code ?? "")
+          : "";
       let mensagem =
         error instanceof Error
           ? error.message
           : "Ocorreu um erro ao tentar acessar a conta.";
 
-      if (mensagem === "Invalid login credentials") {
+      const ehRateLimit =
+        statusErro === 429 ||
+        codigoErro === "over_email_send_rate_limit" ||
+        mensagem.toLowerCase().includes("rate limit") ||
+        mensagem.toLowerCase().includes("only request this after");
+
+      if (ehRateLimit) {
+        mensagem =
+          "Limite de cadastros/e-mails do Supabase atingido (2 e-mails/hora no plano padrão). Aguarde ou desative 'Confirm email' / configure SMTP no painel.";
+      } else if (mensagem === "Invalid login credentials") {
         mensagem = "E-mail ou senha incorretos!";
       } else if (
         mensagem.includes("Database error saving new user") ||
@@ -78,8 +104,10 @@ export function Login() {
         description: mensagem,
       });
 
-      setEmail("");
-      setPassword("");
+      if (!ehRateLimit) {
+        setEmail("");
+        setPassword("");
+      }
     } finally {
       setLoading(false);
     }

@@ -78,7 +78,7 @@ const DUVIDAS_FIXTURE: Duvida[] = [
     turma_id: "t_eng",
     assunto: "Dúvida sobre Padrão Strategy",
     descricao: "Como injetar a estratégia no hook?",
-    anexo_url: null,
+    anexos: [],
     created_at: "2026-11-05T10:00:00Z",
     resolvido: false,
     resposta: null,
@@ -90,7 +90,7 @@ const DUVIDAS_FIXTURE: Duvida[] = [
     turma_id: "t_alg",
     assunto: "Complexidade de Quicksort",
     descricao: "Pior caso O(n^2)?",
-    anexo_url: null,
+    anexos: [],
     created_at: "2026-11-05T11:00:00Z",
     resolvido: true,
     resposta: "Sim, quando o pivô é sempre um extremo.",
@@ -102,7 +102,7 @@ const DUVIDAS_FIXTURE: Duvida[] = [
     turma_id: "t_eng",
     assunto: "Entrega da Fase 3",
     descricao: "Qual o escopo de testes?",
-    anexo_url: null,
+    anexos: [],
     created_at: "2026-11-05T12:00:00Z",
     resolvido: false,
     resposta: null,
@@ -291,18 +291,33 @@ describe("Fase 3 — Padrão Strategy (FiltroStrategy)", () => {
     });
 
     it("normalizarDuvida normaliza relações vindas como array, objeto ou nulo do Supabase", () => {
+      const registroBancoBase = {
+        id_duvida: 1,
+        id_aluno: "aluno-1",
+        id_professor: "prof-1",
+        id_turma: 10,
+        assunto: "Dúvida sobre Padrão Strategy",
+        descricao: "Como injetar a estratégia no hook?",
+        created_at: "2026-11-05T10:00:00Z",
+        resolveu: false,
+        resposta: null,
+      };
+
       const comArray = normalizarDuvida({
-        ...DUVIDAS_FIXTURE[0],
+        ...registroBancoBase,
         aluno: [{ nome: "Aluno A", email: "a@ufjf.br", foto_url: null }],
         professor: [{ nome: "Prof. Marco" }],
-        turma: [{ materia: "Engenharia", turma: "A" }],
+        turma: [{ materia: "Engenharia", periodo_escolar: "2026.3" }],
       });
+      expect(comArray.id).toBe("1");
+      expect(comArray.turma_id).toBe("10");
       expect(comArray.aluno?.nome).toBe("Aluno A");
       expect(comArray.professor?.nome).toBe("Prof. Marco");
       expect(comArray.turma?.materia).toBe("Engenharia");
+      expect(comArray.turma?.turma).toBe("2026.3");
 
       const comNulo = normalizarDuvida({
-        ...DUVIDAS_FIXTURE[0],
+        ...registroBancoBase,
         aluno: null,
         professor: null,
         turma: null,

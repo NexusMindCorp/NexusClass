@@ -30,6 +30,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
     bio: null,
     created_at: "2026-10-01T00:00:00Z",
     role: "aluno",
+    id_escola: "1",
   };
 
   const perfilProfessor: PerfilUsuario = {
@@ -40,19 +41,30 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
     bio: null,
     created_at: "2026-10-01T00:00:00Z",
     role: "professor",
+    id_escola: "1",
+  };
+
+  const entregaBancoBase: EntregaRowComPerfil = {
+    id_entrega: 1,
+    id_atividade: 99,
+    id_aluno: "aluno-123",
+    id_objeto_storage: "obj-entrega-1",
+    nota: null,
+    feedback: null,
+    entregue_em: "2026-11-05T12:00:00.000Z",
   };
 
   const entregaBase: Entrega = {
-    id: "ent-1",
-    atividade_id: "ativ-99",
+    id: "1",
+    atividade_id: "99",
     aluno_id: "aluno-123",
-    url_anexo: "ativ-99/aluno-123/1700000000000-trabalho_final.pdf",
+    id_objeto_storage: "obj-entrega-1",
+    caminho_arquivo: "99/aluno-123/1700000000000-trabalho_final.pdf",
+    nome_arquivo: "trabalho_final.pdf",
     nota: null,
     feedback: null,
     no_prazo: true,
     entregue_em: "2026-11-05T12:00:00.000Z",
-    created_at: "2026-11-05T12:00:00.000Z",
-    updated_at: "2026-11-05T12:00:00.000Z",
   };
 
   beforeEach(() => {
@@ -77,13 +89,13 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
     it("deve construir o caminho completo no formato {atividadeId}/{alunoId}/{timestamp}-{nomeLimpo}", () => {
       const caminho = EntregaAtividadeFacade.construirCaminhoArquivo(
-        "ativ-99",
+        "99",
         "aluno-123",
         "Meu Resumo #1.pdf",
         1730800000000,
       );
 
-      expect(caminho).toBe("ativ-99/aluno-123/1730800000000-Meu_Resumo__1.pdf");
+      expect(caminho).toBe("99/aluno-123/1730800000000-Meu_Resumo__1.pdf");
     });
 
     it("deve normalizar lista de entregas com perfis (objeto, array e fallback Aluno Anônimo)", () => {
@@ -93,38 +105,52 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       const registros: EntregaRowComPerfil[] = [
         {
-          ...entregaBase,
-          id: "ent-1",
-          perfis: { nome: "Ana Clara" },
+          ...entregaBancoBase,
+          id_entrega: 1,
+          perfil: { nome: "Ana Clara" },
         },
         {
-          ...entregaBase,
-          id: "ent-2",
-          perfis: [{ nome: "Bruno Costa" }],
+          ...entregaBancoBase,
+          id_entrega: 2,
+          id_objeto_storage: "obj-entrega-2",
+          perfil: [{ nome: "Bruno Costa" }],
         },
         {
-          ...entregaBase,
-          id: "ent-3",
-          perfis: null,
+          ...entregaBancoBase,
+          id_entrega: 3,
+          id_objeto_storage: "obj-entrega-3",
+          perfil: null,
         },
       ];
 
+      const caminhos = new Map<string, string>([
+        ["obj-entrega-1", "99/a1/1700-ana.pdf"],
+        ["obj-entrega-2", "99/a2/1700-bruno.pdf"],
+      ]);
+
       const normalizadas =
-        EntregaAtividadeFacade.normalizarEntregasComPerfis(registros);
+        EntregaAtividadeFacade.normalizarEntregasComPerfis(registros, caminhos);
 
       expect(normalizadas).toHaveLength(3);
       expect(normalizadas[0].aluno_nome).toBe("Ana Clara");
+      expect(normalizadas[0].nome_arquivo).toBe("ana.pdf");
       expect(normalizadas[1].aluno_nome).toBe("Bruno Costa");
       expect(normalizadas[2].aluno_nome).toBe("Aluno Anônimo");
+      expect(normalizadas[2].caminho_arquivo).toBeNull();
     });
   });
 
   describe("Orquestração Storage + PostgreSQL na EntregaAtividadeFacade (Nível 3 RBT)", () => {
     const criarMockSupabaseClient = () => {
       const uploadMock = vi.fn();
+      const removeMock = vi.fn().mockResolvedValue({ error: null });
       const createSignedUrlMock = vi.fn();
-      const maybeSingleMock = vi.fn();
+      const maybeSingleMock = vi.fn().mockResolvedValue({ data: null, error: null });
       const orderMock = vi.fn();
+      const inStorageMock = vi.fn().mockResolvedValue({
+        data: [{ id: "obj-entrega-1", name: entregaBase.caminho_arquivo }],
+        error: null,
+      });
       const upsertMock = vi.fn();
       const updateEqAlunoMock = vi.fn();
       const updateEqAtividadeMock = vi.fn().mockReturnValue({
@@ -143,10 +169,12 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
       const selectMock = vi.fn().mockReturnValue({
         eq: selectEqAtividadeMock,
+        in: inStorageMock,
       });
 
       const storageFromMock = vi.fn().mockReturnValue({
         upload: uploadMock,
+        remove: removeMock,
         createSignedUrl: createSignedUrlMock,
       });
 
@@ -166,12 +194,14 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
         storageFromMock,
         fromMock,
         uploadMock,
+        removeMock,
         createSignedUrlMock,
         selectMock,
         selectEqAtividadeMock,
         selectEqAlunoMock,
         maybeSingleMock,
         orderMock,
+        inStorageMock,
         upsertMock,
         updateMock,
         updateEqAtividadeMock,
@@ -196,12 +226,12 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
 
       await expect(
-        facadeInativa.carregarEntregas("ativ-99", perfilAluno),
+        facadeInativa.carregarEntregas("99", perfilAluno),
       ).rejects.toThrow("Cliente Supabase não configurado para entregas.");
 
       await expect(
         facadeInativa.submeter({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           arquivo,
         }),
@@ -209,7 +239,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       await expect(
         facadeInativa.avaliar({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           nota: 9.5,
           feedback: "Ótimo",
@@ -221,7 +251,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       ).resolves.toBeNull();
     });
 
-    it("deve realizar upload no Storage e upsert na tabela entregas_atividades ao submeter", async () => {
+    it("deve realizar upload no Storage e upsert na tabela entrega_atividade gravando id_objeto_storage", async () => {
       vi.useFakeTimers();
       vi.setSystemTime(new Date("2026-11-05T15:30:00.000Z"));
 
@@ -231,11 +261,12 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
         fromMock,
         uploadMock,
         upsertMock,
+        removeMock,
       } = criarMockSupabaseClient();
 
-      const caminhoEsperado = `ativ-99/aluno-123/${Date.now()}-Prova_1.pdf`;
+      const caminhoEsperado = `99/aluno-123/${Date.now()}-Prova_1.pdf`;
       uploadMock.mockResolvedValue({
-        data: { path: caminhoEsperado },
+        data: { id: "obj-uuid-1", path: caminhoEsperado },
         error: null,
       });
       upsertMock.mockResolvedValue({ error: null });
@@ -246,7 +277,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
 
       const resultado = await facade.submeter({
-        atividadeId: "ativ-99",
+        atividadeId: "99",
         alunoId: "aluno-123",
         arquivo,
       });
@@ -258,17 +289,62 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       expect(fromMock).toHaveBeenCalledWith(TABELA_ENTREGAS);
       expect(upsertMock).toHaveBeenCalledWith(
         {
-          atividade_id: "ativ-99",
-          aluno_id: "aluno-123",
-          url_anexo: caminhoEsperado,
+          id_atividade: 99,
+          id_aluno: "aluno-123",
+          id_objeto_storage: "obj-uuid-1",
           entregue_em: "2026-11-05T15:30:00.000Z",
         },
-        { onConflict: "atividade_id,aluno_id" },
+        { onConflict: "id_atividade,id_aluno" },
       );
+      expect(removeMock).not.toHaveBeenCalled();
       expect(resultado).toEqual({
+        idObjetoStorage: "obj-uuid-1",
         caminhoArquivo: caminhoEsperado,
         entregueEm: "2026-11-05T15:30:00.000Z",
       });
+    });
+
+    it("deve no reenvio executar UPSERT antes de remover o arquivo antigo (ADR-009 §2.8)", async () => {
+      const ordem: string[] = [];
+      const {
+        client,
+        maybeSingleMock,
+        inStorageMock,
+        uploadMock,
+        upsertMock,
+        removeMock,
+      } = criarMockSupabaseClient();
+
+      maybeSingleMock.mockResolvedValueOnce({
+        data: { id_objeto_storage: "obj-antigo" },
+        error: null,
+      });
+      inStorageMock.mockResolvedValueOnce({
+        data: [{ id: "obj-antigo", name: "99/aluno-123/antigo.pdf" }],
+        error: null,
+      });
+      uploadMock.mockImplementation(async (path: string) => {
+        ordem.push("upload");
+        return { data: { id: "obj-novo", path }, error: null };
+      });
+      upsertMock.mockImplementation(async () => {
+        ordem.push("upsert");
+        return { error: null };
+      });
+      removeMock.mockImplementation(async () => {
+        ordem.push("remove-antigo");
+        return { error: null };
+      });
+
+      const facade = new EntregaAtividadeFacade(client);
+      await facade.submeter({
+        atividadeId: "99",
+        alunoId: "aluno-123",
+        arquivo: new File(["v2"], "novo.pdf"),
+      });
+
+      expect(ordem).toEqual(["upload", "upsert", "remove-antigo"]);
+      expect(removeMock).toHaveBeenCalledWith(["99/aluno-123/antigo.pdf"]);
     });
 
     it("deve interromper a submissão e não chamar upsert no banco se o upload no Storage falhar", async () => {
@@ -287,7 +363,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       await expect(
         facade.submeter({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           arquivo,
         }),
@@ -295,7 +371,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       await expect(
         facade.submeter({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           arquivo,
         }),
@@ -304,10 +380,11 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       expect(upsertMock).not.toHaveBeenCalled();
     });
 
-    it("deve propagar erro caso o upsert no PostgreSQL falhe após o upload", async () => {
-      const { client, uploadMock, upsertMock } = criarMockSupabaseClient();
+    it("deve compensar removendo o arquivo recém-enviado caso o upsert falhe após o upload", async () => {
+      const { client, uploadMock, upsertMock, removeMock } =
+        criarMockSupabaseClient();
       uploadMock.mockResolvedValue({
-        data: { path: "ativ-99/aluno-123/123-arq.pdf" },
+        data: { id: "obj-novo", path: "99/aluno-123/123-arq.pdf" },
         error: null,
       });
       upsertMock.mockResolvedValue({
@@ -319,14 +396,16 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       await expect(
         facade.submeter({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           arquivo,
         }),
       ).rejects.toEqual({ message: "Violação de política RLS" });
+
+      expect(removeMock).toHaveBeenCalledWith(["99/aluno-123/123-arq.pdf"]);
     });
 
-    it("deve carregar entrega própria para aluno e propagar erro se consulta falhar", async () => {
+    it("deve carregar entrega própria para aluno resolvendo caminho via v_storage_objetos e propagar erro se consulta falhar", async () => {
       const {
         client,
         selectEqAtividadeMock,
@@ -335,27 +414,33 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       } = criarMockSupabaseClient();
 
       maybeSingleMock
-        .mockResolvedValueOnce({ data: entregaBase, error: null })
+        .mockResolvedValueOnce({ data: entregaBancoBase, error: null })
+        .mockResolvedValueOnce({ data: null, error: null })
         .mockResolvedValueOnce({
           data: null,
           error: { message: "Erro ao consultar entrega do aluno" },
         });
 
       const facade = new EntregaAtividadeFacade(client);
-      const resultado = await facade.carregarEntregas("ativ-99", perfilAluno);
-
-      expect(selectEqAtividadeMock).toHaveBeenCalledWith(
-        "atividade_id",
-        "ativ-99",
+      const resultado = await facade.carregarEntregas(
+        "99",
+        perfilAluno,
+        "2026-11-10T23:59:00Z",
       );
-      expect(selectEqAlunoMock).toHaveBeenCalledWith("aluno_id", "aluno-123");
+
+      expect(selectEqAtividadeMock).toHaveBeenCalledWith("id_atividade", 99);
+      expect(selectEqAlunoMock).toHaveBeenCalledWith("id_aluno", "aluno-123");
       expect(resultado).toEqual({
         entregaPropria: entregaBase,
         todasEntregas: [],
       });
 
       await expect(
-        facade.carregarEntregas("ativ-99", perfilAluno),
+        facade.carregarEntregas("99", perfilAluno),
+      ).resolves.toEqual({ entregaPropria: null, todasEntregas: [] });
+
+      await expect(
+        facade.carregarEntregas("99", perfilAluno),
       ).rejects.toEqual({ message: "Erro ao consultar entrega do aluno" });
     });
 
@@ -366,8 +451,8 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
         .mockResolvedValueOnce({
           data: [
             {
-              ...entregaBase,
-              perfis: { nome: "Lucas Mendes" },
+              ...entregaBancoBase,
+              perfil: { nome: "Lucas Mendes" },
             },
           ],
           error: null,
@@ -379,8 +464,9 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
 
       const facade = new EntregaAtividadeFacade(client);
       const resultado = await facade.carregarEntregas(
-        "ativ-99",
+        "99",
         perfilProfessor,
+        "2026-11-10T23:59:00Z",
       );
 
       expect(orderMock).toHaveBeenCalledWith("entregue_em", {
@@ -389,16 +475,16 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       expect(resultado.entregaPropria).toBeNull();
       expect(resultado.todasEntregas).toHaveLength(1);
       expect(resultado.todasEntregas[0].aluno_nome).toBe("Lucas Mendes");
+      expect(resultado.todasEntregas[0].caminho_arquivo).toBe(
+        entregaBase.caminho_arquivo,
+      );
 
       await expect(
-        facade.carregarEntregas("ativ-99", perfilProfessor),
+        facade.carregarEntregas("99", perfilProfessor),
       ).rejects.toEqual({ message: "Erro ao listar entregas da turma" });
     });
 
-    it("deve atualizar nota e feedback ao avaliar entrega e propagar erro em caso de falha", async () => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date("2026-11-05T18:00:00.000Z"));
-
+    it("deve atualizar nota e feedback sem updated_at ao avaliar entrega e propagar erro em caso de falha", async () => {
       const {
         client,
         updateMock,
@@ -415,7 +501,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       const facade = new EntregaAtividadeFacade(client);
 
       await facade.avaliar({
-        atividadeId: "ativ-99",
+        atividadeId: "99",
         alunoId: "aluno-123",
         nota: 9.8,
         feedback: "Excelente implementação do padrão Facade!",
@@ -424,17 +510,13 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       expect(updateMock).toHaveBeenCalledWith({
         nota: 9.8,
         feedback: "Excelente implementação do padrão Facade!",
-        updated_at: "2026-11-05T18:00:00.000Z",
       });
-      expect(updateEqAtividadeMock).toHaveBeenCalledWith(
-        "atividade_id",
-        "ativ-99",
-      );
-      expect(updateEqAlunoMock).toHaveBeenCalledWith("aluno_id", "aluno-123");
+      expect(updateEqAtividadeMock).toHaveBeenCalledWith("id_atividade", 99);
+      expect(updateEqAlunoMock).toHaveBeenCalledWith("id_aluno", "aluno-123");
 
       await expect(
         facade.avaliar({
-          atividadeId: "ativ-99",
+          atividadeId: "99",
           alunoId: "aluno-123",
           nota: 5,
           feedback: "Erro",
@@ -459,10 +541,10 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
         });
 
       const facade = new EntregaAtividadeFacade(client);
-      const url = await facade.obterUrlDownload("ativ-99/aluno-123/arq.pdf");
+      const url = await facade.obterUrlDownload("99/aluno-123/arq.pdf");
 
       expect(createSignedUrlMock).toHaveBeenCalledWith(
-        "ativ-99/aluno-123/arq.pdf",
+        "99/aluno-123/arq.pdf",
         TEMPO_EXPIRACAO_URL_SEGUNDOS,
       );
       expect(url).toBe("https://supabase.nexus/signed/123");
@@ -487,7 +569,8 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
         todasEntregas: [{ ...entregaBase, aluno_nome: "Lucas Mendes" }],
       }),
       submeter: vi.fn().mockResolvedValue({
-        caminhoArquivo: entregaBase.url_anexo!,
+        idObjetoStorage: entregaBase.id_objeto_storage,
+        caminhoArquivo: entregaBase.caminho_arquivo!,
         entregueEm: entregaBase.entregue_em,
       }),
       avaliar: vi.fn().mockResolvedValue(undefined),
@@ -501,7 +584,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       const fakeFacade = criarFakeFacade();
 
       const { result } = renderHook(() =>
-        useEntregas("ativ-99", perfilAluno, fakeFacade),
+        useEntregas("99", perfilAluno, fakeFacade),
       );
 
       await waitFor(() => {
@@ -516,7 +599,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
 
       expect(fakeFacade.submeter).toHaveBeenCalledWith({
-        atividadeId: "ativ-99",
+        atividadeId: "99",
         alunoId: "aluno-123",
         arquivo,
       });
@@ -530,7 +613,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       const fakeFacade = criarFakeFacade();
 
       const { result } = renderHook(() =>
-        useEntregas("ativ-99", perfilProfessor, fakeFacade),
+        useEntregas("99", perfilProfessor, fakeFacade),
       );
 
       await waitFor(() => {
@@ -542,7 +625,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
 
       expect(fakeFacade.avaliar).toHaveBeenCalledWith({
-        atividadeId: "ativ-99",
+        atividadeId: "99",
         alunoId: "aluno-123",
         nota: 10,
         feedback: "Perfeito!",
@@ -580,7 +663,7 @@ describe("EntregaAtividadeFacade & useEntregas (Padrão Facade — Níveis 2 e 3
       });
 
       const { result } = renderHook(() =>
-        useEntregas("ativ-99", perfilAluno, fakeFacade),
+        useEntregas("99", perfilAluno, fakeFacade),
       );
 
       await waitFor(() => {

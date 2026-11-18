@@ -30,7 +30,6 @@ const criarMensagemFake = (parcial: Partial<Mensagem> = {}): Mensagem => ({
   conteudo: "Olá, professor!",
   lida: false,
   created_at: "2026-11-05T12:00:00Z",
-  assunto: "",
   ...parcial,
 });
 
@@ -491,33 +490,39 @@ describe("Fase 4 — Padrão Observer (NotificacaoSubject e Observers Realtime)"
   });
 
   describe("Conectores de Borda Supabase Realtime (5 canais)", () => {
-    it("deve conectar e desconectar os 3 canais do Mural (mural_posts, atividades, entregas-mural) repassando payloads ao Subject", () => {
+    it("deve conectar e desconectar os 3 canais do Mural (mural_post, atividade, entregas-mural) repassando payloads ao Subject", () => {
       const { cliente, canais, canaisRemovidos } = criarClienteRealtimeFake();
       const subject = new NotificacaoSubject();
       const eventosRecebidos: EventoNotificacaoRealtime[] = [];
       subject.inscrever({ atualizar: (e) => eventosRecebidos.push(e) });
 
       const desconectar = conectarCanaisMuralRealtime(cliente, subject, {
-        turmaId: "turma-eng",
+        turmaId: "1",
         alunoId: "aluno-1",
       });
 
       expect(canais.size).toBe(3);
-      expect(canais.get("realtime:mural_posts")?.subscrito).toBe(true);
-      expect(canais.get("realtime:atividades")?.subscrito).toBe(true);
+      expect(canais.get("realtime:mural_post")?.subscrito).toBe(true);
+      expect(canais.get("realtime:atividade")?.subscrito).toBe(true);
       expect(canais.get("realtime:entregas-mural")?.subscrito).toBe(true);
+      expect(canais.get("realtime:mural_post")?.filtro?.filter).toBe(
+        "id_turma=eq.1",
+      );
+      expect(canais.get("realtime:entregas-mural")?.filtro?.filter).toBe(
+        "id_aluno=eq.aluno-1",
+      );
 
-      // Dispara eventos simulando o WebSocket do Supabase (com e sem campos definidos)
-      canais.get("realtime:mural_posts")?.callback?.({
-        new: { autor_id: "prof-1" },
+      // Dispara eventos simulando o WebSocket do Supabase (colunas do esquema novo)
+      canais.get("realtime:mural_post")?.callback?.({
+        new: { id_autor: "prof-1" },
       });
-      canais.get("realtime:mural_posts")?.callback?.({
+      canais.get("realtime:mural_post")?.callback?.({
         new: {},
       });
-      canais.get("realtime:atividades")?.callback?.({
-        new: { professor_id: "prof-2" },
+      canais.get("realtime:atividade")?.callback?.({
+        new: { id_professor: "prof-2" },
       });
-      canais.get("realtime:atividades")?.callback?.({
+      canais.get("realtime:atividade")?.callback?.({
         new: {},
       });
       canais.get("realtime:entregas-mural")?.callback?.({
@@ -529,16 +534,16 @@ describe("Fase 4 — Padrão Observer (NotificacaoSubject e Observers Realtime)"
       });
 
       expect(eventosRecebidos).toEqual([
-        { tipo: "NOVO_POST_MURAL", turmaId: "turma-eng", autorId: "prof-1" },
-        { tipo: "NOVO_POST_MURAL", turmaId: "turma-eng", autorId: "" },
+        { tipo: "NOVO_POST_MURAL", turmaId: "1", autorId: "prof-1" },
+        { tipo: "NOVO_POST_MURAL", turmaId: "1", autorId: "" },
         {
           tipo: "NOVA_ATIVIDADE_TURMA",
-          turmaId: "turma-eng",
+          turmaId: "1",
           professorId: "prof-2",
         },
         {
           tipo: "NOVA_ATIVIDADE_TURMA",
-          turmaId: "turma-eng",
+          turmaId: "1",
           professorId: "",
         },
         {
@@ -555,8 +560,8 @@ describe("Fase 4 — Padrão Observer (NotificacaoSubject e Observers Realtime)"
 
       desconectar();
       expect(canaisRemovidos).toEqual([
-        "realtime:mural_posts",
-        "realtime:atividades",
+        "realtime:mural_post",
+        "realtime:atividade",
         "realtime:entregas-mural",
       ]);
     });
@@ -576,25 +581,55 @@ describe("Fase 4 — Padrão Observer (NotificacaoSubject e Observers Realtime)"
         subject,
       );
 
-      const alerta = criarAlertaFake({ id: "alerta-99" });
       canais.get("alertas-calendario-5-min")?.callback?.({
         eventType: "INSERT",
-        new: alerta as unknown as Record<string, unknown>,
+        new: {
+          id_alerta: 99,
+          id_evento: 10,
+          mensagem: "Lembrete: Prova começa em 5 minutos.",
+          minutos_antes: 5,
+          lembrete_para: "2026-11-05T14:55:00Z",
+        },
       });
 
-      const msg = criarMensagemFake({ id: "msg-99" });
+      const msgRow = {
+        id_mensagem: 99,
+        id_remetente: "prof-1",
+        id_destinatario: "aluno-1",
+        conteudo: "Olá!",
+        lida: false,
+        created_at: "2026-11-05T12:00:00Z",
+      };
       canais.get("chat-nexusclass")?.callback?.({
         eventType: "UPDATE",
-        new: msg as unknown as Record<string, unknown>,
+        new: msgRow,
       });
       canais.get("chat-nexusclass")?.callback?.({
-        new: msg as unknown as Record<string, unknown>,
+        new: msgRow,
+      });
+
+      const msgEsperada = criarMensagemFake({
+        id: "99",
+        remetente_id: "prof-1",
+        destinatario_id: "aluno-1",
+        conteudo: "Olá!",
+        lida: false,
+        created_at: "2026-11-05T12:00:00Z",
       });
 
       expect(eventosRecebidos).toEqual([
-        { tipo: "ALERTA_CALENDARIO", alerta },
-        { tipo: "MENSAGEM_CHAT", eventType: "UPDATE", mensagem: msg },
-        { tipo: "MENSAGEM_CHAT", eventType: "INSERT", mensagem: msg },
+        {
+          tipo: "ALERTA_CALENDARIO",
+          alerta: {
+            id: "99",
+            evento_id: "10",
+            mensagem: "Lembrete: Prova começa em 5 minutos.",
+            minutos_antes: 5,
+            lembrete_para: "2026-11-05T14:55:00Z",
+          },
+        },
+        { tipo: "MENSAGEM_CHAT", eventType: "UPDATE", mensagem: msgEsperada },
+        { tipo: "MENSAGEM_CHAT", eventType: "INSERT", mensagem: msgEsperada },
       ]);
 
       desconectarAlertas();
