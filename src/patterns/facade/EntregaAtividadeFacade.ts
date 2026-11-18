@@ -1,9 +1,12 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import type { Entrega, EntregaRowComPerfil } from "@/hooks/EntregasHooks/type";
+import type { TabelaRow } from "@/lib/database.types";
+import { mapEntrega, paraInteiroId, umOuPrimeiro } from "@/lib/db/mappers";
 import { supabase } from "@/lib/supabaseClient";
+import { resolverCaminhosStorage } from "./AnexoStorageFacade";
 
 export const BUCKET_ENTREGAS = "entregas_atividades";
-export const TABELA_ENTREGAS = "entregas_atividades";
+export const TABELA_ENTREGAS = "entrega_atividade";
 export const TEMPO_EXPIRACAO_URL_SEGUNDOS = 3600;
 
 export interface SubmeterEntregaParams {
@@ -13,6 +16,7 @@ export interface SubmeterEntregaParams {
 }
 
 export interface ResultadoSubmissaoEntrega {
+  idObjetoStorage: string;
   caminhoArquivo: string;
   entregueEm: string;
 }
@@ -35,9 +39,10 @@ export interface IEntregaStorageBucket {
     file: File,
     options?: { upsert?: boolean },
   ): Promise<{
-    data: { path: string } | null;
+    data: { id?: string; path: string } | null;
     error: { message: string } | null;
   }>;
+  remove(paths: string[]): Promise<{ error: { message: string } | null }>;
   createSignedUrl(
     path: string,
     expiresIn: number,
@@ -51,14 +56,14 @@ export interface IEntregaTableQuery {
   select(columns: string): {
     eq(
       column: string,
-      value: string,
+      value: string | number,
     ): {
       eq(
         column2: string,
-        value2: string,
+        value2: string | number,
       ): {
         maybeSingle(): Promise<{
-          data: Entrega | null;
+          data: TabelaRow<"entrega_atividade"> | null;
           error: { message: string } | null;
         }>;
       };
@@ -70,28 +75,31 @@ export interface IEntregaTableQuery {
         error: { message: string } | null;
       }>;
     };
+    in(
+      column: string,
+      values: ReadonlyArray<string | number>,
+    ): Promise<{
+      data: Array<Record<string, unknown>> | null;
+      error: { message: string } | null;
+    }>;
   };
   upsert(
     values: {
-      atividade_id: string;
-      aluno_id: string;
-      url_anexo: string;
+      id_atividade: number;
+      id_aluno: string;
+      id_objeto_storage: string;
       entregue_em: string;
     },
     options: { onConflict: string },
   ): Promise<{ error: { message: string } | null }>;
-  update(values: {
-    nota: number;
-    feedback: string;
-    updated_at: string;
-  }): {
+  update(values: { nota: number; feedback: string }): {
     eq(
       column: string,
-      value: string,
+      value: string | number,
     ): {
       eq(
         column2: string,
-        value2: string,
+        value2: string | number,
       ): Promise<{ error: { message: string } | null }>;
     };
   };
@@ -109,6 +117,7 @@ export interface IEntregaAtividadeFacade {
   carregarEntregas(
     atividadeId: string,
     perfil: Pick<PerfilUsuario, "id" | "role">,
+    dataEntregaAtividade?: string | null,
   ): Promise<ResultadoCarregamentoEntregas>;
   submeter(params: SubmeterEntregaParams): Promise<ResultadoSubmissaoEntrega>;
   avaliar(params: AvaliarEntregaParams): Promise<void>;
@@ -138,23 +147,24 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
     nomeOriginal: string,
     timestamp = Date.now(),
   ): string {
-    const nomeLimpo =
-      EntregaAtividadeFacade.higienizarNomeArquivo(nomeOriginal);
+    const nomeLimpo = EntregaAtividadeFacade.higienizarNomeArquivo(nomeOriginal);
     return `${atividadeId}/${alunoId}/${timestamp}-${nomeLimpo}`;
   }
 
   static normalizarEntregasComPerfis(
     registros: EntregaRowComPerfil[] | null,
+    caminhosPorObjeto: Map<string, string> = new Map(),
+    dataEntregaAtividade?: string | null,
   ): Entrega[] {
     if (!registros) return [];
 
     return registros.map((registro) => {
-      const perfilRelacionado = Array.isArray(registro.perfis)
-        ? registro.perfis[0]
-        : registro.perfis;
-
+      const perfilRelacionado = umOuPrimeiro(registro.perfil);
       return {
-        ...registro,
+        ...mapEntrega(registro, {
+          dataEntregaAtividade,
+          caminhoArquivo: caminhosPorObjeto.get(registro.id_objeto_storage) ?? null,
+        }),
         aluno_nome: perfilRelacionado?.nome || "Aluno Anônimo",
       };
     });
@@ -174,21 +184,30 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
   async carregarEntregas(
     atividadeId: string,
     perfil: Pick<PerfilUsuario, "id" | "role">,
+    dataEntregaAtividade?: string | null,
   ): Promise<ResultadoCarregamentoEntregas> {
     const client = this.obterClienteObrigatorio();
+    const idAtividade = paraInteiroId(atividadeId, "atividadeId");
 
     if (perfil.role === "aluno") {
       const { data, error } = await client
         .from(TABELA_ENTREGAS)
         .select("*")
-        .eq("atividade_id", atividadeId)
-        .eq("aluno_id", perfil.id)
+        .eq("id_atividade", idAtividade)
+        .eq("id_aluno", perfil.id)
         .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        return { entregaPropria: null, todasEntregas: [] };
+      }
 
+      const caminhos = await resolverCaminhosStorage(client, [data.id_objeto_storage]);
       return {
-        entregaPropria: data,
+        entregaPropria: mapEntrega(data, {
+          dataEntregaAtividade,
+          caminhoArquivo: caminhos.get(data.id_objeto_storage) ?? null,
+        }),
         todasEntregas: [],
       };
     }
@@ -198,28 +217,59 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
       .select(
         `
         *,
-        perfis:aluno_id (
+        perfil:id_aluno (
           nome
         )
       `,
       )
-      .eq("atividade_id", atividadeId)
+      .eq("id_atividade", idAtividade)
       .order("entregue_em", { ascending: false });
 
     if (error) throw error;
 
+    const idsObjetos = (data ?? []).map((item) => item.id_objeto_storage);
+    const caminhos = await resolverCaminhosStorage(client, idsObjetos);
+
     return {
       entregaPropria: null,
-      todasEntregas: EntregaAtividadeFacade.normalizarEntregasComPerfis(data),
+      todasEntregas: EntregaAtividadeFacade.normalizarEntregasComPerfis(
+        data,
+        caminhos,
+        dataEntregaAtividade,
+      ),
     };
   }
 
+  /**
+   * Ordem obrigatória (ADR-009 §2.8):
+   * 1) consulta objeto anterior;
+   * 2) upload do novo arquivo;
+   * 3) UPSERT apontando para o novo `id_objeto_storage` (com compensação se falhar);
+   * 4) só então remove o objeto anterior do Storage (evita que o ON DELETE CASCADE apague a entrega).
+   */
   async submeter({
     atividadeId,
     alunoId,
     arquivo,
   }: SubmeterEntregaParams): Promise<ResultadoSubmissaoEntrega> {
     const client = this.obterClienteObrigatorio();
+    const idAtividade = paraInteiroId(atividadeId, "atividadeId");
+
+    const { data: entregaAnterior } = await client
+      .from(TABELA_ENTREGAS)
+      .select("id_objeto_storage")
+      .eq("id_atividade", idAtividade)
+      .eq("id_aluno", alunoId)
+      .maybeSingle();
+
+    let caminhoAnterior: string | null = null;
+    if (entregaAnterior?.id_objeto_storage) {
+      const caminhos = await resolverCaminhosStorage(client, [
+        entregaAnterior.id_objeto_storage,
+      ]);
+      caminhoAnterior = caminhos.get(entregaAnterior.id_objeto_storage) ?? null;
+    }
+
     const caminhoArquivo = EntregaAtividadeFacade.construirCaminhoArquivo(
       atividadeId,
       alunoId,
@@ -230,7 +280,7 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
       .from(BUCKET_ENTREGAS)
       .upload(caminhoArquivo, arquivo, { upsert: true });
 
-    if (uploadError || !uploadData) {
+    if (uploadError || !uploadData?.id) {
       throw uploadError ?? new Error("Falha ao enviar arquivo para o Storage.");
     }
 
@@ -238,17 +288,29 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
 
     const { error: dbError } = await client.from(TABELA_ENTREGAS).upsert(
       {
-        atividade_id: atividadeId,
-        aluno_id: alunoId,
-        url_anexo: uploadData.path,
+        id_atividade: idAtividade,
+        id_aluno: alunoId,
+        id_objeto_storage: uploadData.id,
         entregue_em: entregueEm,
       },
-      { onConflict: "atividade_id,aluno_id" },
+      { onConflict: "id_atividade,id_aluno" },
     );
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      await client.storage.from(BUCKET_ENTREGAS).remove([uploadData.path]);
+      throw dbError;
+    }
+
+    if (
+      caminhoAnterior &&
+      caminhoAnterior !== uploadData.path &&
+      entregaAnterior?.id_objeto_storage !== uploadData.id
+    ) {
+      await client.storage.from(BUCKET_ENTREGAS).remove([caminhoAnterior]);
+    }
 
     return {
+      idObjetoStorage: uploadData.id,
       caminhoArquivo: uploadData.path,
       entregueEm,
     };
@@ -261,16 +323,16 @@ export class EntregaAtividadeFacade implements IEntregaAtividadeFacade {
     feedback,
   }: AvaliarEntregaParams): Promise<void> {
     const client = this.obterClienteObrigatorio();
+    const idAtividade = paraInteiroId(atividadeId, "atividadeId");
 
     const { error } = await client
       .from(TABELA_ENTREGAS)
       .update({
         nota,
         feedback,
-        updated_at: new Date().toISOString(),
       })
-      .eq("atividade_id", atividadeId)
-      .eq("aluno_id", alunoId);
+      .eq("id_atividade", idAtividade)
+      .eq("id_aluno", alunoId);
 
     if (error) throw error;
   }
