@@ -2,159 +2,198 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "*", // Libera qualquer cabeçalho de requisição
+  "Access-Control-Allow-Headers": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const BUCKETS_ALUNO = [
+  "entregas_atividades",
+  "duvidasalunostoprofessor",
+  "anexos_suporte",
+] as const;
+
+type StorageObjeto = {
+  id: string;
+  bucket_id: string;
+  name: string;
+};
+
+function respostaJson(body: Record<string, unknown>, status: number) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+async function coletarIdsObjetosDoAluno(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<string[]> {
+  const ids = new Set<string>();
+
+  const [{ data: entregas }, { data: duvidas }, { data: tickets }] =
+    await Promise.all([
+      supabaseAdmin
+        .from("entrega_atividade")
+        .select("id_objeto_storage")
+        .eq("id_aluno", userId),
+      supabaseAdmin
+        .from("duvida")
+        .select("id_duvida")
+        .eq("id_aluno", userId),
+      supabaseAdmin
+        .from("ticket_suporte")
+        .select("id_suporte")
+        .eq("id_perfil", userId),
+    ]);
+
+  for (const e of entregas ?? []) {
+    if (e.id_objeto_storage) ids.add(e.id_objeto_storage);
+  }
+
+  const duvidaIds = (duvidas ?? []).map((d) => d.id_duvida);
+  if (duvidaIds.length > 0) {
+    const { data: duvidaAnexos } = await supabaseAdmin
+      .from("duvida_anexo")
+      .select("id_objeto_storage")
+      .in("id_duvida", duvidaIds);
+
+    for (const a of duvidaAnexos ?? []) {
+      if (a.id_objeto_storage) ids.add(a.id_objeto_storage);
+    }
+  }
+
+  const suporteIds = (tickets ?? []).map((t) => t.id_suporte);
+  if (suporteIds.length > 0) {
+    const { data: suporteAnexos } = await supabaseAdmin
+      .from("ticket_suporte_anexo")
+      .select("id_objeto_storage")
+      .in("id_suporte", suporteIds);
+
+    for (const a of suporteAnexos ?? []) {
+      if (a.id_objeto_storage) ids.add(a.id_objeto_storage);
+    }
+  }
+
+  return Array.from(ids);
+}
+
+async function limparStorageDoAluno(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<void> {
+  const idsRelacionais = await coletarIdsObjetosDoAluno(supabaseAdmin, userId);
+
+  const storageAdmin = supabaseAdmin.schema("storage");
+  const objetosPorId = new Map<string, StorageObjeto>();
+
+  if (idsRelacionais.length > 0) {
+    const { data } = await storageAdmin
+      .from("objects")
+      .select("id, bucket_id, name")
+      .in("id", idsRelacionais);
+
+    for (const obj of (data ?? []) as StorageObjeto[]) {
+      objetosPorId.set(obj.id, obj);
+    }
+  }
+
+  const { data: objetosPorDono } = await storageAdmin
+    .from("objects")
+    .select("id, bucket_id, name")
+    .eq("owner_id", userId)
+    .in("bucket_id", [...BUCKETS_ALUNO]);
+
+  for (const obj of (objetosPorDono ?? []) as StorageObjeto[]) {
+    objetosPorId.set(obj.id, obj);
+  }
+
+  const caminhosPorBucket = new Map<string, string[]>();
+  for (const obj of objetosPorId.values()) {
+    if (!obj.bucket_id || !obj.name) continue;
+    const atual = caminhosPorBucket.get(obj.bucket_id) ?? [];
+    atual.push(obj.name);
+    caminhosPorBucket.set(obj.bucket_id, atual);
+  }
+
+  for (const [bucket, caminhos] of caminhosPorBucket.entries()) {
+    if (caminhos.length > 0) {
+      await supabaseAdmin.storage.from(bucket).remove(caminhos);
+    }
+  }
+}
+
 Deno.serve(async (req) => {
-  // Trata requisição de preflight CORS (enviada automaticamente pelo navegador)
   if (req.method === "OPTIONS") {
-    return new Response("ok", { 
-      status: 200, 
-      headers: corsHeaders 
-    });
+    return new Response("ok", { status: 200, headers: corsHeaders });
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Cabeçalho de autorização ausente" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson({ error: "Cabeçalho de autorização ausente" }, 401);
     }
 
     const token = authHeader.replace("Bearer ", "");
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      return new Response(JSON.stringify({ error: "Variáveis de ambiente do Supabase não configuradas no servidor" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson(
+        { error: "Variáveis de ambiente do Supabase não configuradas no servidor" },
+        500,
+      );
     }
 
-    // Inicializa o cliente admin com a Service Role Key
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Valida com segurança o token JWT do usuário no servidor
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Sessão inválida ou expirada" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson({ error: "Sessão inválida ou expirada" }, 401);
     }
 
-    // Busca a role do usuário no banco de dados para checagem de privilégio
     const { data: perfil, error: perfilError } = await supabaseAdmin
-      .from("perfis")
+      .from("perfil")
       .select("role")
-      .eq("id", user.id)
+      .eq("id_perfil", user.id)
       .single();
 
     if (perfilError || !perfil) {
-      return new Response(JSON.stringify({ error: "Perfil não encontrado no sistema" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson({ error: "Perfil não encontrado no sistema" }, 404);
     }
 
-    // Trava de segurança: apenas usuários com role 'aluno' podem deletar a própria conta
     if (perfil.role !== "aluno") {
-      return new Response(JSON.stringify({ error: "Ação não permitida para este tipo de conta" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson(
+        { error: "Ação não permitida para este tipo de conta" },
+        403,
+      );
     }
 
-    // 1. Limpar arquivos do Storage vinculados às entregas de atividades
+    // 1. Remover arquivos físicos dos buckets privados via Storage API antes do CASCADE
     try {
-      const { data: entregas } = await supabaseAdmin
-        .from("entregas_atividades")
-        .select("url_anexo")
-        .eq("aluno_id", user.id)
-        .not("url_anexo", "is", null);
-
-      if (entregas && entregas.length > 0) {
-        const caminhos = entregas.map((e) => e.url_anexo).filter(Boolean);
-        if (caminhos.length > 0) {
-          await supabaseAdmin.storage.from("entregas_atividades").remove(caminhos);
-        }
-      }
+      await limparStorageDoAluno(supabaseAdmin, user.id);
     } catch (err) {
-      console.error("Erro ao limpar storage de entregas:", err);
+      console.error("Erro ao limpar objetos do Storage:", err);
     }
 
-    // 2. Limpar arquivos do Storage vinculados a dúvidas do aluno
-    try {
-      const { data: duvidas } = await supabaseAdmin
-        .from("duvidasalunostoprofessor")
-        .select("anexo_url")
-        .eq("aluno_id", user.id)
-        .not("anexo_url", "is", null);
-
-      if (duvidas && duvidas.length > 0) {
-        const nomesArquivos: string[] = [];
-        
-        duvidas.forEach((d) => {
-          if (!d.anexo_url) return;
-          try {
-            const urls = JSON.parse(d.anexo_url);
-            if (Array.isArray(urls)) {
-              urls.forEach((url) => {
-                const nome = url.split("/").pop()?.split("?")[0];
-                if (nome) nomesArquivos.push(nome);
-              });
-            }
-          } catch {
-            const nome = d.anexo_url.split("/").pop()?.split("?")[0];
-            if (nome) nomesArquivos.push(nome);
-          }
-        });
-
-        if (nomesArquivos.length > 0) {
-          await supabaseAdmin.storage.from("duvidasalunostoprofessor").remove(nomesArquivos);
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao limpar storage de dúvidas:", err);
-    }
-
-    // 3. Excluir dados das tabelas públicas do banco de dados (previne conflitos de FK antes do delete final)
-    await supabaseAdmin.from("entregas_atividades").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("duvidasalunostoprofessor").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("mensagens").delete().or(`remetente_id.eq.${user.id},destinatario_id.eq.${user.id}`);
-    await supabaseAdmin.from("mural_posts").delete().eq("autor_id", user.id);
-    
-    // Deleta do calendário se a coluna autor_id existir na tabela eventos_calendario
-    try {
-      await supabaseAdmin.from("eventos_calendario").delete().eq("autor_id", user.id);
-    } catch (err) {
-      console.error("Falha ao tentar deletar eventos_calendario:", err);
-    }
-
-    await supabaseAdmin.from("aluno_turma").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("perfis").delete().eq("id", user.id);
-
-    // 4. Deletar definitivamente o usuário no auth.users do Supabase
-    const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+    // 2. Excluir usuário em auth.users: ON DELETE CASCADE limpa Perfil e todas as tabelas filhas
+    const { error: deleteUserError } =
+      await supabaseAdmin.auth.admin.deleteUser(user.id);
     if (deleteUserError) {
       throw deleteUserError;
     }
 
-    return new Response(JSON.stringify({ message: "Conta e dados deletados com sucesso" }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-
-  } catch (error: any) {
+    return respostaJson(
+      { message: "Conta e dados deletados com sucesso" },
+      200,
+    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Erro interno do servidor";
     console.error("Erro na Edge Function deletar-conta:", error);
-    return new Response(JSON.stringify({ error: error.message || "Erro interno do servidor" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respostaJson({ error: message }, 500);
   }
 });

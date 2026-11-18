@@ -2,7 +2,7 @@
 
 - **Registro:** 2026-11-17
 - **Autor / Responsável:** Gianlucca Paiva (`GianluccaPaiva`)
-- **Status:** Em Andamento (Passo 7/10 concluído)
+- **Status:** Em Andamento (Passo 8/10 concluído)
 - **Risco (RBT):** Nível 3 (fronteira Supabase: Repositories, Facade, Observer, fluxo de entrega) + Nível 2 (mappers e permissões puros)
 - **Validação:** `npx tsc -b --noEmit` + `npx vitest run` (por passo); testes de RLS reais no Passo 9-B (final)
 - **Plano detalhado:** [`.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md`](../../.docs/PLANEJAMENTO_REMODELAGEM_ACESSO_BANCO.md) · **ADR:** [ADR-009](../decisions/adr-009-camada-acesso-dados-esquema-normalizado.md)
@@ -20,7 +20,7 @@ Adequar a SPA ao esquema de `docker/constructionsSQL/01_esquema.sql` + `04_supab
 | 5 | Migração dos hooks (Auth → Escola/Turma → Atividade/Entrega/Mural → Dúvida → Calendário → Mensagens → Denúncia/Suporte → Bots → slides) | **Concluído** (0 erros `tsc` em `src/`; `configEngenhariaSoftware.ts` no Passo 10) |
 | 6 | Observer com canais novos | **Concluído** (configuração declarativa + mapeamento dos payloads do banco) |
 | 7 | `permissoes.ts` (Proxy) + ajustes de UI autorizados | **Concluído** (`Login` com input direto `id_escola` sem expor lista de escolas, `BoxAgendamento` exigindo horário, `TurmaCard`/`ListagemConteudosInscritos`/`Mural`/`DuvidasBox` alinhados à RLS) |
-| 8 | Edge Function `deletar-conta` | Pendente |
+| 8 | Edge Function `deletar-conta` | **Concluído** (Storage API nos 3 buckets + `auth.admin.deleteUser()` com `ON DELETE CASCADE`) |
 | 9-A | Testes unitários e de borda (cliente falso) | Pendente |
 | 10 | Doc viva, slides, relatório, UML | Pendente |
 | 9-B | Testes de RLS no Supabase local + E2E (**final**) | Pendente |
