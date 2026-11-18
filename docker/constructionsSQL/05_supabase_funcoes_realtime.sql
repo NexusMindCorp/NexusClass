@@ -179,6 +179,23 @@ BEGIN
 END;
 $$;
 
+-- ----------------------------------------------------------------------------
+-- 5. View segura (security_invoker = true) para resolver id_objeto_storage -> name
+--    As tabelas de anexo em public armazenam apenas o UUID (storage.objects.id);
+--    esta view permite consultar os caminhos no bucket aplicando integralmente
+--    as políticas RLS de storage.objects definidas em 04_supabase_auth_rls.sql.
+-- ----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW public.v_storage_objetos
+WITH (security_invoker = true) AS
+SELECT
+    id,
+    bucket_id,
+    name
+FROM storage.objects;
+
+REVOKE ALL ON public.v_storage_objetos FROM PUBLIC, anon;
+GRANT SELECT ON public.v_storage_objetos TO authenticated;
+
 COMMIT;
 
 -- Atualiza o cache de schema do PostgREST após alterações de DDL/funções

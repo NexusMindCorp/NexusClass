@@ -7,11 +7,11 @@ export type OpcoesTela = "mural" | "calendario" | "principal" | "pesquisar" | "m
 export type PayloadAlertaCalendario = {
     id: string
     evento_id: string
-    titulo_evento: string
+    titulo_evento?: string
     mensagem: string
     minutos_antes?: number
     lembrete_para: string
-    created_at: string
+    created_at?: string
 }
 
 export type EventoCalendarioNotificacao = {

@@ -12,14 +12,14 @@ export type EventoCalendario = {
 }
 
 export type EventoCalendarioBanco = {
-  id: string
+  id_evento: number
   titulo: string
   descricao: string
   data: string
-  horario: string | null
+  horario: string
   tipo: "pessoal" | "turma"
-  turma_id: string | null
-  autor_id: string
+  id_turma: number | null
+  id_autor: string
 }
 
 export type ErroSupabase = {

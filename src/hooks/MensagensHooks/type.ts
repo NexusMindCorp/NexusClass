@@ -7,7 +7,6 @@ export type Mensagem = {
     conteudo: string;
     lida: boolean;
     created_at: string;
-    assunto?: string | null;
 }
 
 export type ConversaResumo = {

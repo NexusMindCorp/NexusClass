@@ -1,5 +1,7 @@
-import type{ PerfilUsuario } from "@/hooks/AuthHooks/type"
+import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
+import type { AnexoRef } from "@/lib/db/mappers";
 import type { TurmaProps } from "../LeituraDataHooks/type";
+
 export type Post = {
     id: string;
     Nome: string;
@@ -14,9 +16,9 @@ export type Atividade = {
     professor_id: string;
     titulo: string;
     descricao: string;
-    data_entrega: string | null;
-    created_at: string;
-    anexo_url: string | null;
+    data_entrega: string;
+    created_at?: string | null;
+    anexos: AnexoRef[];
     professor_nome?: string;
 };
 export type MuralProps = {

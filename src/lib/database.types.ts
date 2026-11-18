@@ -721,7 +721,14 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      v_storage_objetos: {
+        Row: {
+          bucket_id: string | null;
+          id: string | null;
+          name: string | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       [_ in never]: never;

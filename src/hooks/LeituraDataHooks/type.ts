@@ -5,6 +5,8 @@ export type UsuarioResumo = {
 }
 
 export type TurmaProps = {
+  id?: string;
+  id_escola?: string;
   materia: string;
   professor: string;
   professor_id?: string;
@@ -16,16 +18,18 @@ export type TurmaProps = {
 };
 
 export type EscolaProps = {
+  id?: string;
   escola: string;
   ano_letivo: number;
   turmas: Record<string, TurmaProps>;
 };
 
 export type TurmaBanco = {
-  id: string
-  chave: string
-  materia: string
-  banner_url: string
-  sala: string
-  turma: string
-}
+  id_turma: number;
+  codigo_acesso: string;
+  materia: string;
+  banner_url: string | null;
+  sala: string;
+  periodo_escolar: string;
+  id_escola: number;
+};

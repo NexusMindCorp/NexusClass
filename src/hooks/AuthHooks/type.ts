@@ -6,6 +6,7 @@ export type PerfilUsuario = {
     bio: string | null;
     created_at: string;
     role: "aluno" | "professor" | "master";
+    id_escola?: string | null;
 }
 
 export type TurmaProfessor = {

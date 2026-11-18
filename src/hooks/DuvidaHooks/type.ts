@@ -1,5 +1,7 @@
 import type { UsuarioProps } from "@/hooks/GerenciadorHooks/type";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
+import type { TabelaRow } from "@/lib/database.types";
+import type { AnexoRef } from "@/lib/db/mappers";
 
 export type DuvidaAlunoInfo = {
   nome: string;
@@ -16,14 +18,19 @@ export type DuvidaTurmaInfo = {
   turma: string;
 };
 
+export type DuvidaTurmaBanco = {
+  materia: string;
+  periodo_escolar: string;
+};
+
 export type Duvida = {
   id: string;
   aluno_id: string;
-  prof_id: string;
+  prof_id: string | null;
   turma_id: string;
   assunto: string;
   descricao: string;
-  anexo_url: string | null;
+  anexos: AnexoRef[];
   created_at: string;
   resolvido: boolean;
   resposta: string | null;
@@ -32,10 +39,10 @@ export type Duvida = {
   turma?: DuvidaTurmaInfo;
 };
 
-export type DuvidaRegistroBanco = Omit<Duvida, "aluno" | "professor" | "turma"> & {
+export type DuvidaRegistroBanco = TabelaRow<"duvida"> & {
   aluno?: DuvidaAlunoInfo | DuvidaAlunoInfo[] | null;
   professor?: DuvidaProfessorInfo | DuvidaProfessorInfo[] | null;
-  turma?: DuvidaTurmaInfo | DuvidaTurmaInfo[] | null;
+  turma?: DuvidaTurmaBanco | DuvidaTurmaBanco[] | null;
 };
 
 export type DuvidasBoxProps = {
