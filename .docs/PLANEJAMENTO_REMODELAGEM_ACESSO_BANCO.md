@@ -384,7 +384,7 @@ Com `perfil → auth.users ON DELETE CASCADE`, as 8 exclusões manuais viram: (1
 
 | Arquivo | Nível RBT | O que garante |
 |:---|:---|:---|
-| [NEW] `testes/integracao/rls.spec.ts` | 3 (Supabase local, `01 → 04 → 05 → 02`) | com usuários seed: aluno não altera `nota`; professor não cria `turma`; aluno de escola X não se matricula na escola Y (RN12); professor apaga arquivo de entrega da própria turma; buckets privados negam acesso a não membros |
+| [NEW] `testes/integracao/rls.spec.ts` | 3 (Supabase local, `01 → 04 → 02 → 05`) | com usuários seed: aluno não altera `nota`; professor não cria `turma`; aluno de escola X não se matricula na escola Y (RN12); professor apaga arquivo de entrega da própria turma; buckets privados negam acesso a não membros |
 | [NEW] `testes/integracao/alertasCalendario.spec.ts` | 3 | `fn_processar_alertas_calendario()` gera alertas de 5 e 1 min e, executada duas vezes, não duplica |
 | [NEW] `testes/integracao/handleNewUser.spec.ts` | 3 | `signUp` com `id_escola` cria `perfil` aluno; sem escola, falha pelo CHECK |
 
@@ -411,7 +411,7 @@ npx vitest run                      # suíte completa
 npm run test:coverage               # src/lib + src/patterns (+ src/repositories) mantendo 100%
 git grep -n -E "getPublicUrl|perfis|turmas_escolares|mural_posts|duvidasalunostoprofessor|entregas_atividades\"\)|\"mensagens\"" -- src   # deve retornar vazio (exceto nomes de bucket)
 ```
-### Manual Verification (Passo 9-B, ao final: Supabase local, `01 → 04 → 05 → 02`)
+### Manual Verification (Passo 9-B, ao final: Supabase local, `01 → 04 → 02 → 05`)
 1. Cadastro com escola → `perfil` criado pelo trigger.
 2. Aluno se matricula numa turma da própria escola (ok) e de outra escola (mensagem RN12).
 3. Professor cria atividade com 2 anexos → abre os anexos (URL assinada) → exclui a atividade → buckets sem órfãos.
