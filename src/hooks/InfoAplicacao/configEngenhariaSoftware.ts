@@ -392,7 +392,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     entregas:
       "05_supabase_funcoes_realtime.sql, database.types.ts, mappers.ts, permissoes.ts, AnexoStorageFacade, 6 Repositories, migração dos hooks/Observer/Edge Function e 6 novas suítes (RLS reais ao final em 9-B).",
     evidenciaTeste:
-      "13 suítes / 113 testes passando · 100% Lines / 100% Funcs / 98% Stmts em src/lib + src/patterns · 0 erros tsc",
+      "13 suítes / 113 testes confirmados em 19/11 por Gabriel Lineker · 98% instruções / 92,87% ramificações / 100% funções e linhas em src/lib + src/patterns · Supabase ao vivo pendente",
   },
   {
     fase: "Fase 6",
