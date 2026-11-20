@@ -156,6 +156,15 @@ O **código público alfanumérico da escola** pode ser discutido após a primei
 
 ## Como registrar e fechar
 
+**Contas reproduzíveis — Gabriel Lineker (20/11).** Preparar um roteiro administrativo separado da carga acadêmica. Resolver DCC000 e MAT101 pelo código, usar a escola correspondente no cadastro Auth e aplicar papel e vínculo ao perfil criado. A execução padrão deve apenas listar os cenários. A aplicação deve exigir confirmação do projeto, usar credenciais locais e reconhecer contas próprias por metadado administrativo para permitir retomada sem trocar senhas.
+
+O [roteiro de provisionamento](../scripts/provisionar-contas-teste.mjs) roda em simulação com `node scripts/provisionar-contas-teste.mjs`. Para aplicar em uma instalação Supabase descartável com DCC000 e MAT101 em escolas distintas e o gatilho de cadastro ativo, configurar `.env.contas-teste.local`, ignorado pelo Git, com:
+
+- `NEXUS_TEST_SUPABASE_URL` no formato `https://REF_DO_PROJETO.supabase.co` e `NEXUS_TEST_SUPABASE_SERVICE_ROLE_KEY` com a chave administrativa dessa instalação.
+- `NEXUS_TEST_<CONTA>_EMAIL` e `NEXUS_TEST_<CONTA>_SENHA` para cada conta listada na simulação. Usar endereços distintos e senhas de pelo menos 12 caracteres. Guardar a chave fora do ambiente Vite.
+
+Executar `node --env-file=.env.contas-teste.local scripts/provisionar-contas-teste.mjs --aplicar REF_DO_PROJETO`. Após a aplicação, fazer login e conferir papel, escola e turma de cada conta. Uma falha depois da criação do perfil permite reexecutar com os mesmos endereços e senhas. A primeira execução ao vivo continua pendente.
+
 **Feedback RN01 — Gabriel Lineker (20/11).** Exigir feedback em avaliações com nota e ao menos 20 caracteres, descontados espaços nas extremidades, para nota abaixo de 60. Validar no formulário e no banco. Aplicar a restrição às inserções e atualizações futuras, preservando as avaliações antigas até sua revisão. Retestar apenas os limites de feedback que ainda não foram exercitados.
 
 **Escala RN01 — Gabriel Lineker (20/11).** A escala confirmada é 0–100, como no DDL. Alinhar o formulário docente, a validação e a visualização da nota pelo aluno. Manter os dados existentes no valor gravado, pois a origem de cada nota não distingue a escala usada na entrada. A obrigatoriedade e a extensão do feedback na RN01 ficam como critérios separados.
