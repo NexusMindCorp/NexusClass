@@ -18,6 +18,10 @@
 
 ## Ponto de retomada
 
+**Controle de outra escola em 20/11 — Gabriel Lineker.** O SQL somente leitura confirmou o aluno da escola 3 sem matrícula ativa na DCC000 (escola 1). O Playwright passou nas três verificações: DCC000 ausente da sidebar, Cálculo Numérico presente na pesquisa e DCC000 ausente da pesquisa. O aluno vinculado já havia aberto a DCC000 pelo mesmo caminho em rodada anterior. A evidência é de visibilidade no aplicativo. As sessões de professor sem vínculo e master ainda estão pendentes.
+
+**Lote automatizado da DCC000 em 20/11 — Gabriel Lineker.** O [roteiro Playwright](../../scripts/validar-acesso-dcc000.mjs) passou em sete verificações após o login inicial nas duas sessões. Como aluno, a pesquisa abriu a DCC000 pelo botão Entrar, o atalho também abriu a turma, Enviar Dúvida estava disponível e Postar Atividade não apareceu. Como professor, o atalho abriu a turma, Postar Atividade estava disponível e Enviar Dúvida não apareceu. A primeira execução usava um seletor que confundia a chave interna com o título da turma. O roteiro foi corrigido e a segunda execução terminou com código 0. A entrada da turma original relatada sem professor ainda depende de sua identificação. As verificações são de navegação e controles da interface.
+
 **Feedback da RN01 implementado em 20/11 — Gabriel Lineker.** O formulário exige feedback e, abaixo de 60, exige 20 caracteres após desconsiderar espaços nas extremidades. A [migração 09](../../docker/constructionsSQL/09_valida_feedback_avaliacao.sql) aplica a condição a novas gravações sem reescrever avaliações existentes. Revisão estática das condições concluída. TypeScript e 114 testes Vitest passaram. Falta aplicar a migração no Supabase de teste e verificar os limites ainda inéditos na atividade descartável.
 
 **Aplicação da migração 09 em 20/11 — Gabriel Lineker.** O SQL Editor do Supabase de teste concluiu a execução com sucesso, conforme informado por Gabriel. O reteste direcionado do feedback segue pendente.

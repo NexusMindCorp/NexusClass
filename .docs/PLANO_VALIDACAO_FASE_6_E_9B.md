@@ -43,6 +43,44 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 
 O **código público alfanumérico da escola** pode ser discutido após a primeira rodada. Se aprovado, registrar a decisão arquitetural aplicável em `.agents/decisions`, avaliar a manutenção do ID inteiro como chave interna e repetir cadastro, vínculo e autorização.
 
+## Retomada — automação com Supabase e Playwright
+
+**Autor:** Gabriel Lineker (`GabrielLineker`), 2026-11-20.
+
+**Conexão verificada em 20/11 — Gabriel Lineker.** O MCP `supabase-nexusclass-teste` foi cadastrado no Codex CLI e autorizado por OAuth, restrito ao projeto do ambiente de teste e em modo somente leitura. Uma nova execução do CLI confirmou `public.entrega_atividade` existente e `transaction_read_only = on`. A sessão já aberta não expôs o servidor diretamente. A verificação foi realizada pelo CLI. A conexão atual serve para consultar catálogo, dados de teste e logs. Alterações continuam em um fluxo separado.
+
+### Registro de SQL e critérios para avançar
+
+**Aluno de outra escola — Gabriel Lineker (20/11).** Confirmar o perfil da conta de controle antes do login de teste. No navegador, verificar que a DCC000 não aparece na sidebar nem nas telas de pesquisa da escola 3. Comparar com a evidência já registrada do aluno vinculado. A visibilidade da interface fica registrada separadamente da autorização no banco.
+
+- **Passou — Supabase de teste.** A [consulta da conta de controle](../scripts/verificar-aluno-controle-dcc000.sql) confirmou papel aluno, escola 3, DCC000 na escola 1 e ausência de matrícula ativa na DCC000.
+- **Passou — Playwright.** O [roteiro da conta da escola 3](../scripts/validar-aluno-outra-escola.mjs) encerrou com código 0. A DCC000 ficou ausente na sidebar e na pesquisa, enquanto Cálculo Numérico apareceu como controle positivo.
+
+**Acesso dos perfis de controle — Gabriel Lineker, 20/11/2026.** A [consulta de prontidão](../scripts/verificar-perfis-controle-dcc000.sql) **passou** no Supabase de teste. Existem no Auth três masters, um professor da escola 1 sem vínculo com DCC000 e um professor da escola 3. Todos esses perfis estão sem senha configurada e sem e-mail confirmado. A consulta não retornou aluno de outra escola. A rodada autenticada está bloqueada até haver uma conta de controle utilizável. A primeira conta necessária é um aluno da escola 3 cadastrado pelo NexusClass, que envia o código de escola exigido. Manter as duas contas da DCC000 para comparação.
+
+**Lote de navegação e controles — Gabriel Lineker (20/11).** Abrir duas sessões temporárias e, após login, executar a navegação automaticamente. Verificar a entrada da DCC000 pela pesquisa como aluno, a abertura da turma pela sidebar como professor e as ações de dúvida e publicação exibidas por papel. O lote é de leitura e navegação. As ações abertas não são submetidas.
+
+**Autor:** Gabriel Lineker (`GabrielLineker`), 2026-11-20.
+
+- Antes de executar SQL pelo Codex, salvar a consulta em `scripts/` ou apontar para o arquivo de migração existente quando for esse o SQL executado. Registrar data, autor, ambiente, finalidade e arquivo no relatório da rodada. Depois registrar **passou**, **falhou** ou **bloqueado**, com o resultado esperado e o observado. Em caso de falha, registrar o erro relevante e manter a consulta original rastreável. Usar resultados resumidos e omitir credenciais, tokens e dados pessoais desnecessários.
+- **Primeira execução registrada:** [verificação da conexão](../scripts/verificar-conexao-supabase-teste.sql), Supabase de teste, 20/11/2026. **Passou.** Retornou `entrega_atividade_existe = true` e `somente_leitura = on`.
+- **Inventário da matriz:** [consulta executada](../scripts/inventariar-matriz-supabase-teste.sql), Supabase de teste, 20/11/2026, Gabriel Lineker. **Passou.** Retornou `transaction_read_only = on`. Aluno e professor atuais pertencem à escola da DCC000 e têm vínculo com ela. O banco tem três perfis master, um professor da mesma escola sem vínculo com DCC000, um professor de outra escola sem vínculo e 500 alunos da mesma escola sem matrícula ativa em DCC000. A consulta não encontrou aluno de outra escola. A presença de perfil não comprova acesso por login. Foram encontrados a função da 06, as quatro políticas da 07, a coluna e o gatilho ativo da 08 e a restrição da 09. A próxima ação é preparar a rodada com as duas contas conhecidas e selecionar as contas adicionais conforme a cobertura necessária.
+
+| Ordem | Execução pelo Codex | Condição para avançar |
+|---|---|---|
+| 1. Inventário somente leitura | Conferir quais contas de teste, papéis, escolas e vínculos já existem e checar a presença dos objetos esperados das migrações 06–09. Reusar a evidência já registrada das políticas da 07. | Lista mínima de sessões já disponíveis e perfis realmente faltantes, com consultas e resultados registrados. |
+| 2. Rodada em lote com as contas atuais | Automatizar navegação e verificações de leitura pela interface com Testador Noturno e professor vinculado. Separar a evidência da sessão da aplicação da consulta administrativa. | Um resultado por cenário novo. Reutilizar a E3 e as rodadas já confirmadas de nota, aviso, feedback e download. |
+| 3. Completar perfis e isolamento | Se faltarem perfis, preparar apenas os dados de teste necessários. Executar os cenários de leitura por master, professor sem vínculo e perfil de outra escola. Usar dados descartáveis e o fluxo autorizado para cenários de escrita pendentes. | Resultados de acesso permitido ou negado por papel e escola, com limites de cobertura registrados. |
+| 4. Fechar a fase | Automatizar os cenários restantes de maior impacto, consolidar achados e atualizar os artefatos acadêmicos após a validação. | Itens abertos têm evidência, correção ou decisão explícita da dupla. |
+
+1. **Conectar o Supabase de teste.** Gabriel instala e autentica a integração Supabase, autorizando o projeto usado no ambiente local. Codex confirma o destino com uma consulta de leitura e confere as migrações 06–09 pelo catálogo e pelos objetos instalados. As quatro políticas da 07 já foram verificadas. Reaproveitar essa evidência enquanto a configuração permanecer a mesma.
+2. **Preparar as sessões de teste.** Codex reaproveita o roteiro Playwright da E3 e agrupa os cenários por papel. Usar Testador Noturno e a conta de professor vinculada à DCC000. Habilitar master e perfis de outra escola quando forem necessários para a matriz. Gabriel autentica as contas quando solicitado. Se houver reutilização de sessão, guardar o estado apenas localmente, fora do Git.
+3. **Executar a matriz de permissões em lote.** Conferir acesso a entregas e anexos por aluno, professor vinculado, perfil sem vínculo e master. Usar dados descartáveis nas verificações que exigirem mutação. Registrar separadamente os resultados pela interface, a inspeção do banco e as verificações com sessão de cada papel. O bloqueio efetivo de escrita após avaliação continua pendente.
+4. **Cobrir as lacunas da Fase 6.** Automatizar os testes de componente e a jornada que efetivamente envia uma entrega. Priorizar os achados abertos em acesso à turma, vínculo docente, mural e denúncia. Depois cobrir cadastro, calendário, alertas e Realtime conforme a matriz acima.
+5. **Fechar a documentação.** Consolidar evidências e atualizar `grupo24/` só no fechamento. Se a integração não estiver disponível, manter o Playwright em lote e reservar o SQL Editor manual às verificações administrativas que dependerem dele.
+
+**Evidência reaproveitável.** A atividade E3 teve a leitura validada por Playwright como aluno e professor. Nas atividades descartáveis, passaram envio e reenvio antes da avaliação, leitura e download após a nota, aviso de atraso (RN07), escala de 0 a 100 e critérios de feedback (RN01). A RN08 passou pela interface e teve as políticas instaladas conferidas. Repetir apenas cenários afetados por uma mudança ou resultados ainda sem evidência.
+
 ## Como registrar e fechar
 
 **Feedback RN01 — Gabriel Lineker (20/11).** Exigir feedback em avaliações com nota e ao menos 20 caracteres, descontados espaços nas extremidades, para nota abaixo de 60. Validar no formulário e no banco. Aplicar a restrição às inserções e atualizações futuras, preservando as avaliações antigas até sua revisão. Retestar apenas os limites de feedback que ainda não foram exercitados.
