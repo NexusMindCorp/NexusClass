@@ -140,7 +140,7 @@ export function useMural(turmaId: string, perfil: PerfilUsuario) {
       );
       setPosts((anterior) => ({
         ...anterior,
-        posts: [...anterior.posts, novoPost],
+        posts: [novoPost, ...anterior.posts.filter((post) => post.id !== novoPost.id)],
       }));
       setConteudo("");
       mudarAberturaBox(false);

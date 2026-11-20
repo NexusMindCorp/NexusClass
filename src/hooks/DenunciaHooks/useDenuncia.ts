@@ -21,12 +21,10 @@ export function useDenuncia() {
 
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   async function submit(alvo: string, idAutor?: string) {
     setSending(true)
     setError(null)
-    setSuccess(false)
 
     try {
       const autorResolvido =
@@ -53,7 +51,6 @@ export function useDenuncia() {
         descricao: detalhes,
       })
 
-      setSuccess(true)
       setDetalhes("")
       setMotivoSelecionado(motivos[0])
     } catch (err: unknown) {
@@ -63,7 +60,6 @@ export function useDenuncia() {
           "Erro de conexão ao enviar denúncia. Tente novamente.",
         ),
       )
-      setSuccess(false)
       throw err
     } finally {
       setSending(false)
@@ -78,7 +74,6 @@ export function useDenuncia() {
     setDetalhes,
     sending,
     error,
-    success,
     submit,
   }
 }

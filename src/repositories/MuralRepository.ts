@@ -62,7 +62,8 @@ export class MuralRepository implements IMuralRepository {
       `,
       )
       .eq("id_turma", turmaNum)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false })
+      .order("id_post", { ascending: false });
 
     if (error) throw error;
 

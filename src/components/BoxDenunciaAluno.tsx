@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { toast } from "sonner";
 import { useDenuncia } from "@/hooks/DenunciaHooks/useDenuncia";
 import type { BoxDenunciaAlunoProps } from "@/hooks/DenunciaHooks/type";
 
@@ -13,13 +14,13 @@ export function BoxDenunciaAluno({ aluno, alunoId, autorId, onClose }: BoxDenunc
     setDetalhes,
     sending,
     error,
-    success,
     submit,
   } = useDenuncia();
 
   async function handleConfirm() {
     try {
       await submit(alunoId || aluno, autorId);
+      toast.success("Denúncia enviada com sucesso.");
       onClose();
     } catch (err) {
       console.error("Erro ao enviar denúncia", err);
@@ -96,12 +97,7 @@ export function BoxDenunciaAluno({ aluno, alunoId, autorId, onClose }: BoxDenunc
             {sending ? "Enviando..." : "Denunciar"}
           </Button>
         </div>
-        {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
-        {success && (
-          <p className="mt-3 text-sm text-green-600">
-            Denúncia enviada com sucesso.
-          </p>
-        )}
+        {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
       </div>
     </div>
   );

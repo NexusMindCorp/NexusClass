@@ -29,7 +29,7 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 6-A Concluída → Próxima: Fase 6 (Componentes + E2E + RLS reais 9-B)",
+  faseAtual: "Fase 6 em andamento · Componentes, Playwright e Passo 9-B",
   ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
   data: "2026-11-17",
   branch: "DesiningTeste",
@@ -397,11 +397,11 @@ export const roadmapFases: FaseRoadmapItem[] = [
   {
     fase: "Fase 6",
     titulo: "Testes de Componente + E2E (Playwright) + RLS reais (Passo 9-B)",
-    status: "Planejado",
-    responsavel: "A definir na retomada (Handoff)",
+    status: "Em Andamento",
+    responsavel: "Gabriel Lineker",
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), suíte de integração RLS no Supabase e consolidação final.",
-    evidenciaTeste: "Espaço reservado: suíte completa unitária + integração RLS + componente + E2E",
+    evidenciaTeste: "Jornadas de entrega e avaliação, navegação por perfil e testes de proteção de rotas. A verificação de autorização no banco segue em andamento.",
   },
 ];
 
@@ -517,13 +517,13 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     destaque: true,
   },
   {
-    etapa: "Pós-Fase 6 (Componentes + E2E + RLS Final)",
-    responsavel: "A atualizar na Fase 6",
-    testes: "—",
-    statements: "—",
-    branches: "—",
-    functions: "—",
-    lines: "—",
+    etapa: "Fase 6 em andamento (20/11)",
+    responsavel: "Gabriel Lineker",
+    testes: "16 suítes (125 testes)",
+    statements: "98% (lib + patterns)",
+    branches: "92,9% (lib + patterns)",
+    functions: "100% (lib + patterns)",
+    lines: "100% (lib + patterns)",
   },
 ];
 
