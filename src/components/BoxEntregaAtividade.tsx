@@ -74,7 +74,16 @@ export function BoxEntregaAtividade({
       alert("Por favor, insira uma nota válida entre 0 e 100.");
       return;
     }
-    await avaliarEntrega(alunoId, nota, feedbackInput);
+    const feedback = feedbackInput.trim();
+    if (!feedback) {
+      alert("Informe o feedback da avaliação.");
+      return;
+    }
+    if (nota < 60 && Array.from(feedback).length < 20) {
+      alert("Para notas abaixo de 60, o feedback deve ter pelo menos 20 caracteres.");
+      return;
+    }
+    await avaliarEntrega(alunoId, nota, feedback);
     setAvaliandoAlunoId(null);
   };
 
@@ -348,6 +357,7 @@ export function BoxEntregaAtividade({
                         </p>
                       )}
                       <Textarea
+                        required
                         value={feedbackInput}
                         onChange={(e) => setFeedbackInput(e.target.value)}
                         placeholder="Muito bem! A resposta do exercício 3..."

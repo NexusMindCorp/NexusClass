@@ -18,6 +18,12 @@
 
 ## Ponto de retomada
 
+**Feedback da RN01 implementado em 20/11 — Gabriel Lineker.** O formulário exige feedback e, abaixo de 60, exige 20 caracteres após desconsiderar espaços nas extremidades. A [migração 09](../../docker/constructionsSQL/09_valida_feedback_avaliacao.sql) aplica a condição a novas gravações sem reescrever avaliações existentes. Revisão estática das condições concluída. TypeScript e 114 testes Vitest passaram. Falta aplicar a migração no Supabase de teste e verificar os limites ainda inéditos na atividade descartável.
+
+**Aplicação da migração 09 em 20/11 — Gabriel Lineker.** O SQL Editor do Supabase de teste concluiu a execução com sucesso, conforme informado por Gabriel. O reteste direcionado do feedback segue pendente.
+
+**Reteste do feedback da RN01 em 20/11 — Gabriel Lineker.** Na atividade descartável da DCC000, o formulário bloqueou nota 67 com feedback vazio e nota 59 com feedback curto. Aceitou nota 59 com “Revise a questão 02.”, de exatamente 20 caracteres. A avaliação apareceu na lista docente. A migração 09 estava aplicada. Os bloqueios foram observados pela interface. O roteiro SQL da atividade descartável foi atualizado com os valores da avaliação aceita.
+
 **Escala RN01 alinhada em 20/11 — Gabriel Lineker.** A tela docente aceita 0–100, e a visão do aluno exibe a nota sobre 100. O roteiro automatizado considera o novo denominador. A restrição existente do banco já cobre a faixa. Os valores gravados foram preservados. TypeScript, sintaxe do roteiro e 114 testes Vitest passaram. O próximo reteste direcionado usa uma nota acima de 10 em uma atividade descartável existente.
 
 **Reteste da escala RN01 em 20/11 — Gabriel Lineker.** Na atividade descartável RN08, o professor salvou nota 67,0. O aluno viu `67.0 / 100.0`, o feedback “muito bom” e `APEX_LOGO.jpg`. O reteste confirmou o valor acima de 10 nas duas visões. O roteiro SQL da atividade descartável passou a esperar a nova nota. Os critérios da RN01 relativos ao feedback obrigatório e ao mínimo de 20 caracteres abaixo de 60 ainda têm validação própria.

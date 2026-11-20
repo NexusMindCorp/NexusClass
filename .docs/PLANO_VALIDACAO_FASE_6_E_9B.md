@@ -45,6 +45,8 @@ O **código público alfanumérico da escola** pode ser discutido após a primei
 
 ## Como registrar e fechar
 
+**Feedback RN01 — Gabriel Lineker (20/11).** Exigir feedback em avaliações com nota e ao menos 20 caracteres, descontados espaços nas extremidades, para nota abaixo de 60. Validar no formulário e no banco. Aplicar a restrição às inserções e atualizações futuras, preservando as avaliações antigas até sua revisão. Retestar apenas os limites de feedback que ainda não foram exercitados.
+
 **Escala RN01 — Gabriel Lineker (20/11).** A escala confirmada é 0–100, como no DDL. Alinhar o formulário docente, a validação e a visualização da nota pelo aluno. Manter os dados existentes no valor gravado, pois a origem de cada nota não distingue a escala usada na entrada. A obrigatoriedade e a extensão do feedback na RN01 ficam como critérios separados.
 
 **Reuso de evidências — Gabriel Lineker (20/11).** Aproveitar cenários já comprovados na mesma configuração. Pedir novo teste manual apenas quando uma alteração puder invalidar o resultado anterior ou quando houver uma diferença relevante ainda sem evidência. Ao solicitar o reteste, indicar a condição nova e o resultado que ela confirma.
