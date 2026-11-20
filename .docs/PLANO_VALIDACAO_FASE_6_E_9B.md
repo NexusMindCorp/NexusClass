@@ -57,6 +57,14 @@ Limitar a renderização da lista em lotes e oferecer busca por nome para locali
 
 **Ordem 1 concluída — Gabriel Lineker.** O Supabase de teste abriu sessão no cadastro válido, criou o perfil de aluno na escola 1 e recusou a escola inexistente. Na DCC001, a inscrição repetida manteve um único vínculo ativo e o cancelamento o removeu. A matrícula na MAT101 foi recusada. [Relatório](../relatorios/2026-11/2026-11-20-cadastro-matricula.md)
 
+**Ordem 2 — Gabriel Lineker.** Reexecutar a suíte de falhas de entrega. Em dados descartáveis, comparar o arquivo antes e depois das operações de edição e exclusão após avaliação e verificar se o cadastro de evento passado é recusado. Remover os registros de teste criados.
+
+**Resultado da ordem 2 — Gabriel Lineker.** Passaram as falhas simuladas de entrega, a proteção efetiva do arquivo avaliado e o bloqueio de data passada no Edge. A API aceitou evento passado. Definir se a regra deve valer também no banco. [Relatório](../relatorios/2026-11/2026-11-20-lacunas-entrega-calendario.md)
+
+**Decisão de Gabriel Lineker.** O banco deve recusar datas anteriores ao dia corrente em São Paulo na criação e no reagendamento. Hoje continua válido, como na interface. Preservar eventos históricos e permitir edições que não alterem data ou horário. Retestar pela API com criação válida, rejeição de criação e de reagendamento para ontem e preservação da data válida.
+
+**Ordem 2 concluída — Gabriel Lineker.** Depois da aplicação da migração 13, o Supabase aceitou hoje na criação e amanhã no reagendamento, recusou ontem nos dois casos e preservou a data válida. [Relatório do reteste](../relatorios/2026-11/2026-11-20-lacunas-entrega-calendario.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
