@@ -50,4 +50,50 @@ describe("EscolaTurmaRepository — Isolamento por Escola e Matrícula RN12 (Ní
       "Você só pode se matricular em turmas da sua escola (RN12).",
     );
   });
+
+  it.each([
+    ["master", null, ["1", "4"]],
+    ["master", "1", ["1"]],
+    ["aluno", "1", ["1"]],
+    ["professor", "1", ["1"]],
+  ] as const)("carrega o catálogo de %s com escola %s", async (papel, escola, esperado) => {
+    const consultaEscola = {
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { id_escola: 1, nome: "Escola de teste", ano_letivo: 2026 },
+        error: null,
+      }),
+    };
+    const turmas = [
+      { id_turma: 1, id_escola: 1, codigo_acesso: "DCC000", materia: "Banco de Dados" },
+      { id_turma: 4, id_escola: 3, codigo_acesso: "MAT101", materia: "Cálculo Numérico" },
+    ];
+    const consultaTurmas = Object.assign(Promise.resolve({ data: turmas, error: null }), {
+      eq: vi.fn().mockResolvedValue({ data: [turmas[0]], error: null }),
+    });
+    const consultaVinculos = {
+      in: vi.fn().mockReturnValue(Object.assign(Promise.resolve({ data: [] }), {
+        eq: vi.fn().mockResolvedValue({ data: [] }),
+      })),
+    };
+    const client = {
+      from: vi.fn((tabela) => ({
+        select: vi.fn().mockReturnValue(
+          tabela === "escola" ? consultaEscola : tabela === "turma" ? consultaTurmas : consultaVinculos,
+        ),
+      })),
+    } as unknown as ClienteSupabaseTipado;
+
+    const catalogo = await new EscolaTurmaRepository(client).carregarDadosEscola(escola, papel);
+
+    expect(Object.keys(catalogo.turmas)).toEqual(esperado);
+    if (escola) {
+      expect(consultaTurmas.eq).toHaveBeenCalledWith("id_escola", 1);
+    } else {
+      expect(consultaTurmas.eq).not.toHaveBeenCalled();
+      expect(catalogo.turmas["4"].id_escola).toBe("3");
+    }
+  });
 });

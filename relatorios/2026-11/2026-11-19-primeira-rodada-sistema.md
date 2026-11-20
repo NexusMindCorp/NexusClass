@@ -18,6 +18,14 @@
 
 ## Ponto de retomada
 
+**Reteste do catálogo master em 20/11 — Gabriel Lineker.** O Playwright abriu Banco de Dados e Cálculo Numérico pela pesquisa, em uma única sessão master. O reteste passou com código 0 e confirma o catálogo de múltiplas escolas pela interface. A conta descartável foi promovida para esta rodada e precisa voltar ao papel professor na escola 1. A rodada não testou mutações administrativas nem negações de escrita no banco.
+
+**Restauração após o reteste master — Gabriel Lineker.** A execução do [SQL de restauração](../../scripts/restaurar-professor-controle.sql) no Supabase de teste retornou `professor | 1`. A conta voltou ao papel anterior e a rodada de navegação por perfil foi encerrada.
+
+**Catálogo master corrigido em 20/11 — Gabriel Lineker.** O SQL de restauração retornou professor na escola 1. A correção remove o filtro de escola da consulta de turmas apenas para master sem escola explícita. O filtro dos demais perfis continua coberto pelos testes. A consulta usa a sessão normal do Supabase, com as políticas existentes. TypeScript e 118 testes Vitest passaram. Falta repetir apenas o Playwright do master nas escolas 1 e 3 com a correção.
+
+**Controle master em 20/11 — Gabriel Lineker.** O SQL de preparação retornou papel master e escola nula. Playwright abriu Banco de Dados na escola 1, mas não encontrou Cálculo Numérico na pesquisa para abrir a escola 3. O roteiro encerrou com código 1. O carregamento atual do catálogo seleciona uma escola e filtra suas turmas, o que explica o resultado observado. A autorização efetiva sobre registros da segunda escola não foi medida nesta rodada. Restaurar a conta de controle para professor antes de seguir com a correção do catálogo.
+
 **Controle docente sem vínculo em 20/11 — Gabriel Lineker.** A consulta de prontidão verificou a conta descartável da escola 1 e a execução administrativa retornou o papel professor. O Playwright confirmou ausência da DCC000 na sidebar e na pesquisa docente. A primeira tentativa passou na sidebar e falhou na pesquisa por esperar um cartão que a Strategy filtra. O roteiro corrigido passou com código 0. O professor vinculado já abriu a turma em rodada anterior. A sessão master ainda está pendente.
 
 **Controle de outra escola em 20/11 — Gabriel Lineker.** O SQL somente leitura confirmou o aluno da escola 3 sem matrícula ativa na DCC000 (escola 1). O Playwright passou nas três verificações: DCC000 ausente da sidebar, Cálculo Numérico presente na pesquisa e DCC000 ausente da pesquisa. O aluno vinculado já havia aberto a DCC000 pelo mesmo caminho em rodada anterior. A evidência é de visibilidade no aplicativo. As sessões de professor sem vínculo e master ainda estão pendentes.

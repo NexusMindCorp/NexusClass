@@ -101,10 +101,15 @@ export class EscolaTurmaRepository implements IEscolaTurmaRepository {
       throw new Error("Não foi possível carregar escolas no Supabase.");
     }
 
-    const { data: turmasData, error: turmasError } = await client
+    let turmasQuery = client
       .from("turma")
-      .select("id_turma, codigo_acesso, materia, banner_url, sala, periodo_escolar, id_escola")
-      .eq("id_escola", escolaData.id_escola);
+      .select("id_turma, codigo_acesso, materia, banner_url, sala, periodo_escolar, id_escola");
+
+    if (role !== "master" || idEscola) {
+      turmasQuery = turmasQuery.eq("id_escola", escolaData.id_escola);
+    }
+
+    const { data: turmasData, error: turmasError } = await turmasQuery;
 
     if (turmasError || !turmasData) {
       throw new Error("Não foi possível carregar turmas no Supabase.");
