@@ -92,7 +92,7 @@ export function InfoAplicacao() {
             className="gap-2 cursor-pointer"
           >
             <FlaskConical className="h-4 w-4" />
-            Engenharia de Software (DCC061)
+            Engenharia de Software
           </Button>
           <Button
             type="button"
