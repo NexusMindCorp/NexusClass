@@ -340,6 +340,7 @@ export type Database = {
       };
       entrega_atividade: {
         Row: {
+          atraso?: boolean | null;
           entregue_em: string;
           feedback: string | null;
           id_aluno: string;

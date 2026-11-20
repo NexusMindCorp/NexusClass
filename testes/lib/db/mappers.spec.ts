@@ -139,6 +139,25 @@ describe("Data Mappers — Conversão Row -> Domínio (Nível 2 RBT)", () => {
     expect(entrega.aluno_nome).toBe("Alice");
   });
 
+  it("mapEntrega preserva o atraso registrado no envio mesmo se o prazo mudar", () => {
+    const row = {
+      id_entrega: 5,
+      id_atividade: 2,
+      id_aluno: "a-1",
+      id_objeto_storage: "obj-1",
+      nota: null,
+      feedback: null,
+      entregue_em: "2026-11-11T00:00:00.000Z",
+    };
+
+    expect(mapEntrega({ ...row, atraso: true }, {
+      dataEntregaAtividade: "2026-11-12T00:00:00.000Z",
+    }).no_prazo).toBe(false);
+    expect(mapEntrega({ ...row, atraso: false }, {
+      dataEntregaAtividade: "2026-11-10T00:00:00.000Z",
+    }).no_prazo).toBe(true);
+  });
+
   it("mapPostMural, mapAtividade, mapDuvida, mapEventoCalendario, mapAlertaCalendario e mapMensagem convertem os demais agregados", () => {
     const post = mapPostMural(
       {

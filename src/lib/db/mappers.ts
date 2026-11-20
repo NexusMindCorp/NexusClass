@@ -201,7 +201,9 @@ export function mapEntrega(
     nome_arquivo: extrairNomeArquivoStorage(caminho),
     nota: row.nota,
     feedback: row.feedback,
-    no_prazo: calcularEntregaNoPrazo(row.entregue_em, opcoes.dataEntregaAtividade),
+    no_prazo: row.atraso == null
+      ? calcularEntregaNoPrazo(row.entregue_em, opcoes.dataEntregaAtividade)
+      : !row.atraso,
     entregue_em: row.entregue_em,
     ...(perfilRel !== null ? { aluno_nome: perfilRel?.nome || "Aluno Anônimo" } : {}),
   };

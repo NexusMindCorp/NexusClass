@@ -70,8 +70,8 @@ export function BoxEntregaAtividade({
 
   const salvarAvaliacao = async (alunoId: string) => {
     const nota = parseFloat(notaInput);
-    if (isNaN(nota) || nota < 0 || nota > 10) {
-      alert("Por favor, insira uma nota válida entre 0 e 10.");
+    if (!Number.isFinite(nota) || nota < 0 || nota > 100) {
+      alert("Por favor, insira uma nota válida entre 0 e 100.");
       return;
     }
     await avaliarEntrega(alunoId, nota, feedbackInput);
@@ -141,7 +141,7 @@ export function BoxEntregaAtividade({
                   </span>
                   {entregaPropria.nota !== null && (
                     <span className="text-sm font-extrabold text-foreground px-2 py-0.5 bg-background border border-border rounded">
-                      {entregaPropria.nota.toFixed(1)} / 10.0
+                      {entregaPropria.nota.toFixed(1)} / 100.0
                     </span>
                   )}
                 </div>
@@ -325,23 +325,28 @@ export function BoxEntregaAtividade({
                   <div className="flex gap-4">
                     <div className="w-1/4">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
-                        Nota (0 a 10)
+                        Nota (0 a 100)
                       </label>
                       <input
                         type="number"
                         step="0.1"
                         min="0"
-                        max="10"
+                        max="100"
                         value={notaInput}
                         onChange={(e) => setNotaInput(e.target.value)}
                         className="w-full rounded border border-input bg-background px-2.5 py-1.5 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
-                        placeholder="Ex: 8.5"
+                        placeholder="Ex: 85.0"
                       />
                     </div>
                     <div className="w-3/4">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
                         Feedback ao Aluno
                       </label>
+                      {!ent.no_prazo && (
+                        <p className="mb-1 text-xs text-destructive">
+                          Aviso automático: trabalho entregue após o prazo.
+                        </p>
+                      )}
                       <Textarea
                         value={feedbackInput}
                         onChange={(e) => setFeedbackInput(e.target.value)}

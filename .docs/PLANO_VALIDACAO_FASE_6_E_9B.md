@@ -22,6 +22,15 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 
 ## O que verificar na rodada integrada
 
+### Retomada — acesso de professor
+
+**Registro de Gabriel Lineker (`GabrielLineker`).** Os testes com aluno já confirmaram envio, persistência do anexo e reenvio. O próximo marco é fechar o ciclo de avaliação com uma única conta docente da carga.
+
+1. **Gabriel confirma a turma de teste.** Codex cruza a carga com o vínculo disponível no ambiente para identificar qual conta existente, Ana Paula ou Carlos Eduardo, é professora daquela turma. Se a turma anterior não tiver docente, usar uma turma com vínculo confirmado e gerar nela uma entrega atrasada de teste.
+2. **Habilitar somente essa conta no Supabase Auth de teste.** Usar acesso administrativo para definir uma credencial da conta existente, preservando o UUID, o perfil e o vínculo. Gabriel usa o painel se o acesso administrativo estiver apenas com ele. Validar o login e a visualização da turma antes de prosseguir.
+3. **Executar o ciclo de avaliação.** Professor abre a entrega atrasada, confere se há aviso no feedback (RN07), registra nota e feedback e confirma a persistência. Aluno volta à mesma entrega e tenta substituir o anexo após a avaliação (RN08). Codex registra cada resultado como aprovado ou falhou, com a evidência correspondente.
+4. **Avançar para a matriz RLS.** Com o ciclo documentado, habilitar o master e preparar os perfis de outra escola. Uma falha no ciclo vira um achado para correção e reteste. A conta master não é um pré-requisito para a avaliação pelo professor.
+
 | Área | Cenários mínimos |
 |---|---|
 | **Auth e cadastro — RF01, RN11** | Login por papel. Cadastro com escola válida e tentativa com escola inválida. Vínculo entre Auth e perfil, papel inicial de aluno e escola correta. Registrar a configuração de confirmação de e-mail e o estado do reenvio. |
@@ -35,6 +44,16 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 O **código público alfanumérico da escola** pode ser discutido após a primeira rodada. Se aprovado, registrar a decisão arquitetural aplicável em `.agents/decisions`, avaliar a manutenção do ID inteiro como chave interna e repetir cadastro, vínculo e autorização.
 
 ## Como registrar e fechar
+
+**Escala RN01 — Gabriel Lineker (20/11).** A escala confirmada é 0–100, como no DDL. Alinhar o formulário docente, a validação e a visualização da nota pelo aluno. Manter os dados existentes no valor gravado, pois a origem de cada nota não distingue a escala usada na entrada. A obrigatoriedade e a extensão do feedback na RN01 ficam como critérios separados.
+
+**Reuso de evidências — Gabriel Lineker (20/11).** Aproveitar cenários já comprovados na mesma configuração. Pedir novo teste manual apenas quando uma alteração puder invalidar o resultado anterior ou quando houver uma diferença relevante ainda sem evidência. Ao solicitar o reteste, indicar a condição nova e o resultado que ela confirma.
+
+**Correção RN07 — Gabriel Lineker (20/11).** Registrar o atraso no envio com o relógio do banco e exibir o aviso na área de avaliação. Guardar o indicador separado do parecer docente, pois a RLS da primeira entrega exige feedback nulo. Para entregas anteriores à migração, derivar o aviso das datas disponíveis. Retestar entrega no prazo e atrasada, reenvio antes da nota e edição do parecer.
+
+**Correção RN08 — Gabriel Lineker (20/11).** Aplicar a migração 07 após a 06 no Supabase de teste. A nota registrada é o marco do bloqueio, como na interface, inclusive se o feedback estiver vazio. A proteção deve abranger o registro e o arquivo da entrega. Validar com uma entrega descartável o reenvio sem nota, a avaliação e sua edição pelo professor vinculado, a leitura pelo aluno e a preservação do anexo após avaliação.
+
+**Primeira execução automatizada — Gabriel Lineker (20/11).** O roteiro `node scripts/validar-leitura-e3.mjs` abre duas sessões temporárias no Edge. Após autenticar cada conta e abrir a aba Atividades da DCC000 nas duas janelas, o roteiro abre e verifica a entrega da E3. Ele verifica leitura pela interface e ausência da opção de substituir o arquivo após avaliação. A verificação de permissões de escrita no banco fica para o cenário descartável.
 
 - Em **`.agents/features/`**, manter o checklist da fase e a autoria. Usar **`.agents/troubleshooting/`** para falhas reproduzidas e **`.agents/decisions/`** quando houver alteração de contrato que justifique ADR.
 - Em **`.docs/`** e **`relatorios/`**, registrar autor, commit ou versão do ambiente, papel/escola, cenário, resultado esperado e observado, evidência sem credenciais, correção e reteste. Marcar cada cenário como aprovado, falhou, bloqueado ou pendente. Preservar no handoff o ponto exato de retomada.
