@@ -47,6 +47,12 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 
 **Resultado — Gabriel Lineker (20/11).** Anexo, isolamento e exclusão passaram. A confirmação visual ficou pendente porque a lista de alunos da DCC000 não mostrou a conta descartável matriculada. [Relatório](../relatorios/2026-11/2026-11-20-anexo-duvida-denuncia.md)
 
+**Paginação das matrículas — Gabriel Lineker.** A sessão do professor encontrou 9.509 matrículas ativas na DCC000. A resposta inicial trouxe 1.000 e omitiu a conta descartável, encontrada na consulta por ID. Paginar a consulta em ordem da chave composta, preservar filtros e permissões e retestar a denúncia pelo Edge.
+
+Limitar a renderização da lista em lotes e oferecer busca por nome para localizar um aluno nas turmas grandes.
+
+**Passou — Gabriel Lineker.** O Edge encontrou o aluno descartável pela busca, exibiu a confirmação, fechou o formulário e registrou a denúncia 6 no Supabase de teste. [Relatório](../relatorios/2026-11/2026-11-20-paginacao-alunos-denuncia.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)

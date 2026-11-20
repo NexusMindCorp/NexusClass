@@ -123,16 +123,12 @@ export class EscolaTurmaRepository implements IEscolaTurmaRepository {
     const alunosPorTurma = new Map<number, UsuarioResumo[]>();
 
     if (idsTurmas.length > 0) {
-      const [{ data: profData }, { data: alunoData }] = await Promise.all([
+      const [{ data: profData }, alunoData] = await Promise.all([
         client
           .from("professor_turma")
           .select("id_turma, perfil:id_professor (id_perfil, nome, foto_url)")
           .in("id_turma", idsTurmas),
-        client
-          .from("aluno_turma")
-          .select("id_turma, perfil:id_aluno (id_perfil, nome, foto_url)")
-          .in("id_turma", idsTurmas)
-          .eq("situacao", "ativa"),
+        this.listarMatriculasAtivas(client, idsTurmas),
       ]);
 
       for (const item of (profData ?? []) as unknown as VinculoPerfilJoin[]) {
@@ -146,7 +142,7 @@ export class EscolaTurmaRepository implements IEscolaTurmaRepository {
         }
       }
 
-      for (const item of (alunoData ?? []) as unknown as VinculoPerfilJoin[]) {
+      for (const item of alunoData) {
         const perfil = umOuPrimeiro(item.perfil);
         if (perfil?.nome) {
           const lista = alunosPorTurma.get(item.id_turma) ?? [];
@@ -179,6 +175,37 @@ export class EscolaTurmaRepository implements IEscolaTurmaRepository {
       ano_letivo: escolaData.ano_letivo,
       turmas: turmasFormatadas,
     };
+  }
+
+  private async listarMatriculasAtivas(
+    client: ClienteSupabaseTipado,
+    idsTurmas: number[],
+  ): Promise<VinculoPerfilJoin[]> {
+    const matriculas: VinculoPerfilJoin[] = [];
+    const tamanhoPagina = 1000;
+    let total: number | null = null;
+
+    do {
+      const inicio = matriculas.length;
+      const { data, count, error } = await client
+        .from("aluno_turma")
+        .select(
+          "id_turma, perfil:id_aluno (id_perfil, nome, foto_url)",
+          inicio === 0 ? { count: "exact" } : undefined,
+        )
+        .in("id_turma", idsTurmas)
+        .eq("situacao", "ativa")
+        .order("id_turma")
+        .order("id_aluno")
+        .range(inicio, inicio + tamanhoPagina - 1);
+
+      if (error) throw error;
+      if (!data?.length) break;
+      matriculas.push(...data);
+      if (inicio === 0) total = count;
+    } while (total === null || matriculas.length < total);
+
+    return matriculas;
   }
 
   async listarTurmasProfessor(

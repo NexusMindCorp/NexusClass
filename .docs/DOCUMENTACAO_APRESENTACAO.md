@@ -10,7 +10,7 @@
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-20 |
 | **Última etapa concluída** | **Fase 6-A — Passo 10 (Fechamento — Passos 0 a 10 Concluídos):** Atualizados os slides interativos ([`configEngenhariaSoftware.ts`](../src/hooks/InfoAplicacao/configEngenhariaSoftware.ts)), o diagrama UML ([`diagrama_classes_detalhado.puml`](../out/diagramas/diagrama_classes_detalhado.puml) com `DataMappers`, `permissoes`, `AnexoStorageFacade` e os 6 Repositories) e gerado o relatório [`2026-11-17-fase-6a-remodelagem-acesso-banco.md`](../relatorios/2026-11/2026-11-17-fase-6a-remodelagem-acesso-banco.md). Toda a SPA usa agora o esquema normalizado (`01_esquema.sql` + `04_supabase_auth_rls.sql` + `05_supabase_funcoes_realtime.sql`) com **0 erros `tsc`** e **13 suítes / 113 testes passando** (100% Lines / 100% Funcs / 98% Stmts em `src/lib` + `src/patterns`). |
 | **Último relatório** | [Revisão de estado em 19/11](RELATORIO_ESTADO_ATUAL_2026-11-19.md) e [registro da sessão](../relatorios/2026-11/2026-11-19-estado-atual-nexusclass.md), por Gabriel Lineker. A [entrega de 17/11](../relatorios/2026-11/2026-11-17-fase-6a-remodelagem-acesso-banco.md), de Gianlucca Paiva, conserva os detalhes da implementação. |
-| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Gabriel Lineker validou anexos e exclusão de dúvidas. Investigar a ausência da conta descartável na lista de alunos da DCC000 e retestar a confirmação visual da denúncia. [Plano de validação](PLANO_VALIDACAO_FASE_6_E_9B.md) · [Relatório da rodada](../relatorios/2026-11/2026-11-20-anexo-duvida-denuncia.md) |
+| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Gabriel Lineker paginou a lista de matrículas e confirmou a denúncia no Edge. Revisar os itens restantes da matriz antes do fechamento acadêmico. [Plano de validação](PLANO_VALIDACAO_FASE_6_E_9B.md) · [Relatório da rodada](../relatorios/2026-11/2026-11-20-paginacao-alunos-denuncia.md) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); não alterar `01`/`02`/`04` SQL; rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
@@ -22,7 +22,7 @@
 | 3 | Strategy (filtros) | **Concluído** | Gianlucca Paiva | 78 testes passando (6 suítes); `FiltroStrategy.ts` com **100%** de cobertura; condicionais e duplicações removidas de `Pesquisar`, `DuvidasBox` e `AppSidebar` |
 | 4 | Observer (Realtime) | **Concluído** | Gabriel Lineker | 89 testes passando (7 suítes); `NotificacaoSubject.ts` com **100%** de cobertura; 5 canais Realtime desacoplados em `useMural`, `useGerenciador` e `useMensagens` |
 | 5 | Singleton / Proxy documentados + diagrama | **Concluído** | Gianlucca Paiva | `supabaseClient.ts` (`<<Singleton>>`) e `ProtectedRoute`/`BoxRestrito` (`<<Proxy>>`) catalogados em `src/patterns/`; `diagrama_classes_detalhado.puml` atualizado com os 7 padrões GoF |
-| 6 | Testes de componente + E2E e Passo 9-B | Em andamento | Gabriel Lineker (20/11) | Ciclo de anexos da dúvida verificado. Confirmação visual de denúncia aguarda investigação da lista de alunos. |
+| 6 | Testes de componente + E2E e Passo 9-B | Em andamento | Gabriel Lineker (20/11) | Ciclo de anexos e confirmação visual da denúncia verificados. Lista de alunos paginada e com busca. |
 | 6-A | Remodelagem do acesso ao banco (esquema normalizado) | **Concluído** (Passos 0–10; 9-B RLS ao vivo na Fase 6) | Gianlucca Paiva | `05_*.sql`, `database.types.ts`, `mappers.ts`, `permissoes.ts`, `AnexoStorageFacade`, 6 Repositories, slides + UML + **13 suítes / 113 testes** |
 | 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gianlucca Paiva | Atualizado com dados reais da Fase 5; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
 
@@ -115,6 +115,7 @@
 ## Diário de Sessões
 | Data | Autor | Resumo |
 |:---|:---|:---|
+| 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Confirmou o corte em 1.000 matrículas, paginou a consulta e validou a denúncia no Edge. |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Validou upload, acesso e remoção de anexo da dúvida. Registrou ausência da conta descartável na lista usada pela denúncia. |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Confirmou recebimento de mensagem via Realtime, leitura da resposta da dúvida e abertura de chamado no Supabase de teste. |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Preparou e aplicou a migração de invalidação de alertas. O reteste do reagendamento passou no Supabase de teste. |

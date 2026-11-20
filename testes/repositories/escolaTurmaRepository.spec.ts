@@ -75,7 +75,17 @@ describe("EscolaTurmaRepository — Isolamento por Escola e Matrícula RN12 (Ní
     });
     const consultaVinculos = {
       in: vi.fn().mockReturnValue(Object.assign(Promise.resolve({ data: [] }), {
-        eq: vi.fn().mockResolvedValue({ data: [] }),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        range: vi.fn()
+          .mockResolvedValueOnce({
+            data: [{ id_turma: 1, perfil: { id_perfil: "aluno-1", nome: "Primeiro aluno", foto_url: null } }],
+            count: 2,
+          })
+          .mockResolvedValueOnce({
+            data: [{ id_turma: 1, perfil: { id_perfil: "aluno-2", nome: "Aluno da segunda página", foto_url: null } }],
+            count: null,
+          }),
       })),
     };
     const client = {
@@ -89,6 +99,7 @@ describe("EscolaTurmaRepository — Isolamento por Escola e Matrícula RN12 (Ní
     const catalogo = await new EscolaTurmaRepository(client).carregarDadosEscola(escola, papel);
 
     expect(Object.keys(catalogo.turmas)).toEqual(esperado);
+    expect(catalogo.turmas["1"].alunos.map(({ id }) => id)).toEqual(["aluno-1", "aluno-2"]);
     if (escola) {
       expect(consultaTurmas.eq).toHaveBeenCalledWith("id_escola", 1);
     } else {

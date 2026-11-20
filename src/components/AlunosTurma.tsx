@@ -7,6 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,10 +29,18 @@ import { BoxPerfilUsuario } from "@/components/BoxPerfilUsuario";
 import { PerfilAvatar } from "./PerfilAvatar";
 import type { AlunosTurmaProps, tableRowProps } from "@/hooks/AlunosHooks/type";
 
+const tamanhoLote = 50;
+
 export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
   const { opcaoSelecionada, nomeAluno, idAluno, handleOptionSelect } = useOptionAlunos();
+  const [busca, setBusca] = useState("");
+  const [limite, setLimite] = useState(tamanhoLote);
   const listaSemUsuario = turma.alunos.filter(
     (aluno) => aluno.id !== perfil.id,
+  );
+  const buscaNormalizada = busca.trim().toLocaleLowerCase("pt-BR");
+  const alunosFiltrados = listaSemUsuario.filter(({ nome }) =>
+    nome.toLocaleLowerCase("pt-BR").includes(buscaNormalizada),
   );
   const professorId = turma.professor_id || "";
   const podeInteragirComProfessor = Boolean(
@@ -174,6 +184,16 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
           </span>
         </div>
 
+        <Input
+          type="search"
+          aria-label="Buscar aluno por nome"
+          placeholder="Buscar aluno por nome"
+          value={busca}
+          onChange={(event) => {
+            setBusca(event.target.value);
+            setLimite(tamanhoLote);
+          }}
+        />
         <div className="rounded-md border bg-card overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/30">
@@ -183,16 +203,26 @@ export function AlunosTurma({ turma, perfil, abrirChat }: AlunosTurmaProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {listaSemUsuario.map((aluno, index) =>
+              {alunosFiltrados.slice(0, limite).map((aluno, index) =>
                 renderLinhaPessoa({
                   id: aluno.id || String(index),
                   nome: aluno.nome,
                   foto: aluno.foto_url,
                 }),
               )}
+              {alunosFiltrados.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={2}>Nenhum aluno encontrado.</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
+        {limite < alunosFiltrados.length && (
+          <Button variant="outline" onClick={() => setLimite(limite + tamanhoLote)}>
+            Mostrar mais alunos
+          </Button>
+        )}
       </div>
     </>
   );

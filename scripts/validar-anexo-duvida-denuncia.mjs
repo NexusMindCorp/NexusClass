@@ -93,10 +93,13 @@ async function validarDenuncia(aluno, professor, master) {
     await pagina.getByRole('button', { name: 'Entrar', exact: true }).click();
     const atalho = pagina.getByRole('button', { name: /Banco de Dados - 2026\.3/ });
     await expect(atalho).toBeVisible({ timeout: 25_000 });
-    etapa = 'abertura da lista de alunos';
+    etapa = 'abertura da turma';
     await atalho.click();
+    etapa = 'abertura da lista de alunos';
     await pagina.getByRole('button', { name: 'Alunos', exact: true }).click();
     etapa = 'localização do aluno descartável';
+    const busca = pagina.getByRole('searchbox', { name: 'Buscar aluno por nome' });
+    if (await busca.isVisible()) await busca.fill(nome);
     const linha = pagina.getByRole('row').filter({ has: pagina.getByText(nome, { exact: true }) });
     try {
       await linha.hover();
