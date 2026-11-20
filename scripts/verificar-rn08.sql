@@ -11,8 +11,8 @@ SELECT
     entrega.feedback,
     storage_objeto.name AS arquivo,
     COALESCE(
-        entrega.nota = 59
-        AND entrega.feedback = 'Revise a questão 02.'
+        entrega.nota = 60
+        AND entrega.feedback = 'Parecer de teste após migração 10. Nota 60.'
         AND storage_objeto.bucket_id = 'entregas_atividades'
         AND right(storage_objeto.name, length('APEX_LOGO.jpg')) = 'APEX_LOGO.jpg',
         false
