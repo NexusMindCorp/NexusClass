@@ -51,6 +51,13 @@ O **código público alfanumérico da escola** pode ser discutido após a primei
 
 ### Registro de SQL e critérios para avançar
 
+**Controle master — Gabriel Lineker (20/11).** Reaproveitar a conta descartável do professor sem vínculo, cenário já registrado. O [SQL de preparação](../scripts/preparar-master-controle.sql) está pendente de execução no Supabase de teste e exige que a conta esteja sem vínculos docentes e de matrícula. A saída esperada é `master` com escola nula. No Playwright, autenticar a conta em sessão nova e conferir a visibilidade da DCC000 na escola 1 e de Cálculo Numérico na escola 3. Reverter o papel da conta descartável ao concluir a rodada administrativa.
+
+**Professor de controle — Gabriel Lineker (20/11).** A [consulta de prontidão](../scripts/verificar-professor-controle-dcc000.sql) **passou** no Supabase de teste. A conta descartável está confirmada no Auth, tem papel aluno na escola 1 e não tem matrícula ativa nem vínculo docente com DCC000. O [SQL de preparação](../scripts/preparar-professor-controle-dcc000.sql) foi revisado e está pendente de execução administrativa. Ele altera só o papel dessa conta, sem criar vínculo. O resultado esperado é uma linha com `professor` e escola `1`. Depois, iniciar nova sessão no Playwright e registrar o comportamento da DCC000.
+
+- **Passou — preparação administrativa.** Gabriel executou o SQL de preparação no Supabase de teste. A saída foi uma linha com papel `professor` e escola `1`. O roteiro Playwright confere a ausência da DCC000 na sidebar e na pesquisa docente. A estratégia de pesquisa do professor lista apenas turmas em que leciona.
+- **Passou — Playwright.** O [roteiro do professor sem vínculo](../scripts/validar-professor-sem-vinculo.mjs) confirmou que a DCC000 não aparece na sidebar nem na pesquisa. A primeira tentativa esperava erroneamente um cartão visível sem a ação Entrar. A execução corrigida terminou com código 0.
+
 **Aluno de outra escola — Gabriel Lineker (20/11).** Confirmar o perfil da conta de controle antes do login de teste. No navegador, verificar que a DCC000 não aparece na sidebar nem nas telas de pesquisa da escola 3. Comparar com a evidência já registrada do aluno vinculado. A visibilidade da interface fica registrada separadamente da autorização no banco.
 
 - **Passou — Supabase de teste.** A [consulta da conta de controle](../scripts/verificar-aluno-controle-dcc000.sql) confirmou papel aluno, escola 3, DCC000 na escola 1 e ausência de matrícula ativa na DCC000.

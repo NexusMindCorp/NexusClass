@@ -18,6 +18,8 @@
 
 ## Ponto de retomada
 
+**Controle docente sem vínculo em 20/11 — Gabriel Lineker.** A consulta de prontidão verificou a conta descartável da escola 1 e a execução administrativa retornou o papel professor. O Playwright confirmou ausência da DCC000 na sidebar e na pesquisa docente. A primeira tentativa passou na sidebar e falhou na pesquisa por esperar um cartão que a Strategy filtra. O roteiro corrigido passou com código 0. O professor vinculado já abriu a turma em rodada anterior. A sessão master ainda está pendente.
+
 **Controle de outra escola em 20/11 — Gabriel Lineker.** O SQL somente leitura confirmou o aluno da escola 3 sem matrícula ativa na DCC000 (escola 1). O Playwright passou nas três verificações: DCC000 ausente da sidebar, Cálculo Numérico presente na pesquisa e DCC000 ausente da pesquisa. O aluno vinculado já havia aberto a DCC000 pelo mesmo caminho em rodada anterior. A evidência é de visibilidade no aplicativo. As sessões de professor sem vínculo e master ainda estão pendentes.
 
 **Lote automatizado da DCC000 em 20/11 — Gabriel Lineker.** O [roteiro Playwright](../../scripts/validar-acesso-dcc000.mjs) passou em sete verificações após o login inicial nas duas sessões. Como aluno, a pesquisa abriu a DCC000 pelo botão Entrar, o atalho também abriu a turma, Enviar Dúvida estava disponível e Postar Atividade não apareceu. Como professor, o atalho abriu a turma, Postar Atividade estava disponível e Enviar Dúvida não apareceu. A primeira execução usava um seletor que confundia a chave interna com o título da turma. O roteiro foi corrigido e a segunda execução terminou com código 0. A entrada da turma original relatada sem professor ainda depende de sua identificação. As verificações são de navegação e controles da interface.
