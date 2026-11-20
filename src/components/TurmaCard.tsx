@@ -35,15 +35,18 @@ export function TurmaCard({
     <Card
       className={`relative mx-auto w-full pt-0 overflow-hidden ${compacto ? "" : "max-w-sm"}`}
     >
-      <div
-        className={`absolute inset-0 z-30 bg-black/35 ${compacto ? "h-24" : "aspect-video"}`}
-      />
-
-      <img
-        src={banners || undefined}
-        alt="Banner da turma"
-        className={`relative z-20 w-full object-cover brightness-70 ${compacto ? "h-24" : "aspect-video"}`}
-      />
+      <div className={`relative w-full bg-muted ${compacto ? "h-24" : "aspect-video"}`}>
+        {banners?.trim() && (
+          <img
+            key={banners}
+            src={banners}
+            alt="Banner da turma"
+            className="absolute inset-0 h-full w-full object-cover brightness-70"
+            onError={(event) => { event.currentTarget.hidden = true; }}
+          />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-black/35" />
+      </div>
 
       <CardHeader className={compacto ? "p-4 pb-1 pt-0" : ""}>
         <CardAction className="relative z-40 h-11 w-11">
