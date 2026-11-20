@@ -53,6 +53,10 @@ Limitar a renderização da lista em lotes e oferecer busca por nome para locali
 
 **Passou — Gabriel Lineker.** O Edge encontrou o aluno descartável pela busca, exibiu a confirmação, fechou o formulário e registrou a denúncia 6 no Supabase de teste. [Relatório](../relatorios/2026-11/2026-11-20-paginacao-alunos-denuncia.md)
 
+**Ordem 1 — Gabriel Lineker.** Exercitar o cadastro público com escola existente e inexistente usando os mesmos metadados da tela. Conferir perfil inicial e exigência de confirmação. Testar matrícula em turma da mesma escola, repetição idempotente, cancelamento e recusa entre escolas. Remover a matrícula criada ao final. A ordem 2 aguarda autorização de Gabriel.
+
+**Ordem 1 concluída — Gabriel Lineker.** O Supabase de teste abriu sessão no cadastro válido, criou o perfil de aluno na escola 1 e recusou a escola inexistente. Na DCC001, a inscrição repetida manteve um único vínculo ativo e o cancelamento o removeu. A matrícula na MAT101 foi recusada. [Relatório](../relatorios/2026-11/2026-11-20-cadastro-matricula.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
