@@ -65,6 +65,31 @@ Limitar a renderização da lista em lotes e oferecer busca por nome para locali
 
 **Ordem 2 concluída — Gabriel Lineker.** Depois da aplicação da migração 13, o Supabase aceitou hoje na criação e amanhã no reagendamento, recusou ontem nos dois casos e preservou a data válida. [Relatório do reteste](../relatorios/2026-11/2026-11-20-lacunas-entrega-calendario.md)
 
+## Retomada após as ordens 1 e 2
+
+**Autor** Gabriel Lineker (`GabrielLineker`), 20/11/2026.
+
+As ordens 1 e 2 estão encerradas no ambiente de teste. Reutilizar as evidências registradas. Repetir apenas os cenários afetados pelas decisões abaixo ou pela instalação isolada.
+
+### Ordem 3 — Decisões da dupla
+
+| Decisão | Gabriel e Gianlucca | Codex após a decisão | Evidência para fechar |
+|---|---|---|---|
+| Exclusão de conta | Definir se entra nesta entrega. Gabriel autoriza expressamente a exclusão da conta descartável indicada no Supabase de teste. | Preparar conta com dados e arquivo próprios, testar a função pelo fluxo da aplicação e conferir Auth, perfil, vínculos e Storage após a exclusão. | A conta perde acesso e seus dados recebem o tratamento previsto. Se adiado, registrar a pendência. |
+| Código público da escola | Decidir se entra nesta entrega e aprovar o formato do código e o tratamento das escolas existentes. A proposta é manter o ID numérico como chave interna e usar um código público alfanumérico, único e gerado automaticamente. | Registrar a decisão arquitetural, preparar migração, preencher os códigos das escolas existentes, ajustar o cadastro e verificar código válido, inválido, unicidade, vínculo e isolamento entre escolas. | Contas e vínculos existentes preservados. Cadastro por código público aceito na escola correta. |
+| Banners reais | Decidir se entram nesta entrega e disponibilizar as imagens ou indicar as fontes aprovadas. | Associar as imagens às turmas definidas e conferir cartão e mural com imagem disponível e com falha. | Imagens previstas carregam e o fallback já validado continua funcional. |
+| Reenvio de confirmação | Decidir se entra nesta entrega. Se aprovado, indicar ambiente com confirmação de e-mail habilitada e uma caixa de teste acessível para receber as mensagens. | Configurar e validar cadastro, reenvio e confirmação com conta descartável. Conferir retorno da interface e login após confirmação. | A mensagem chega na caixa de teste e permite confirmar a conta. Se adiado, registrar que o ambiente anterior abriu sessão imediatamente. |
+
+Na retomada, registrar para cada linha se será executada ou adiada, com responsável. Os itens aprovados podem avançar de forma independente. Caso uma decisão altere o cadastro, a carga ou o esquema, concluir essa parte antes de validar a instalação isolada.
+
+### Ordem 4 — Carga isolada e fechamento acadêmico
+
+1. **Preparar o destino.** Gabriel e Gianlucca identificam a instalação isolada e confirmam a versão de referência. Codex confere a sequência de esquema, carga, migrações aprovadas e provisionamento. Se uma operação exigir o SQL Editor, deixar o arquivo e a finalidade registrados antes da execução.
+2. **Validar do zero.** Codex executa a carga e o provisionamento nessa instalação, confere integridade e vínculos e faz uma verificação curta de login por papel e isolamento entre escolas. Registrar a versão, o ambiente, os scripts executados, os resultados e as diferenças encontradas. O provisionamento já passou no Supabase de teste utilizado até aqui.
+3. **Atualizar a entrega.** Após validar a instalação e fechar as decisões da ordem 3, Codex reconcilia requisitos, DER, modelo, scripts e evidências de `grupo24/` com o estado aprovado. A dupla confere o pacote final e as pendências adiadas.
+
+[Relatório de encerramento e retomada](../relatorios/2026-11/2026-11-20-encerramento-validacao-e-retomada.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
