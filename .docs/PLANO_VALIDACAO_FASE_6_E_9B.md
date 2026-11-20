@@ -39,6 +39,10 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 | **Dúvidas, mensagens, suporte e denúncias — RF06 e RF08–10, RN09** | Resposta do professor e anexos da dúvida, tentativa de leitura de anexo por perfil sem vínculo, exclusão de dúvida com verificação dos arquivos, chat entre participantes, abertura de ticket e registro de denúncia. |
 | **Calendário — RF07, RN02 e RN04–06, RN10** | Eventos pessoais e de turma por papel, rejeição de data passada, lembretes de 1 e 5 minutos, reagendamento sem alertas duplicados e remoção por cascata. Confirmar que a execução veio do cron e que o evento é recebido pelo caminho Realtime quando aplicável. |
 
+**Comunicação — Gabriel Lineker (20/11).** Confirmar que uma sessão autenticada do destinatário recebe a mensagem pelo canal Realtime. Usar as contas descartáveis para conferir também a resposta docente à dúvida e a abertura de ticket visível ao usuário e ao master.
+
+**Passou no Supabase de teste — Gabriel Lineker (20/11).** O professor recebeu a mensagem 8 pelo canal Realtime. O aluno leu a resposta à dúvida 7. O master consultou o chamado pendente 5. [Relatório](../relatorios/2026-11/2026-11-20-comunicacao-realtime.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
