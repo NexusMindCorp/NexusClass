@@ -38,6 +38,10 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 | **Atividade e entrega — RF04–05, RN01, RN07–08** | Professor publica, aluno envia e reenvia, professor avalia e aluno vê o resultado. Verificar nota e feedback no limite, envio atrasado e reenvio após avaliação. Conferir arquivo e registro após reenvio e após falha no upload ou na gravação. |
 | **Dúvidas, mensagens, suporte e denúncias — RF06 e RF08–10, RN09** | Resposta do professor e anexos da dúvida, tentativa de leitura de anexo por perfil sem vínculo, exclusão de dúvida com verificação dos arquivos, chat entre participantes, abertura de ticket e registro de denúncia. |
 | **Calendário — RF07, RN02 e RN04–06, RN10** | Eventos pessoais e de turma por papel, rejeição de data passada, lembretes de 1 e 5 minutos, reagendamento sem alertas duplicados e remoção por cascata. Confirmar que a execução veio do cron e que o evento é recebido pelo caminho Realtime quando aplicável. |
+
+**Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
+
+**Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
 | **Banco e RLS — Passo 9-B** | Confirmar operações permitidas e negadas para aluno, professor e master, conferindo o estado dos registros após cada teste. Adaptar os 11 cenários da E4 ao esquema vigente, com dados de teste atuais, asserções sobre a restrição esperada e transações reversíveis em banco isolado. |
 | **Automação — Fase 6** | Testes de componente para `ProtectedRoute`, `BoxRestrito` e filtro de dúvidas. Playwright para a jornada login → turma → entrega. Registrar execução, evidência e limites de cobertura. |
 
@@ -163,7 +167,7 @@ O [roteiro de provisionamento](../scripts/provisionar-contas-teste.mjs) roda em 
 - `NEXUS_TEST_SUPABASE_URL` no formato `https://REF_DO_PROJETO.supabase.co` e `NEXUS_TEST_SUPABASE_SERVICE_ROLE_KEY` com a chave administrativa dessa instalação.
 - `NEXUS_TEST_<CONTA>_EMAIL` e `NEXUS_TEST_<CONTA>_SENHA` para cada conta listada na simulação. Usar endereços distintos e senhas de pelo menos 12 caracteres. Guardar a chave fora do ambiente Vite.
 
-Executar `node --env-file=.env.contas-teste.local scripts/provisionar-contas-teste.mjs --aplicar REF_DO_PROJETO`. Após a aplicação, fazer login e conferir papel, escola e turma de cada conta. Uma falha depois da criação do perfil permite reexecutar com os mesmos endereços e senhas. A primeira execução ao vivo continua pendente.
+Executar `node --env-file=.env.contas-teste.local scripts/provisionar-contas-teste.mjs --aplicar REF_DO_PROJETO`. Após a aplicação, fazer login e conferir papel, escola e turma de cada conta. Uma falha depois da criação do perfil permite reexecutar com os mesmos endereços e senhas. **Passou no Supabase de teste (Gabriel Lineker).** As cinco contas foram criadas e tiveram login, perfil e configuração da matriz conferidos. [Resultados](../relatorios/2026-11/2026-11-20-provisionamento-contas-teste.md)
 
 **Feedback RN01 — Gabriel Lineker (20/11).** Exigir feedback em avaliações com nota e ao menos 20 caracteres, descontados espaços nas extremidades, para nota abaixo de 60. Validar no formulário e no banco. Aplicar a restrição às inserções e atualizações futuras, preservando as avaliações antigas até sua revisão. Retestar apenas os limites de feedback que ainda não foram exercitados.
 
