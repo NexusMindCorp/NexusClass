@@ -43,6 +43,10 @@ Alterações que recriem tabelas ou modifiquem dados já existentes exigem ident
 
 **Passou no Supabase de teste — Gabriel Lineker (20/11).** O professor recebeu a mensagem 8 pelo canal Realtime. O aluno leu a resposta à dúvida 7. O master consultou o chamado pendente 5. [Relatório](../relatorios/2026-11/2026-11-20-comunicacao-realtime.md)
 
+**Anexo e confirmação visual — Gabriel Lineker (20/11).** Verificar upload, leitura pelo professor vinculado, isolamento do anexo e a remoção de arquivo, vínculo e dúvida. Pelo navegador, denunciar apenas um perfil descartável e verificar mensagem de sucesso e fechamento do formulário.
+
+**Resultado — Gabriel Lineker (20/11).** Anexo, isolamento e exclusão passaram. A confirmação visual ficou pendente porque a lista de alunos da DCC000 não mostrou a conta descartável matriculada. [Relatório](../relatorios/2026-11/2026-11-20-anexo-duvida-denuncia.md)
+
 **Lote pela API — Gabriel Lineker (20/11).** Usar as contas provisionadas e a chave pública. Validar chat e denúncia entre os perfis descartáveis. Para calendário, aguardar o lembrete de cinco minutos gravado pelo cron, reagendar o mesmo evento, comparar as datas dos alertas e verificar a remoção em cascata ao excluir o evento descartável. Registrar a cobertura da API separadamente da interface.
 
 **Resultado do lote — Gabriel Lineker (20/11).** Chat, denúncia e cascata passaram. No reagendamento pela API, o lembrete antigo impediu que o cron criasse um novo na janela esperada. [Roteiro](../scripts/validar-calendario-comunicacao.mjs) · [Relatório](../relatorios/2026-11/2026-11-20-calendario-comunicacao.md)
