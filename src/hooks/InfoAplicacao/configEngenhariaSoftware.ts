@@ -401,7 +401,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     responsavel: "Gabriel Lineker",
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), suíte de integração RLS no Supabase e consolidação final.",
-    evidenciaTeste: "Jornadas de entrega e avaliação, navegação por perfil e testes de proteção de rotas. Chat, denúncia e cascata de alertas verificados pela API. Reagendamento com alerta anterior segue pendente.",
+    evidenciaTeste: "Jornadas de entrega e avaliação, navegação por perfil e testes de proteção de rotas. Chat, denúncia, reagendamento e cascata de alertas verificados pela API.",
   },
 ];
 

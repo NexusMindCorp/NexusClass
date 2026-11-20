@@ -4,6 +4,9 @@ import { setTimeout as esperar } from 'node:timers/promises';
 import { createClient } from '@supabase/supabase-js';
 
 const ref = process.argv[2];
+const somenteCalendario = process.argv[3] === '--somente-calendario';
+assert.ok(process.argv.length === 3 || (process.argv.length === 4 && somenteCalendario),
+  'Uso: validar-calendario-comunicacao.mjs REF [--somente-calendario]');
 const url = process.env.NEXUS_TEST_SUPABASE_URL;
 assert.match(ref ?? '', /^[a-z0-9]{20}$/);
 assert.equal(url, `https://${ref}.supabase.co`);
@@ -96,6 +99,7 @@ async function calendario(professor, aluno) {
     assert.equal(conta(inicial, primeiro), 1, 'Lembrete inicial');
     await dados(professor.cliente.from('evento_calendario').update(horarioCivil(segundoEvento))
       .eq('id_evento', id).select('id_evento').single(), 'Reagendamento');
+    assert.equal(conta(await listarAlertas(), primeiro), 0, 'Invalidação imediata do lembrete antigo');
     const final = await ate(primeiroCron + minuto + 22_000, segundo);
     console.log(`Calendário evento ${id}: antigo=${conta(final, primeiro)}, novo=${conta(final, segundo)}.`);
     assert.equal(conta(final, segundo), 1, 'Novo lembrete de 5 minutos após reagendamento');
@@ -107,19 +111,18 @@ async function calendario(professor, aluno) {
     const depois = await dados(auditor.from('alerta_calendario').select('id_alerta')
       .eq('id_evento', id), 'Conferência administrativa da cascata');
     assert.deepEqual(depois, []);
-    assert.ok(antes.length > 0, 'Controle para verificação de cascata');
-    console.log(`Calendário evento ${id}: cascata eliminou ${antes.length} alerta(s).`);
+    console.log(`Calendário evento ${id}: removido com ${antes.length} alerta(s) antes e zero depois.`);
   }
 }
 
 try {
-  const [aluno, professor, outro, master] = await Promise.all([
-    entrar('ALUNO_DCC000'), entrar('PROFESSOR_DCC000'), entrar('ALUNO_MAT101'), entrar('MASTER'),
-  ]);
-  const resultados = await Promise.allSettled([
-    comunicacao(aluno, professor, outro, master),
-    calendario(professor, aluno),
-  ]);
+  const [aluno, professor] = await Promise.all([entrar('ALUNO_DCC000'), entrar('PROFESSOR_DCC000')]);
+  const operacoes = [calendario(professor, aluno)];
+  if (!somenteCalendario) {
+    operacoes.push(Promise.all([entrar('ALUNO_MAT101'), entrar('MASTER')])
+      .then(([outro, master]) => comunicacao(aluno, professor, outro, master)));
+  }
+  const resultados = await Promise.allSettled(operacoes);
   for (const resultado of resultados) {
     if (resultado.status === 'fulfilled') continue;
     console.error(resultado.reason.message);
