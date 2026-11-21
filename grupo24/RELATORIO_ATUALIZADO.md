@@ -484,6 +484,8 @@ O script `docker/constructionsSQL/03_verificacao.sql` foi expandido dos 11 teste
 
 ---
 
+**Resultado da instalação limpa — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** O Docker dedicado confirmou **16/16**, incluindo o teste 13. O resultado anterior de **15/16** permanece como evidência histórica da instância legada. [Relatório da instalação](../relatorios/2026-11/2026-11-21-validacao-docker-banners.md)
+
 ## 6. REGISTRO DE EVOLUÇÃO DESDE A E4 E PENDÊNCIAS EXPLÍCITAS
 
 ### 6.1 O que mudou desde a E4 e por quê
@@ -505,12 +507,12 @@ O script `docker/constructionsSQL/03_verificacao.sql` foi expandido dos 11 teste
 
 As pendências abaixo permanecem explicitamente registradas para decisão ou execução na etapa final, sem comprometer a integridade do que já foi validado:
 
-1. **Ordem 3 — Itens opcionais ainda pendentes de decisão da dupla (Gabriel Lineker & Gianlucca Paiva):**
-   - **Banners reais das turmas:** disponibilização/definição das imagens finais para as turmas (o tratamento visual de fallback para banners e avatares indisponíveis já foi corrigido e validado via Playwright).
-   - **Reenvio de confirmação de e-mail:** decidir se entra nesta entrega; exige um ambiente com confirmação de e-mail habilitada e caixa de teste acessível (o Supabase de teste atual abre sessão imediatamente após o cadastro).
-2. **Ordem 4 — Validação da instalação limpa isolada:**
-   - Executar do zero a sequência oficial (`01_esquema.sql` → `04_supabase_auth_rls.sql` → `02_carga.sql` → `05_supabase_funcoes_realtime.sql` → `06`..`16` → `03_verificacao.sql`) em uma instância isolada limpa. A execução ao vivo em 2026-11-21 no Supabase de teste atual aprovou **15/16 testes** (`1–12` e `14–16`), expondo no **Teste 13** que a instância anterior ao commit `bd0994c` não possui os gatilhos RN12 (`trg_aluno_turma_escola` / `trg_professor_turma_escola`) nem a atualização de `DCC002` para `id_escola = 1` — divergência que será eliminada na instalação limpa da Ordem 4 (alcançando **16/16**), acompanhada do provisionamento de contas e de um smoke test curto de login por papel e isolamento entre escolas.
-   - Reexportar opcionalmente `grupo24/der.png` e um PDF consolidado a partir de [`grupo24/modelo.drawio`](modelo.drawio) e deste documento (`RELATORIO_ATUALIZADO.md`) caso a submissão final exija entrega em formato PDF/PNG atualizado.
+1. **Publicação e reenvio de confirmação.** Gianlucca Paiva decide o encaminhamento da publicação. A decisão sobre reenvio fica junto à verificação do envio de e-mail no ambiente alvo.
+2. **Exportação acadêmica.** Se a submissão exigir PNG e PDF atualizados, exportar o DER a partir de [`modelo.drawio`](modelo.drawio) e gerar o PDF deste relatório. Os binários da E4 permanecem como referência da entrega anterior.
+
+**Fechamento da Ordem 4 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** A sequência oficial foi executada em Supabase local no Docker com a carga versionada e obteve **16/16**, incluindo RN12, com `ROLLBACK`. Os cinco perfis autenticaram nos papéis e escolas esperados. A verificação de isolamento usou o acesso às entregas da DCC000. O fallback de banner foi confirmado entre cartão e mural. [Evidências locais](../relatorios/2026-11/2026-11-21-validacao-docker-banners.md)
+
+**Reteste integrado da migração 10 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Pela SPA local, o aluno substituiu o anexo com a nota ainda nula. O professor vinculado avaliou a entrega com resposta HTTP 204. A consulta ao banco confirmou nota 70 e o feedback, com vínculo, arquivo, horário e atraso preservados durante a avaliação. [Relatório do reteste](../relatorios/2026-11/2026-11-21-reteste-integrado-migracao-10.md)
 
 ---
 

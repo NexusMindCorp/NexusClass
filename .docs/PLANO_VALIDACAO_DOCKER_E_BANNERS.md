@@ -15,3 +15,5 @@ Referências [Plano da Fase 6 e do Passo 9-B](PLANO_VALIDACAO_FASE_6_E_9B.md) e 
 ## Execução local
 
 A sequência oficial rodou no projeto Docker `nexusclass-ordem4-465f3c2` com a carga versionada, 16/16 casos aprovados e `ROLLBACK` no fim da verificação. O reteste SQL da migração 10 passou com papel `authenticated`, dados descartáveis e `ROLLBACK`. A interface recebeu o fallback compartilhado. Ver [relatório da rodada](../relatorios/2026-11/2026-11-21-validacao-docker-banners.md).
+
+**Fechamento técnico — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** O reteste integrado da migração 10 passou no Edge contra o Supabase local. O relatório do Grupo 24 foi reconciliado com os resultados. Revisão da carga reservada a uma decisão futura. Publicação e reenvio de confirmação sob decisão de Gianlucca Paiva. [Evidência do reteste](../relatorios/2026-11/2026-11-21-reteste-integrado-migracao-10.md)

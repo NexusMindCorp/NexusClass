@@ -415,7 +415,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, exclusão de conta atômica (14), código público da escola (15), hardening XSS com SanitizacaoStrategy OWASP (16 + vercel.json + Edge Functions), consolidação de 01_esquema.sql, idempotência da 09 e RLS ao vivo.",
     evidenciaTeste:
-      "18 suítes / 140 testes verdes. Instalação limpa no Docker aprovada com 16/16 casos SQL, incluindo RN12. Migração 10 retestada no banco e fallback de banner aplicado no cartão e no mural.",
+      "18 suítes / 140 testes verdes. Instalação limpa no Docker com 16/16 casos SQL. Reenvio sem nota e avaliação docente confirmados na SPA e no banco. Fallback validado no cartão e no mural.",
   },
 ];
 

@@ -9,11 +9,13 @@
 |:---|:---|
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-21 |
 | **Última etapa concluída** | **Consolidação da Sessão de 21/11 (Fases 6 e 7 + Diagramas + `ConfiguracoesAvancadas` + `.agents/`):** concluídos Exclusão atômica de conta (`14` + `deletar-conta`), `03_verificacao.sql` (16 testes) + `grupo24/`, Código público da escola (`ADR-010`/`15`, 10/10 ao vivo), Hardening XSS/OWASP (`ADR-011`, `V-01..V-05`: `SanitizacaoStrategy.ts` com 0 deps, `16`, `resend-email`/`resend-suport`, `vercel.json`, `01_esquema.sql` consolidado, `09` idempotente, redação real de stream em `Testes de segurança.pdf`), atualização da aba `InfoAplicacao` (slide Pentest + correções visuais dos badges/pills), liberação de `ConfiguracoesAvancadas` para `professor`/`master` mantendo *Deletar Conta* restrito a `aluno`, sincronização dos diagramas (`out/diagramas/*.puml` + `grupo24/modelo.drawio`) e governança `.agents/` (**18 suítes / 140 testes**; **98.16% Stmts / 93.35% Branch / 100% Funcs / 100% Lines**). |
-| **Último relatório** | [Validação local da instalação e dos banners](../relatorios/2026-11/2026-11-21-validacao-docker-banners.md), por Gabriel Lineker. |
-| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Instalação isolada registrada com 16/16 e reteste SQL da migração 10 concluído. Banner de fallback implementado. Restam o reteste integrado pela SPA, a exportação acadêmica conforme exigência da entrega e a etapa de publicação, que inclui a decisão sobre o reenvio de confirmação. Revisão da carga adiada. [Plano e resultados](PLANO_VALIDACAO_DOCKER_E_BANNERS.md) |
+| **Último relatório** | [Reteste integrado da migração 10](../relatorios/2026-11/2026-11-21-reteste-integrado-migracao-10.md), por Gabriel Lineker. |
+| **Fase atual / Próximo passo** | **Fase 6 e Passo 9-B validados no ambiente local.** Instalação limpa com 16/16, migração 10 retestada no banco e na SPA e relatório do Grupo 24 reconciliado. Gianlucca decide a publicação e a inclusão do reenvio de confirmação. Exportação dos binários conforme exigência da entrega. Revisão da carga adiada. [Plano e resultados](PLANO_VALIDACAO_DOCKER_E_BANNERS.md) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); `01_esquema.sql` consolidado mantém compatibilidade idempotente com `06`–`16` (não quebrar `02`/`04`); rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
+
+**Reteste integrado em 21/11/2026 por Gabriel Lineker (`GabrielLineker`).** Reenvio sem nota e avaliação docente pela SPA aprovados. Nota, feedback e integridade da entrega conferidos no banco local.
 
 **Validação local da Fase 6 e do Passo 9-B em 21/11/2026 por Gabriel Lineker (`GabrielLineker`).** Carga atual aprovada em 16/16 casos SQL, cinco logins validados e migração 10 retestada no banco. Fallback do banner confirmado no Edge em página isolada e na navegação da SPA entre cartão e mural.
 
@@ -116,6 +118,8 @@
 - **Lições / trade-offs:** Reconhecer padrões nativos da linguagem/framework (ES Module Singleton e React Router Protection Proxy) em vez de forçar classes redundantes reforça o princípio de simplicidade do trabalho.
 
 ## Diário de Sessões
+
+**21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Reteste integrado da migração 10 concluído no Edge com a SPA conectada ao Docker. Atualizado o pacote textual do Grupo 24 e registrada a decisão de publicação com Gianlucca Paiva.
 
 **21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Instalação isolada aprovada com 16/16, reteste SQL da migração 10 e fallback de banners no cartão e no mural.
 | Data | Autor | Resumo |
