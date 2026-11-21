@@ -54,8 +54,59 @@ it("renderiza a rota e entrega o perfil ao Outlet quando há sessão", () => {
   expect(screen.getByText("Área autenticada de Aluno de teste")).toBeInTheDocument();
 });
 
-it("exibe acesso restrito nas configurações avançadas de um professor", () => {
-  configuracoes.mockReturnValue({ perfil: { role: "professor" } });
+it("libera configurações avançadas para professor sem expor deletar conta", () => {
+  configuracoes.mockReturnValue({
+    perfil: { id: "p-1", nome: "Prof. Ana", email: "ana@escola.edu.br", role: "professor" },
+    senhaDoInput: "",
+    setSenhaDoInput: vi.fn(),
+    areaSensivel: false,
+    setAreaSensivel: vi.fn(),
+    carregando: false,
+    handleAlterarSenha: vi.fn(),
+    handleDeletarConta: vi.fn(),
+  });
+  render(<ConfiguracoesAvancadas usuario={{}} listaEscolar={{ turmas: {} }} cancelarInscricao={vi.fn()} estaInscrito={() => false} />);
+  expect(screen.getByRole("heading", { name: "Configurações Avançadas" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /alterar senha/i })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Acesso Restrito" })).toBeNull();
+  expect(screen.queryByRole("button", { name: /deletar conta/i })).toBeNull();
+});
+
+it("libera configurações avançadas para master sem expor deletar conta", () => {
+  configuracoes.mockReturnValue({
+    perfil: { id: "m-1", nome: "Master", email: "master@escola.edu.br", role: "master" },
+    senhaDoInput: "",
+    setSenhaDoInput: vi.fn(),
+    areaSensivel: false,
+    setAreaSensivel: vi.fn(),
+    carregando: false,
+    handleAlterarSenha: vi.fn(),
+    handleDeletarConta: vi.fn(),
+  });
+  render(<ConfiguracoesAvancadas usuario={{}} listaEscolar={{ turmas: {} }} cancelarInscricao={vi.fn()} estaInscrito={() => false} />);
+  expect(screen.getByRole("heading", { name: "Configurações Avançadas" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /alterar senha/i })).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /deletar conta/i })).toBeNull();
+});
+
+it("exibe deletar conta nas configurações avançadas para aluno", () => {
+  configuracoes.mockReturnValue({
+    perfil: { id: "a-1", nome: "Aluno", email: "aluno@escola.edu.br", role: "aluno" },
+    senhaDoInput: "",
+    setSenhaDoInput: vi.fn(),
+    areaSensivel: false,
+    setAreaSensivel: vi.fn(),
+    carregando: false,
+    handleAlterarSenha: vi.fn(),
+    handleDeletarConta: vi.fn(),
+  });
+  render(<ConfiguracoesAvancadas usuario={{}} listaEscolar={{ turmas: {} }} cancelarInscricao={vi.fn()} estaInscrito={() => false} />);
+  expect(screen.getByRole("button", { name: /alterar senha/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /deletar conta/i })).toBeInTheDocument();
+});
+
+it("exibe acesso restrito nas configurações avançadas quando não há perfil autorizado", () => {
+  configuracoes.mockReturnValue({ perfil: null });
   render(<ConfiguracoesAvancadas usuario={{}} listaEscolar={{}} cancelarInscricao={vi.fn()} estaInscrito={() => false} />);
   expect(screen.getByRole("heading", { name: "Acesso Restrito" })).toBeInTheDocument();
   expect(screen.queryByRole("button", { name: /deletar conta/i })).toBeNull();

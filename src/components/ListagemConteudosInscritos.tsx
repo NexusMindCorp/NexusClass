@@ -51,9 +51,9 @@ export function ListagemConteudosInscritos({
     }
   };
 
-  const turmasFiltradas = listaEscolar.turmas
+  const turmasFiltradas = listaEscolar?.turmas
     ? Object.entries(listaEscolar.turmas)
-        .filter(([key]) => estaInscrito(key) || usuario.role === "master")
+        .filter(([key]) => estaInscrito(key) || usuario?.role === "master")
         .sort((a, b) =>
           (a[1] as any).materia.localeCompare((b[1] as any).materia),
         )

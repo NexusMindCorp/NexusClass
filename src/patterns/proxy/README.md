@@ -7,7 +7,7 @@
 ## 1. Problema Real que Resolve
 Em uma plataforma educacional com múltiplos papéis (`aluno`, `professor`, `master`) e rotas autenticadas:
 1. O painel principal (`LayoutPrincipal`) não pode ser montado nem disparar consultas ao banco enquanto a sessão do usuário ainda está sendo verificada ou quando o usuário não está autenticado.
-2. Telas de escopo restrito por papel — como a área de cancelamento de matrícula e exclusão de conta de estudante em `ConfiguracoesAvancadas` (`isAluno = perfil?.role === "aluno"`) — não devem expor controles sensíveis a perfis incompatíveis.
+2. Telas e ações de escopo restrito por papel — como a tela `ConfiguracoesAvancadas` (protegida por `<BoxRestrito />` quando não há perfil autorizado, liberando alteração de senha para `aluno`, `professor` e `master`, e restringindo a Zona de Perigo / exclusão de conta exclusivamente a `aluno`, em sincronia com o `403` da Edge Function `deletar-conta`) — não devem expor controles sensíveis a perfis incompatíveis.
 
 ## 2. Participantes GoF no Código Real
 
@@ -15,7 +15,7 @@ Em uma plataforma educacional com múltiplos papéis (`aluno`, `professor`, `mas
 |:---|:---|:---|
 | **Client** | `App.tsx` (`<Routes>`) / `GerenciadorTelas.tsx` | Solicita a renderização da rota ou subtela sem conhecer os detalhes da verificação de sessão/papel |
 | **Protection Proxy (Nível Rota)** | [`ProtectedRoute.tsx`](../../components/ProtectedRoute.tsx) | Intercepta o acesso à rota `/`: exibe *spinner* enquanto `loading === true`, redireciona para `/login` se `!session` e só monta o `<Outlet />` quando autenticado |
-| **Protection Proxy (Nível Papel)** | [`ConfiguracoesAvancadas.tsx`](../../components/ConfiguracoesAvancadas.tsx) + [`BoxRestrito.tsx`](../../components/BoxRestrito.tsx) | Verifica `perfil?.role === "aluno"`; caso contrário, substitui o conteúdo real pelo componente de bloqueio `<BoxRestrito />` |
+| **Protection Proxy (Nível Papel)** | [`ConfiguracoesAvancadas.tsx`](../../components/ConfiguracoesAvancadas.tsx) + [`BoxRestrito.tsx`](../../components/BoxRestrito.tsx) | Libera `ConfiguracoesAvancadas` apenas para papéis autenticados válidos (`aluno`, `professor`, `master`), substituindo pelo `<BoxRestrito />` caso contrário, e restringe a exclusão de conta (`Zona de Perigo`) apenas a `aluno` |
 | **Real Subject** | `LayoutPrincipal.tsx` / Painel interno de `ConfiguracoesAvancadas` | Componente protegido que só é instanciado/renderizado após a aprovação do Proxy |
 
 ### Trecho Real (`src/components/ProtectedRoute.tsx`)

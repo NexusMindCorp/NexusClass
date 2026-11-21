@@ -31,12 +31,16 @@ export function ConfiguracoesAvancadas({
   const [showPassword, setShowPassword] = useState(false);
 
   const isAluno = perfil?.role === "aluno";
+  const podeAcessarConfiguracoes =
+    perfil?.role === "aluno" ||
+    perfil?.role === "professor" ||
+    perfil?.role === "master";
 
   const mostrarSenha = () => {
     setShowPassword(!showPassword);
   };
 
-  return isAluno ? (
+  return podeAcessarConfiguracoes ? (
     <div className="w-full max-w-4xl mx-auto space-y-8 pb-10 container-expansivel-configuracoes-interna">
       <div className="w-full bg-card border border-border rounded-2xl p-8 shadow-sm transition-colors">
         <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -124,25 +128,27 @@ export function ConfiguracoesAvancadas({
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-border flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  <p className="font-semibold text-destructive">
-                    Zona de Perigo
-                  </p>
-                  <p className="text-xs">
-                    Excluir sua conta é uma ação irreversível.
-                  </p>
+              {isAluno && (
+                <div className="pt-4 border-t border-border flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-semibold text-destructive">
+                      Zona de Perigo
+                    </p>
+                    <p className="text-xs">
+                      Excluir sua conta é uma ação irreversível.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="lg"
+                    onClick={handleDeletarConta}
+                    className="cursor-pointer gap-2 font-bold transition-all duration-200  hover:scale-105 hover:shadow-lg active:scale-95"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                    Deletar Conta
+                  </Button>
                 </div>
-                <Button
-                  variant="destructive"
-                  size="lg"
-                  onClick={handleDeletarConta}
-                  className="cursor-pointer gap-2 font-bold transition-all duration-200  hover:scale-105 hover:shadow-lg active:scale-95"
-                >
-                  <Trash2 className="h-5 w-5" />
-                  Deletar Conta
-                </Button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -150,14 +156,14 @@ export function ConfiguracoesAvancadas({
 
       <div className="w-full">
         <ListagemConteudosInscritos
-          usuario={usuario}
+          usuario={perfil ?? usuario}
           listaEscolar={listaEscolar}
           cancelarInscricao={cancelarInscricao}
           estaInscrito={estaInscrito}
         />
       </div>
 
-      {areaSensivel && (
+      {isAluno && areaSensivel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <BoxAlertaDeletaConta
             onClose={() => setAreaSensivel(false)}
