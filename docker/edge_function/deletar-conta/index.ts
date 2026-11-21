@@ -2,159 +2,221 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "*", // Libera qualquer cabeçalho de requisição
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const TAMANHO_LOTE_STORAGE = 100;
+
+type ObjetoStoragePerfil = {
+  id_objeto_storage: string;
+  bucket_id: string;
+  caminho: string;
+};
+
+type FalhaLimpezaStorage = {
+  bucket: string;
+  caminhos: string[];
+  erro: string;
+};
+
+type ResultadoLimpezaStorage = {
+  removidos: number;
+  comFalha: number;
+  falhas: FalhaLimpezaStorage[];
+};
+
+function respostaJson(body: Record<string, unknown>, status: number): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function extrairBearerToken(authHeader: string | null): string | null {
+  if (!authHeader) return null;
+  const match = /^Bearer\s+(.+)$/i.exec(authHeader.trim());
+  const token = match?.[1]?.trim();
+  return token && token.length > 0 ? token : null;
+}
+
+function agruparCaminhosPorBucket(
+  objetos: ObjetoStoragePerfil[],
+): Map<string, string[]> {
+  const porBucket = new Map<string, Set<string>>();
+
+  for (const obj of objetos) {
+    if (!obj.bucket_id || !obj.caminho) continue;
+    const conjunto = porBucket.get(obj.bucket_id) ?? new Set<string>();
+    conjunto.add(obj.caminho);
+    porBucket.set(obj.bucket_id, conjunto);
+  }
+
+  const resultado = new Map<string, string[]>();
+  for (const [bucket, conjunto] of porBucket.entries()) {
+    resultado.set(bucket, Array.from(conjunto));
+  }
+
+  return resultado;
+}
+
+async function removerObjetosStorageEmLotes(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  caminhosPorBucket: Map<string, string[]>,
+): Promise<ResultadoLimpezaStorage> {
+  let removidos = 0;
+  let comFalha = 0;
+  const falhas: FalhaLimpezaStorage[] = [];
+
+  for (const [bucket, caminhos] of caminhosPorBucket.entries()) {
+    for (let i = 0; i < caminhos.length; i += TAMANHO_LOTE_STORAGE) {
+      const lote = caminhos.slice(i, i + TAMANHO_LOTE_STORAGE);
+      try {
+        const { error } = await supabaseAdmin.storage.from(bucket).remove(lote);
+        if (error) {
+          comFalha += lote.length;
+          falhas.push({ bucket, caminhos: lote, erro: error.message });
+        } else {
+          removidos += lote.length;
+        }
+      } catch (err: unknown) {
+        const mensagem = err instanceof Error ? err.message : String(err);
+        comFalha += lote.length;
+        falhas.push({ bucket, caminhos: lote, erro: mensagem });
+      }
+    }
+  }
+
+  return { removidos, comFalha, falhas };
+}
+
 Deno.serve(async (req) => {
-  // Trata requisição de preflight CORS (enviada automaticamente pelo navegador)
   if (req.method === "OPTIONS") {
-    return new Response("ok", { 
-      status: 200, 
-      headers: corsHeaders 
-    });
+    return new Response("ok", { status: 200, headers: corsHeaders });
+  }
+
+  if (req.method !== "POST") {
+    return respostaJson({ error: "Método não permitido. Utilize POST." }, 405);
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Cabeçalho de autorização ausente" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const token = extrairBearerToken(req.headers.get("Authorization"));
+    if (!token) {
+      return respostaJson(
+        { error: "Cabeçalho de autorização ausente ou inválido" },
+        401,
+      );
     }
-
-    const token = authHeader.replace("Bearer ", "");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      return new Response(JSON.stringify({ error: "Variáveis de ambiente do Supabase não configuradas no servidor" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson(
+        {
+          error:
+            "Variáveis de ambiente do Supabase não configuradas no servidor",
+        },
+        500,
+      );
     }
 
-    // Inicializa o cliente admin com a Service Role Key
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
 
-    // Valida com segurança o token JWT do usuário no servidor
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    // 1. Pré-validações somente-leitura (nenhum efeito colateral em caso de falha)
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseAdmin.auth.getUser(token);
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Sessão inválida ou expirada" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson({ error: "Sessão inválida ou expirada" }, 401);
     }
 
-    // Busca a role do usuário no banco de dados para checagem de privilégio
     const { data: perfil, error: perfilError } = await supabaseAdmin
-      .from("perfis")
+      .from("perfil")
       .select("role")
-      .eq("id", user.id)
+      .eq("id_perfil", user.id)
       .single();
 
     if (perfilError || !perfil) {
-      return new Response(JSON.stringify({ error: "Perfil não encontrado no sistema" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return respostaJson({ error: "Perfil não encontrado no sistema" }, 404);
     }
 
-    // Trava de segurança: apenas usuários com role 'aluno' podem deletar a própria conta
     if (perfil.role !== "aluno") {
-      return new Response(JSON.stringify({ error: "Ação não permitida para este tipo de conta" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return respostaJson(
+        { error: "Ação não permitida para este tipo de conta" },
+        403,
+      );
+    }
+
+    // 2. Coleta prévia dos arquivos do aluno via RPC exclusiva de service_role
+    const { data: objetosRaw, error: listarStorageError } =
+      await supabaseAdmin.rpc("listar_objetos_storage_perfil", {
+        p_id_perfil: user.id,
       });
+
+    if (listarStorageError) {
+      console.error(
+        "Erro ao listar objetos do Storage via RPC antes da exclusão:",
+        listarStorageError,
+      );
+      return respostaJson(
+        { error: "Falha ao preparar a limpeza dos arquivos da conta" },
+        500,
+      );
     }
 
-    // 1. Limpar arquivos do Storage vinculados às entregas de atividades
-    try {
-      const { data: entregas } = await supabaseAdmin
-        .from("entregas_atividades")
-        .select("url_anexo")
-        .eq("aluno_id", user.id)
-        .not("url_anexo", "is", null);
+    const caminhosPorBucket = agruparCaminhosPorBucket(
+      (objetosRaw ?? []) as ObjetoStoragePerfil[],
+    );
 
-      if (entregas && entregas.length > 0) {
-        const caminhos = entregas.map((e) => e.url_anexo).filter(Boolean);
-        if (caminhos.length > 0) {
-          await supabaseAdmin.storage.from("entregas_atividades").remove(caminhos);
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao limpar storage de entregas:", err);
-    }
-
-    // 2. Limpar arquivos do Storage vinculados a dúvidas do aluno
-    try {
-      const { data: duvidas } = await supabaseAdmin
-        .from("duvidasalunostoprofessor")
-        .select("anexo_url")
-        .eq("aluno_id", user.id)
-        .not("anexo_url", "is", null);
-
-      if (duvidas && duvidas.length > 0) {
-        const nomesArquivos: string[] = [];
-        
-        duvidas.forEach((d) => {
-          if (!d.anexo_url) return;
-          try {
-            const urls = JSON.parse(d.anexo_url);
-            if (Array.isArray(urls)) {
-              urls.forEach((url) => {
-                const nome = url.split("/").pop()?.split("?")[0];
-                if (nome) nomesArquivos.push(nome);
-              });
-            }
-          } catch {
-            const nome = d.anexo_url.split("/").pop()?.split("?")[0];
-            if (nome) nomesArquivos.push(nome);
-          }
-        });
-
-        if (nomesArquivos.length > 0) {
-          await supabaseAdmin.storage.from("duvidasalunostoprofessor").remove(nomesArquivos);
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao limpar storage de dúvidas:", err);
-    }
-
-    // 3. Excluir dados das tabelas públicas do banco de dados (previne conflitos de FK antes do delete final)
-    await supabaseAdmin.from("entregas_atividades").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("duvidasalunostoprofessor").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("mensagens").delete().or(`remetente_id.eq.${user.id},destinatario_id.eq.${user.id}`);
-    await supabaseAdmin.from("mural_posts").delete().eq("autor_id", user.id);
-    
-    // Deleta do calendário se a coluna autor_id existir na tabela eventos_calendario
-    try {
-      await supabaseAdmin.from("eventos_calendario").delete().eq("autor_id", user.id);
-    } catch (err) {
-      console.error("Falha ao tentar deletar eventos_calendario:", err);
-    }
-
-    await supabaseAdmin.from("aluno_turma").delete().eq("aluno_id", user.id);
-    await supabaseAdmin.from("perfis").delete().eq("id", user.id);
-
-    // 4. Deletar definitivamente o usuário no auth.users do Supabase
-    const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+    // 3. Ponto de commit atômico (ACID): auth.users -> ON DELETE CASCADE em Perfil e filhas.
+    //    Se falhar aqui, o PostgreSQL desfaz tudo automaticamente e o Storage segue intacto.
+    const { error: deleteUserError } =
+      await supabaseAdmin.auth.admin.deleteUser(user.id);
     if (deleteUserError) {
-      throw deleteUserError;
+      console.error("Erro ao excluir usuário em auth.users:", deleteUserError);
+      return respostaJson(
+        { error: "Não foi possível excluir a conta no momento" },
+        500,
+      );
     }
 
-    return new Response(JSON.stringify({ message: "Conta e dados deletados com sucesso" }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // 4. Remoção física no Storage pós-commit em lotes com verificação explícita de erro
+    const limpeza = await removerObjetosStorageEmLotes(
+      supabaseAdmin,
+      caminhosPorBucket,
+    );
 
-  } catch (error: any) {
-    console.error("Erro na Edge Function deletar-conta:", error);
-    return new Response(JSON.stringify({ error: error.message || "Erro interno do servidor" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    if (limpeza.falhas.length > 0) {
+      console.error(
+        "Limpeza parcial de Storage após exclusão de conta:",
+        JSON.stringify({
+          userId: user.id,
+          removidos: limpeza.removidos,
+          comFalha: limpeza.comFalha,
+          falhas: limpeza.falhas,
+        }),
+      );
+    }
+
+    return respostaJson(
+      {
+        message: "Conta e dados deletados com sucesso",
+        storage_limpeza_parcial: limpeza.falhas.length > 0,
+        arquivos_removidos: limpeza.removidos,
+        arquivos_com_falha: limpeza.comFalha,
+      },
+      200,
+    );
+  } catch (error: unknown) {
+    console.error("Erro inesperado na Edge Function deletar-conta:", error);
+    return respostaJson({ error: "Erro interno do servidor" }, 500);
   }
 });

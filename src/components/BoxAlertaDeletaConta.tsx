@@ -4,6 +4,32 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabaseClient";
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 
+async function extrairMensagemErroFuncao(error: unknown): Promise<string> {
+  if (
+    error &&
+    typeof error === "object" &&
+    "context" in error &&
+    error.context instanceof Response
+  ) {
+    try {
+      const body = (await error.context.clone().json()) as {
+        error?: unknown;
+      };
+      if (typeof body?.error === "string" && body.error.trim().length > 0) {
+        return body.error;
+      }
+    } catch {
+      // fallback abaixo
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return "Falha na execução do processo de deleção.";
+}
+
 export function BoxAlertaDeletaConta({
   onClose,
   perfil,
@@ -16,7 +42,6 @@ export function BoxAlertaDeletaConta({
   const [carregando, setCarregando] = useState(false);
 
   const handleConfirmarDelecao = async () => {
-  
     if (textoConfirmacao !== "DELETAR") {
       return toast.error("Você deve digitar DELETAR para confirmar.");
     }
@@ -30,60 +55,53 @@ export function BoxAlertaDeletaConta({
     setCarregando(true);
 
     try {
-      
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email: perfil.email,
-        password: senhaConfirmacao,
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: perfil.email,
+          password: senhaConfirmacao,
+        });
 
       if (authError) {
         throw new Error("Senha atual incorreta. Confirme suas credenciais.");
       }
 
-  
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const supabaseUrl = (supabase as any).supabaseUrl;
-      const supabaseKey = (supabase as any).supabaseKey;
+      const accessToken =
+        authData.session?.access_token ??
+        (await supabase.auth.getSession()).data.session?.access_token;
 
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error("Credenciais do Supabase não encontradas.");
+      if (!accessToken) {
+        throw new Error("Sessão inválida ou expirada. Faça login novamente.");
       }
 
-
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/deletar-conta?apikey=${supabaseKey}`,
+      const { error: invokeError } = await supabase.functions.invoke(
+        "deletar-conta",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || "Falha na execução do processo de deleção.",
-        );
+      if (invokeError) {
+        throw new Error(await extrairMensagemErroFuncao(invokeError));
       }
 
       toast.success("Sua conta foi deletada definitivamente.");
-
-     
       await supabase.auth.signOut();
-
+      onClose();
       window.location.reload();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const mensagem =
+        error instanceof Error && error.message
+          ? error.message
+          : "Tente novamente mais tarde.";
       console.error("Erro na deleção de conta:", error);
       toast.error("Falha ao deletar conta", {
-        description: error.message || "Tente novamente mais tarde.",
+        description: mensagem,
       });
     } finally {
       setCarregando(false);
-      onClose();
     }
   };
 
@@ -125,6 +143,7 @@ export function BoxAlertaDeletaConta({
           variant="outline"
           className="flex-1 cursor-pointer"
           onClick={onClose}
+          disabled={carregando}
         >
           Cancelar
         </Button>

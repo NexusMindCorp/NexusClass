@@ -7,10 +7,10 @@
 
 | Campo | Estado Atual |
 |:---|:---|
-| **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-20 |
-| **Última etapa concluída** | **Fase 6-A — Passo 10 (Fechamento — Passos 0 a 10 Concluídos):** Atualizados os slides interativos ([`configEngenhariaSoftware.ts`](../src/hooks/InfoAplicacao/configEngenhariaSoftware.ts)), o diagrama UML ([`diagrama_classes_detalhado.puml`](../out/diagramas/diagrama_classes_detalhado.puml) com `DataMappers`, `permissoes`, `AnexoStorageFacade` e os 6 Repositories) e gerado o relatório [`2026-11-17-fase-6a-remodelagem-acesso-banco.md`](../relatorios/2026-11/2026-11-17-fase-6a-remodelagem-acesso-banco.md). Toda a SPA usa agora o esquema normalizado (`01_esquema.sql` + `04_supabase_auth_rls.sql` + `05_supabase_funcoes_realtime.sql`) com **0 erros `tsc`** e **13 suítes / 113 testes passando** (100% Lines / 100% Funcs / 98% Stmts em `src/lib` + `src/patterns`). |
-| **Último relatório** | [Encerramento e retomada em 20/11](../relatorios/2026-11/2026-11-20-encerramento-validacao-e-retomada.md), por Gabriel Lineker. |
-| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Ordens 1 e 2 concluídas. Retomar pelas decisões de Gabriel Lineker e Gianlucca Paiva na ordem 3. Depois, validar a instalação isolada e consolidar `grupo24/` na ordem 4. [Plano de retomada](PLANO_VALIDACAO_FASE_6_E_9B.md#retomada-após-as-ordens-1-e-2) |
+| **Última modificação por** | **Gianlucca Paiva** (`GianluccaPaiva`) em 2026-11-21 |
+| **Última etapa concluída** | **Fase 6 / Passo 9-B — Ordem 3 (Exclusão de conta concluída e validada):** Aplicada a migração `14_rpc_storage_exclusao_conta.sql` (1 RPC somente-leitura exclusiva de `service_role`), refatorada a Edge Function `deletar-conta` (coleta prévia → `auth.admin.deleteUser` ACID → limpeza do Storage em lotes) publicada com slug oficial `deletar-conta` (`bright-task` removida), ajustado `BoxAlertaDeletaConta.tsx` (`supabase.functions.invoke`) e validado ponta a ponta via `scripts/validar-exclusao-conta.mjs` + auditoria SQL (`0` registros remanescentes em `auth.users`, `perfil`, tabelas filhas e `storage.objects`; **16 suítes / 125 testes passando**). |
+| **Último relatório** | [Correção e validação da exclusão de conta em 21/11](../relatorios/2026-11/2026-11-21-correcao-validacao-exclusao-conta.md), por Gianlucca Paiva. |
+| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Ordens 1 e 2 concluídas; item **Exclusão de conta** da Ordem 3 concluído e validado. Retomar pelas decisões restantes da dupla na Ordem 3 (código público da escola, banners reais e reenvio de confirmação). Depois, validar a instalação isolada (incluindo migração `14`) e consolidar `grupo24/` na Ordem 4. [Plano de retomada](PLANO_VALIDACAO_FASE_6_E_9B.md#retomada-após-as-ordens-1-e-2) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); não alterar `01`/`02`/`04` SQL; rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
@@ -22,7 +22,7 @@
 | 3 | Strategy (filtros) | **Concluído** | Gianlucca Paiva | 78 testes passando (6 suítes); `FiltroStrategy.ts` com **100%** de cobertura; condicionais e duplicações removidas de `Pesquisar`, `DuvidasBox` e `AppSidebar` |
 | 4 | Observer (Realtime) | **Concluído** | Gabriel Lineker | 89 testes passando (7 suítes); `NotificacaoSubject.ts` com **100%** de cobertura; 5 canais Realtime desacoplados em `useMural`, `useGerenciador` e `useMensagens` |
 | 5 | Singleton / Proxy documentados + diagrama | **Concluído** | Gianlucca Paiva | `supabaseClient.ts` (`<<Singleton>>`) e `ProtectedRoute`/`BoxRestrito` (`<<Proxy>>`) catalogados em `src/patterns/`; `diagrama_classes_detalhado.puml` atualizado com os 7 padrões GoF |
-| 6 | Testes de componente + E2E e Passo 9-B | Ordens 1 e 2 concluídas | Gabriel Lineker (20/11) | Ordens 3 e 4 planejadas. Retomada pelas decisões de escopo da dupla. |
+| 6 | Testes de componente + E2E e Passo 9-B | Em andamento (Ordens 1, 2 e Exclusão de Conta da Ordem 3 concluídas) | Gianlucca Paiva (21/11) | Exclusão de conta corrigida (migração 14 + Edge Function `deletar-conta` + `BoxAlertaDeletaConta`) e validada ponta a ponta. Faltam decisões restantes da Ordem 3 e carga isolada da Ordem 4. |
 | 6-A | Remodelagem do acesso ao banco (esquema normalizado) | **Concluído** (Passos 0–10; 9-B RLS ao vivo na Fase 6) | Gianlucca Paiva | `05_*.sql`, `database.types.ts`, `mappers.ts`, `permissoes.ts`, `AnexoStorageFacade`, 6 Repositories, slides + UML + **13 suítes / 113 testes** |
 | 7 | Aba de Apresentação DCC061 (`InfoAplicacao.tsx`) | **Ativo (Refinamento Visual na Fase 7)** | Gianlucca Paiva | Atualizado com dados reais da Fase 5; **pendente lapidação/correção de estilizações quebradas no fechamento (Fase 7)** |
 
@@ -115,6 +115,7 @@
 ## Diário de Sessões
 | Data | Autor | Resumo |
 |:---|:---|:---|
+| 2026-11-21 | Gianlucca Paiva (`GianluccaPaiva`) | **Ordem 3 — Exclusão de conta concluída e validada:** criada e aplicada a migração `14_rpc_storage_exclusao_conta.sql` (RPC somente-leitura exclusiva de `service_role`), refatorada e publicada a Edge Function com slug oficial `deletar-conta` (`bright-task` removida), ajustado `BoxAlertaDeletaConta.tsx` e validado ponta a ponta via `scripts/validar-exclusao-conta.mjs` + auditoria SQL (`0` registros em `auth.users`, `perfil`, filhas e `storage.objects`; 16 suítes / 125 testes). |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Encerrou a sessão de validação, consolidou as evidências das ordens 1 e 2 e registrou a retomada pelas decisões da dupla e pela instalação isolada. |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Aplicou a migração 13 e validou o bloqueio de datas passadas na criação e no reagendamento pela API. |
 | 2026-11-20 | Gabriel Lineker (`GabrielLineker`) | Preparou a migração para rejeitar datas passadas na criação e no reagendamento, com roteiro focado na API. |

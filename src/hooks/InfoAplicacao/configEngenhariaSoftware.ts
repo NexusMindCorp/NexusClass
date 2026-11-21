@@ -29,9 +29,10 @@ import type {
  */
 
 export const ultimaAtualizacaoEngenharia = {
-  faseAtual: "Fase 6 em andamento · Componentes, Playwright e Passo 9-B",
+  faseAtual:
+    "Fase 6 em andamento · Ordens 1, 2 e Exclusão de Conta (Ordem 3) validadas",
   ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
-  data: "2026-11-17",
+  data: "2026-11-21",
   branch: "DesiningTeste",
 };
 
@@ -41,16 +42,16 @@ export const metricasEngenharia: MetricaProjeto[] = [
     rotulo: "linhas/funções (98% Stmts) em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "113",
-    rotulo: "testes passando em 13 suítes (eram 3)",
+    valor: "125",
+    rotulo: "testes passando em 16 suítes (eram 3)",
   },
   {
     valor: "7 + 1",
     rotulo: "padrões GoF + Repository (ADR-009) modelados em UML",
   },
   {
-    valor: "Fase 6-A",
-    rotulo: "concluída (acesso tipado ao esquema normalizado + RLS)",
+    valor: "Fase 6",
+    rotulo: "Ordens 1, 2 e Exclusão de Conta (Ordem 3) validadas no Supabase",
   },
 ];
 
@@ -398,10 +399,11 @@ export const roadmapFases: FaseRoadmapItem[] = [
     fase: "Fase 6",
     titulo: "Testes de Componente + E2E (Playwright) + RLS reais (Passo 9-B)",
     status: "Em Andamento",
-    responsavel: "Gabriel Lineker",
+    responsavel: "Gabriel Lineker & Gianlucca Paiva",
     entregas:
-      "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), suíte de integração RLS no Supabase e consolidação final.",
-    evidenciaTeste: "Entregas, calendário, cadastro e matrícula validados no ambiente de teste. A próxima etapa depende das decisões da dupla e da validação da carga em uma instalação isolada.",
+      "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), RLS ao vivo no Supabase, exclusão de conta atômica (migração 14 + Edge Function deletar-conta) e consolidação final.",
+    evidenciaTeste:
+      "16 suítes / 125 testes verdes; entregas, calendário, cadastro, matrícula e exclusão de conta ponta a ponta validados no Supabase de teste. Faltam decisões restantes da Ordem 3 e carga isolada (Ordem 4).",
   },
 ];
 
@@ -514,16 +516,16 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     branches: "92.87% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
     lines: "100.00% (lib + patterns)",
-    destaque: true,
   },
   {
-    etapa: "Fase 6 em andamento (20/11)",
-    responsavel: "Gabriel Lineker",
+    etapa: "Fase 6 em andamento (20–21/11 · Componentes + Ordem 3)",
+    responsavel: "Gabriel Lineker & Gianlucca Paiva",
     testes: "16 suítes (125 testes)",
     statements: "98% (lib + patterns)",
     branches: "92,9% (lib + patterns)",
     functions: "100% (lib + patterns)",
     lines: "100% (lib + patterns)",
+    destaque: true,
   },
 ];
 
