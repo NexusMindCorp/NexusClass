@@ -21,6 +21,7 @@ export function useConfiguracoesAvancadas() {
   };
 
   const handleDeletarConta = () => {
+    if (perfil?.role !== "aluno") return;
     setAreaSensivel(true);
   };
 

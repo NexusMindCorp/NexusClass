@@ -1,8 +1,8 @@
 # `src/patterns/` — Catálogo de Padrões de Projeto do NexusClass
 
-Cada subpasta contém a implementação e/ou documentação técnica do padrão GoF aplicado no projeto (`por quê` · `como funciona` · `arquivos` · `testes`). Decisão fundacional: [ADR-001](../../.agents/decisions/adr-001-patterns-e-cobertura.md) (complementado pelo [ADR-009](../../.agents/decisions/adr-009-remodelagem-acesso-banco-repositories.md) para Repositories/Data Mappers em `src/repositories/`). Suítes de teste em `testes/patterns/<padrao>/`.
+Cada subpasta contém a implementação e/ou documentação técnica do padrão GoF aplicado no projeto (`por quê` · `como funciona` · `arquivos` · `testes`). Decisão fundacional: [ADR-001](../../.agents/decisions/adr-001-patterns-e-cobertura.md) (complementado pelos [ADR-009](../../.agents/decisions/adr-009-camada-acesso-dados-esquema-normalizado.md) para Repositories/Data Mappers em `src/repositories/` e [ADR-011](../../.agents/decisions/adr-011-hardening-xss-strategy-owasp.md) para `SanitizacaoStrategy`). Suítes de teste em `testes/patterns/<padrao>/`.
 
-> **Estado consolidado (atualizado por Gianlucca Paiva / `GianluccaPaiva` em 2026-11-21):** **18 suítes / 137 testes** passando no Vitest · Cobertura V8 (`src/lib` + `src/patterns`): **98.16% Statements / 93.35% Branch / 100% Functions / 100% Lines** · `0` erros TypeScript.
+> **Estado consolidado (atualizado por Gianlucca Paiva / `GianluccaPaiva` em 2026-11-21):** **18 suítes / 140 testes** passando no Vitest · Cobertura V8 (`src/lib` + `src/patterns`): **98.16% Statements / 93.35% Branch / 100% Functions / 100% Lines** · `0` erros TypeScript.
 
 | # | Padrão | Tipo (GoF) | Pasta / Implementação | Problema real que resolve | Status |
 |:---|:---|:---|:---|:---|:---|

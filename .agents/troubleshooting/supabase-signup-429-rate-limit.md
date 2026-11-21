@@ -2,7 +2,7 @@
 
 - **Data:** 2026-11-17
 - **Autor / Responsável:** Gianlucca Paiva (`GianluccaPaiva`)
-- **Ambiente:** Browser (SPA React + Vite) → Supabase Auth hospedado (`https://qexobdhuwxcoeteqnlcn.supabase.co/auth/v1/signup`)
+- **Ambiente:** Browser (SPA React + Vite) → Supabase Auth hospedado (`https://REF_DO_PROJETO.supabase.co/auth/v1/signup`)
 - **Severidade:** Alta (bloqueia novos cadastros em testes consecutivos quando a confirmação por e-mail está ativa)
 - **Status:** Mitigado na UI / Aguardando configuração no painel Supabase
 
@@ -10,7 +10,7 @@
 Ao submeter o formulário de cadastro em [`src/components/Login.tsx`](../../src/components/Login.tsx) (`supabase.auth.signUp`), o console do navegador registra erro HTTP 429 antes mesmo do trigger `on_auth_user_created` ou logo após poucas tentativas seguidas:
 
 ```text
-POST https://qexobdhuwxcoeteqnlcn.supabase.co/auth/v1/signup 429 (Too Many Requests)
+POST https://REF_DO_PROJETO.supabase.co/auth/v1/signup 429 (Too Many Requests)
 ```
 
 O código retorna `status: 429` e/ou `code: "over_email_send_rate_limit"` (ou cooldown de 60 segundos entre envios para o mesmo endereço).
