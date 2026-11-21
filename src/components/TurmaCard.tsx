@@ -9,11 +9,13 @@ import {
 } from "@/components/ui/card";
 import { ButtonGroup } from "./ui/button-group";
 import { PerfilAvatar } from "./PerfilAvatar";
+import { TurmaBanner } from "./TurmaBanner";
 import type { TurmasProps } from "../hooks/TurmaCardHooks/type";
 import { pode } from "@/lib/permissoes";
 import { Plus } from "lucide-react";
 
 export function TurmaCard({
+  chaveTurma,
   id_escola,
   materia,
   professor,
@@ -36,15 +38,7 @@ export function TurmaCard({
       className={`relative mx-auto w-full pt-0 overflow-hidden ${compacto ? "" : "max-w-sm"}`}
     >
       <div className={`relative w-full bg-muted ${compacto ? "h-24" : "aspect-video"}`}>
-        {banners?.trim() && (
-          <img
-            key={banners}
-            src={banners}
-            alt="Banner da turma"
-            className="absolute inset-0 h-full w-full object-cover brightness-70"
-            onError={(event) => { event.currentTarget.hidden = true; }}
-          />
-        )}
+        <TurmaBanner chaveTurma={chaveTurma} url={banners} alt="Banner da turma" classNameImagem="brightness-70" />
         <div className="pointer-events-none absolute inset-0 bg-black/35" />
       </div>
 

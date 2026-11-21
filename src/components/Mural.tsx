@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { obterUrlHttpSegura } from "@/patterns/strategy/SanitizacaoStrategy";
+import { TurmaBanner } from "./TurmaBanner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -90,15 +91,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
         onEditar={editarAtividade}
       />
       <Card className="relative h-72 w-full overflow-hidden bg-muted sm:h-67">
-        {turma.banners?.trim() && (
-          <img
-            key={turma.banners}
-            src={turma.banners}
-            alt={`Banner da turma ${materia}`}
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={(event) => { event.currentTarget.hidden = true; }}
-          />
-        )}
+        <TurmaBanner chaveTurma={materia} url={turma.banners} alt={`Banner da turma ${materia}`} />
         <div className="absolute inset-0 bg-black/50" />
         <CardHeader className="relative z-10 flex h-full flex-col justify-between p-4 sm:px-6">
           <div>

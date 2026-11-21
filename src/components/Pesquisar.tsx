@@ -123,6 +123,7 @@ export function Pesquisar(props: PesquisarProps) {
                   {turmasOrdenadas.map(([key, turma]) => (
                     <TurmaCard
                       key={key}
+                      chaveTurma={key}
                       compacto={true}
                       id_escola={turma.id_escola}
                       materia={turma.materia}

@@ -17,10 +17,9 @@ async function conferir(operacao, etapa) {
   return data;
 }
 
-async function aplicar(referencia) {
-  if (!/^[a-z0-9]{20}$/.test(referencia ?? '') ||
-      process.env.NEXUS_TEST_SUPABASE_URL !== `https://${referencia}.supabase.co`) {
-    throw new Error('Informe a referência exata do projeto Supabase de teste.');
+async function aplicar(urlEsperada) {
+  if (!urlEsperada || process.env.NEXUS_TEST_SUPABASE_URL !== urlEsperada) {
+    throw new Error('Confira a referência ou o endereço local do Supabase de teste.');
   }
   const chave = process.env.NEXUS_TEST_SUPABASE_SERVICE_ROLE_KEY;
   if (!chave) throw new Error('Chave administrativa local ausente.');
@@ -132,9 +131,12 @@ try {
     console.log('Simulação local. Contas previstas:');
     for (const { chave } of contas) console.log(chave);
   } else if (args.length === 2 && args[0] === '--aplicar') {
-    await aplicar(args[1]);
+    const referencia = args[1];
+    await aplicar(/^[a-z0-9]{20}$/.test(referencia) ? `https://${referencia}.supabase.co` : null);
+  } else if (args.length === 1 && args[0] === '--aplicar-local') {
+    await aplicar('http://127.0.0.1:54321');
   } else {
-    throw new Error('Uso: node scripts/provisionar-contas-teste.mjs [--aplicar REF_DO_PROJETO]');
+    throw new Error('Uso: node scripts/provisionar-contas-teste.mjs [--aplicar REF_DO_PROJETO | --aplicar-local]');
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : 'Falha inesperada no provisionamento.');

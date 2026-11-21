@@ -415,7 +415,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, exclusão de conta atômica (14), código público da escola (15), hardening XSS com SanitizacaoStrategy OWASP (16 + vercel.json + Edge Functions), consolidação de 01_esquema.sql, idempotência da 09 e RLS ao vivo.",
     evidenciaTeste:
-      "18 suítes / 140 testes verdes (98.16% Stmts / 93.35% Branch / 100% Funcs/Lines); V-01..V-05 resolvidos, migração 16 validada ao vivo sob ROLLBACK e ConfiguracoesAvancadas ajustada por papel. Faltam decisões opcionais da Ordem 3 e carga isolada (Ordem 4).",
+      "18 suítes / 140 testes verdes. Instalação limpa no Docker aprovada com 16/16 casos SQL, incluindo RN12. Migração 10 retestada no banco e fallback de banner aplicado no cartão e no mural.",
   },
 ];
 
@@ -454,7 +454,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     alvos:
       "Login, matrícula, primeira entrega, Realtime, exclusão atômica (14), código público (15), constraints XSS (16) e auditoria ofensiva (V-01..V-05)",
     tecnicas:
-      "Automação de navegador, scripts SQL reversíveis (BEGIN...ROLLBACK) e testes ofensivos OWASP; pendente apenas carga limpa isolada (Ordem 4)",
+      "Automação de navegador, scripts SQL reversíveis (BEGIN...ROLLBACK) e instalação limpa no Docker com 16/16 casos aprovados",
     status: "Em Andamento",
   },
 ];

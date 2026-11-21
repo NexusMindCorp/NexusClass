@@ -41,6 +41,7 @@ export function GerenciadorTelas(props: GerenciadorTelasProps) {
               .map(([key, turma]) => (
                 <TurmaCard
                   key={key}
+                  chaveTurma={key}
                   id_escola={turma.id_escola}
                   materia={turma.materia}
                   banners={turma.banners}

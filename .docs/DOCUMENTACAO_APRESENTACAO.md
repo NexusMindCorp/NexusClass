@@ -7,13 +7,16 @@
 
 | Campo | Estado Atual |
 |:---|:---|
-| **Última modificação por** | **Gianlucca Paiva** (`GianluccaPaiva`) em 2026-11-21 |
+| **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-21 |
 | **Última etapa concluída** | **Consolidação da Sessão de 21/11 (Fases 6 e 7 + Diagramas + `ConfiguracoesAvancadas` + `.agents/`):** concluídos Exclusão atômica de conta (`14` + `deletar-conta`), `03_verificacao.sql` (16 testes) + `grupo24/`, Código público da escola (`ADR-010`/`15`, 10/10 ao vivo), Hardening XSS/OWASP (`ADR-011`, `V-01..V-05`: `SanitizacaoStrategy.ts` com 0 deps, `16`, `resend-email`/`resend-suport`, `vercel.json`, `01_esquema.sql` consolidado, `09` idempotente, redação real de stream em `Testes de segurança.pdf`), atualização da aba `InfoAplicacao` (slide Pentest + correções visuais dos badges/pills), liberação de `ConfiguracoesAvancadas` para `professor`/`master` mantendo *Deletar Conta* restrito a `aluno`, sincronização dos diagramas (`out/diagramas/*.puml` + `grupo24/modelo.drawio`) e governança `.agents/` (**18 suítes / 140 testes**; **98.16% Stmts / 93.35% Branch / 100% Funcs / 100% Lines**). |
-| **Último relatório** | [Resumo Consolidado da Sessão de 21/11](../relatorios/2026-11/2026-11-21-resumo-sessao-consolidado.md), por Gianlucca Paiva. |
-| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B (fechamento operacional) + Commit pós-Fase 7.** Faltam: publicar Edge Functions `resend-email`/`resend-suport` e `vercel.json` no ambiente alvo; decidir os 2 itens opcionais da Ordem 3 (banners reais e reenvio de confirmação); executar a instalação isolada do zero (`01 → 04 → 02 → 05 → 06..16 → 03` validando 16/16) e exportar `grupo24/der.png`/PDF na Ordem 4; e commitar/realizar a limpeza Git pós-Fase 7. [Plano de retomada](PLANO_VALIDACAO_FASE_6_E_9B.md#retomada-após-as-ordens-1-e-2) |
+| **Último relatório** | [Validação local da instalação e dos banners](../relatorios/2026-11/2026-11-21-validacao-docker-banners.md), por Gabriel Lineker. |
+| **Fase atual / Próximo passo** | **Fase 6 + Passo 9-B.** Instalação isolada registrada com 16/16 e reteste SQL da migração 10 concluído. Banner de fallback implementado. Restam o reteste integrado pela SPA, a exportação acadêmica conforme exigência da entrega e a etapa de publicação, que inclui a decisão sobre o reenvio de confirmação. Revisão da carga adiada. [Plano e resultados](PLANO_VALIDACAO_DOCKER_E_BANNERS.md) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); `01_esquema.sql` consolidado mantém compatibilidade idempotente com `06`–`16` (não quebrar `02`/`04`); rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
 ## Painel de Progresso
+
+**Validação local da Fase 6 e do Passo 9-B em 21/11/2026 por Gabriel Lineker (`GabrielLineker`).** Carga atual aprovada em 16/16 casos SQL, cinco logins validados e migração 10 retestada no banco. Fallback do banner confirmado no Edge em página isolada e na navegação da SPA entre cartão e mural.
+
 | Fase | Item | Status | Responsável (Última Mod.) | Resultado |
 |:---|:---|:---|:---|:---|
 | 0 | Base de testes (`utils.ts` + `assetPath.ts` + `setupTests.ts`) | **Concluído** | Gabriel Lineker | 29 testes passando (2 suítes); cobertura `src/lib` saltou de **4.27%** para **98.36%** (`utils.ts` 100%) |
@@ -113,6 +116,8 @@
 - **Lições / trade-offs:** Reconhecer padrões nativos da linguagem/framework (ES Module Singleton e React Router Protection Proxy) em vez de forçar classes redundantes reforça o princípio de simplicidade do trabalho.
 
 ## Diário de Sessões
+
+**21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Instalação isolada aprovada com 16/16, reteste SQL da migração 10 e fallback de banners no cartão e no mural.
 | Data | Autor | Resumo |
 |:---|:---|:---|
 | 2026-11-21 (8) | Gianlucca Paiva (`GianluccaPaiva`) | **Ajuste de `ConfiguracoesAvancadas` + Fechamento `.agents/` (`ADR-011`):** liberada a tela `ConfiguracoesAvancadas.tsx` (*Alterar Senha* e visualização de turmas em `ListagemConteudosInscritos.tsx`) para `professor` e `master`, mantendo **Zona de Perigo (Deletar Conta)** exclusiva para `aluno` (alinhada ao `403` da Edge Function `deletar-conta`, com guard defensivo em `useConfiguracoesAvancadas.ts`) e `<BoxRestrito />` para sessão sem perfil autorizado; criado `ADR-011` (`adr-011-hardening-xss-strategy-owasp.md`), atualizados `.agents/INICIALIZACAO.md`, `.agents/features/fase-6-validacao-sistema.md`, `src/patterns/proxy/README.md`, `src/patterns/README.md`, `configEngenhariaSoftware.ts` e `2026-11-21-resumo-sessao-consolidado.md` (**18 suítes / 140 testes**; `0` erros `tsc`). |
