@@ -17,6 +17,10 @@
 
 ## Painel de Progresso
 
+**Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** [Documento-texto em PDF](../entregas/DCC061/DCC061-NexusClass-Documento.pdf) e [slides em PDF](../entregas/DCC061/DCC061-NexusClass-Slides.pdf) preparados a partir da aba Informações, dos relatórios e das evidências da refatoração. O documento tem sete páginas e o deck tem 12 slides em formato 16:9.
+
+**Fechamento da E4/DCC060 — encaminhamento para Gianlucca Paiva por Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Decidir com o Grupo 24 se a entrega final exige a versão reconciliada. Se exigida, exportar relatório e DER a partir de `grupo24/RELATORIO_ATUALIZADO.md` e `grupo24/modelo.drawio`, identificar os artefatos históricos da E4 e referenciar `docker/constructionsSQL` como sequência vigente validada em 16/16 casos. A revisão da carga foi descartada nesta entrega. Os ajustes finais e a publicação ficam a cargo de Gianlucca.
+
 **Conferência DCC061 em 21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Em `c4b6c96`, Vitest com V8 aprovou **19 suítes e 144 testes**, incluindo os quatro testes do repositório de comunicação com dublês. Cobertura no recorte `src/lib` e `src/patterns` de 98,16% de instruções, 93,35% de ramificações e 100% de funções e linhas. As evidências complementares incluem a instalação de 16/16 casos SQL e a jornada de reenvio e avaliação pela SPA no Docker. A confirmação de envio real pelas novas Edge Functions fica na etapa de publicação.
 
 **Reteste integrado em 21/11/2026 por Gabriel Lineker (`GabrielLineker`).** Reenvio sem nota e avaliação docente pela SPA aprovados. Nota, feedback e integridade da entrega conferidos no banco local.
