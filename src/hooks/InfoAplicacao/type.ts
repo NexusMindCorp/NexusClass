@@ -91,3 +91,21 @@ export type SnapshotCoberturaItem = {
   lines: string;
   destaque?: boolean;
 };
+
+export type VetorPentestItem = {
+  ferramenta: string;
+  alvo: string;
+  resultado: string;
+  avaliacao: string;
+  status: StatusFaseItem;
+};
+
+export type VulnerabilidadeRemediadaItem = {
+  codigo: string;
+  titulo: string;
+  severidade: "Alta" | "Média–Alta" | "Média" | "Baixa–Média" | "Estrutural";
+  camada: string;
+  achado: string;
+  remediacao: string;
+  status: StatusFaseItem;
+};

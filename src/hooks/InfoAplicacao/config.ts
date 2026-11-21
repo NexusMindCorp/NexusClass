@@ -186,7 +186,7 @@ export const funcionalidadesImplementadas: CardItem[] = [
   {
     titulo: "Autenticação e sessões",
     descricao:
-      "Login, cadastro, logout, rotas protegidas e carregamento do perfil autenticado via Supabase Auth.",
+      "Login, cadastro via código público da escola (ESC-XXXXXXXX), rotas protegidas, carregamento do perfil via Supabase Auth e exclusão atômica de conta via Edge Function.",
     icone: Lock,
   },
   {
@@ -231,7 +231,7 @@ export const qualidadeUx: CardItem[] = [
   {
     titulo: "Segurança",
     descricao:
-      "Acesso protegido por autenticação, RLS no banco e operações sensíveis concentradas no Supabase.",
+      "Defesa em profundidade: RLS no PostgreSQL, código público de escola (ESC-XXXXXXXX), sanitização OWASP (SanitizacaoStrategy), cabeçalhos HTTP (CSP/Clickjacking) e validação por Pentest (Burp, Wapiti, SQLmap e XSS).",
     icone: ShieldCheck,
   },
   {
@@ -276,13 +276,13 @@ export const conexaoSistema: CardItem[] = [
   {
     titulo: "Banco PostgreSQL",
     descricao:
-      "As entidades principais ficam em tabelas como perfis, turmas, mural, atividades, entregas e mensagens.",
+      "Esquema normalizado com 18 tabelas, anexos em 1FN, constraints CHECK de integridade/segurança e 01_esquema.sql consolidado.",
     icone: Database,
   },
   {
     titulo: "Segurança e tempo real",
     descricao:
-      "RLS, Auth, triggers, cron, canais WebSocket e Edge Function protegem e automatizam fluxos sensíveis.",
+      "RLS, Auth, triggers, pg_cron, canais WebSocket, Edge Functions protegidas contra HTML Injection e cabeçalhos HTTP de segurança na Vercel.",
     icone: RadioTower,
   },
 ];

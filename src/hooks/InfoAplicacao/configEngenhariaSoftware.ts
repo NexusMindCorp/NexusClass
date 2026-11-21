@@ -9,6 +9,7 @@ import {
   GitBranch,
   Layers,
   ShieldAlert,
+  ShieldCheck,
   Sparkles,
   Wrench,
 } from "lucide-react";
@@ -20,6 +21,8 @@ import type {
   MetricaProjeto,
   PadraoCatalogoItem,
   SnapshotCoberturaItem,
+  VetorPentestItem,
+  VulnerabilidadeRemediadaItem,
 } from "./type";
 
 /**
@@ -97,6 +100,11 @@ export const ferramentasEngenharia: BadgeItem[] = [
     nome: "Git Handoff Dupla",
     icone: GitBranch,
     cor: "text-teal-600 dark:text-teal-400 bg-teal-500/10 border-teal-500/20",
+  },
+  {
+    nome: "OWASP & Pentest",
+    icone: ShieldCheck,
+    cor: "text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border-emerald-500/25",
   },
 ];
 
@@ -433,18 +441,21 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 3 — Fronteira / Integração",
     camada: "Testes com Fakes/Mocks na Borda",
     ferramenta: "Vitest + Testing Library",
-    alvos: "GeminiAdapter + useGeminiChat (Fase 1 - Concluído), EntregaAtividadeFacade + useEntregas (Fase 2 - Concluído), NotificacaoSubject + 5 canais Realtime (Fase 4 - Concluído), ProtectedRoute (Fase 6)",
+    alvos:
+      "GeminiAdapter, EntregaAtividadeFacade, AnexoStorageFacade, NotificacaoSubject (5 canais), 3 Repositories, ProtectedRoute, BoxRestrito, BoxDenunciaAluno e codigoPublicoEscola",
     tecnicas:
       "Injeção de dependência, Fakes em memória e Mocks restritos à fronteira externa (SDK Gemini / Supabase)",
-    status: "Em Andamento",
+    status: "Concluído",
   },
   {
-    nivelRbt: "Nível 3 — Fluxo Crítico Ponta a Ponta",
-    camada: "Teste End-to-End (E2E)",
-    ferramenta: "Playwright",
-    alvos: "Jornada crítica: Login → Acessar Turma → Submeter Atividade (Fase 6)",
-    tecnicas: "Automação de navegador real em ambiente isolado de teste",
-    status: "Planejado",
+    nivelRbt: "Nível 3 — Fluxo Crítico Ponta a Ponta & Segurança",
+    camada: "E2E (Playwright), RLS ao Vivo e Pentest",
+    ferramenta: "Playwright + SQL + Burp / Wapiti / SQLmap",
+    alvos:
+      "Login, matrícula, primeira entrega, Realtime, exclusão atômica (14), código público (15), constraints XSS (16) e auditoria ofensiva (V-01..V-05)",
+    tecnicas:
+      "Automação de navegador, scripts SQL reversíveis (BEGIN...ROLLBACK) e testes ofensivos OWASP; pendente apenas carga limpa isolada (Ordem 4)",
+    status: "Em Andamento",
   },
 ];
 
@@ -560,5 +571,116 @@ export const destaquesFaseZero = [
     detalhe:
       "Injeção de FakeAssistenteIA, FakeEntregaFacade e ClienteRealtimeFake nos módulos, simulando Function Calling, Storage + PostgreSQL e WebSocket Realtime sem gastar franquia de API nem depender de rede.",
     icone: ShieldAlert,
+  },
+  {
+    titulo: "Defesa em Profundidade & Pentest (OWASP)",
+    detalhe:
+      "Validação ofensiva com Burp Suite, Wapiti, SQLmap e payloads Stored XSS integrada ao padrão SanitizacaoStrategy (0 deps), CHECK constraints no PostgreSQL, escape HTML nas Edge Functions e cabeçalhos CSP na Vercel.",
+    icone: ShieldCheck,
+  },
+];
+
+export const vetoresPentest: VetorPentestItem[] = [
+  {
+    ferramenta: "Reconhecimento (DevTools, robots.txt, Wappalyzer)",
+    alvo: "Rotas, scripts públicos e superfície da SPA",
+    resultado:
+      "Nenhuma rota administrativa burlável no cliente; robots.txt inexistente e stack mapeada.",
+    avaliacao: "Conforme — segurança não depende de ofuscação de front-end.",
+    status: "Concluído",
+  },
+  {
+    ferramenta: "Burp Suite (Repeater) + Cookie Manager",
+    alvo: "Autenticação, sessão e escalada de privilégios",
+    resultado:
+      "Ausência de cookie isAdmin; tentativa de alterar role no POST de autenticação bloqueada.",
+    avaliacao:
+      "Conforme — handle_new_user fixa role = 'aluno' e RLS protege public.perfil.",
+    status: "Concluído",
+  },
+  {
+    ferramenta: "SQLmap (--level=2..3 --risk=2, GET/POST/PATCH/DELETE)",
+    alvo: "API REST PostgREST (/rest/v1/...)",
+    resultado:
+      "Nenhum parâmetro injetável; enumeração (-D/-T/--columns) barrada com 400/403/Unauthorized.",
+    avaliacao:
+      "Conforme — consultas parametrizadas do PostgREST, tipagem estrita e WAF.",
+    status: "Concluído",
+  },
+  {
+    ferramenta: "Wapiti (Scanner Web)",
+    alvo: "Cabeçalhos HTTP de resposta e camada TLS",
+    resultado:
+      "Detectou ausência de CSP, X-Frame-Options e X-Content-Type-Options (TLS gerenciado pela Vercel).",
+    avaliacao:
+      "Resolvido — cabeçalhos HTTP de segurança adicionados em vercel.json (V-03).",
+    status: "Concluído",
+  },
+  {
+    ferramenta: "Testes de XSS Persistente (Stored XSS)",
+    alvo: "Campos livres persistidos no banco e renderizados",
+    resultado:
+      "React 19 escapou na UI (0 dangerouslySetInnerHTML), mas entradas cruas chegavam ao banco e aos e-mails.",
+    avaliacao:
+      "Resolvido — SanitizacaoStrategy OWASP + Edge Functions + Migração 16 + CSP (V-01/V-02/V-04).",
+    status: "Concluído",
+  },
+];
+
+export const vulnerabilidadesRemediadas: VulnerabilidadeRemediadaItem[] = [
+  {
+    codigo: "V-01",
+    titulo: "HTML Injection / Stored XSS em Edge Functions de E-mail",
+    severidade: "Alta",
+    camada: "Edge Functions (resend-email & resend-suport)",
+    achado:
+      "Campos de denúncia, suporte e links de anexo eram interpolados diretamente em templates HTML sem escape de entidades nem allowlist de protocolo.",
+    remediacao:
+      "Aplicado escaparHtml() OWASP em todos os campos interpolados, bloqueio de CRLF injection no assunto, allowlist http(s): nos anexos e rel='noopener noreferrer'.",
+    status: "Concluído",
+  },
+  {
+    codigo: "V-02",
+    titulo: "Validação de Protocolo em URLs Persistidas e Renderizadas",
+    severidade: "Média–Alta",
+    camada: "PostgreSQL (Migração 16) + SPA (Strategy & UI)",
+    achado:
+      "foto_url, banner_url e links de anexo aceitavam esquemas perigosos (javascript:, data:text/html) sem validação unificada.",
+    remediacao:
+      "Criada UrlHttpSeguraStrategy em SanitizacaoStrategy.ts, aplicada nos pontos de renderização/persistência e reforçada no banco com ck_perfil_foto_url_http e ck_turma_banner_url_http (testadas ao vivo sob ROLLBACK).",
+    status: "Concluído",
+  },
+  {
+    codigo: "V-03",
+    titulo: "Ausência de Cabeçalhos HTTP de Segurança (Achado Wapiti)",
+    severidade: "Média",
+    camada: "Hospedagem (vercel.json)",
+    achado:
+      "O scanner Wapiti apontou ausência de Content-Security-Policy, X-Frame-Options e X-Content-Type-Options nas respostas HTTP.",
+    remediacao:
+      "Configurados CSP (calibrada para Vite, Google Fonts, Supabase e Gemini com frame-ancestors 'none'), X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy e Permissions-Policy.",
+    status: "Concluído",
+  },
+  {
+    codigo: "V-04",
+    titulo: "Normalização Centralizada de Entrada Livre (OWASP Strategy)",
+    severidade: "Baixa–Média",
+    camada: "Patterns + 5 Repositories + PostgreSQL (Migração 16)",
+    achado:
+      "Repositories gravavam texto livre sem remover bytes nulos ou caracteres de controle invisíveis (preservando <, >, & para conteúdo acadêmico).",
+    remediacao:
+      "Implementada SanitizacaoStrategy.ts (TextoEntradaStrategy, UrlHttpSeguraStrategy, EscapeHtmlStrategy; 8 testes, 100% Stmts/Funcs/Lines, 0 deps) + 8 CHECK constraints ck_*_texto_sem_controle consolidadas em 01_esquema.sql.",
+    status: "Concluído",
+  },
+  {
+    codigo: "V-05",
+    titulo: "Hardening Estrutural: Código da Escola, Exclusão Atômica e Redação do Pentest",
+    severidade: "Estrutural",
+    camada: "Banco (Migrações 14–15) + Edge + Docs",
+    achado:
+      "Enumeração sequencial de escolas (id_escola = 1, 2, 3), exclusão de conta sem pré-coleta segura do Storage e dados sensíveis no PDF bruto do pentest.",
+    remediacao:
+      "Código público ESC-XXXXXXXX (ADR-010, REVOKE SELECT de coluna + RPC própria), RPC service_role exclusiva na exclusão atômica (14) e redação real de stream no PDF de pentest (0 vazamentos).",
+    status: "Concluído",
   },
 ];

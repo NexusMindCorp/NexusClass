@@ -14,7 +14,9 @@ import {
   Github,
   Layers,
   Lightbulb,
+  LockKeyhole,
   Server,
+  ShieldAlert,
   ShieldCheck,
   Terminal,
   User,
@@ -47,6 +49,8 @@ import {
   pilaresEngenharia,
   roadmapFases,
   ultimaAtualizacaoEngenharia,
+  vetoresPentest,
+  vulnerabilidadesRemediadas,
 } from "../hooks/InfoAplicacao/configEngenhariaSoftware";
 import type { TipoApresentacao } from "../hooks/InfoAplicacao/type";
 import { getBadgeStatusStyle } from "@/lib/utils";
@@ -74,9 +78,9 @@ export function InfoAplicacao() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            alterne entre os slides de{" "}
+            Alterne entre os slides de{" "}
             <strong className="text-foreground">
-              Engenharia de Software (Design Patterns & Testes)
+              Engenharia de Software (Design Patterns, Testes & Pentest)
             </strong>{" "}
             e a documentação arquitetural original de{" "}
             <strong className="text-foreground">Modelagem de Sistemas</strong>.
@@ -121,6 +125,9 @@ export function InfoAplicacao() {
                 </Badge>
                 <Badge variant="outline" className="info-hero-badge">
                   Testes Automatizados (Vitest + V8)
+                </Badge>
+                <Badge variant="outline" className="info-hero-badge">
+                  Pentest & Hardening OWASP
                 </Badge>
                 <Badge variant="outline" className="info-hero-badge">
                   Branch: {ultimaAtualizacaoEngenharia.branch}
@@ -247,21 +254,45 @@ export function InfoAplicacao() {
                   </p>
                 </div>
 
-                <div className="info-process-list">
-                  <div>
-                    <span>ANTES</span>
-                    <strong>Problema no Código Original</strong>
-                    <p>{padraoAtivo.problemaAntes}</p>
+                <div className="mt-4 grid gap-2.5">
+                  <div className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex rounded bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-rose-700 dark:text-rose-300">
+                        ANTES
+                      </span>
+                      <strong className="text-sm font-bold leading-tight text-foreground">
+                        Problema no Código Original
+                      </strong>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                      {padraoAtivo.problemaAntes}
+                    </p>
                   </div>
-                  <div>
-                    <span>DEPOIS</span>
-                    <strong>Solução Arquitetural</strong>
-                    <p>{padraoAtivo.solucaoDepois}</p>
+                  <div className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex rounded bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-700 dark:text-emerald-300">
+                        DEPOIS
+                      </span>
+                      <strong className="text-sm font-bold leading-tight text-foreground">
+                        Solução Arquitetural
+                      </strong>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                      {padraoAtivo.solucaoDepois}
+                    </p>
                   </div>
-                  <div>
-                    <span>GANHO</span>
-                    <strong>Impacto em Testes & Manutenção</strong>
-                    <p>{padraoAtivo.beneficioQualidade}</p>
+                  <div className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex rounded bg-primary/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-primary">
+                        GANHO
+                      </span>
+                      <strong className="text-sm font-bold leading-tight text-foreground">
+                        Impacto em Testes & Manutenção
+                      </strong>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                      {padraoAtivo.beneficioQualidade}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -293,15 +324,15 @@ export function InfoAplicacao() {
             </div>
           </section>
 
-          {/* SLIDE 3 — ESTRATÉGIA DE TESTES E DESTAQUES DA FASE 0 */}
+          {/* SLIDE 3 — ESTRATÉGIA DE TESTES (RBT) E QUALIDADE */}
           <section className="info-slide-card">
             <SectionHeader
               icone={FlaskConical}
-              titulo="Estratégia de Testes de Software & Entregas da Fase 0"
-              descricao="Aplicação prática de Testes Baseados em Risco (RBT), Determinismo Temporal (Fake Timers), Valor Limite e Particionamento de Equivalência."
+              titulo="Estratégia de Testes de Software (RBT) & Qualidade"
+              descricao="Aplicação prática de Testes Baseados em Risco (RBT), Determinismo Temporal (Fake Timers), Valor Limite, Particionamento de Equivalência e Defesa em Profundidade OWASP."
             />
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
               {destaquesFaseZero.map((item) => (
                 <InfoCard
                   key={item.titulo}
@@ -385,7 +416,99 @@ export function InfoAplicacao() {
             </div>
           </section>
 
-          {/* SLIDE 5 — ROADMAP DE FASES E PASSAGEM DE BASTÃO (HANDOFF DA DUPLA) */}
+          {/* SLIDE 5 — SEGURANÇA, PENTEST E HARDENING OWASP */}
+          <section className="info-slide-card info-slide-destaque">
+            <SectionHeader
+              icone={LockKeyhole}
+              titulo="Segurança, Pentest & Hardening OWASP (V-01 a V-05)"
+              descricao="Consolidação dos testes ofensivos executados (Reconhecimento, Burp Suite, Wapiti, SQLmap e Stored XSS) e das correções em defesa em profundidade aplicadas com o padrão SanitizacaoStrategy, Migrações 14–16, Edge Functions e cabeçalhos HTTP."
+            />
+
+            <div className="overflow-x-auto rounded-xl border border-border bg-background/60">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border bg-muted/60 text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">Vetor / Ferramenta</th>
+                    <th className="px-4 py-3">Alvo</th>
+                    <th className="px-4 py-3">Resultado no Pentest</th>
+                    <th className="px-4 py-3">Avaliação / Ação</th>
+                    <th className="px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {vetoresPentest.map((vetor) => (
+                    <tr key={vetor.ferramenta} className="text-muted-foreground">
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {vetor.ferramenta}
+                      </td>
+                      <td className="px-4 py-3">{vetor.alvo}</td>
+                      <td className="px-4 py-3">{vetor.resultado}</td>
+                      <td className="px-4 py-3 text-foreground/90">
+                        {vetor.avaliacao}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex rounded border px-2 py-0.5 text-xs font-semibold ${getBadgeStatusStyle(
+                            vetor.status
+                          )}`}
+                        >
+                          {vetor.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+              {vulnerabilidadesRemediadas.map((vuln, idx) => (
+                <div
+                  key={vuln.codigo}
+                  className={`rounded-md border border-border bg-background/70 p-4 space-y-2 transition-colors hover:border-primary/40 hover:bg-background ${
+                    idx === vulnerabilidadesRemediadas.length - 1 &&
+                    vulnerabilidadesRemediadas.length % 2 === 1
+                      ? "md:col-span-2"
+                      : ""
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
+                      <strong className="text-sm font-bold text-foreground">
+                        {vuln.codigo} — {vuln.titulo}
+                      </strong>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge variant="outline" className="text-[11px]">
+                        {vuln.severidade}
+                      </Badge>
+                      <span
+                        className={`inline-flex items-center rounded border px-2 py-0.5 text-[11px] font-semibold ${getBadgeStatusStyle(
+                          vuln.status
+                        )}`}
+                      >
+                        Resolvido
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs font-medium text-primary">
+                    Camada: {vuln.camada}
+                  </p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    <strong className="text-foreground">Achado:</strong>{" "}
+                    {vuln.achado}
+                  </p>
+                  <p className="border-t border-border/60 pt-2 text-xs leading-relaxed text-muted-foreground">
+                    <strong className="text-foreground">Remediação:</strong>{" "}
+                    {vuln.remediacao}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* SLIDE 6 — ROADMAP DE FASES E PASSAGEM DE BASTÃO (HANDOFF DA DUPLA) */}
           <section className="info-flow-card">
             <SectionHeader
               icone={GitBranch}
@@ -397,7 +520,9 @@ export function InfoAplicacao() {
               {roadmapFases.map((item) => (
                 <div key={item.fase} className="info-flow-step space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span>{item.fase}</span>
+                    <div className="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground">
+                      {item.fase}
+                    </div>
                     <em
                       className={`rounded border px-2 py-0.5 text-xs font-semibold not-italic ${getBadgeStatusStyle(
                         item.status
@@ -419,12 +544,12 @@ export function InfoAplicacao() {
             </div>
           </section>
 
-          {/* SLIDE 6 — FERRAMENTAS E ECOSSISTEMA DE QUALIDADE */}
+          {/* SLIDE 7 — FERRAMENTAS E ECOSSISTEMA DE QUALIDADE E SEGURANÇA */}
           <section className="info-slide-card">
             <SectionHeader
               icone={Terminal}
-              titulo="Ferramentas de Qualidade, Testes e Arquitetura"
-              descricao="Stack utilizada para testes automatizados, cobertura, tipagem e governança em dupla."
+              titulo="Ferramentas de Qualidade, Testes, Segurança e Arquitetura"
+              descricao="Stack utilizada para testes automatizados, cobertura, tipagem, pentest OWASP e governança em dupla."
             />
             <div className="info-tech-grid">
               {ferramentasEngenharia.map((tech) => {
