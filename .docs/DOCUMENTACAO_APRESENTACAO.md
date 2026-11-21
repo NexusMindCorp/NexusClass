@@ -9,7 +9,7 @@
 |:---|:---|
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-21 |
 | **Última etapa concluída** | **Consolidação da Sessão de 21/11 (Fases 6 e 7 + Diagramas + `ConfiguracoesAvancadas` + `resend-email`/`resend-suport` + `.agents/`):** concluídos Exclusão atômica de conta (`14` + `deletar-conta`), `03_verificacao.sql` (16 testes) + `grupo24/`, Código público da escola (`ADR-010`/`15`, 10/10 ao vivo), Hardening XSS/OWASP (`ADR-011`, `V-01..V-05`: `SanitizacaoStrategy.ts` com 0 deps, `16`, `vercel.json`, `01_esquema.sql` consolidado, `09` idempotente, redação real de stream em `Testes de segurança.pdf`), atualização da aba `InfoAplicacao` (slide Pentest + correções visuais), liberação de `ConfiguracoesAvancadas` para `professor`/`master` mantendo *Deletar Conta* restrito a `aluno`, refatoração completa de `resend-email`/`resend-suport` (esquema 18 tabelas, anexos 1FN, HTML responsivo, disparo *best-effort* em `ComunicacaoRepository` e `scripts/validar-envio-resend.mjs` validado `HTTP 200`), sincronização dos diagramas e governança `.agents/` (**19 suítes / 144 testes**; **98.16% Stmts / 93.35% Branch / 100% Funcs / 100% Lines**). |
-| **Último relatório** | [Reteste integrado da migração 10](../relatorios/2026-11/2026-11-21-reteste-integrado-migracao-10.md), por Gabriel Lineker. |
+| **Último relatório** | [Fechamento da sessão de Gabriel](../relatorios/2026-11/2026-11-21-fechamento-sessao-gabriel.md), por Gabriel Lineker. |
 | **Fase atual / Próximo passo** | **Fase 6 e Passo 9-B validados no ambiente local.** Instalação limpa com 16/16, migração 10 retestada no banco e na SPA e relatório do Grupo 24 reconciliado. Gianlucca decide a publicação e a inclusão do reenvio de confirmação. Exportação dos binários conforme exigência da entrega. Revisão da carga adiada. [Plano e resultados](PLANO_VALIDACAO_DOCKER_E_BANNERS.md) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); `01_esquema.sql` consolidado mantém compatibilidade idempotente com `06`–`16` (não quebrar `02`/`04`); rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
@@ -19,7 +19,7 @@
 
 ## Painel de Progresso
 
-**Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** [Documento-texto em PDF](../entregas/DCC061/DCC061-NexusClass-Documento.pdf) e [slides em PDF](../entregas/DCC061/DCC061-NexusClass-Slides.pdf) preparados a partir da aba Informações, dos relatórios e das evidências da refatoração, com a paleta clara e o logotipo do NexusClass. O documento tem sete páginas e o deck tem 12 slides em formato 16:9. O [roteiro de apresentação](../entregas/DCC061/DCC061-NexusClass-Roteiro.pdf) propõe 17 min 30 s, com divisão de fala e preparação da demonstração.
+**Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Gabriel guardou fora do repositório os três PDFs preparados com a identidade clara do NexusClass: documento-texto de sete páginas, 12 slides em formato 16:9 e roteiro de 17 min 30 s. A remoção dos PDFs versionados em `60517fa` foi intencional. Gianlucca deve usar as cópias externas no ensaio e na conferência da submissão.
 
 **Fechamento da E4/DCC060 — encaminhamento para Gianlucca Paiva por Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Decidir com o Grupo 24 se a entrega final exige a versão reconciliada. Se exigida, exportar relatório e DER a partir de `grupo24/RELATORIO_ATUALIZADO.md` e `grupo24/modelo.drawio`, identificar os artefatos históricos da E4 e referenciar `docker/constructionsSQL` como sequência vigente validada em 16/16 casos. A revisão da carga foi descartada nesta entrega. Os ajustes finais e a publicação ficam a cargo de Gianlucca.
 
@@ -128,6 +128,8 @@
 - **Lições / trade-offs:** Reconhecer padrões nativos da linguagem/framework (ES Module Singleton e React Router Protection Proxy) em vez de forçar classes redundantes reforça o princípio de simplicidade do trabalho.
 
 ## Diário de Sessões
+
+**21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Sessão encerrada com as validações locais consolidadas, os PDFs da DCC061 guardados externamente e as pendências encaminhadas a Gianlucca no plano de fechamento.
 
 **21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Reteste integrado da migração 10 concluído no Edge com a SPA conectada ao Docker. Atualizado o pacote textual do Grupo 24 e registrada a decisão de publicação com Gianlucca Paiva.
 
