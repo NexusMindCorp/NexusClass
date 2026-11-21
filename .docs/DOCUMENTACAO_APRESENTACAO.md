@@ -15,6 +15,8 @@
 
 **Nota para Gianlucca Paiva na etapa de publicação — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** A revisão da carga saiu do escopo desta entrega. Manter o `02_carga.sql`, que passou nos 16 casos em Docker e preserva os cenários acadêmicos e de volume. Se no futuro a dupla quiser automatizar a preparação das jornadas da SPA, avaliar uma carga funcional pequena, local e separada, reaproveitando os cinco perfis do provisionador, prazos relativos e alguns anexos reais no Storage. Os casos da SPA podem ser reproduzidos com esses perfis, sem gerar senhas e arquivos para o lote inteiro ou copiar dados de produção. Publicação e decisão sobre o reenvio seguem com Gianlucca.
 
+**Encaminhamento final — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Todas as pendências passam a Gianlucca Paiva, incluindo DCC061, E4/DCC060, publicação e consolidação do repositório. Ver [plano de fechamento](../.agents/PLANO_FECHAMENTO_GIANLUCCA.md).
+
 ## Painel de Progresso
 
 **Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** [Documento-texto em PDF](../entregas/DCC061/DCC061-NexusClass-Documento.pdf) e [slides em PDF](../entregas/DCC061/DCC061-NexusClass-Slides.pdf) preparados a partir da aba Informações, dos relatórios e das evidências da refatoração. O documento tem sete páginas e o deck tem 12 slides em formato 16:9.

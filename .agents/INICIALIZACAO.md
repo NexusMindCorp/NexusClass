@@ -12,6 +12,8 @@
 | Tamanho | ~150 arquivos versionados (projeto pequeno → sem ferramentas de grafo; usar `npx madge --circular src/` se necessário) |
 
 ## Roteiro Rápido (Trabalho em Dupla & Continuidade entre Fases)
+
+**Retomada de Gianlucca Paiva** · Gabriel Lineker (`GabrielLineker`), 21/11/2026. As pendências acadêmicas, de publicação e de organização do repositório estão no [Plano de fechamento do NexusClass](PLANO_FECHAMENTO_GIANLUCCA.md).
 1. Ler `AGENTS.md`.
 2. **Checagem de Continuidade (Obrigatória antes de atualizar ou iniciar fase):** Ler o bloco **Ponto de Retomada (Handoff)** em `.docs/DOCUMENTACAO_APRESENTACAO.md` e o relatório mais recente em `relatorios/<mes-ano>/` para absorver o que foi feito no processo anterior. Nunca iniciar uma fase do zero sem considerar os artefatos, contratos e testes deixados pela etapa anterior, mantendo alinhamento estrito com `.docs/PLANEJAMENTO_REFATORACAO.md`.
 3. Ler **apenas** a spec da feature atual em `features/` e o ADR relacionado.
