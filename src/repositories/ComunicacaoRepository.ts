@@ -248,17 +248,31 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
 
   async criarDenuncia(dados: NovaDenunciaParams): Promise<void> {
     const client = resolverClienteSupabase(this.client);
-    const { error } = await client.from("denuncia").insert({
-      id_autor: dados.idAutor,
-      id_denunciado: dados.idDenunciado,
-      motivo: sanitizarTextoLinhaUnica(dados.motivo, 150),
-      descricao:
-        sanitizarTextoMultilinha(dados.descricao) ||
-        "Nenhum detalhe adicional fornecido.",
-      status: "pendente",
-    });
+    const { data, error } = await client
+      .from("denuncia")
+      .insert({
+        id_autor: dados.idAutor,
+        id_denunciado: dados.idDenunciado,
+        motivo: sanitizarTextoLinhaUnica(dados.motivo, 150),
+        descricao:
+          sanitizarTextoMultilinha(dados.descricao) ||
+          "Nenhum detalhe adicional fornecido.",
+        status: "pendente",
+      })
+      .select("id_denuncia")
+      .single();
 
     if (error) throw error;
+
+    if (data?.id_denuncia && typeof client.functions?.invoke === "function") {
+      try {
+        await client.functions.invoke("resend-email", {
+          body: { id_denuncia: data.id_denuncia },
+        });
+      } catch {
+        // Notificação por e-mail é best-effort e não invalida a denúncia gravada.
+      }
+    }
   }
 
   async criarTicketSuporte(
@@ -287,6 +301,16 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
       arquivos,
       `suporte/${dados.idPerfil}/${data.id_suporte}`,
     );
+
+    if (typeof client.functions?.invoke === "function") {
+      try {
+        await client.functions.invoke("resend-suport", {
+          body: { id_suporte: data.id_suporte },
+        });
+      } catch {
+        // Notificação por e-mail é best-effort e não invalida o chamado gravado.
+      }
+    }
   }
 }
 
