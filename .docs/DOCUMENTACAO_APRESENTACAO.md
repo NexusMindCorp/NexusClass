@@ -19,7 +19,7 @@
 
 ## Painel de Progresso
 
-**Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** [Documento-texto em PDF](../entregas/DCC061/DCC061-NexusClass-Documento.pdf) e [slides em PDF](../entregas/DCC061/DCC061-NexusClass-Slides.pdf) preparados a partir da aba Informações, dos relatórios e das evidências da refatoração. O documento tem sete páginas e o deck tem 12 slides em formato 16:9.
+**Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** [Documento-texto em PDF](../entregas/DCC061/DCC061-NexusClass-Documento.pdf) e [slides em PDF](../entregas/DCC061/DCC061-NexusClass-Slides.pdf) preparados a partir da aba Informações, dos relatórios e das evidências da refatoração, com a paleta clara e o logotipo do NexusClass. O documento tem sete páginas e o deck tem 12 slides em formato 16:9. O [roteiro de apresentação](../entregas/DCC061/DCC061-NexusClass-Roteiro.pdf) propõe 17 min 30 s, com divisão de fala e preparação da demonstração.
 
 **Fechamento da E4/DCC060 — encaminhamento para Gianlucca Paiva por Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Decidir com o Grupo 24 se a entrega final exige a versão reconciliada. Se exigida, exportar relatório e DER a partir de `grupo24/RELATORIO_ATUALIZADO.md` e `grupo24/modelo.drawio`, identificar os artefatos históricos da E4 e referenciar `docker/constructionsSQL` como sequência vigente validada em 16/16 casos. A revisão da carga foi descartada nesta entrega. Os ajustes finais e a publicação ficam a cargo de Gianlucca.
 
