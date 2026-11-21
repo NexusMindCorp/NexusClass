@@ -64,9 +64,129 @@ function extrairIdInteiroPositivo(valor: unknown): number | null {
   return Number.isInteger(num) && num > 0 ? num : null;
 }
 
+function parseDestinatarios(valor: string | undefined): string[] {
+  if (!valor) return [];
+  const validos = valor
+    .split(/[,;\s]+/)
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item));
+  return Array.from(new Set(validos));
+}
+
 function extrairNomeArquivo(caminho: string): string {
   const partes = caminho.split("/");
   return partes[partes.length - 1] || "Anexo";
+}
+
+function formatarDataBrasil(iso?: string | null): string {
+  const data = iso ? new Date(iso) : new Date();
+  if (Number.isNaN(data.getTime())) return "Agora";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: "America/Sao_Paulo",
+  }).format(data);
+}
+
+function montarHtmlSuporte(dados: {
+  idSuporte: number;
+  nome: string;
+  email: string;
+  role: string;
+  assunto: string;
+  status: string;
+  mensagemHtml: string;
+  anexos: Array<{ nome: string; url: string }>;
+  dataFormatada: string;
+}): string {
+  const blocoAnexos =
+    dados.anexos.length > 0
+      ? `
+        <div style="margin-top:22px;">
+          <p style="margin:0 0 10px 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#52525b;">Anexos enviados (${dados.anexos.length}) · links válidos por 7 dias</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            ${dados.anexos
+              .map(
+                (anexo) => `
+                <tr>
+                  <td style="padding:0 0 8px 0;">
+                    <a href="${escaparHtml(anexo.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background-color:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;text-decoration:none;">
+                      Visualizar anexo: ${escaparHtml(anexo.nome)}
+                    </a>
+                  </td>
+                </tr>`,
+              )
+              .join("")}
+          </table>
+        </div>
+      `
+      : "";
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novo Chamado #${escaparHtml(dados.idSuporte)} — NexusClass</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#18181b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e4e4e7;box-shadow:0 4px 14px rgba(24,24,27,0.06);">
+          <tr>
+            <td style="background-color:#4338ca;background-image:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);padding:26px 28px;color:#ffffff;">
+              <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background-color:rgba(255,255,255,0.18);color:#eef2ff;padding:4px 10px;border-radius:999px;">Central de Suporte · Novo Chamado</span>
+              <h1 style="margin:12px 0 4px 0;font-size:22px;line-height:1.3;font-weight:700;color:#ffffff;">Chamado #${escaparHtml(dados.idSuporte)} — ${escaparHtml(dados.assunto)}</h1>
+              <p style="margin:0;font-size:13px;color:#e0e7ff;">Aberto em ${escaparHtml(dados.dataFormatada)} (horário de Brasília)</p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:26px 28px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;border-spacing:0;background-color:#fafafa;border:1px solid #e4e4e7;border-radius:10px;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;width:34%;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#71717a;">Solicitante</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;font-size:14px;color:#18181b;">
+                    <strong>${escaparHtml(dados.nome)}</strong>
+                    <span style="display:inline-block;margin-left:6px;font-size:11px;font-weight:600;background-color:#f4f4f5;color:#52525b;border:1px solid #d4d4d8;padding:1px 8px;border-radius:999px;text-transform:capitalize;">${escaparHtml(dados.role)}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#71717a;">E-mail de Retorno</td>
+                  <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;font-size:14px;color:#3730a3;font-weight:500;">${escaparHtml(dados.email)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:12px 16px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#71717a;">Status</td>
+                  <td style="padding:12px 16px;">
+                    <span style="display:inline-block;font-size:12px;font-weight:600;background-color:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;padding:3px 10px;border-radius:999px;text-transform:capitalize;">${escaparHtml(dados.status)}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 8px 0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#52525b;">Mensagem do usuário</p>
+              <div style="background-color:#f8fafc;border-left:4px solid #4f46e5;border-radius:0 8px 8px 0;padding:16px 18px;font-size:14px;line-height:1.65;color:#27272a;word-break:break-word;">
+                ${dados.mensagemHtml}
+              </div>
+
+              ${blocoAnexos}
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background-color:#fafafa;border-top:1px solid #e4e4e7;padding:18px 28px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#71717a;line-height:1.5;">
+                Você pode responder diretamente a este e-mail (<strong>Reply-To</strong> configurado para o solicitante).<br/>
+                Notificação automática da plataforma <strong>NexusClass</strong>.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
 Deno.serve(async (req: Request) => {
@@ -126,7 +246,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: ticket, error: erroTicket } = await supabaseAdmin
       .from("ticket_suporte")
-      .select("id_suporte, id_perfil, assunto, mensagem, status")
+      .select("id_suporte, id_perfil, assunto, mensagem, status, created_at")
       .eq("id_suporte", idSuporte)
       .maybeSingle();
 
@@ -155,12 +275,12 @@ Deno.serve(async (req: Request) => {
     }
 
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const destinatarioEmail = Deno.env.get("DESTINATARIO_EMAIL");
+    const destinatarios = parseDestinatarios(Deno.env.get("DESTINATARIO_EMAIL"));
     const remetenteEmail =
       Deno.env.get("RESEND_FROM_EMAIL") ||
       "NexusClass Suporte <onboarding@resend.dev>";
 
-    if (!resendApiKey || !destinatarioEmail) {
+    if (!resendApiKey || destinatarios.length === 0) {
       return respostaJson(
         { error: "Serviço de e-mail não configurado no ambiente." },
         503,
@@ -182,7 +302,7 @@ Deno.serve(async (req: Request) => {
       .map((a) => a.id_objeto_storage as string)
       .filter(Boolean);
 
-    const linksSeguros: string[] = [];
+    const anexosSeguros: Array<{ nome: string; url: string }> = [];
     if (idsObjetos.length > 0) {
       const { data: objetos } = await supabaseAdmin
         .from("v_storage_objetos")
@@ -201,45 +321,37 @@ Deno.serve(async (req: Request) => {
         for (const item of assinados ?? []) {
           const urlSegura = obterUrlHttpSegura(item.signedUrl);
           if (!urlSegura) continue;
-          const rotulo = extrairNomeArquivo(item.path ?? "Anexo");
-          linksSeguros.push(
-            `<a href="${escaparHtml(urlSegura)}" target="_blank" rel="noopener noreferrer">${escaparHtml(rotulo)}</a>`,
-          );
+          anexosSeguros.push({
+            nome: extrairNomeArquivo(item.path ?? "Anexo"),
+            url: urlSegura,
+          });
         }
       }
     }
 
-    const anexosHtml =
-      linksSeguros.length > 0
-        ? `
-          <hr/>
-          <p><strong>Anexos (links válidos por 7 dias):</strong></p>
-          ${linksSeguros.join("<br/>")}
-        `
-        : "";
-
-    const nomeHtml = escaparHtml(perfilAutor?.nome ?? "Não informado");
-    const emailHtml = escaparHtml(perfilAutor?.email ?? "Não informado");
     const assuntoTexto = sanitizarAssuntoEmail(ticket.assunto || "Suporte");
-    const assuntoHtml = escaparHtml(ticket.assunto || "Sem assunto");
     const mensagemHtml = escaparHtml(ticket.mensagem ?? "").replace(
       /\r?\n/g,
       "<br/>",
     );
 
+    const html = montarHtmlSuporte({
+      idSuporte: ticket.id_suporte,
+      nome: perfilAutor?.nome ?? "Não informado",
+      email: perfilAutor?.email ?? "Não informado",
+      role: perfilAutor?.role ?? "usuário",
+      assunto: ticket.assunto || "Sem assunto",
+      status: ticket.status || "pendente",
+      mensagemHtml,
+      anexos: anexosSeguros,
+      dataFormatada: formatarDataBrasil(ticket.created_at),
+    });
+
     const bodyResend: Record<string, unknown> = {
       from: remetenteEmail,
-      to: [destinatarioEmail],
-      subject: `Novo Chamado #${ticket.id_suporte}: ${assuntoTexto}`,
-      html: `
-        <h2>Novo Pedido de Suporte/Contato (#${escaparHtml(ticket.id_suporte)})</h2>
-        <p><strong>Nome do Usuário:</strong> ${nomeHtml}</p>
-        <p><strong>E-mail para Retorno:</strong> ${emailHtml}</p>
-        <p><strong>Assunto:</strong> ${assuntoHtml}</p>
-        <hr/>
-        <p><strong>Mensagem:</strong><br/>${mensagemHtml}</p>
-        ${anexosHtml}
-      `,
+      to: destinatarios,
+      subject: `[NexusClass] Novo Chamado #${ticket.id_suporte}: ${assuntoTexto}`,
+      html,
     };
 
     if (
@@ -279,7 +391,8 @@ Deno.serve(async (req: Request) => {
       {
         enviado: true,
         id: data?.id ?? null,
-        anexos: linksSeguros.length,
+        destinatarios: destinatarios.length,
+        anexos: anexosSeguros.length,
       },
       200,
     );
