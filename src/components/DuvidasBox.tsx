@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDuvidas } from "@/hooks/DuvidaHooks/useDuvidas";
 import { pode } from "@/lib/permissoes";
+import { obterUrlHttpSegura } from "@/patterns/strategy/SanitizacaoStrategy";
 import type { Duvida, DuvidasBoxProps } from "@/hooks/DuvidaHooks/type";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -222,7 +223,7 @@ export function DuvidasBox({ perfil }: DuvidasBoxProps) {
                       {attachments.map((anexo) => (
                         <a
                           key={anexo.idObjeto}
-                          href={anexo.urlAssinada ?? "#"}
+                          href={obterUrlHttpSegura(anexo.urlAssinada) ?? "#"}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border bg-background text-xs text-foreground hover:bg-muted transition-colors max-w-xs truncate"

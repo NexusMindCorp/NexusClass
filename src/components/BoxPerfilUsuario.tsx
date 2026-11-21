@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
+  Building2,
+  Check,
+  Copy,
   Loader2,
   Mail,
   FileText,
@@ -7,6 +11,7 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
+import { toast } from "sonner";
 import { usePerfilUsuario } from "@/hooks/PerfilUserHooks/usePerfilUsuario";
 import { PerfilAvatar } from "./PerfilAvatar";
 import type { BoxPerfilUsuarioProps } from "@/hooks/PerfilUserHooks/type";
@@ -16,10 +21,24 @@ export function BoxPerfilUsuario({
   onClose,
   currentUserProfile,
 }: BoxPerfilUsuarioProps) {
-  const { perfilAlvo, loading, error, ehProprioUsuario } = usePerfilUsuario({
-    nomeUsuario,
-    currentUserProfile,
-  });
+  const { perfilAlvo, codigoEscola, loading, error, ehProprioUsuario } =
+    usePerfilUsuario({
+      nomeUsuario,
+      currentUserProfile,
+    });
+  const [copiado, setCopiado] = useState(false);
+
+  const handleCopiarCodigo = async () => {
+    if (!codigoEscola) return;
+    try {
+      await navigator.clipboard.writeText(codigoEscola);
+      setCopiado(true);
+      toast.success("Código da escola copiado!");
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      toast.error("Não foi possível copiar o código da escola.");
+    }
+  };
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 animate-in fade-in duration-200">
@@ -114,6 +133,35 @@ export function BoxPerfilUsuario({
                     </p>
                   </div>
                 </div>
+
+                {/* Código da Escola — visível apenas para o próprio usuário */}
+                {ehProprioUsuario && codigoEscola && (
+                  <div className="flex items-start justify-between gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Código da Escola
+                        </p>
+                        <p className="text-sm font-mono font-semibold text-foreground tracking-wider">
+                          {codigoEscola}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void handleCopiarCodigo()}
+                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                      aria-label="Copiar código da escola"
+                    >
+                      {copiado ? (
+                        <Check className="h-4 w-4 text-emerald-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                )}
 
                 {/* Bio */}
                 <div className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors">

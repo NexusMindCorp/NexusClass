@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { obterUrlHttpSegura } from "@/patterns/strategy/SanitizacaoStrategy";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -388,7 +389,7 @@ export function Mural({ materia, turma, perfil, abrirChat }: MuralProps) {
                       {atv.anexos.map((anexo) => (
                         <a
                           key={anexo.idObjeto}
-                          href={anexo.urlAssinada ?? "#"}
+                          href={obterUrlHttpSegura(anexo.urlAssinada) ?? "#"}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-muted/30 text-xs font-medium text-foreground hover:bg-muted transition-colors max-w-xs truncate"

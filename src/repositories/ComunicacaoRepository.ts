@@ -11,6 +11,10 @@ import {
   AnexoStorageFacade,
   CONFIG_ANEXO_SUPORTE,
 } from "@/patterns/facade/AnexoStorageFacade";
+import {
+  sanitizarTextoLinhaUnica,
+  sanitizarTextoMultilinha,
+} from "@/patterns/strategy/SanitizacaoStrategy";
 import { resolverClienteSupabase, type ClienteSupabaseTipado } from "./base";
 
 export interface NovoEventoParams {
@@ -145,8 +149,8 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
     const { data, error } = await client
       .from("evento_calendario")
       .insert({
-        titulo: dados.titulo,
-        descricao: dados.descricao,
+        titulo: sanitizarTextoLinhaUnica(dados.titulo, 150),
+        descricao: sanitizarTextoMultilinha(dados.descricao),
         data: dados.data,
         horario: dados.horario,
         tipo: dados.tipo,
@@ -218,7 +222,7 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
     const { error } = await client.from("mensagem").insert({
       id_remetente: idRemetente,
       id_destinatario: idDestinatario,
-      conteudo: conteudo.trim(),
+      conteudo: sanitizarTextoMultilinha(conteudo),
       lida: false,
     });
 
@@ -247,8 +251,10 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
     const { error } = await client.from("denuncia").insert({
       id_autor: dados.idAutor,
       id_denunciado: dados.idDenunciado,
-      motivo: dados.motivo,
-      descricao: dados.descricao.trim() || "Nenhum detalhe adicional fornecido.",
+      motivo: sanitizarTextoLinhaUnica(dados.motivo, 150),
+      descricao:
+        sanitizarTextoMultilinha(dados.descricao) ||
+        "Nenhum detalhe adicional fornecido.",
       status: "pendente",
     });
 
@@ -264,8 +270,8 @@ export class ComunicacaoRepository implements IComunicacaoRepository {
       .from("ticket_suporte")
       .insert({
         id_perfil: dados.idPerfil,
-        assunto: dados.assunto.trim(),
-        mensagem: dados.mensagem.trim(),
+        assunto: sanitizarTextoLinhaUnica(dados.assunto, 150),
+        mensagem: sanitizarTextoMultilinha(dados.mensagem),
         status: "pendente",
       })
       .select("id_suporte")

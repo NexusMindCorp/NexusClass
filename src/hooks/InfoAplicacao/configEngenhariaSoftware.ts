@@ -30,7 +30,7 @@ import type {
 
 export const ultimaAtualizacaoEngenharia = {
   faseAtual:
-    "Fase 6 em andamento · Ordens 1, 2 e Exclusão de Conta (Ordem 3) validadas",
+    "Fase 6 em andamento · Hardening XSS (Strategy OWASP), Código da Escola e Esquema consolidado",
   ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
   data: "2026-11-21",
   branch: "DesiningTeste",
@@ -39,11 +39,12 @@ export const ultimaAtualizacaoEngenharia = {
 export const metricasEngenharia: MetricaProjeto[] = [
   {
     valor: "100%",
-    rotulo: "linhas/funções (98% Stmts) em src/lib e src/patterns (era 4.27%)",
+    rotulo:
+      "linhas/funções (98.16% Stmts · 93.35% Branch) em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "125",
-    rotulo: "testes passando em 16 suítes (eram 3)",
+    valor: "137",
+    rotulo: "testes passando em 18 suítes (eram 3)",
   },
   {
     valor: "7 + 1",
@@ -51,7 +52,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
   },
   {
     valor: "Fase 6",
-    rotulo: "Ordens 1, 2 e Exclusão de Conta (Ordem 3) validadas no Supabase",
+    rotulo:
+      "Ordens 1, 2, Exclusão, Código da Escola e Hardening XSS (V-01..V-04) validados",
   },
 ];
 
@@ -203,15 +205,15 @@ await facade.submeter({
     id: "strategy",
     nome: "4. Strategy (Estratégia)",
     categoria: "Comportamental",
-    fase: "Fase 3",
+    fase: "Fase 3 + Fase 6",
     status: "Concluído",
     responsavel: "Gianlucca Paiva (GianluccaPaiva)",
     ondeAplicado:
-      "src/patterns/strategy/FiltroStrategy.ts + usePesquisa.ts, Pesquisar.tsx, useDuvidas.ts, DuvidasBox.tsx e AppSidebar.tsx",
+      "src/patterns/strategy/FiltroStrategy.ts + SanitizacaoStrategy.ts (usePesquisa, Pesquisar, useDuvidas, DuvidasBox, AppSidebar, 5 Repositories e UI)",
     problemaAntes:
-      "Os filtros de turmas (Inscritas, Disponíveis, Todas + termo de busca) e da Central de Dúvidas (papel + Todos, Pendente, Resolvida) estavam fragmentados e duplicados em condicionais dentro dos componentes visuais.",
+      "Os filtros de turmas e da Central de Dúvidas estavam fragmentados e duplicados em condicionais na UI, e as entradas de texto/URLs careciam de sanitização contextual OWASP unificada.",
     solucaoDepois:
-      "Contrato genérico FiltroStrategy<T, Contexto> com estratégias concretas puras e composições declarativas para turmas (filtrarEOrdenarTurmas) e dúvidas (filtrarDuvidasPorPerfilEStatus).",
+      "Contratos genéricos FiltroStrategy<T, Contexto> (turmas e dúvidas) e SanitizacaoStrategy<TEntrada, TSaida> com 3 estratégias OWASP puras (TextoEntradaStrategy, UrlHttpSeguraStrategy, EscapeHtmlStrategy) e 0 dependências externas.",
     codigoAntes: `// Antes: condicionais espalhadas e duplicadas em Pesquisar.tsx / DuvidasBox.tsx
 const turmasParaExibir = turmasBase.filter(([key]) => {
   if (isProfessor && !inscrito) return false;
@@ -219,14 +221,16 @@ const turmasParaExibir = turmasBase.filter(([key]) => {
   if (isAluno && abaAtiva === "disponiveis" && inscrito) return false;
   return true;
 });`,
-    codigoDepois: `// Depois: estratégias puras selecionadas por papel/aba e compostas sem if/else na UI
+    codigoDepois: `// Depois: estratégias puras para filtragem e sanitização OWASP
 export interface FiltroStrategy<T, Contexto = void> {
   filtrar(itens: readonly T[], contexto: Contexto): T[];
 }
-const estrategia = obterEstrategiaFiltroTurma(abaAtiva, role);
-const filtradas = estrategia.filtrar(base, { estaInscrito });`,
+export interface SanitizacaoStrategy<TEntrada = string, TSaida = string> {
+  readonly contexto: "texto" | "url" | "html";
+  sanitizar(entrada: TEntrada): TSaida;
+}`,
     beneficioQualidade:
-      "Transforma regras de filtragem em classes/funções puras de Nível 2 RBT, elimina duplicação entre DuvidasBox e AppSidebar e atinge 100% de cobertura unitária.",
+      "Transforma regras de filtragem e defesa XSS OWASP em estratégias puras de Nível 2 RBT, dispensando DOMPurify (0 dangerouslySetInnerHTML) com 100% Stmts/Funcs/Lines (97.87% Branch em SanitizacaoStrategy.ts).",
   },
   {
     id: "observer",
@@ -397,13 +401,13 @@ export const roadmapFases: FaseRoadmapItem[] = [
   },
   {
     fase: "Fase 6",
-    titulo: "Testes de Componente + E2E (Playwright) + RLS reais (Passo 9-B)",
+    titulo: "Testes de Componente + E2E (Playwright) + Hardening XSS + RLS reais (Passo 9-B)",
     status: "Em Andamento",
     responsavel: "Gabriel Lineker & Gianlucca Paiva",
     entregas:
-      "Testes de ProtectedRoute/BoxRestrito, fluxo E2E crítico (login → entrega), RLS ao vivo no Supabase, exclusão de conta atômica (migração 14 + Edge Function deletar-conta) e consolidação final.",
+      "Testes de ProtectedRoute/BoxRestrito, exclusão de conta atômica (14), código público da escola (15), hardening XSS com SanitizacaoStrategy OWASP (16 + vercel.json + Edge Functions), consolidação de 01_esquema.sql, idempotência da 09 e RLS ao vivo.",
     evidenciaTeste:
-      "16 suítes / 125 testes verdes; entregas, calendário, cadastro, matrícula e exclusão de conta ponta a ponta validados no Supabase de teste. Faltam decisões restantes da Ordem 3 e carga isolada (Ordem 4).",
+      "18 suítes / 137 testes verdes (98.16% Stmts / 93.35% Branch / 100% Funcs/Lines); V-01..V-04 resolvidos e migração 16 validada ao vivo sob ROLLBACK. Faltam decisões opcionais da Ordem 3 e carga isolada (Ordem 4).",
   },
 ];
 
@@ -420,7 +424,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
     nivelRbt: "Nível 2 — Lógica Pura (Determinística)",
     camada: "Testes Unitários Puros (Zero I/O)",
     ferramenta: "Vitest + Fake Timers",
-    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1 - Concluído), EntregaAtividadeFacade estáticos (Fase 2 - Concluído), FiltroStrategy (Fase 3 - Concluído) e helpers puros de NotificacaoSubject (Fase 4 - Concluído)",
+    alvos: "src/lib/utils.ts (25 funções), BotFactory (Fase 1), EntregaAtividadeFacade estáticos (Fase 2), FiltroStrategy (Fase 3), NotificacaoSubject (Fase 4), mappers/permissoes (Fase 6-A) e SanitizacaoStrategy OWASP (Fase 6)",
     tecnicas:
       "Padrão AAA, Particionamento de Equivalência, Análise de Valor Limite, Tabela de Decisão e vi.useFakeTimers()",
     status: "Concluído",
@@ -520,11 +524,20 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
   {
     etapa: "Fase 6 em andamento (20–21/11 · Componentes + Ordem 3)",
     responsavel: "Gabriel Lineker & Gianlucca Paiva",
-    testes: "16 suítes (125 testes)",
-    statements: "98% (lib + patterns)",
-    branches: "92,9% (lib + patterns)",
-    functions: "100% (lib + patterns)",
-    lines: "100% (lib + patterns)",
+    testes: "17 suítes (129 testes)",
+    statements: "98.00% (lib + patterns)",
+    branches: "92.87% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
+  },
+  {
+    etapa: "Fase 6 — Hardening XSS + Strategy OWASP (21/11)",
+    responsavel: "Gianlucca Paiva",
+    testes: "18 suítes (137 testes)",
+    statements: "98.16% (lib + patterns)",
+    branches: "93.35% (lib + patterns)",
+    functions: "100.00% (lib + patterns)",
+    lines: "100.00% (lib + patterns)",
     destaque: true,
   },
 ];

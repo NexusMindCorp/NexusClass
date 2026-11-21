@@ -18,6 +18,11 @@ test('retoma uma instalação parcial e rejeita conta sem marcador administrativ
   let falharMatricula = true;
   let cadastros = 0;
 
+  const escolasPorCodigo = new Map([
+    ['ESC-TESTE001', 1],
+    ['ESC-TESTE003', 3],
+  ]);
+
   t.mock.method(globalThis, 'fetch', async (input, init) => {
     const url = new URL(input);
     assert.equal(url.host, `${ref}.supabase.co`);
@@ -28,12 +33,20 @@ test('retoma uma instalação parcial e rejeita conta sem marcador administrativ
       cadastros++;
       const id = randomUUID();
       const user = { id, email: corpo.email, app_metadata: corpo.app_metadata };
+      const idEscola = escolasPorCodigo.get(corpo.user_metadata.codigo_escola) ?? null;
+      assert.ok(idEscola, 'codigo_escola válido deve ser enviado no cadastro');
       usuarios.set(id, user);
-      perfis.set(id, { id_perfil: id, role: 'aluno', id_escola: corpo.user_metadata.id_escola, email: corpo.email });
+      perfis.set(id, { id_perfil: id, role: 'aluno', id_escola: idEscola, email: corpo.email });
       return Response.json({ user });
     }
     if (url.pathname.startsWith('/auth/v1/admin/users/')) {
       return Response.json({ user: usuarios.get(recurso) });
+    }
+    if (recurso === 'escola') {
+      return Response.json([
+        { id_escola: 1, codigo_publico: 'ESC-TESTE001' },
+        { id_escola: 3, codigo_publico: 'ESC-TESTE003' },
+      ]);
     }
     if (recurso === 'turma') {
       return Response.json([

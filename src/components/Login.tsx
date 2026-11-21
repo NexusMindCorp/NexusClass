@@ -17,7 +17,7 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
-  const [idEscola, setIdEscola] = useState("");
+  const [codigoEscola, setCodigoEscola] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,10 +25,10 @@ export function Login() {
     e.preventDefault();
     if (loading) return;
 
-    const escolaNum = Number(idEscola.trim());
-    if (!isLogin && (!Number.isInteger(escolaNum) || escolaNum <= 0)) {
-      toast.error("ID da escola inválido", {
-        description: "Informe o código numérico (id_escola) da sua escola.",
+    const codigoNormalizado = codigoEscola.trim().toUpperCase();
+    if (!isLogin && !/^[A-Z0-9-]{4,16}$/.test(codigoNormalizado)) {
+      toast.error("Código da escola inválido", {
+        description: "Informe o código público da sua escola (ex.: ESC-7K4M9P2Q).",
       });
       return;
     }
@@ -51,7 +51,7 @@ export function Login() {
           options: {
             data: {
               nome,
-              id_escola: escolaNum,
+              codigo_escola: codigoNormalizado,
             },
           },
         });
@@ -97,7 +97,8 @@ export function Login() {
         mensagem.includes("fk_perfil_escola") ||
         mensagem.includes("ck_perfil_escola_por_role")
       ) {
-        mensagem = "ID da escola inválido ou não encontrado. Verifique com sua instituição.";
+        mensagem =
+          "Código da escola inválido ou não encontrado. Verifique com sua instituição.";
       }
 
       toast.error("Erro no acesso", {
@@ -185,24 +186,26 @@ export function Login() {
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="id-escola"
+                    htmlFor="codigo-escola"
                     className="text-white text-sm font-medium"
                   >
-                    ID da Escola
+                    Código da Escola
                   </Label>
                   <div className="relative">
                     <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                     <Input
-                      id="id-escola"
-                      type="number"
-                      min={1}
-                      step={1}
-                      inputMode="numeric"
-                      placeholder="Código (id_escola) da sua escola"
-                      value={idEscola}
-                      onChange={(e) => setIdEscola(e.target.value)}
+                      id="codigo-escola"
+                      type="text"
+                      maxLength={16}
+                      autoCapitalize="characters"
+                      autoComplete="off"
+                      placeholder="Ex: ESC-7K4M9P2Q"
+                      value={codigoEscola}
+                      onChange={(e) =>
+                        setCodigoEscola(e.target.value.toUpperCase())
+                      }
                       required
-                      className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500"
+                      className="h-12 bg-transparent border-purple-500/25 text-white pl-11 rounded-xl uppercase tracking-wider focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:border-purple-500"
                     />
                   </div>
                 </div>

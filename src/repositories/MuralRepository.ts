@@ -1,6 +1,7 @@
 import type { Post } from "@/hooks/MuralHooks/type";
 import type { TabelaRow } from "@/lib/database.types";
 import { mapPostMural, paraInteiroId, umOuPrimeiro } from "@/lib/db/mappers";
+import { sanitizarTextoMultilinha } from "@/patterns/strategy/SanitizacaoStrategy";
 import { resolverClienteSupabase, type ClienteSupabaseTipado } from "./base";
 
 type MuralPostRowComAutor = Pick<
@@ -85,7 +86,7 @@ export class MuralRepository implements IMuralRepository {
       .insert({
         id_turma: turmaNum,
         id_autor: idAutor,
-        conteudo: conteudo.trim(),
+        conteudo: sanitizarTextoMultilinha(conteudo),
       })
       .select(
         `

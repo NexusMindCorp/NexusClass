@@ -387,18 +387,21 @@ export type Database = {
       escola: {
         Row: {
           ano_letivo: number;
+          codigo_publico: string;
           created_at: string;
           id_escola: number;
           nome: string;
         };
         Insert: {
           ano_letivo: number;
+          codigo_publico?: string;
           created_at?: string;
           id_escola?: number;
           nome: string;
         };
         Update: {
           ano_letivo?: number;
+          codigo_publico?: string;
           created_at?: string;
           id_escola?: number;
           nome?: string;
@@ -732,7 +735,10 @@ export type Database = {
       };
     };
     Functions: {
-      [_ in never]: never;
+      obter_codigo_publico_minha_escola: {
+        Args: Record<PropertyKey, never>;
+        Returns: string | null;
+      };
     };
     Enums: {
       [_ in never]: never;

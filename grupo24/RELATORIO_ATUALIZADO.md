@@ -6,7 +6,7 @@
 **Branch de referência:** `DesiningTeste`  
 **Ambiente de validação:** Supabase de teste (`REF_DO_PROJETO`)  
 
-> **Nota sobre preservação de artefatos originais:** Os documentos PDF entregues nas etapas anteriores ([`grupo24/relatorio.pdf`](relatorio.pdf) e [`grupo24/modelo_trabalho_v3.pdf`](modelo_trabalho_v3.pdf)) e a imagem histórica [`grupo24/der.png`](der.png) foram preservados intactos como registro da E4. Este documento (`RELATORIO_ATUALIZADO.md`) e o diagrama editável [`grupo24/modelo.drawio`](modelo.drawio) consolidam a versão reconciliada com o esquema PostgreSQL/Supabase, as políticas RLS, as funções/gatilhos e as migrações `06`–`14` efetivamente implementados e validados até 2026-11-21.
+> **Nota sobre preservação de artefatos originais:** Os documentos PDF entregues nas etapas anteriores ([`grupo24/relatorio.pdf`](relatorio.pdf) e [`grupo24/modelo_trabalho_v3.pdf`](modelo_trabalho_v3.pdf)) e a imagem histórica [`grupo24/der.png`](der.png) foram preservados intactos como registro da E4. Este documento (`RELATORIO_ATUALIZADO.md`) e o diagrama editável [`grupo24/modelo.drawio`](modelo.drawio) consolidam a versão reconciliada com o esquema PostgreSQL/Supabase (`01_esquema.sql` consolidado), as políticas RLS, as funções/gatilhos e as migrações `06`–`16` efetivamente implementados e validados até 2026-11-21.
 
 ---
 
@@ -62,7 +62,7 @@
 
 ## 3. MODELAGEM DO BANCO DE DADOS
 
-Nesta seção apresentam-se o Diagrama Entidade-Relacionamento (DER) reconciliado, o Modelo Lógico completo das 18 tabelas com suas integrações ao Supabase (`auth.users`, `storage.objects`, `v_storage_objetos`, RLS, Realtime, `pg_cron` e migrações `06`–`14`) e a fundamentação de Normalização (3FN/FNBC).
+Nesta seção apresentam-se o Diagrama Entidade-Relacionamento (DER) reconciliado, o Modelo Lógico completo das 18 tabelas com suas integrações ao Supabase (`auth.users`, `storage.objects`, `v_storage_objetos`, RLS, Realtime, `pg_cron` e migrações `06`–`16`) e a fundamentação de Normalização (3FN/FNBC).
 
 ### 3.1 Diagrama Entidade-Relacionamento (DER)
 
@@ -106,21 +106,22 @@ O diagrama editável atualizado encontra-se em [`grupo24/modelo.drawio`](modelo.
 
 ### 3.2 Modelo Lógico (Esquema Vigente — 18 Tabelas)
 
-Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/constructionsSQL/01_esquema.sql` acrescida da coluna `atraso` da migração `08_registra_atraso_entrega.sql`, compreendendo **18 tabelas** no schema `public`, integradas às tabelas gerenciadas `auth.users` e `storage.objects` do Supabase. As chaves primárias (PK) encontram-se em **negrito**.
+Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/constructionsSQL/01_esquema.sql` consolidado (já incorporando `Escola.codigo_publico` da migração `15`, `Entrega_Atividade.atraso` da migração `08`, `ck_entrega_feedback_avaliacao` da migração `09` e as constraints de proteção contra XSS/URLs da migração `16`), compreendendo **18 tabelas** no schema `public`, integradas às tabelas gerenciadas `auth.users` e `storage.objects` do Supabase. As chaves primárias (PK) encontram-se em **negrito**.
 
-1. **Escola** (**id_escola**, nome, ano_letivo, created_at)
-   - `PK`: `id_escola` (`SERIAL`)
-   - `CHECK`: `ano_letivo BETWEEN 2000 AND 2100` (`ck_escola_ano_letivo`)
+1. **Escola** (**id_escola**, nome, ano_letivo, codigo_publico, created_at)
+   - `PK`: `id_escola` (`SERIAL`); `UNIQUE`: `codigo_publico` (`VARCHAR(16) NOT NULL DEFAULT nexusclass_private.gerar_codigo_publico_escola()`, `uq_escola_codigo_publico` — ADR-010 / migração `15`)
+   - `CHECK`: `ano_letivo BETWEEN 2000 AND 2100` (`ck_escola_ano_letivo`) e formato `^ESC-[A-Z2-9]{8}$` (`ck_escola_codigo_publico_formato`)
 
 2. **Turma** (**id_turma**, codigo_acesso, materia, sala, periodo_escolar, banner_url, id_escola)
    - `PK`: `id_turma` (`SERIAL`); `UNIQUE`: `codigo_acesso` (`uq_turma_codigo_acesso`)
+   - `CHECK`: protocolo `http://` ou `https://` em `banner_url` (`ck_turma_banner_url_http`, `NOT VALID`, migração `16`)
    - `FK`: `id_escola` referencia `Escola(id_escola)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE RESTRICT`)
 
 3. **Perfil** (**id_perfil**, role, nome, email, bio, foto_url, created_at, id_escola)
    - `PK`: `id_perfil` (`UUID`); `UNIQUE`: `email` (`uq_perfil_email`)
    - `FK`: `id_perfil` referencia `auth.users(id)` (`NOT NULL`, `ON DELETE CASCADE`)
    - `FK`: `id_escola` referencia `Escola(id_escola)` (`NULL` permitido apenas para `master`, `ON UPDATE CASCADE ON DELETE RESTRICT`)
-   - `CHECK`: `role IN ('aluno', 'professor', 'master')` (`ck_perfil_role`) e `(role = 'master' AND id_escola IS NULL) OR (role IN ('aluno', 'professor') AND id_escola IS NOT NULL)` (`ck_perfil_escola_por_role` — **RN11**)
+   - `CHECK`: `role IN ('aluno', 'professor', 'master')` (`ck_perfil_role`), `(role = 'master' AND id_escola IS NULL) OR (role IN ('aluno', 'professor') AND id_escola IS NOT NULL)` (`ck_perfil_escola_por_role` — **RN11**), `ck_perfil_foto_url_http` (`http://`/`https://` em `foto_url`, `NOT VALID`) e `ck_perfil_texto_sem_controle` (`nome` e `bio` sem bytes nulos/controles invisíveis, `NOT VALID`, migração `16`)
 
 4. **Professor_Turma** (**id_professor**, **id_turma**, created_at)
    - `PK`: `(id_professor, id_turma)` (`pk_professor_turma`)
@@ -135,6 +136,7 @@ Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/construct
 
 6. **Atividade** (**id_atividade**, titulo, descricao, data_entrega, id_turma, id_professor)
    - `PK`: `id_atividade` (`SERIAL`)
+   - `CHECK`: `ck_atividade_texto_sem_controle` (`titulo` e `descricao` sem controles invisíveis, `NOT VALID`, migração `16`)
    - `FK`: `id_turma` referencia `Turma(id_turma)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
    - `FK`: `id_professor` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE RESTRICT`)
 
@@ -145,14 +147,15 @@ Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/construct
 
 8. **Entrega_Atividade** (**id_entrega**, id_objeto_storage, nota, feedback, entregue_em, atraso, id_atividade, id_aluno)
    - `PK`: `id_entrega` (`SERIAL`); `UNIQUE`: `(id_atividade, id_aluno)` (`uq_entrega_atividade_aluno`)
-   - Coluna `atraso` (`BOOLEAN`, adicionada na migração `08_registra_atraso_entrega.sql`; registros anteriores permanecem com `NULL`)
-   - `CHECK`: `nota IS NULL OR (nota >= 0 AND nota <= 100)` (`ck_entrega_nota_intervalo`) e exigência de feedback com mínimo de 20 caracteres para `nota < 60` e mínimo de 1 caractere para `nota >= 60` (`ck_entrega_feedback_avaliacao`, `NOT VALID`, migração `09`)
+   - Coluna `atraso` (`BOOLEAN`, consolidada em `01_esquema.sql` e adicionada na migração `08_registra_atraso_entrega.sql`; registros anteriores permanecem com `NULL`)
+   - `CHECK`: `nota IS NULL OR (nota >= 0 AND nota <= 100)` (`ck_entrega_nota_intervalo`) e exigência de feedback com mínimo de 20 caracteres para `nota < 60` e mínimo de 1 caractere para `nota >= 60` (`ck_entrega_feedback_avaliacao`, `NOT VALID`, consolidada em `01_esquema.sql` e idempotente na migração `09`)
    - `FK`: `id_atividade` referencia `Atividade(id_atividade)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
    - `FK`: `id_aluno` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
    - `FK`: `id_objeto_storage` (`UUID`) referencia `storage.objects(id)` (`NOT NULL`, `ON DELETE CASCADE`)
 
 9. **Duvida** (**id_duvida**, assunto, descricao, resolveu, resposta, created_at, id_aluno, id_turma, id_professor)
    - `PK`: `id_duvida` (`SERIAL`)
+   - `CHECK`: `ck_duvida_texto_sem_controle` (`assunto`, `descricao` e `resposta` sem controles invisíveis, `NOT VALID`, migração `16`)
    - `FK`: `id_aluno` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
    - `FK`: `id_turma` referencia `Turma(id_turma)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
    - `FK`: `id_professor` (`UUID`) referencia `Perfil(id_perfil)` (`NULL` permitido até resposta, `ON UPDATE CASCADE ON DELETE SET NULL`)
@@ -164,11 +167,13 @@ Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/construct
 
 11. **Mural_Post** (**id_post**, conteudo, created_at, id_turma, id_autor)
     - `PK`: `id_post` (`SERIAL`)
+    - `CHECK`: `ck_mural_post_texto_sem_controle` (`conteudo` sem controles invisíveis, `NOT VALID`, migração `16`)
     - `FK`: `id_turma` referencia `Turma(id_turma)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_autor` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
 
 12. **Comentario_Mural** (**id_comentario**, conteudo, created_at, id_post, id_autor)
     - `PK`: `id_comentario` (`SERIAL`)
+    - `CHECK`: `ck_comentario_mural_texto_sem_controle` (`conteudo` sem controles invisíveis, `NOT VALID`, migração `16`)
     - `FK`: `id_post` referencia `Mural_Post(id_post)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_autor` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
 
@@ -186,20 +191,20 @@ Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/construct
 
 15. **Mensagem** (**id_mensagem**, conteudo, lida, created_at, id_remetente, id_destinatario)
     - `PK`: `id_mensagem` (`SERIAL`)
-    - `CHECK`: `id_remetente <> id_destinatario` (`ck_mensagem_autoria_distinta`)
+    - `CHECK`: `id_remetente <> id_destinatario` (`ck_mensagem_autoria_distinta`) e `ck_mensagem_texto_sem_controle` (`conteudo` sem controles invisíveis, `NOT VALID`, migração `16`)
     - `FK`: `id_remetente` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_destinatario` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
 
 16. **Denuncia** (**id_denuncia**, motivo, descricao, status, parecer_moderacao, created_at, id_autor, id_denunciado, id_master)
     - `PK`: `id_denuncia` (`SERIAL`)
-    - `CHECK`: `status IN ('pendente', 'em_analise', 'resolvido')` (`ck_denuncia_status`) e `id_autor <> id_denunciado` (`ck_denuncia_partes_distintas`)
+    - `CHECK`: `status IN ('pendente', 'em_analise', 'resolvido')` (`ck_denuncia_status`), `id_autor <> id_denunciado` (`ck_denuncia_partes_distintas`) e `ck_denuncia_texto_sem_controle` (`motivo` e `descricao` sem controles invisíveis, `NOT VALID`, migração `16`)
     - `FK`: `id_autor` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_denunciado` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_master` (`UUID`) referencia `Perfil(id_perfil)` (`NULL` permitido até moderação, `ON UPDATE CASCADE ON DELETE SET NULL`)
 
 17. **Ticket_Suporte** (**id_suporte**, assunto, mensagem, status, resposta_suporte, created_at, id_perfil, id_master)
     - `PK`: `id_suporte` (`SERIAL`)
-    - `CHECK`: `status IN ('pendente', 'em_analise', 'resolvido')` (`ck_ticket_status`)
+    - `CHECK`: `status IN ('pendente', 'em_analise', 'resolvido')` (`ck_ticket_status`) e `ck_ticket_suporte_texto_sem_controle` (`assunto` e `mensagem` sem controles invisíveis, `NOT VALID`, migração `16`)
     - `FK`: `id_perfil` (`UUID`) referencia `Perfil(id_perfil)` (`NOT NULL`, `ON UPDATE CASCADE ON DELETE CASCADE`)
     - `FK`: `id_master` (`UUID`) referencia `Perfil(id_perfil)` (`NULL` permitido até atendimento, `ON UPDATE CASCADE ON DELETE SET NULL`)
 
@@ -215,19 +220,22 @@ Abaixo apresenta-se a estrutura relacional vigente derivada de `docker/construct
 - **Controle de Situação de Matrícula (`Aluno_Turma`):** preserva o histórico do vínculo via `situacao IN ('ativa', 'cancelada')` com PK composta `(id_aluno, id_turma)` e proteção entre escolas pelo gatilho `trg_aluno_turma_escola` (RN12).
 - **Anexos vinculados a `storage.objects` e View `v_storage_objetos`:** as tabelas `Atividade_Anexo`, `Duvida_Anexo`, `Ticket_Suporte_Anexo` e `Entrega_Atividade` passaram a armazenar `id_objeto_storage UUID` (FK para `storage.objects(id)` em 4 buckets privados: `anexos_atividades`, `entregas_atividades`, `duvidasalunostoprofessor`, `anexos_suporte`) em vez de URLs públicas em texto. Para resolver `id_objeto_storage → (bucket_id, name)` sem expor o schema `storage` no PostgREST nem contornar RLS, `05_supabase_funcoes_realtime.sql` define a view `public.v_storage_objetos` com **`WITH (security_invoker = true)`**, garantindo que cada consulta aplique integralmente as políticas RLS de `storage.objects` da sessão autenticada.
 - **Evolução de `no_prazo` (derivado na E4) para `atraso` (persistido na migração `08`):** na E4 previu-se omitir `no_prazo` e gravar um aviso textual de atraso no campo `feedback`. Na validação integrada verificou-se que misturar marcação automática de sistema com o parecer pedagógico do professor gerava conflito com a RN01 e com a edição docente. A migração `08_registra_atraso_entrega.sql` resolveu isso adicionando `Entrega_Atividade.atraso BOOLEAN` preenchida automaticamente pelo gatilho `registrar_atraso_entrega` no instante exato da submissão (`statement_timestamp() > data_entrega`), preservando o fato histórico da entrega mesmo que o prazo da atividade seja alterado posteriormente e mantendo `feedback` exclusivo para avaliação docente.
+- **Código Público da Escola (`Escola.codigo_publico` — ADR-010 / Migração `15`):** mantém `id_escola SERIAL` como chave primária/estrangeira interna e adiciona o identificador público único `ESC-XXXXXXXX` (gerado por `nexusclass_private.gerar_codigo_publico_escola()`), com privilégios de coluna bloqueando leitura direta por `anon`/`authenticated` e exposição controlada exclusivamente para a própria escola do usuário autenticado via RPC `obter_codigo_publico_minha_escola()`.
+- **Proteção contra URLs perigosas e controles invisíveis (Migração `16`):** reforça no banco a defesa em profundidade contra XSS/injeção de protocolo (allowlist `http://`/`https://` em `perfil.foto_url` e `turma.banner_url` e rejeição de bytes nulos/caracteres de controle ASCII invisíveis em 8 tabelas de texto livre, preservando `<`, `>`, `&` e `"` legítimos conforme OWASP).
 - **Omissão de Dados Redundantes:** atributos como `nome`/`email` em `Ticket_Suporte` ou `titulo_evento` em `Alerta_Calendario` continuam omitidos para preservar a 3FN, sendo obtidos por `JOIN`.
-- **Segurança, Tempo Real, Agendamento e Sequência Oficial de Instalação Limpa:** o esquema físico completo é composto pelo núcleo DDL (`01`), 89 políticas RLS cobrindo as 18 tabelas públicas e os 4 buckets privados (`04`), gatilho de cadastro/Realtime/`pg_cron`/`v_storage_objetos` (`05`) e as migrações incrementais `06`–`14`. A **sequência oficial de instalação limpa** é:
-  - **Ambiente com carga de testes e verificação:** `01_esquema.sql` → `04_supabase_auth_rls.sql` → `02_carga.sql` → `05_supabase_funcoes_realtime.sql` → `06` → `07` → `08` → `09` → `10` → `11` → `12` → `13` → `14` → `03_verificacao.sql`.
-  - **Produção limpa (sem carga sintética):** `01_esquema.sql` → `04_supabase_auth_rls.sql` → `05_supabase_funcoes_realtime.sql` → `06`..`14`.
+- **Segurança, Tempo Real, Agendamento e Sequência Oficial de Instalação Limpa:** o esquema físico completo é composto pelo núcleo DDL consolidado (`01`), 89 políticas RLS cobrindo as 18 tabelas públicas e os 4 buckets privados (`04`), gatilho de cadastro/Realtime/`pg_cron`/`v_storage_objetos` (`05`) e as migrações incrementais idempotentes `06`–`16`. A **sequência oficial de instalação limpa** é:
+  - **Ambiente com carga de testes e verificação:** `01_esquema.sql` → `04_supabase_auth_rls.sql` → `02_carga.sql` → `05_supabase_funcoes_realtime.sql` → `06` → `07` → `08` → `09` → `10` → `11` → `12` → `13` → `14` → `15` → `16` → `03_verificacao.sql`.
+  - **Produção limpa (sem carga sintética):** `01_esquema.sql` → `04_supabase_auth_rls.sql` → `05_supabase_funcoes_realtime.sql` → `06`..`16`.
 
 #### Restrições Complementares (Gatilhos, RLS e Rotinas)
 
-1. **Domínio de colunas (`CHECK`):** `ano_letivo` (`2000..2100`), `nota` (`0..100`), `ck_entrega_feedback_avaliacao` (RN01, migração `09`), `tipo` (`'pessoal'`, `'turma'`) e coerência com `id_turma`, `role` (`'aluno'`, `'professor'`, `'master'`), `ck_perfil_escola_por_role` (RN11), `minutos_antes` (`1`, `5`), `situacao` (`'ativa'`, `'cancelada'`), `status` (`'pendente'`, `'em_analise'`, `'resolvido'`), autoria distinta em `Mensagem` e partes distintas em `Denuncia`.
+1. **Domínio de colunas (`CHECK`):** `ano_letivo` (`2000..2100`), `ck_escola_codigo_publico_formato` (`ESC-XXXXXXXX`, migração `15`), `nota` (`0..100`), `ck_entrega_feedback_avaliacao` (RN01, migração `09` idempotente), `tipo` (`'pessoal'`, `'turma'`) e coerência com `id_turma`, `role` (`'aluno'`, `'professor'`, `'master'`), `ck_perfil_escola_por_role` (RN11), `minutos_antes` (`1`, `5`), `situacao` (`'ativa'`, `'cancelada'`), `status` (`'pendente'`, `'em_analise'`, `'resolvido'`), autoria distinta em `Mensagem`, partes distintas em `Denuncia`, allowlist `http(s)://` em `perfil.foto_url` / `turma.banner_url` e 8 constraints `ck_*_texto_sem_controle` (migração `16`).
 2. **Isolamento entre escolas (RN12):** gatilhos `trg_aluno_turma_escola` e `trg_professor_turma_escola` (`SECURITY DEFINER`, `01_esquema.sql`) impedem vínculos de alunos ou professores com turmas de outra escola.
 3. **Proteção de entregas avaliadas e escopo docente (RN08):** função `nexusclass_private.reenvio_preserva_avaliacao` (migração `06`), 4 políticas `AS RESTRICTIVE` em `entrega_atividade` e `storage.objects` (migração `07`) e gatilho `limitar_edicao_docente_entrega` (migração `10`, executando alfabeticamente antes de `registrar_atraso_entrega`).
 4. **Registro automático de atraso (RN07):** gatilho `registrar_atraso_entrega` (migração `08`) calcula `entregue_em := statement_timestamp()` e `atraso := NEW.entregue_em > prazo` em inserções e reenvios.
 5. **Calendário com fuso oficial, reagendamento e bloqueio de data passada (RN02/RN04):** `fn_processar_alertas_calendario()` via `pg_cron` com `TimeZone = 'America/Sao_Paulo'` (migração `11`), gatilho `invalidar_alertas_ao_reagendar` (migração `12`) e gatilhos `validar_data_evento_insercao` / `validar_data_evento_reagendamento` (migração `13`).
-6. **Segurança na criação e exclusão de contas (RF01/RN09/RN11):** `handle_new_user()` (`05`) sempre fixa `role = 'aluno'` ignorando papel informado no metadata; `public.listar_objetos_storage_perfil(UUID)` (migração `14`, exclusiva de `service_role`) subsidia a Edge Function `deletar-conta` para exclusão atômica de aluno e limpeza completa do Storage.
+6. **Segurança na criação, código público da escola e exclusão de contas (RF01/RN09/RN11):** `handle_new_user()` (`05`, atualizada pela migração `15`) sempre fixa `role = 'aluno'` e exige `codigo_escola` válido (`ESC-XXXXXXXX`), com `codigo_publico` oculto por privilégio de coluna e acessível apenas via `public.obter_codigo_publico_minha_escola()`; `public.listar_objetos_storage_perfil(UUID)` (migração `14`, exclusiva de `service_role`) subsidia a Edge Function `deletar-conta` para exclusão atômica de aluno e limpeza completa do Storage.
+7. **Defesa em profundidade contra XSS e protocolos perigosos (Migração `16`):** constraints `ck_perfil_foto_url_http`, `ck_turma_banner_url_http` e as 8 `ck_*_texto_sem_controle` (consolidadas em `01_esquema.sql` e aplicadas de forma idempotente em `16_protecao_urls_e_entradas.sql`) protegem o banco contra `javascript:`, `data:text/html` e bytes de controle invisíveis mesmo em escritas diretas via API.
 
 ### 3.3 Normalização
 
@@ -250,7 +258,7 @@ O esquema lógico vigente mantém **todas as 18 tabelas na 3ª Forma Normal (3FN
 
 | Relação | Chave(s) Candidata(s) | Dependências Funcionais Não Triviais | Forma Normal e Justificativa |
 | :--- | :--- | :--- | :--- |
-| **Escola** | `id_escola` | `id_escola → nome, ano_letivo, created_at` | **3FN / FNBC:** atributos atômicos, chave simples e ausência de dependências transitivas. |
+| **Escola** | `id_escola`, `codigo_publico` | `id_escola → nome, ano_letivo, codigo_publico, created_at`; `codigo_publico → id_escola, nome, ano_letivo, created_at` | **3FN / FNBC:** atributos atômicos, todos os determinantes são chaves candidatas (`uq_escola_codigo_publico`) e ausência de dependências transitivas. |
 | **Turma** | `id_turma`, `codigo_acesso` | `id_turma → codigo_acesso, materia, sala, periodo_escolar, banner_url, id_escola`; `codigo_acesso → id_turma, materia, sala, periodo_escolar, banner_url, id_escola` | **3FN / FNBC:** todos os determinantes são chaves candidatas da relação. |
 | **Perfil** | `id_perfil`, `email` | `id_perfil → role, nome, email, bio, foto_url, created_at, id_escola`; `email → id_perfil, role, nome, bio, foto_url, created_at, id_escola` | **3FN / FNBC:** todos os determinantes são superchaves; `id_escola` depende funcionalmente da chave do perfil, sem transitividade. |
 | **Professor_Turma** | `(id_professor, id_turma)` | `{id_professor, id_turma} → created_at` | **3FN / FNBC:** `created_at` depende da chave composta inteira (2FN) e não há transitividade (3FN). |
@@ -381,50 +389,52 @@ O esquema lógico vigente mantém **todas as 18 tabelas na 3ª Forma Normal (3FN
 
 ## 5. MODELO FÍSICO: TABELAS, SEGURANÇA, FUNÇÕES, CARGA E VERIFICAÇÃO
 
-### 5.1 Esquema Base, RLS, Funções/Realtime e Migrações (`01`, `04`, `05`, `06`–`14`)
+### 5.1 Esquema Base, RLS, Funções/Realtime e Migrações (`01`, `04`, `05`, `06`–`16`)
 
 Os scripts canônicos do banco de dados residem em `docker/constructionsSQL/` e seguem uma arquitetura modular e idempotente para PostgreSQL/Supabase:
 
-- **`01_esquema.sql` (DDL das 18 tabelas, buckets e RN12):**
-  - **Chaves primárias e candidatas:** 15 tabelas usam chaves `SERIAL`; `Perfil` usa `id_perfil UUID` vinculado a `auth.users(id)` (`ON DELETE CASCADE`); as tabelas associativas `Professor_Turma` e `Aluno_Turma` usam PK composta `(id_professor, id_turma)` e `(id_aluno, id_turma)` (RN03). Restrições `UNIQUE` protegem `Turma.codigo_acesso`, `Perfil.email`, `Entrega_Atividade(id_atividade, id_aluno)` e `Alerta_Calendario(id_evento, minutos_antes, lembrete_para)` (RN05).
+- **`01_esquema.sql` (DDL consolidado das 18 tabelas, buckets, RN12, código público e constraints XSS):**
+  - **Chaves primárias e candidatas:** 15 tabelas usam chaves `SERIAL`; `Perfil` usa `id_perfil UUID` vinculado a `auth.users(id)` (`ON DELETE CASCADE`); as tabelas associativas `Professor_Turma` e `Aluno_Turma` usam PK composta `(id_professor, id_turma)` e `(id_aluno, id_turma)` (RN03). Restrições `UNIQUE` protegem `Escola.codigo_publico` (`uq_escola_codigo_publico`, gerado por `nexusclass_private.gerar_codigo_publico_escola()`), `Turma.codigo_acesso`, `Perfil.email`, `Entrega_Atividade(id_atividade, id_aluno)` e `Alerta_Calendario(id_evento, minutos_antes, lembrete_para)` (RN05).
   - **Ações referenciais:** todas as FKs em `public` adotam `ON UPDATE CASCADE`. Para exclusão: `ON DELETE RESTRICT` em `Turma.id_escola`, `Perfil.id_escola` e `Atividade.id_professor`; `ON DELETE SET NULL` em `Duvida.id_professor`, `Denuncia.id_master` e `Ticket_Suporte.id_master`; `ON DELETE CASCADE` nos vínculos de turma, anexos (`storage.objects`), entregas, postagens, comentários, alertas de calendário (RN06) e cadeia de exclusão de conta de aluno a partir de `auth.users(id)`.
-  - **Restrições `CHECK`:** ano letivo `2000..2100`, nota `0..100`, `tipo` de evento e obrigatoriedade condicional de `id_turma`, `role`, `ck_perfil_escola_por_role` (RN11), `situacao`, `minutos_antes IN (1, 5)`, `status` de denúncia/suporte e impedimento de automensagem/autodenúncia.
+  - **Colunas e restrições `CHECK` consolidadas:** incorpora `Escola.codigo_publico` + `ck_escola_codigo_publico_formato`, `Entrega_Atividade.atraso`, `ck_entrega_feedback_avaliacao`, ano letivo `2000..2100`, nota `0..100`, `tipo` de evento e obrigatoriedade condicional de `id_turma`, `role`, `ck_perfil_escola_por_role` (RN11), `situacao`, `minutos_antes IN (1, 5)`, `status` de denúncia/suporte, impedimento de automensagem/autodenúncia e todas as 10 constraints de proteção da migração `16` (`ck_perfil_foto_url_http`, `ck_turma_banner_url_http` e as 8 `ck_*_texto_sem_controle`).
   - **Buckets privados:** cria em `storage.buckets` os 4 buckets com `public = FALSE` (`anexos_atividades`, `entregas_atividades`, `duvidasalunostoprofessor`, `anexos_suporte`).
   - **Gatilhos de escola (RN12):** `trg_aluno_turma_escola` e `trg_professor_turma_escola` (`SECURITY DEFINER`, `SET search_path = ''`) impedem vínculos entre perfis e turmas de escolas distintas.
 - **`04_supabase_auth_rls.sql` (Segurança por Linha — RLS):**
   - Habilita `ROW LEVEL SECURITY` em todas as **18 tabelas** do schema `public`.
   - Define **89 políticas RLS** no total: **57 políticas** sobre `public.*` (isolamento por papel, matrícula ativa, vínculo docente, escola e escopo global `master`) e **32 políticas** sobre `storage.objects` cobrindo leitura, upload, atualização e exclusão nos 4 buckets privados.
 - **`05_supabase_funcoes_realtime.sql` (Cadastro, Realtime, Storage aditivo, `pg_cron` e View segura):**
-  - `public.handle_new_user()` + trigger `on_auth_user_created` em `auth.users`: cria `Perfil` automaticamente com `role` sempre fixado em `'aluno'` e `id_escola` extraído e validado numericamente dos metadados (falhando em `ck_perfil_escola_por_role` se ausente/inválido).
+  - `public.handle_new_user()` + trigger `on_auth_user_created` em `auth.users`: cria `Perfil` automaticamente com `role` sempre fixado em `'aluno'` e vínculo de escola validado nos metadados (atualizado pela migração `15` para exigir `codigo_escola` no formato `ESC-XXXXXXXX`).
   - `REPLICA IDENTITY FULL` em `Entrega_Atividade` e registro das 5 tabelas do `NotificacaoSubject` (`mural_post`, `atividade`, `entrega_atividade`, `mensagem`, `alerta_calendario`) na publicação `supabase_realtime`.
   - Política aditiva em `storage.objects` permitindo ao professor da turma remover entregas no bucket `entregas_atividades` ao excluir uma atividade própria.
   - Extensão `pg_cron` + função `public.fn_processar_alertas_calendario()` (exclusiva de `service_role`/cron) agendada em `* * * * *` (`processar_alertas_calendario`) para limpar alertas expirados e gerar lembretes de 5 e 1 minuto.
   - View `public.v_storage_objetos WITH (security_invoker = true)` (acesso concedido apenas a `authenticated`) para resolver `id_objeto_storage → (bucket_id, name)` respeitando integralmente o RLS de `storage.objects`.
 
-#### Catálogo das Migrações Incrementais (`06`–`14`)
+#### Catálogo das Migrações Incrementais (`06`–`16`)
 
 | Migração | Objetos Criados / Alterados | Regra / Problema Endereçado |
 | :--- | :--- | :--- |
 | `06_corrige_rls_reenvio_entrega.sql` | Schema `nexusclass_private`, função `reenvio_preserva_avaliacao(...)` (`SECURITY DEFINER`) e `ALTER POLICY` de reenvio em `entrega_atividade`. | Garante que o reenvio do aluno preserve `nota` e `feedback` sem recursão de RLS. |
 | `07_protege_entrega_avaliada.sql` | 4 políticas `AS RESTRICTIVE`: `entrega_avaliada_bloqueia_aluno_update`, `entrega_avaliada_bloqueia_aluno_delete`, `entrega_avaliada_protege_arquivo_update`, `entrega_avaliada_protege_arquivo_delete`. | **RN08:** bloqueia alteração/exclusão do registro e do arquivo pelo aluno assim que `nota IS NOT NULL`. |
-| `08_registra_atraso_entrega.sql` | Coluna `entrega_atividade.atraso BOOLEAN` + gatilho `BEFORE INSERT OR UPDATE` `registrar_atraso_entrega`. | **RN07:** grava `entregue_em := statement_timestamp()` e `atraso := entregue_em > prazo` sem interferir em `feedback`. |
-| `09_valida_feedback_avaliacao.sql` | Constraint `ck_entrega_feedback_avaliacao` (`NOT VALID`) em `entrega_atividade`. | **RN01:** exige `feedback` preenchido (`>= 20` caracteres se `nota < 60`, `>= 1` se `nota >= 60`) preservando dados legados. |
+| `08_registra_atraso_entrega.sql` | Coluna `entrega_atividade.atraso BOOLEAN` (consolidada em `01`) + gatilho `BEFORE INSERT OR UPDATE` `registrar_atraso_entrega`. | **RN07:** grava `entregue_em := statement_timestamp()` e `atraso := entregue_em > prazo` sem interferir em `feedback`. |
+| `09_valida_feedback_avaliacao.sql` | Constraint `ck_entrega_feedback_avaliacao` (`NOT VALID`) em `entrega_atividade`, tornada **idempotente** com `DROP CONSTRAINT IF EXISTS` (consolidada em `01`). | **RN01:** exige `feedback` preenchido (`>= 20` caracteres se `nota < 60`, `>= 1` se `nota >= 60`) preservando dados legados e permitindo reexecução segura. |
 | `10_limita_edicao_docente_entrega.sql` | Gatilho `BEFORE UPDATE` `limitar_edicao_docente_entrega` (`SECURITY INVOKER`, `SQLSTATE 42501`). | **RN08:** impede que professores alterem colunas fora de `nota` e `feedback` (executa alfabeticamente antes de `registrar_atraso_entrega`). |
 | `11_alinha_fuso_alertas_calendario.sql` | `ALTER FUNCTION public.fn_processar_alertas_calendario() SET TimeZone TO 'America/Sao_Paulo'`. | **RN02:** corrige divergência UTC vs. horário civil de São Paulo no disparo de alertas pelo `pg_cron`. |
 | `12_invalida_alertas_ao_reagendar.sql` | Gatilho `AFTER UPDATE OF data, horario` `invalidar_alertas_ao_reagendar` (`SECURITY DEFINER`). | **RN02:** remove alertas antigos na mesma transação quando data ou horário do evento muda, permitindo novo disparo pelo cron. |
 | `13_bloqueia_evento_em_data_passada.sql` | Gatilhos `BEFORE INSERT` (`validar_data_evento_insercao`) e `BEFORE UPDATE OF data, horario` (`validar_data_evento_reagendamento`, `SQLSTATE 23514`). | **RN04:** recusa criação ou reagendamento de evento com data anterior a hoje em `America/Sao_Paulo`, preservando eventos históricos. |
 | `14_rpc_storage_exclusao_conta.sql` | RPC `public.listar_objetos_storage_perfil(UUID)` (`STABLE`, `SECURITY DEFINER`, restrita exclusivamente a `service_role`). | **RN09:** lista todos os arquivos do aluno (entregas, dúvidas, suporte e órfãos por `owner`/`owner_id`) para a Edge Function `deletar-conta` sem expor o schema `storage` no PostgREST (`PGRST106`). |
+| `15_codigo_publico_escola.sql` | Função `nexusclass_private.gerar_codigo_publico_escola()`, coluna `escola.codigo_publico VARCHAR(16)` (consolidada em `01`), backfill, `uq_escola_codigo_publico`, `ck_escola_codigo_publico_formato`, atualização de `handle_new_user()`, privilégios de coluna e RPC `public.obter_codigo_publico_minha_escola()`. | **ADR-010 / Segurança no Cadastro:** elimina enumeração sequencial de `id_escola`, exige `codigo_escola` (`ESC-XXXXXXXX`) no cadastro e restringe a leitura do código à própria escola do usuário autenticado. |
+| `16_protecao_urls_e_entradas.sql` | Constraints `ck_perfil_foto_url_http`, `ck_turma_banner_url_http` e 8 constraints `ck_*_texto_sem_controle` (`NOT VALID`, idempotentes com `DROP CONSTRAINT IF EXISTS` e consolidadas em `01`). | **Hardening XSS (V-02 / V-04):** exige protocolo `http://` ou `https://` em URLs de foto/banner e bloqueia bytes nulos e caracteres de controle ASCII invisíveis em 8 tabelas (preservando `<`, `>`, `&` e `"` legítimos conforme OWASP). |
 
 #### Sequência Oficial de Instalação Limpa
 
 ```text
 Ambiente com massa de testes e verificação:
   01_esquema.sql -> 04_supabase_auth_rls.sql -> 02_carga.sql -> 05_supabase_funcoes_realtime.sql
-  -> 06 -> 07 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13 -> 14 -> 03_verificacao.sql
+  -> 06 -> 07 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 03_verificacao.sql
 
 Ambiente de produção limpa (sem carga sintética):
   01_esquema.sql -> 04_supabase_auth_rls.sql -> 05_supabase_funcoes_realtime.sql
-  -> 06 -> 07 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13 -> 14
+  -> 06 -> 07 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16
 ```
 
 ### 5.2 Carga de Dados (`02_carga.sql`)
@@ -444,7 +454,7 @@ O script `docker/constructionsSQL/02_carga.sql` popula todas as **18 tabelas** d
 
 ### 5.3 Verificação das Restrições de Integridade (`03_verificacao.sql`)
 
-O script `docker/constructionsSQL/03_verificacao.sql` foi expandido dos 11 testes originais da E4 para **16 testes automatizados** (`INSERT`, `UPDATE` e `DELETE`) totalmente compatíveis com o esquema vigente (`01` + `04` + `02` + `05` + `06`–`14`):
+O script `docker/constructionsSQL/03_verificacao.sql` foi expandido dos 11 testes originais da E4 para **16 testes automatizados** (`INSERT`, `UPDATE` e `DELETE`) totalmente compatíveis com o esquema vigente (`01` + `04` + `02` + `05` + `06`–`16`):
 
 - **Transação 100% reversível:** toda a suíte executa dentro de `BEGIN;` ... `ROLLBACK;`, revertendo integralmente qualquer escrita temporária e produzindo **0 efeitos colaterais** na base.
 - **Asserções estritas com diagnóstico:** nos testes negativos, o bloco `EXCEPTION` valida o `SQLSTATE` esperado e inspeciona `CONSTRAINT_NAME` / `COLUMN_NAME` (via `GET STACKED DIAGNOSTICS`) ou a mensagem do gatilho, emitindo `RAISE NOTICE`. Caso uma operação inválida seja aceita indevidamente, o script dispara `RAISE EXCEPTION` explícita.
@@ -486,18 +496,19 @@ O script `docker/constructionsSQL/03_verificacao.sql` foi expandido dos 11 teste
 | **Validação de Avaliação Docente (RN01 e RN08)** | Regras previstas apenas como gatilhos futuros. | `ck_entrega_feedback_avaliacao` (migração `09`), `reenvio_preserva_avaliacao` (migração `06`), 4 políticas RLS `RESTRICTIVE` (migração `07`) e gatilho `limitar_edicao_docente_entrega` (migração `10`). | Impedir alteração de entrega/arquivo pelo aluno após nota e restringir professores estritamente a `nota` e `feedback`. |
 | **Calendário, Fuso, Reagendamento e Datas Passadas (RN02/RN04/RN05)** | Gatilho imediato para eventos de turma; RN04 somente na aplicação; `UNIQUE (id_evento, minutos_antes)`. | `pg_cron` (`fn_processar_alertas_calendario`) + Realtime (`05`), fuso `America/Sao_Paulo` (migração `11`), invalidação ao reagendar (migração `12`), bloqueio de data passada no banco (migração `13`) e `uq_alerta_evento_tempo_dest` sobre `(id_evento, minutos_antes, lembrete_para)`. | Eliminar disparos fora de fuso (UTC vs. São Paulo), evitar alertas órfãos após reagendamento e impedir inserção de datas passadas diretamente via API. |
 | **Exclusão de Conta e Limpeza de Storage (RN09)** | Apenas exclusão de anexos de dúvida prevista na aplicação. | Edge Function oficial `deletar-conta` (substituindo slug divergente legado) + RPC somente-leitura `listar_objetos_storage_perfil` (`service_role`, migração `14`) + ajuste no modal `BoxAlertaDeletaConta`. | Eliminar erro `404` de slug e falha silenciosa `PGRST106` no Storage, garantindo exclusão ACID em `auth.users` seguida de limpeza em lotes com `0` registros remanescentes (validado ponta a ponta em 2026-11-21). |
+| **Código Público da Escola (ADR-010 / Migração `15`)** | Cadastro expunha `id_escola` sequencial (`1, 2, 3`). | Coluna `Escola.codigo_publico VARCHAR(16)` (`ESC-XXXXXXXX`, gerado por `nexusclass_private.gerar_codigo_publico_escola()`), `handle_new_user()` exigindo `codigo_escola`, privilégio de coluna ocultando `codigo_publico` de `anon`/`authenticated` e RPC `obter_codigo_publico_minha_escola()`. | Impedir enumeração sequencial de escolas e restringir a visualização do código exclusivamente às informações pessoais do próprio usuário (validado 10/10 ao vivo em 2026-11-21). |
+| **Hardening XSS e Consolidação do DDL (Migração `16` + `01`/`09`)** | `foto_url`/`banner_url` sem validação de protocolo; textos sem bloqueio de controles invisíveis; `01_esquema.sql` sem colunas/constraints das migrações posteriores; `09` não idempotente. | Migração `16_protecao_urls_e_entradas.sql` (`ck_perfil_foto_url_http`, `ck_turma_banner_url_http` e 8 `ck_*_texto_sem_controle` testadas ao vivo sob `ROLLBACK`), `01_esquema.sql` consolidado e `09_valida_feedback_avaliacao.sql` idempotente (`DROP CONSTRAINT IF EXISTS`). | Defesa em profundidade contra XSS/protocolos perigosos (`javascript:`, `data:text/html`) e bytes de controle invisíveis (preservando `<`, `>`, `&` legítimos conforme OWASP) e garantia de instalação limpa consistente. |
 | **Carga de Dados e Verificação (`02` e `03`)** | IDs inteiros e 11 testes em `03_verificacao.sql`. | UUIDs determinísticos (`00000000-0000-0000-0000-<12 dígitos>`), `auth.users` e `storage.objects` preservando 10.013 usuários e 200.006 entregas; `03_verificacao.sql` atualizado com 16 testes e datas relativas. | Manter reprodutibilidade integral das consultas E3/E4 e dos experimentos de desempenho sobre o esquema Supabase vigente. |
 
 ### 6.2 Pendências Explícitas em Aberto
 
 As pendências abaixo permanecem explicitamente registradas para decisão ou execução na etapa final, sem comprometer a integridade do que já foi validado:
 
-1. **Ordem 3 — Itens ainda pendentes de decisão da dupla (Gabriel Lineker & Gianlucca Paiva):**
-   - **Código público alfanumérico da escola:** decidir se entra nesta entrega (mantendo `id_escola` inteiro como chave interna e adicionando código público único gerado automaticamente), com registro de ADR, migração, backfill das escolas existentes e reteste do cadastro.
+1. **Ordem 3 — Itens opcionais ainda pendentes de decisão da dupla (Gabriel Lineker & Gianlucca Paiva):**
    - **Banners reais das turmas:** disponibilização/definição das imagens finais para as turmas (o tratamento visual de fallback para banners e avatares indisponíveis já foi corrigido e validado via Playwright).
    - **Reenvio de confirmação de e-mail:** decidir se entra nesta entrega; exige um ambiente com confirmação de e-mail habilitada e caixa de teste acessível (o Supabase de teste atual abre sessão imediatamente após o cadastro).
 2. **Ordem 4 — Validação da instalação limpa isolada:**
-   - Executar do zero a sequência oficial (`01_esquema.sql` → `04_supabase_auth_rls.sql` → `02_carga.sql` → `05_supabase_funcoes_realtime.sql` → `06`..`14` → `03_verificacao.sql`) em uma instância isolada limpa. A execução ao vivo em 2026-11-21 no Supabase de teste atual aprovou **15/16 testes** (`1–12` e `14–16`), expondo no **Teste 13** que a instância anterior ao commit `bd0994c` não possui os gatilhos RN12 (`trg_aluno_turma_escola` / `trg_professor_turma_escola`) nem a atualização de `DCC002` para `id_escola = 1` — divergência que será eliminada na instalação limpa da Ordem 4 (alcançando **16/16**), acompanhada do provisionamento de contas e de um smoke test curto de login por papel e isolamento entre escolas.
+   - Executar do zero a sequência oficial (`01_esquema.sql` → `04_supabase_auth_rls.sql` → `02_carga.sql` → `05_supabase_funcoes_realtime.sql` → `06`..`16` → `03_verificacao.sql`) em uma instância isolada limpa. A execução ao vivo em 2026-11-21 no Supabase de teste atual aprovou **15/16 testes** (`1–12` e `14–16`), expondo no **Teste 13** que a instância anterior ao commit `bd0994c` não possui os gatilhos RN12 (`trg_aluno_turma_escola` / `trg_professor_turma_escola`) nem a atualização de `DCC002` para `id_escola = 1` — divergência que será eliminada na instalação limpa da Ordem 4 (alcançando **16/16**), acompanhada do provisionamento de contas e de um smoke test curto de login por papel e isolamento entre escolas.
    - Reexportar opcionalmente `grupo24/der.png` e um PDF consolidado a partir de [`grupo24/modelo.drawio`](modelo.drawio) e deste documento (`RELATORIO_ATUALIZADO.md`) caso a submissão final exija entrega em formato PDF/PNG atualizado.
 
 ---
@@ -507,4 +518,4 @@ As pendências abaixo permanecem explicitamente registradas para decisão ou exe
 | Seção do trabalho | Ferramenta | Para quê e o que foi revisado pela equipe |
 | :--- | :--- | :--- |
 | Relatório Geral / Formatação / Revisões (Etapas E1–E4) | Google Gemini | Utilizado para o aprimoramento e organização da formatação textual do relatório original (`relatorio.pdf`). A equipe revisou todo o conteúdo, coerência e adequação das seções. |
-| Reconciliação do DER (`modelo.drawio`) e Relatório Atualizado (`RELATORIO_ATUALIZADO.md`) — 2026-11-21 | Antigravity / Google Gemini | Utilizado na conferência cruzada entre `relatorio.pdf`, `01_esquema.sql`, `02_carga.sql`, `03_verificacao.sql`, `04_supabase_auth_rls.sql`, `05_supabase_funcoes_realtime.sql`, migrações `06`–`14` e relatórios de validação das Ordens 1–3, atualizando o XML de `modelo.drawio` e consolidando este relatório sem exposição de identificadores sensíveis. Conteúdo verificado e assinado por Gianlucca Paiva (`GianluccaPaiva`) para revisão conjunta com Gabriel Lineker (`GabrielLineker`). |
+| Reconciliação do DER (`modelo.drawio`) e Relatório Atualizado (`RELATORIO_ATUALIZADO.md`) — 2026-11-21 | Antigravity / Google Gemini | Utilizado na conferência cruzada entre `relatorio.pdf`, `01_esquema.sql` (consolidado), `02_carga.sql`, `03_verificacao.sql`, `04_supabase_auth_rls.sql`, `05_supabase_funcoes_realtime.sql`, migrações `06`–`16` e relatórios de validação das Ordens 1–3 e hardening XSS, atualizando o XML de `modelo.drawio` e consolidando este relatório sem exposição de identificadores sensíveis. Conteúdo verificado e assinado por Gianlucca Paiva (`GianluccaPaiva`) para revisão conjunta com Gabriel Lineker (`GabrielLineker`). |

@@ -18,23 +18,27 @@ async function dados(operacao, etapa) {
   return data;
 }
 
-async function validarCadastro(escola) {
+async function validarCadastro(escola, codigoPublico) {
   const chave = randomUUID();
   const nome = `Teste cadastro ${chave}`;
   const senha = `Nx!7${randomBytes(24).toString('base64url')}`;
   const emailValido = `nexusclass-${chave}@example.com`;
   const emailInvalido = `nexusclass-invalido-${chave}@example.com`;
-  const inexistente = 2147483647;
+  const emailNumerico = `nexusclass-numerico-${chave}@example.com`;
+  const codigoInexistente = 'ESC-ZZZZ9999';
   const perfil = (email) => leitor.from('perfil').select('id_perfil,role,nome,id_escola').eq('email', email);
   assert.deepEqual(await dados(leitor.from('escola').select('id_escola')
-    .eq('id_escola', inexistente), 'Controle de escola inexistente'), []);
+    .eq('codigo_publico', codigoInexistente), 'Controle de código de escola inexistente'), []);
 
   const publico = clientePublico();
   sessoes.push(publico);
-  const cadastro = (email, id_escola) => publico.auth.signUp({
-    email, password: senha, options: { data: { nome, id_escola } },
+  const cadastro = (email, metadata) => publico.auth.signUp({
+    email, password: senha, options: { data: { nome, ...metadata } },
   });
-  const { user, session } = await dados(cadastro(emailValido, escola), 'Cadastro público válido');
+  const { user, session } = await dados(
+    cadastro(emailValido, { codigo_escola: codigoPublico }),
+    'Cadastro público válido por código público',
+  );
   assert.ok(user?.id, 'O Auth deve retornar o usuário');
   const [linha] = await dados(perfil(emailValido), 'Perfil criado');
   assert.deepEqual(linha, { id_perfil: user.id, role: 'aluno', nome, id_escola: escola });
@@ -44,12 +48,17 @@ async function validarCadastro(escola) {
     const { error } = await publico.auth.signInWithPassword({ email: emailValido, password: senha });
     assert.equal(error?.code, 'email_not_confirmed');
   }
-  console.log(`Cadastro válido PASSOU (papel aluno, escola ${escola}, ${session ? 'sessão imediata' : 'confirmação exigida'}).`);
+  console.log(`Cadastro válido PASSOU (papel aluno, escola ${escola} via código público, ${session ? 'sessão imediata' : 'confirmação exigida'}).`);
 
-  const { error } = await cadastro(emailInvalido, inexistente);
-  assert.equal(error?.code, 'unexpected_failure', 'A escola inexistente deve ser recusada na criação do perfil');
+  const { error } = await cadastro(emailInvalido, { codigo_escola: codigoInexistente });
+  assert.equal(error?.code, 'unexpected_failure', 'Código público inexistente deve ser recusado na criação do perfil');
   assert.deepEqual(await dados(perfil(emailInvalido), 'Ausência do perfil inválido'), []);
-  console.log('Cadastro inválido PASSOU (escola inexistente recusada, sem perfil).');
+  console.log('Cadastro inválido PASSOU (código público inexistente recusado, sem perfil).');
+
+  const { error: erroNumerico } = await cadastro(emailNumerico, { id_escola: escola });
+  assert.equal(erroNumerico?.code, 'unexpected_failure', 'id_escola numérico puro deve ser recusado sem codigo_escola');
+  assert.deepEqual(await dados(perfil(emailNumerico), 'Ausência de perfil numérico'), []);
+  console.log('Rejeição de id_escola numérico PASSOU.');
 }
 
 async function validarMatricula(local, externa) {
@@ -98,8 +107,13 @@ try {
   const local = turmas.find(({ codigo_acesso }) => codigo_acesso === 'DCC001');
   const externa = turmas.find(({ codigo_acesso }) => codigo_acesso === 'MAT101');
   assert.ok(local && externa, 'Turmas de teste ausentes');
+  const escolaLocal = await dados(
+    leitor.from('escola').select('id_escola,codigo_publico').eq('id_escola', local.id_escola).single(),
+    'Leitura do código público da escola local',
+  );
+  assert.ok(escolaLocal?.codigo_publico, 'Escola local sem codigo_publico (migração 15)');
   const resultados = await Promise.allSettled([
-    validarCadastro(local.id_escola), validarMatricula(local, externa),
+    validarCadastro(local.id_escola, escolaLocal.codigo_publico), validarMatricula(local, externa),
   ]);
   for (const resultado of resultados) {
     if (resultado.status === 'rejected') {

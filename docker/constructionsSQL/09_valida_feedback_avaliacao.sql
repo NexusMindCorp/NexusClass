@@ -2,6 +2,8 @@
 BEGIN;
 
 ALTER TABLE public.entrega_atividade
+    DROP CONSTRAINT IF EXISTS ck_entrega_feedback_avaliacao;
+ALTER TABLE public.entrega_atividade
     ADD CONSTRAINT ck_entrega_feedback_avaliacao
     CHECK (
         nota IS NULL

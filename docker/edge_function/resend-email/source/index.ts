@@ -3,17 +3,47 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const DESTINATARIO_EMAIL = Deno.env.get("DESTINATARIO_EMAIL");
 
+const MAPA_HTML: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#x27;",
+};
+
+function escaparHtml(valor: unknown): string {
+  return String(valor ?? "").replace(/[&<>"']/g, (char) => MAPA_HTML[char]);
+}
+
+function sanitizarAssuntoEmail(valor: unknown): string {
+  return String(valor ?? "")
+    .replace(/[\r\n\u0000-\u001F\u007F]+/g, " ")
+    .trim()
+    .slice(0, 150);
+}
+
 export default {
   async fetch(req: Request) {
     try {
-      // 1. Pega os dados que o Webhook do banco enviou
-      const payload = await req.json();
-      console.log("Payload recebido do banco:", payload);
+      const payload = (await req.json()) as {
+        record?: {
+          aluno_denunciado?: unknown;
+          id_denunciado?: unknown;
+          motivo?: unknown;
+          descricao?: unknown;
+        };
+      };
 
-      // O Webhook do banco manda a nova linha dentro da propriedade "record"
-      const { aluno_denunciado, motivo, descricao } = payload.record;
+      const registro = payload.record ?? {};
+      const denunciadoSeguro = escaparHtml(
+        registro.aluno_denunciado ?? registro.id_denunciado ?? "Não informado",
+      );
+      const motivoAssunto = sanitizarAssuntoEmail(registro.motivo ?? "Denúncia");
+      const motivoHtml = escaparHtml(registro.motivo ?? "Não informado");
+      const descricaoHtml = escaparHtml(
+        registro.descricao || "Sem detalhes fornecidos.",
+      ).replace(/\r?\n/g, "<br/>");
 
-      // 2. Chama a API do Resend
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -21,27 +51,28 @@ export default {
           Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: "NexusClass Alertas <onboarding@resend.dev>", // E-mail padrão do Resend
+          from: "NexusClass Alertas <onboarding@resend.dev>",
           to: DESTINATARIO_EMAIL,
-          subject: `⚠️ Nova Denúncia: ${motivo}`,
+          subject: `⚠️ Nova Denúncia: ${motivoAssunto}`,
           html: `
             <h2>Nova denúncia registrada no sistema</h2>
-            <p><strong>Aluno Denunciado:</strong> ${aluno_denunciado}</p>
-            <p><strong>Motivo:</strong> ${motivo}</p>
-            <p><strong>Descrição:</strong><br/> ${descricao || 'Sem detalhes fornecidos.'}</p>
+            <p><strong>Usuário Denunciado:</strong> ${denunciadoSeguro}</p>
+            <p><strong>Motivo:</strong> ${motivoHtml}</p>
+            <p><strong>Descrição:</strong><br/>${descricaoHtml}</p>
           `,
         }),
       });
 
       const data = await res.json();
-      console.log("Resposta do Resend:", data);
-
       return new Response(JSON.stringify(data), {
         headers: { "Content-Type": "application/json" },
       });
-    } catch (error: any) {
-      console.error("Erro na Edge Function:", error);
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    } catch (error: unknown) {
+      console.error("Erro na Edge Function resend-email:", error);
+      return new Response(
+        JSON.stringify({ error: "Erro interno ao enviar notificação" }),
+        { status: 500, headers: { "Content-Type": "application/json" } },
+      );
     }
-  }
+  },
 };

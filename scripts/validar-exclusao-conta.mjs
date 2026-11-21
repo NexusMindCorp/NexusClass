@@ -4,9 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.VITE_SUPABASE_URL;
 const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
+const codigoEscolaArg = process.argv[2]?.trim().toUpperCase() ?? process.env.NEXUS_TEST_CODIGO_ESCOLA_1?.trim().toUpperCase();
 
 assert.ok(url, 'VITE_SUPABASE_URL ausente no ambiente');
 assert.ok(anonKey, 'VITE_SUPABASE_ANON_KEY ausente no ambiente');
+assert.ok(codigoEscolaArg, 'Informe o código público da escola 1 via argumento ou NEXUS_TEST_CODIGO_ESCOLA_1');
 
 const clientOptions = { auth: { persistSession: false, autoRefreshToken: false } };
 const supabase = createClient(url, anonKey, clientOptions);
@@ -62,12 +64,12 @@ async function executar() {
     'Leitura da turma DCC001',
   );
 
-  // 2. Cadastro público do aluno descartável na mesma escola
+  // 2. Cadastro público do aluno descartável usando código público da escola
   const signUpData = await dados(
     supabase.auth.signUp({
       email,
       password: senha,
-      options: { data: { nome, id_escola: turma.id_escola } },
+      options: { data: { nome, codigo_escola: codigoEscolaArg } },
     }),
     'Cadastro público da conta descartável',
   );

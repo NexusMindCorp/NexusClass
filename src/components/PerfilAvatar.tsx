@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { getCorMateria, getCorNomeUsuario } from "@/lib/utils";
+import { obterUrlHttpSegura } from "@/patterns/strategy/SanitizacaoStrategy";
 type PerfilAvatarProps = {
   classNameAvatar?: string;
   classNameDiv?: string;
@@ -15,6 +16,9 @@ export function PerfilAvatar({
   palavra,
 }: PerfilAvatarProps) {
   const nome = palavra?.trim() || "U";
+  const fotoSegura = obterUrlHttpSegura(foto, {
+    permitirCaminhoRelativo: true,
+  });
   const tipoPalavra =
     tipo === "usuario"
       ? getCorNomeUsuario(nome)
@@ -24,9 +28,9 @@ export function PerfilAvatar({
     : {};
   return (
     <Avatar {...classNameAvatarFinal}>
-      {foto?.trim() && (
+      {fotoSegura && (
         <AvatarImage
-          src={foto}
+          src={fotoSegura}
           alt="Foto do Usuário"
           className="object-cover"
         />

@@ -50,6 +50,16 @@ async function aplicar(referencia) {
     throw new Error('A matriz requer DCC000 e MAT101 em escolas distintas.');
   }
 
+  const escolas = await conferir(
+    banco.from('escola').select('id_escola,codigo_publico')
+      .in('id_escola', [porCodigo.get('DCC000').id_escola, porCodigo.get('MAT101').id_escola]),
+    'Leitura dos códigos públicos das escolas',
+  );
+  const codigoPorEscola = new Map(escolas.map((e) => [e.id_escola, e.codigo_publico]));
+  if (codigoPorEscola.size !== 2 || [...codigoPorEscola.values()].some((c) => !c)) {
+    throw new Error('As escolas das turmas de teste precisam possuir codigo_publico preenchido (migração 15).');
+  }
+
   const existentes = new Map();
   for (const conta of configuradas) {
     const perfil = await conferir(
@@ -73,7 +83,10 @@ async function aplicar(referencia) {
         email: conta.email,
         password: conta.senha,
         email_confirm: true,
-        user_metadata: { nome: `Teste ${conta.chave}`, id_escola: turma.id_escola },
+        user_metadata: {
+          nome: `Teste ${conta.chave}`,
+          codigo_escola: codigoPorEscola.get(turma.id_escola),
+        },
         app_metadata: { nexusclass_fixture: conta.chave },
       }), `Cadastro Auth ${conta.chave}`);
       perfil = await conferir(

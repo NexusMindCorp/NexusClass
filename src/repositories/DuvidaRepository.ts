@@ -4,6 +4,10 @@ import {
   AnexoStorageFacade,
   CONFIG_ANEXO_DUVIDA,
 } from "@/patterns/facade/AnexoStorageFacade";
+import {
+  sanitizarTextoLinhaUnica,
+  sanitizarTextoMultilinha,
+} from "@/patterns/strategy/SanitizacaoStrategy";
 import { resolverClienteSupabase, type ClienteSupabaseTipado } from "./base";
 
 export interface NovaDuvidaParams {
@@ -102,8 +106,8 @@ export class DuvidaRepository implements IDuvidaRepository {
         id_aluno: dados.idAluno,
         id_professor: profRel.id_professor,
         id_turma: turmaNum,
-        assunto: dados.assunto.trim(),
-        descricao: dados.descricao.trim(),
+        assunto: sanitizarTextoLinhaUnica(dados.assunto, 150),
+        descricao: sanitizarTextoMultilinha(dados.descricao),
         resolveu: false,
       })
       .select(
@@ -140,7 +144,7 @@ export class DuvidaRepository implements IDuvidaRepository {
     const { error } = await client
       .from("duvida")
       .update({
-        resposta,
+        resposta: sanitizarTextoMultilinha(resposta),
         resolveu: true,
       })
       .eq("id_duvida", duvidaNum);

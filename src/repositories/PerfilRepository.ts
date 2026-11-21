@@ -1,5 +1,9 @@
 import type { PerfilUsuario } from "@/hooks/AuthHooks/type";
 import { mapPerfil } from "@/lib/db/mappers";
+import {
+  exigirUrlHttpSeguraOuNula,
+  sanitizarTextoMultilinha,
+} from "@/patterns/strategy/SanitizacaoStrategy";
 import { resolverClienteSupabase, type ClienteSupabaseTipado } from "./base";
 
 export interface AtualizacaoPerfilParams {
@@ -10,6 +14,7 @@ export interface AtualizacaoPerfilParams {
 export interface IPerfilRepository {
   buscarPorId(idPerfil: string): Promise<PerfilUsuario | null>;
   buscarPorNome(nome: string): Promise<PerfilUsuario | null>;
+  obterCodigoPublicoMinhaEscola(): Promise<string | null>;
   atualizarDados(
     idPerfil: string,
     dados: AtualizacaoPerfilParams,
@@ -47,17 +52,32 @@ export class PerfilRepository implements IPerfilRepository {
     return data ? mapPerfil(data) : null;
   }
 
+  async obterCodigoPublicoMinhaEscola(): Promise<string | null> {
+    const client = resolverClienteSupabase(this.client);
+    const { data, error } = await client.rpc("obter_codigo_publico_minha_escola");
+
+    if (error) throw error;
+    return typeof data === "string" && data.trim().length > 0 ? data : null;
+  }
+
   async atualizarDados(
     idPerfil: string,
     dados: AtualizacaoPerfilParams,
   ): Promise<PerfilUsuario> {
     const client = resolverClienteSupabase(this.client);
+    const fotoSegura = exigirUrlHttpSeguraOuNula(
+      dados.foto_url,
+      "A URL da foto de perfil deve começar com https:// ou http://.",
+    );
+    const bioSegura =
+      dados.bio !== null ? sanitizarTextoMultilinha(dados.bio) : null;
+
     // Atualiza somente campos mutáveis pelo usuário (nunca envia role ou id_escola)
     const { data, error } = await client
       .from("perfil")
       .update({
-        foto_url: dados.foto_url || null,
-        bio: dados.bio,
+        foto_url: fotoSegura,
+        bio: bioSegura || null,
       })
       .eq("id_perfil", idPerfil)
       .select("*")

@@ -7,6 +7,10 @@ import {
   resolverCaminhosStorage,
 } from "@/patterns/facade/AnexoStorageFacade";
 import { BUCKET_ENTREGAS } from "@/patterns/facade/EntregaAtividadeFacade";
+import {
+  sanitizarTextoLinhaUnica,
+  sanitizarTextoMultilinha,
+} from "@/patterns/strategy/SanitizacaoStrategy";
 import { resolverClienteSupabase, type ClienteSupabaseTipado } from "./base";
 
 type AtividadeComProfessorRow = TabelaRow<"atividade"> & {
@@ -131,8 +135,8 @@ export class AtividadeRepository implements IAtividadeRepository {
       .insert({
         id_turma: turmaNum,
         id_professor: dados.idProfessor,
-        titulo: dados.titulo.trim(),
-        descricao: dados.descricao.trim(),
+        titulo: sanitizarTextoLinhaUnica(dados.titulo, 150),
+        descricao: sanitizarTextoMultilinha(dados.descricao),
         data_entrega: new Date(dados.dataEntrega).toISOString(),
       })
       .select(
@@ -187,8 +191,8 @@ export class AtividadeRepository implements IAtividadeRepository {
     const { data, error } = await client
       .from("atividade")
       .update({
-        titulo: dados.titulo.trim(),
-        descricao: dados.descricao.trim(),
+        titulo: sanitizarTextoLinhaUnica(dados.titulo, 150),
+        descricao: sanitizarTextoMultilinha(dados.descricao),
         data_entrega: new Date(dados.dataEntrega).toISOString(),
       })
       .eq("id_atividade", atividadeNum)

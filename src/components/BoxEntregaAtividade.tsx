@@ -1,5 +1,6 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { useEntregas } from "@/hooks/EntregasHooks/useEntregas";
+import { obterUrlHttpSegura } from "@/patterns/strategy/SanitizacaoStrategy";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -53,8 +54,9 @@ export function BoxEntregaAtividade({
   const handleDownload = async (caminho: string | null) => {
     if (!caminho) return;
     const url = await obterLinkArquivo(caminho);
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
+    const urlSegura = obterUrlHttpSegura(url);
+    if (urlSegura) {
+      window.open(urlSegura, "_blank", "noopener,noreferrer");
     }
   };
 

@@ -1,6 +1,9 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  Building2,
+  Check,
+  Copy,
   LogOutIcon,
   Moon,
   Edit,
@@ -62,6 +65,38 @@ export function Navbar({
   const [modalEditar, setModalEditar] = useState(false);
   const [fotoInput, setFotoInput] = useState(perfil?.foto_url || "");
   const [bioInput, setBioInput] = useState(perfil?.bio || "");
+  const [codigoEscola, setCodigoEscola] = useState<string | null>(null);
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
+
+  useEffect(() => {
+    if (!modalVisualizar || !perfil?.id_escola) return;
+    let ativo = true;
+
+    void perfilRepository
+      .obterCodigoPublicoMinhaEscola()
+      .then((codigo) => {
+        if (ativo) setCodigoEscola(codigo);
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar código público da escola:", err);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, [modalVisualizar, perfil?.id_escola]);
+
+  const handleCopiarCodigoEscola = async () => {
+    if (!codigoEscola) return;
+    try {
+      await navigator.clipboard.writeText(codigoEscola);
+      setCodigoCopiado(true);
+      toast.success("Código da escola copiado!");
+      setTimeout(() => setCodigoCopiado(false), 2000);
+    } catch {
+      toast.error("Não foi possível copiar o código da escola.");
+    }
+  };
 
   const abrirModalEditar = () => {
     setFotoInput(perfil?.foto_url || "");
@@ -248,6 +283,33 @@ export function Navbar({
                 </p>
                 <p className="text-xs text-muted-foreground">{perfil?.email}</p>
               </div>
+              {codigoEscola && (
+                <div className="w-full p-3 rounded-md bg-secondary/70 border border-border flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <Building2 className="h-4 w-4 text-primary shrink-0" />
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                        Código da Escola
+                      </p>
+                      <p className="text-sm font-mono font-semibold tracking-wider text-foreground">
+                        {codigoEscola}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopiarCodigoEscola()}
+                    className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    aria-label="Copiar código da escola"
+                  >
+                    {codigoCopiado ? (
+                      <Check className="h-4 w-4 text-emerald-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              )}
               <div className="w-full mt-2 p-4 rounded-md bg-secondary border border-primary/50">
                 <h4 className="text-sm font-medium mb-1">Bio:</h4>
                 <p className="text-sm text-muted-foreground italic">

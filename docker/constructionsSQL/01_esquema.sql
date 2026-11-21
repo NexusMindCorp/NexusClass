@@ -39,6 +39,55 @@ DROP TABLE IF EXISTS Turma CASCADE;
 DROP TABLE IF EXISTS Escola CASCADE;
 
 -- ----------------------------------------------------------------------------
+-- 0. Schema privado e gerador de código público único da Escola (ADR-010 / M15)
+-- ----------------------------------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS nexusclass_private;
+REVOKE ALL ON SCHEMA nexusclass_private FROM PUBLIC;
+
+CREATE OR REPLACE FUNCTION nexusclass_private.gerar_codigo_publico_escola()
+RETURNS VARCHAR(16)
+LANGUAGE plpgsql
+VOLATILE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    v_alfabeto CONSTANT TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    v_hex TEXT;
+    v_codigo TEXT;
+    v_idx INTEGER;
+    v_byte INTEGER;
+    v_tentativa INTEGER := 0;
+BEGIN
+    LOOP
+        v_tentativa := v_tentativa + 1;
+        IF v_tentativa > 50 THEN
+            RAISE EXCEPTION 'Não foi possível gerar um código público único para a escola.';
+        END IF;
+
+        v_hex := replace(gen_random_uuid()::text, '-', '');
+        v_codigo := 'ESC-';
+
+        FOR v_idx IN 0..7 LOOP
+            v_byte := ('x' || substr(v_hex, (v_idx * 2) + 1, 2))::bit(8)::integer;
+            v_codigo := v_codigo || substr(v_alfabeto, (v_byte % length(v_alfabeto)) + 1, 1);
+        END LOOP;
+
+        EXIT WHEN NOT EXISTS (
+            SELECT 1
+            FROM public.escola AS e
+            WHERE e.codigo_publico = v_codigo
+        );
+    END LOOP;
+
+    RETURN v_codigo::VARCHAR(16);
+END;
+$$;
+
+REVOKE ALL ON FUNCTION nexusclass_private.gerar_codigo_publico_escola()
+    FROM PUBLIC, anon, authenticated;
+
+-- ----------------------------------------------------------------------------
 -- 1. Tabela: Escola
 -- ----------------------------------------------------------------------------
 CREATE TABLE
@@ -46,15 +95,45 @@ CREATE TABLE
         id_escola SERIAL,
         nome VARCHAR(150) NOT NULL,
         ano_letivo INTEGER NOT NULL,
+        codigo_publico VARCHAR(16) NOT NULL DEFAULT nexusclass_private.gerar_codigo_publico_escola(),
         created_at TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT pk_escola PRIMARY KEY (id_escola),
+            CONSTRAINT uq_escola_codigo_publico UNIQUE (codigo_publico),
+            CONSTRAINT ck_escola_codigo_publico_formato CHECK (
+                codigo_publico ~ '^[A-Z0-9-]{4,16}$'
+            ),
             CONSTRAINT ck_escola_ano_letivo CHECK (
                 ano_letivo >= 2000
                 AND ano_letivo <= 2100
             )
     );
+
+CREATE OR REPLACE FUNCTION nexusclass_private.normalizar_codigo_publico_escola()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    IF NEW.codigo_publico IS NULL OR BTRIM(NEW.codigo_publico) = '' THEN
+        NEW.codigo_publico := nexusclass_private.gerar_codigo_publico_escola();
+    ELSE
+        NEW.codigo_publico := UPPER(BTRIM(NEW.codigo_publico));
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION nexusclass_private.normalizar_codigo_publico_escola()
+    FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS normalizar_codigo_publico_escola ON Escola;
+CREATE TRIGGER normalizar_codigo_publico_escola
+    BEFORE INSERT OR UPDATE OF codigo_publico ON Escola
+    FOR EACH ROW EXECUTE FUNCTION nexusclass_private.normalizar_codigo_publico_escola();
 
 -- ----------------------------------------------------------------------------
 -- 2. Tabela: Turma
@@ -70,6 +149,10 @@ CREATE TABLE
         id_escola INTEGER NOT NULL,
         CONSTRAINT pk_turma PRIMARY KEY (id_turma),
         CONSTRAINT uq_turma_codigo_acesso UNIQUE (codigo_acesso),
+        CONSTRAINT ck_turma_banner_url_http CHECK (
+            banner_url IS NULL
+            OR banner_url ~ '^https?://[^\s<>"'']+$'
+        ),
         CONSTRAINT fk_turma_escola FOREIGN KEY (id_escola) REFERENCES Escola (id_escola) ON UPDATE CASCADE ON DELETE RESTRICT
     );
 
@@ -97,6 +180,14 @@ CREATE TABLE
             CONSTRAINT ck_perfil_escola_por_role CHECK (
                 (role = 'master' AND id_escola IS NULL)
                 OR (role IN ('aluno', 'professor') AND id_escola IS NOT NULL)
+            ),
+            CONSTRAINT ck_perfil_foto_url_http CHECK (
+                foto_url IS NULL
+                OR foto_url ~ '^https?://[^\s<>"'']+$'
+            ),
+            CONSTRAINT ck_perfil_texto_sem_controle CHECK (
+                nome !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND (bio IS NULL OR bio !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]')
             )
     );
 
@@ -146,6 +237,10 @@ CREATE TABLE
             id_turma INTEGER NOT NULL,
             id_professor UUID NOT NULL,
             CONSTRAINT pk_atividade PRIMARY KEY (id_atividade),
+            CONSTRAINT ck_atividade_texto_sem_controle CHECK (
+                titulo !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND descricao !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_atividade_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_atividade_professor FOREIGN KEY (id_professor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE RESTRICT
     );
@@ -172,6 +267,7 @@ CREATE TABLE
         id_objeto_storage UUID NOT NULL,
         nota NUMERIC(5, 2),
         feedback TEXT,
+        atraso BOOLEAN,
         entregue_em TIMESTAMP
         WITH
             TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -184,6 +280,14 @@ CREATE TABLE
                 OR (
                     nota >= 0
                     AND nota <= 100
+                )
+            ),
+            CONSTRAINT ck_entrega_feedback_avaliacao CHECK (
+                nota IS NULL
+                OR (
+                    feedback IS NOT NULL
+                    AND char_length(regexp_replace(feedback, '^[[:space:]]+|[[:space:]]+$', '', 'g'))
+                        >= CASE WHEN nota < 60 THEN 20 ELSE 1 END
                 )
             ),
             CONSTRAINT fk_entrega_atividade FOREIGN KEY (id_atividade) REFERENCES Atividade (id_atividade) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -208,6 +312,11 @@ CREATE TABLE
             id_turma INTEGER NOT NULL,
             id_professor UUID,
             CONSTRAINT pk_duvida PRIMARY KEY (id_duvida),
+            CONSTRAINT ck_duvida_texto_sem_controle CHECK (
+                assunto !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND descricao !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND (resposta IS NULL OR resposta !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]')
+            ),
             CONSTRAINT fk_duvida_aluno FOREIGN KEY (id_aluno) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_duvida_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_duvida_professor FOREIGN KEY (id_professor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE SET NULL
@@ -239,6 +348,9 @@ CREATE TABLE
             id_turma INTEGER NOT NULL,
             id_autor UUID NOT NULL,
             CONSTRAINT pk_mural_post PRIMARY KEY (id_post),
+            CONSTRAINT ck_mural_post_texto_sem_controle CHECK (
+                conteudo !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_mural_post_turma FOREIGN KEY (id_turma) REFERENCES Turma (id_turma) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_mural_post_autor FOREIGN KEY (id_autor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
     );
@@ -256,6 +368,9 @@ CREATE TABLE
             id_post INTEGER NOT NULL,
             id_autor UUID NOT NULL,
             CONSTRAINT pk_comentario_mural PRIMARY KEY (id_comentario),
+            CONSTRAINT ck_comentario_mural_texto_sem_controle CHECK (
+                conteudo !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_comentario_post FOREIGN KEY (id_post) REFERENCES Mural_Post (id_post) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_comentario_autor FOREIGN KEY (id_autor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
     );
@@ -322,6 +437,9 @@ CREATE TABLE
             id_destinatario UUID NOT NULL,
             CONSTRAINT pk_mensagem PRIMARY KEY (id_mensagem),
             CONSTRAINT ck_mensagem_autoria_distinta CHECK (id_remetente <> id_destinatario),
+            CONSTRAINT ck_mensagem_texto_sem_controle CHECK (
+                conteudo !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_mensagem_remetente FOREIGN KEY (id_remetente) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_mensagem_destinatario FOREIGN KEY (id_destinatario) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE
     );
@@ -345,6 +463,10 @@ CREATE TABLE
             CONSTRAINT pk_denuncia PRIMARY KEY (id_denuncia),
             CONSTRAINT ck_denuncia_status CHECK (status IN ('pendente', 'em_analise', 'resolvido')),
             CONSTRAINT ck_denuncia_partes_distintas CHECK (id_autor <> id_denunciado),
+            CONSTRAINT ck_denuncia_texto_sem_controle CHECK (
+                motivo !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND descricao !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_denuncia_autor FOREIGN KEY (id_autor) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_denuncia_denunciado FOREIGN KEY (id_denunciado) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_denuncia_master FOREIGN KEY (id_master) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE SET NULL
@@ -367,6 +489,10 @@ CREATE TABLE
             id_master UUID,
             CONSTRAINT pk_ticket_suporte PRIMARY KEY (id_suporte),
             CONSTRAINT ck_ticket_status CHECK (status IN ('pendente', 'em_analise', 'resolvido')),
+            CONSTRAINT ck_ticket_suporte_texto_sem_controle CHECK (
+                assunto !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+                AND mensagem !~ '[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'
+            ),
             CONSTRAINT fk_ticket_perfil FOREIGN KEY (id_perfil) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE CASCADE,
             CONSTRAINT fk_ticket_master FOREIGN KEY (id_master) REFERENCES Perfil (id_perfil) ON UPDATE CASCADE ON DELETE SET NULL
     );
