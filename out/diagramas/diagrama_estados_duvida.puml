@@ -7,24 +7,32 @@ skinparam state {
     FontName Arial
 }
 
-title Ciclo de Estados da Dúvida (Classe Duvida - Atributo resolvido)
+title Ciclo de Estados da Dúvida (Tabela Duvida — Atributo resolveu / resolvido)
 
-state "Aberta\n(Aguardando Resposta)" as Aberta
-state "Respondida\n(Aguardando Confirmação)" as Respondida
-state "Resolvida\n(Concluída)" as Resolvida
+state "Aberta / Pendente\n(resolveu = false)" as Aberta
+state "Resolvida\n(resolveu = true)" as Resolvida
+state "Excluída" as Excluida
 
-state "Professor Respondeu?" as choiceRespondeu <<choice>>
-state "Dúvida Sanada?" as choiceSanada <<choice>>
+[*] --> Aberta : criar(assunto, descricao, arquivos[])\n/ SanitizacaoStrategy + AnexoStorageFacade (Duvida_Anexo 1FN)
 
-[*] --> Aberta : criarDuvida() / resolvido = false, resposta = null
+Aberta --> Resolvida : responder(idDuvida, resposta) [permissoes.pode.responderDuvida]\n/ sanitizarTextoMultilinha(resposta), resolveu = true
 
-Aberta --> choiceRespondeu : responderDuvida(resposta)
-choiceRespondeu --> Respondida : [SIM] / resposta = texto
-choiceRespondeu --> Aberta : [NÃO]
+Aberta --> Excluida : excluir(duvida) [permissoes.pode.excluirDuvida]\n/ AnexoStorageFacade.remover() + DELETE Duvida
+Resolvida --> Excluida : excluir(duvida) [permissoes.pode.excluirDuvida]\n/ AnexoStorageFacade.remover() + DELETE Duvida
 
-Respondida --> choiceSanada : interagir()
-choiceSanada --> Resolvida : [SIM] / resolverDuvida() -> resolvido = true
-choiceSanada --> Aberta : [NÃO] / resposta = null
+Aberta : entry / exibirNaAba("Pendentes") e anexos 1FN com UrlHttpSeguraStrategy
+Resolvida : entry / exibirRespostaDocente() e moverParaAba("Resolvidas")
 
 Resolvida --> [*]
+Excluida --> [*]
+
+note right of Resolvida
+  **Persistência e segurança:**
+  - `Duvida.resolveu` (banco) é mapeado para `resolvido`
+    no front-end por `DataMappers.mapDuvida`.
+  - Resposta docente sanitizada por `TextoEntradaStrategy`
+    e protegida por `ck_duvida_texto_sem_controle` (M16).
+  - Anexos armazenados em 1FN (`Duvida_Anexo`) no bucket
+    privado `duvidasalunostoprofessor` com `ON DELETE CASCADE`.
+end note
 @enduml

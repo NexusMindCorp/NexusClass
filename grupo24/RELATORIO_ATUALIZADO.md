@@ -70,9 +70,10 @@ O diagrama editável atualizado encontra-se em [`grupo24/modelo.drawio`](modelo.
 
 **Atualizações incorporadas ao DER (`grupo24/modelo.drawio`):**
 1. **Vínculo `Perfil` ↔ `Escola` (`Pertence`):** adicionado o relacionamento `Pertence` conectando `Perfil` e `Escola` com cardinalidades `Escola (0,1)` e `Perfil (0,N)` (na notação de cardinalidade utilizada no diagrama: cada perfil pertence a 0 ou 1 escola — `0` para `master` e `1` para `aluno`/`professor`, conforme RN11 — e cada escola agrega de 0 a N perfis), sustentando também o isolamento da RN12.
-2. **Entidade `EntregaAtividade`:** substituído `entrega_url` por `id_objeto_storage` (referência a `storage.objects(id)`) e incluído o atributo persistido `atraso` (migração `08`) no lugar da antiga elipse derivada `no_prazo`.
-3. **Entidades com anexos (`Atividade`, `Duvida` e `TicketSuporte`):** atualizados os atributos multivalorados de `anexos_urls*` para `anexos_storage*`, refletindo o armazenamento por `id_objeto_storage` nas tabelas normalizadas `Atividade_Anexo`, `Duvida_Anexo` e `Ticket_Suporte_Anexo`.
-4. **Coerência conferida em `EventoCalendario` e `AlertaCalendario`:** atributos alinhados integralmente a `01_esquema.sql` e às migrações `05`, `11`, `12` e `13`.
+2. **Entidade `Escola` (`codigo_publico`):** incluído o atributo único `codigo_publico` (`ESC-XXXXXXXX`, ADR-010 / migração `15`, consolidado em `01_esquema.sql`), refletindo a chave candidata pública utilizada no cadastro sem expor `id_escola` sequencial.
+3. **Entidade `EntregaAtividade`:** substituído `entrega_url` por `id_objeto_storage` (referência a `storage.objects(id)`) e incluído o atributo persistido `atraso` (migração `08`) no lugar da antiga elipse derivada `no_prazo`.
+4. **Entidades com anexos (`Atividade`, `Duvida` e `TicketSuporte`):** atualizados os atributos multivalorados de `anexos_urls*` para `anexos_storage*`, refletindo o armazenamento por `id_objeto_storage` nas tabelas normalizadas `Atividade_Anexo`, `Duvida_Anexo` e `Ticket_Suporte_Anexo`.
+5. **Coerência conferida em `EventoCalendario` e `AlertaCalendario`:** atributos alinhados integralmente a `01_esquema.sql` e às migrações `05`, `11`, `12` e `13`.
 
 #### Tabela de Relacionamentos e Cardinalidades (mín, máx) do DER
 

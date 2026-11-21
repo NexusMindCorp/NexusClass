@@ -44,10 +44,13 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="W7pX7e5tpb1DauYl1XSr-183" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=0;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="Escola" vertex="1">
-          <mxGeometry height="120" width="160" x="1290" y="610" as="geometry" />
+          <mxGeometry height="140" width="160" x="1290" y="610" as="geometry" />
         </mxCell>
-        <mxCell id="W7pX7e5tpb1DauYl1XSr-184" parent="W7pX7e5tpb1DauYl1XSr-183" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;rounded=0;labelBackgroundColor=none;fontColor=#393C56;" value="&lt;u&gt;id_escola&lt;/u&gt;&lt;br&gt;nome&lt;br&gt;ano_letivo&lt;div&gt;created_at&lt;/div&gt;" vertex="1">
-          <mxGeometry height="70" width="160" y="50" as="geometry" />
+        <mxCell id="W7pX7e5tpb1DauYl1XSr-184" parent="W7pX7e5tpb1DauYl1XSr-183" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;rounded=0;labelBackgroundColor=none;fontColor=#393C56;" value="&lt;u&gt;id_escola&lt;/u&gt;&lt;br&gt;nome&lt;br&gt;ano_letivo&lt;br&gt;codigo_publico (UK)&lt;div&gt;created_at&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="160" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="adr010-escola-codigo-note" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=10;align=center;verticalAlign=middle;fontSize=10;dashed=1;fillColor=#FFF8EB;strokeColor=#E07A5F;fontColor=#393C56;" value="codigo_publico: UNIQUE&lt;br&gt;formato ESC-XXXXXXXX" vertex="1">
+          <mxGeometry height="42" width="160" x="1290" y="762" as="geometry" />
         </mxCell>
         <mxCell id="W7pX7e5tpb1DauYl1XSr-185" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=0;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="Turma" vertex="1">
           <mxGeometry height="150" width="160" x="860" y="550" as="geometry" />

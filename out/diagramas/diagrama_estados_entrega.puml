@@ -7,31 +7,51 @@ skinparam state {
     FontName Arial
 }
 
-title Ciclo de Vida de uma Entrega de Atividade (Classe Entrega)
+title Ciclo de Vida de uma Entrega de Atividade (Entrega_Atividade — RN01, RN07, RN08)
 
 state Pendente
 state PendenteAtrasada
 state EnviadaNoPrazo
 state EnviadaAtrasada
 state Avaliada
-state choice1 <<choice>>
+state choicePrazo <<choice>>
+state choiceReenvio <<choice>>
 
 [*] --> Pendente : criarAtividade()
 
-Pendente --> choice1 : enviarEntrega(url_anexo)
-choice1 --> EnviadaNoPrazo : [dataAtual <= dataLimite] / registrarPrazo(true)
-choice1 --> EnviadaAtrasada : [dataAtual > dataLimite] / registrarPrazo(false)
+Pendente --> choicePrazo : submeter(arquivo) / upload Storage + UPSERT id_objeto_storage
+choicePrazo --> EnviadaNoPrazo : [entregue_em <= data_entrega] / trigger RN07 atraso = false
+choicePrazo --> EnviadaAtrasada : [entregue_em > data_entrega] / trigger RN07 atraso = true
 
-Pendente --> PendenteAtrasada : tempoEsgotado [dataAtual > dataLimite] / no_prazo = false
-PendenteAtrasada --> EnviadaAtrasada : enviarEntrega(url_anexo)
+Pendente --> PendenteAtrasada : prazoVencido [agora > data_entrega]
+PendenteAtrasada --> EnviadaAtrasada : submeter(arquivo) / trigger RN07 atraso = true
 
-EnviadaNoPrazo --> Avaliada : avaliarEntrega(nota, feedback) / atribuirNota()
-EnviadaAtrasada --> Avaliada : avaliarEntrega(nota, feedback) / atribuirNota()
+EnviadaNoPrazo --> choiceReenvio : submeter(novoArquivo) [nota IS NULL] / troca id_objeto_storage
+EnviadaAtrasada --> choiceReenvio : submeter(novoArquivo) [nota IS NULL] / troca id_objeto_storage
+choiceReenvio --> EnviadaNoPrazo : [entregue_em <= data_entrega] / atraso = false
+choiceReenvio --> EnviadaAtrasada : [entregue_em > data_entrega] / atraso = true
+
+EnviadaNoPrazo --> Avaliada : avaliar(nota, feedback) [RN01: nota 0..100 e feedback válido]
+EnviadaAtrasada --> Avaliada : avaliar(nota, feedback) [RN01 + aviso RN07 de atraso]
 
 Pendente : entry / exibirCardPendente()
-EnviadaNoPrazo : entry / exibirStatus("Entregue")
-EnviadaAtrasada : entry / exibirStatus("Entregue com Atraso")
-Avaliada : entry / exibirNotaEEstabelecerConcluida()
+PendenteAtrasada : entry / exibirAvisoPrazoVencido()
+EnviadaNoPrazo : entry / exibirBadge("No Prazo") e permitirSubstituicao()
+EnviadaAtrasada : entry / exibirBadge("Fora do Prazo") e permitirSubstituicao()
+Avaliada : entry / exibirNotaEFeedback()
+Avaliada : do / RN08: RLS RESTRICTIVE bloqueia UPDATE/DELETE do aluno (tabela e Storage)
+Avaliada : do / RN08: trigger limitar_edicao_docente_entrega restringe docente a nota e feedback
 
-Avaliada --> [*]
+Avaliada --> Avaliada : avaliar(nota, feedback) [docente atualiza apenas nota/feedback — RN01/RN08]
+
+note right of Avaliada
+  **Regras aplicadas no banco:**
+  - **RN01 (M09):** nota em [0, 100]; feedback >= 20 chars
+    se nota < 60, ou >= 1 char se nota >= 60.
+  - **RN07 (M08):** atraso calculado automaticamente pelo
+    trigger registrar_atraso_entrega no servidor.
+  - **RN08 (M07/M10):** após nota IS NOT NULL, aluno não
+    pode editar/excluir registro nem arquivo no Storage.
+end note
+
 @enduml

@@ -2,8 +2,8 @@
 !theme plain
 hide circle
 skinparam handwritten false
-skinparam nodesep 120
-skinparam ranksep 120
+skinparam nodesep 90
+skinparam ranksep 90
 
 skinparam entity {
     BackgroundColor White
@@ -11,176 +11,250 @@ skinparam entity {
     BorderColor #DB2777
 }
 
-entity "perfis" as perfis {
-  *id : uuid <<PK>>
+title Modelo Entidade-Relacionamento — NexusClass (Esquema Consolidado: 18 Tabelas)
+
+' ============================================================================
+' 1. NÚCLEO INSTITUCIONAL E IDENTIDADE
+' ============================================================================
+entity "Escola" as Escola {
+  *id_escola : SERIAL <<PK>>
   --
-  role : user_role
-  nome : text
-  email : text
-  bio : text
-  foto_url : text
-  created_at : timestamptz
+  *nome : VARCHAR(150)
+  *ano_letivo : INTEGER
+  *codigo_publico : VARCHAR(16) <<UK, ESC-XXXXXXXX>>
+  *created_at : TIMESTAMPTZ
 }
 
-entity "escolas" as escolas {
-  *id : uuid <<PK>>
+entity "Turma" as Turma {
+  *id_turma : SERIAL <<PK>>
   --
-  nome : text
-  ano_letivo : int4
-  created_at : timestamptz
+  *codigo_acesso : VARCHAR(30) <<UK>>
+  *materia : VARCHAR(120)
+  *sala : VARCHAR(50)
+  *periodo_escolar : VARCHAR(50)
+  banner_url : TEXT
+  *id_escola : INTEGER <<FK>>
 }
 
-entity "turmas_escolares" as turmas_escolares {
-  *id : uuid <<PK>>
+entity "Perfil" as Perfil {
+  *id_perfil : UUID <<PK, FK auth.users>>
   --
-  escola_id : uuid <<FK>>
-  chave : text
-  materia : text
-  banner_url : text
-  sala : text
-  turma : text
-  created_at : timestamptz
+  *role : VARCHAR(20) [aluno|professor|master]
+  *nome : VARCHAR(150)
+  *email : VARCHAR(180) <<UK>>
+  bio : TEXT
+  foto_url : TEXT
+  *created_at : TIMESTAMPTZ
+  id_escola : INTEGER <<FK, RN11>>
 }
 
-entity "aluno_turma" as aluno_turma {
-  *id : uuid <<PK>>
+entity "Professor_Turma" as Professor_Turma {
+  *id_professor : UUID <<PK, FK>>
+  *id_turma : INTEGER <<PK, FK>>
   --
-  aluno_id : uuid <<FK>>
-  turma_id : uuid <<FK>>
-  created_at : timestamptz
+  *created_at : TIMESTAMPTZ
 }
 
-entity "professor_turma" as professor_turma {
-  *id : uuid <<PK>>
+entity "Aluno_Turma" as Aluno_Turma {
+  *id_aluno : UUID <<PK, FK>>
+  *id_turma : INTEGER <<PK, FK>>
   --
-  professor_id : uuid <<FK>>
-  turma_id : uuid <<FK>>
-  created_at : timestamptz
+  *situacao : VARCHAR(20) [ativa|cancelada]
+  *created_at : TIMESTAMPTZ
 }
 
-entity "atividades" as atividades {
-  *id : uuid <<PK>>
+' ============================================================================
+' 2. ATIVIDADES, ENTREGAS E ANEXOS (1FN)
+' ============================================================================
+entity "Atividade" as Atividade {
+  *id_atividade : SERIAL <<PK>>
   --
-  turma_id : uuid <<FK>>
-  professor_id : uuid <<FK>>
-  titulo : text
-  descricao : text
-  data_entrega : timestamptz
-  created_at : timestamptz
-  anexo_url : text
+  *titulo : VARCHAR(150)
+  *descricao : TEXT
+  *data_entrega : TIMESTAMPTZ
+  *id_turma : INTEGER <<FK>>
+  *id_professor : UUID <<FK>>
 }
 
-entity "entregas_atividades" as entregas_atividades {
-  *id : uuid <<PK>>
+entity "Atividade_Anexo" as Atividade_Anexo {
+  *id_anexo : SERIAL <<PK>>
   --
-  atividade_id : uuid <<FK>>
-  aluno_id : uuid <<FK>>
-  url_anexo : text
-  nota : numeric
-  feedback : text
-  no_prazo : bool
-  entregue_em : timestamptz
-  created_at : timestamptz
-  updated_at : timestamptz
+  *id_objeto_storage : UUID <<FK storage.objects>>
+  *id_atividade : INTEGER <<FK>>
 }
 
-entity "mensagens" as mensagens {
-  *id : uuid <<PK>>
+entity "Entrega_Atividade" as Entrega_Atividade {
+  *id_entrega : SERIAL <<PK>>
   --
-  remetente_id : uuid <<FK>>
-  destinatario_id : uuid <<FK>>
-  assunto : text
-  conteudo : text
-  lida : bool
-  created_at : timestamptz
+  *id_objeto_storage : UUID <<FK storage.objects>>
+  nota : NUMERIC(5,2)
+  feedback : TEXT
+  atraso : BOOLEAN <<RN07>>
+  *entregue_em : TIMESTAMPTZ
+  *id_atividade : INTEGER <<FK, UK>>
+  *id_aluno : UUID <<FK, UK>>
 }
 
-entity "mural_posts" as mural_posts {
-  *id : uuid <<PK>>
+' ============================================================================
+' 3. DÚVIDAS E MURAL
+' ============================================================================
+entity "Duvida" as Duvida {
+  *id_duvida : SERIAL <<PK>>
   --
-  turma_id : uuid <<FK>>
-  autor_id : uuid <<FK>>
-  conteudo : text
-  created_at : timestamptz
+  *assunto : VARCHAR(150)
+  *descricao : TEXT
+  *resolveu : BOOLEAN
+  resposta : TEXT
+  *created_at : TIMESTAMPTZ
+  *id_aluno : UUID <<FK>>
+  *id_turma : INTEGER <<FK>>
+  id_professor : UUID <<FK>>
 }
 
-entity "eventos_calendario" as eventos_calendario {
-  *id : uuid <<PK>>
+entity "Duvida_Anexo" as Duvida_Anexo {
+  *id_anexo : SERIAL <<PK>>
   --
-  titulo : text
-  descricao : text
-  data : date
-  horario : time
-  created_at : timestamptz
-  autor_id : uuid <<FK>>
-  tipo : text
-  turma_id : uuid <<FK>>
+  *id_objeto_storage : UUID <<FK storage.objects>>
+  *id_duvida : INTEGER <<FK>>
 }
 
-entity "alertas_calendario" as alertas_calendario {
-  *id : uuid <<PK>>
+entity "Mural_Post" as Mural_Post {
+  *id_post : SERIAL <<PK>>
   --
-  evento_id : uuid <<FK>>
-  titulo_evento : text
-  mensagem : text
-  lembrete_para : timestamptz
-  created_at : timestamptz
-  minutos_antes : int4
+  *conteudo : TEXT
+  *created_at : TIMESTAMPTZ
+  *id_turma : INTEGER <<FK>>
+  *id_autor : UUID <<FK>>
 }
 
-entity "duvidasalunostoprofessor" as duvidasalunostoprofessor {
-  *id : uuid <<PK>>
+entity "Comentario_Mural" as Comentario_Mural {
+  *id_comentario : SERIAL <<PK>>
   --
-  aluno_id : uuid <<FK>>
-  prof_id : uuid <<FK>>
-  turma_id : uuid <<FK>>
-  assunto : text
-  descricao : text
-  anexo_url : text
-  created_at : timestamptz
-  resolvido : bool
-  resposta : text
+  *conteudo : TEXT
+  *created_at : TIMESTAMPTZ
+  *id_post : INTEGER <<FK>>
+  *id_autor : UUID <<FK>>
 }
 
-entity "denuncias" as denuncias {
-  *id : uuid <<PK>>
+' ============================================================================
+' 4. CALENDÁRIO, MENSAGENS, MODERAÇÃO E SUPORTE
+' ============================================================================
+entity "Evento_Calendario" as Evento_Calendario {
+  *id_evento : SERIAL <<PK>>
   --
-  created_at : timestamptz
-  aluno_denunciado : text
-  motivo : text
-  descricao : text
-  status : text
+  *titulo : VARCHAR(150)
+  *descricao : TEXT
+  *data : DATE
+  *horario : TIME
+  *tipo : VARCHAR(20) [pessoal|turma]
+  *id_autor : UUID <<FK>>
+  id_turma : INTEGER <<FK>>
 }
 
-entity "suporte" as suporte {
-  *id : uuid <<PK>>
+entity "Alerta_Calendario" as Alerta_Calendario {
+  *id_alerta : SERIAL <<PK>>
   --
-  created_at : timestamptz
-  nome : text
-  email : text
-  assunto : text
-  mensagem : text
-  status : text
-  anexos_suporte : text
+  *mensagem : TEXT
+  *minutos_antes : INTEGER [1|5]
+  *lembrete_para : TIMESTAMPTZ
+  *id_evento : INTEGER <<FK>>
 }
 
-escolas ||--o{ turmas_escolares : "contém"
-turmas_escolares ||--o{ aluno_turma : "possui"
-perfis ||--o{ aluno_turma : "inscreve-se"
-turmas_escolares ||--o{ professor_turma : "aloca"
-perfis ||--o{ professor_turma : "leciona"
-turmas_escolares ||--o{ atividades : "registra"
-perfis ||--o{ atividades : "cria"
-atividades ||--o{ entregas_atividades : "vincula"
-perfis ||--o{ entregas_atividades : "entrega"
-perfis ||--o{ mensagens : "envia"
-perfis ||--o{ mensagens : "recebe"
-turmas_escolares ||--o{ mural_posts : "exibe"
-perfis ||--o{ mural_posts : "publica"
-perfis ||--o{ eventos_calendario : "agenda"
-turmas_escolares ||--o{ eventos_calendario : "associa"
-eventos_calendario ||--o{ alertas_calendario : "dispara"
-perfis ||--o{ duvidasalunostoprofessor : "pergunta"
-perfis ||--o{ duvidasalunostoprofessor : "responde"
-turmas_escolares ||--o{ duvidasalunostoprofessor : "pertence"
+entity "Mensagem" as Mensagem {
+  *id_mensagem : SERIAL <<PK>>
+  --
+  *conteudo : TEXT
+  *lida : BOOLEAN
+  *created_at : TIMESTAMPTZ
+  *id_remetente : UUID <<FK>>
+  *id_destinatario : UUID <<FK>>
+}
+
+entity "Denuncia" as Denuncia {
+  *id_denuncia : SERIAL <<PK>>
+  --
+  *motivo : VARCHAR(150)
+  *descricao : TEXT
+  *status : VARCHAR(20) [pendente|em_analise|resolvido]
+  parecer_moderacao : TEXT
+  *created_at : TIMESTAMPTZ
+  *id_autor : UUID <<FK>>
+  *id_denunciado : UUID <<FK>>
+  id_master : UUID <<FK>>
+}
+
+entity "Ticket_Suporte" as Ticket_Suporte {
+  *id_suporte : SERIAL <<PK>>
+  --
+  *assunto : VARCHAR(150)
+  *mensagem : TEXT
+  *status : VARCHAR(20) [pendente|em_analise|resolvido]
+  resposta_suporte : TEXT
+  *created_at : TIMESTAMPTZ
+  *id_perfil : UUID <<FK>>
+  id_master : UUID <<FK>>
+}
+
+entity "Ticket_Suporte_Anexo" as Ticket_Suporte_Anexo {
+  *id_anexo : SERIAL <<PK>>
+  --
+  *id_objeto_storage : UUID <<FK storage.objects>>
+  *id_suporte : INTEGER <<FK>>
+}
+
+' ============================================================================
+' 5. RELACIONAMENTOS (CONSOLIDADOS COM 01_esquema.sql)
+' ============================================================================
+Escola ||--o{ Turma : "possui"
+Escola |o--o{ Perfil : "pertence (RN11)"
+
+Turma ||--o{ Professor_Turma : "aloca"
+Perfil ||--o{ Professor_Turma : "leciona (RN12)"
+Turma ||--o{ Aluno_Turma : "recebe"
+Perfil ||--o{ Aluno_Turma : "matricula-se (RN03/RN12)"
+
+Turma ||--o{ Atividade : "contém"
+Perfil ||--o{ Atividade : "cria (professor)"
+Atividade ||--o{ Atividade_Anexo : "possui anexo 1FN"
+Atividade ||--o{ Entrega_Atividade : "recebe"
+Perfil ||--o{ Entrega_Atividade : "submete (aluno)"
+
+Turma ||--o{ Duvida : "contém"
+Perfil ||--o{ Duvida : "abre (aluno)"
+Perfil |o--o{ Duvida : "responde (professor)"
+Duvida ||--o{ Duvida_Anexo : "possui anexo 1FN"
+
+Turma ||--o{ Mural_Post : "exibe"
+Perfil ||--o{ Mural_Post : "publica"
+Mural_Post ||--o{ Comentario_Mural : "recebe"
+Perfil ||--o{ Comentario_Mural : "comenta"
+
+Perfil ||--o{ Evento_Calendario : "cria"
+Turma |o--o{ Evento_Calendario : "vincula (tipo=turma)"
+Evento_Calendario ||--o{ Alerta_Calendario : "dispara (RN05/RN06)"
+
+Perfil ||--o{ Mensagem : "envia"
+Perfil ||--o{ Mensagem : "recebe"
+
+Perfil ||--o{ Denuncia : "registra (autor)"
+Perfil ||--o{ Denuncia : "alvo (denunciado)"
+Perfil |o--o{ Denuncia : "modera (master)"
+
+Perfil ||--o{ Ticket_Suporte : "abre"
+Perfil |o--o{ Ticket_Suporte : "atende (master)"
+Ticket_Suporte ||--o{ Ticket_Suporte_Anexo : "possui anexo 1FN"
+
+' ============================================================================
+' 6. RESUMO DAS CHECK CONSTRAINTS, UNICIDADES E GATILHOS DE SEGURANÇA
+' ============================================================================
+legend right
+  |= Categoria |= Regras / Constraints Consolidadas (01_esquema.sql + M06..M16) |
+  | Escola (ADR-010) | uq_escola_codigo_publico; ck_escola_codigo_publico_formato (^[A-Z0-9-]{4,16}$); ck_escola_ano_letivo (2000..2100); leitura de codigo_publico restrita via RPC obter_codigo_publico_minha_escola() |
+  | Multi-escola (RN11/RN12) | ck_perfil_role (aluno/professor/master); ck_perfil_escola_por_role (master => id_escola NULL; demais NOT NULL); triggers trg_aluno_turma_escola e trg_professor_turma_escola |
+  | Entregas (RN01/RN07/RN08) | uq_entrega_atividade_aluno (id_atividade, id_aluno); ck_entrega_nota_intervalo (0..100); ck_entrega_feedback_avaliacao (>=20 chars se nota < 60, >=1 se >= 60); atraso via trigger registrar_atraso_entrega; bloqueio pós-nota via RLS RESTRICTIVE (M07) + limitar_edicao_docente_entrega (M10) |
+  | Calendário (RN02..RN06/RN10) | ck_evento_tipo (pessoal/turma); ck_evento_turma_obrigatoria; ck_alerta_minutos_antes (1 ou 5); uq_alerta_evento_tempo_dest; bloqueio de data passada (M13) e invalidação ao reagendar (M12) |
+  | Integridade Geral | uq_turma_codigo_acesso; uq_perfil_email; ck_aluno_turma_situacao (ativa/cancelada); ck_mensagem_autoria_distinta; ck_denuncia_partes_distintas; ck_denuncia_status e ck_ticket_status (pendente/em_analise/resolvido) |
+  | Hardening OWASP (M16) | Allowlist http(s):// sem espaços/aspas/<> em ck_perfil_foto_url_http e ck_turma_banner_url_http; bloqueio de caracteres de controle ASCII (0x00..0x08, 0x0B, 0x0C, 0x0E..0x1F, 0x7F) nas 8 constraints ck_*_texto_sem_controle (Perfil, Atividade, Duvida, Mural_Post, Comentario_Mural, Mensagem, Denuncia, Ticket_Suporte) |
+  | Storage Privado (1FN) | 4 buckets privados (anexos_atividades, entregas_atividades, duvidasalunostoprofessor, anexos_suporte) referenciados via FK id_objeto_storage -> storage.objects(id) ON DELETE CASCADE |
+endlegend
 @enduml

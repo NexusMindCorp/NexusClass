@@ -45,7 +45,16 @@ package "Camada de Acesso a Dados — Repositories (src/repositories)" {
     class PerfilRepository <<Repository>> {
         +buscarPorId(idPerfil) : Promise<PerfilUsuario | null>
         +buscarPorNome(nome) : Promise<PerfilUsuario | null>
+        +obterCodigoPublicoMinhaEscola() : Promise<string | null>
         +atualizarDados(idPerfil, dados) : Promise<PerfilUsuario>
+    }
+
+    class Escola <<Entity>> {
+        +id_escola : number
+        +nome : string
+        +ano_letivo : number
+        +codigo_publico : string <<UNIQUE, ESC-XXXXXXXX>>
+        +created_at : string
     }
 
     class EscolaTurmaRepository <<Repository>> {
@@ -174,6 +183,29 @@ package "Design Patterns GoF (src/patterns)" {
 
     class FiltroTodasDuvidasStrategy <<Strategy>> {
         +filtrar(itens: readonly Duvida[]) : Duvida[]
+    }
+
+    interface "SanitizacaoStrategy<TEntrada, TSaida>" as SanitizacaoStrategy <<Strategy>> {
+        +contexto : ContextoSanitizacao
+        +sanitizar(entrada: TEntrada) : TSaida
+    }
+
+    class TextoEntradaStrategy <<Strategy>> {
+        +contexto : "texto"
+        -multiline : boolean
+        -maxLength : number
+        +sanitizar(entrada: string) : string
+    }
+
+    class UrlHttpSeguraStrategy <<Strategy>> {
+        +contexto : "url"
+        -permitirCaminhoRelativo : boolean
+        +sanitizar(entrada: string | null | undefined) : string | null
+    }
+
+    class EscapeHtmlStrategy <<Strategy>> {
+        +contexto : "html"
+        +sanitizar(entrada: string) : string
     }
 
     interface "NotificacaoObserver<E>" as NotificacaoObserver <<Observer>> {
@@ -411,9 +443,11 @@ class BoxPerfilUsuario {
 }
 
 class usePerfilUsuario {
-    +perfilEditado : PerfilUsuario
+    +perfilAlvo : PerfilUsuario | null
+    +codigoEscola : string | null
+    +ehProprioUsuario : boolean
     +loading : boolean
-    +salvarAlteracoes() : Promise<void>
+    +error : string | null
 }
 
 class BoxEntregaAtividade {
@@ -461,7 +495,7 @@ EntregaAtividadeFacade ..> supabaseClient : coordena Storage + DB
 BoxEntregaAtividade "1" ..> "1" useEntregas : gerencia entregas com
 useEntregas "1" ..> "1" IEntregaAtividadeFacade : delega submissão/avaliação
 
-' Relações Strategy (Fase 3)
+' Relações Strategy — Filtros (Fase 3) & Sanitização OWASP XSS (Fase 6)
 FiltroTurmaPorTextoStrategy ..|> FiltroStrategy
 FiltroTurmasInscritasStrategy ..|> FiltroStrategy
 FiltroTurmasDisponiveisStrategy ..|> FiltroStrategy
@@ -473,6 +507,18 @@ FiltroTodasDuvidasStrategy ..|> FiltroStrategy
 usePesquisa "1" ..> "1..*" FiltroStrategy : filtra turmas com
 useDuvidas "1" ..> "1..*" FiltroStrategy : filtra dúvidas com
 
+TextoEntradaStrategy ..|> SanitizacaoStrategy
+UrlHttpSeguraStrategy ..|> SanitizacaoStrategy
+EscapeHtmlStrategy ..|> SanitizacaoStrategy
+PerfilRepository ..> SanitizacaoStrategy : valida foto_url e sanitiza bio
+MuralRepository ..> SanitizacaoStrategy : sanitiza posts e comentários
+DuvidaRepository ..> SanitizacaoStrategy : sanitiza assunto, descrição e resposta
+AtividadeRepository ..> SanitizacaoStrategy : sanitiza título e descrição
+ComunicacaoRepository ..> SanitizacaoStrategy : sanitiza mensagens, denúncias e suporte
+Mural ..> UrlHttpSeguraStrategy : valida URLs de anexos
+DuvidasBox ..> UrlHttpSeguraStrategy : valida URLs de anexos
+BoxEntregaAtividade ..> UrlHttpSeguraStrategy : valida URL de download
+
 ' Relações Observer (Fase 4)
 ToastNotificacaoObserver ..|> NotificacaoObserver
 StateRefreshObserver ..|> NotificacaoObserver
@@ -483,9 +529,11 @@ useGerenciador "1" ..> "1" NotificacaoSubject : inscreve alertas em
 useMensagens "1" ..> "1" NotificacaoSubject : inscreve chat em
 
 ' Relações Repositories, DataMappers, AnexoStorageFacade & Singleton (Fase 6-A)
-PerfilRepository ..> supabaseClient : consulta tipada
+PerfilRepository ..> supabaseClient : consulta tipada + RPC
+PerfilRepository ..> Escola : lê codigo_publico via RPC
 PerfilRepository ..> DataMappers : converte Row
 EscolaTurmaRepository ..> supabaseClient : consulta tipada
+EscolaTurmaRepository ..> Escola : consulta catálogo (sem codigo_publico)
 EscolaTurmaRepository ..> DataMappers : converte Row
 AtividadeRepository ..> supabaseClient : consulta tipada
 AtividadeRepository ..> AnexoStorageFacade : anexa/remove 1FN
@@ -502,7 +550,7 @@ AnexoStorageFacade ..> supabaseClient : Storage privado + v_storage_objetos
 
 useAuth ..> PerfilRepository : carrega perfil
 useAuth ..> EscolaTurmaRepository : carrega turmas prof.
-usePerfilUsuario ..> PerfilRepository : busca por nome
+usePerfilUsuario ..> PerfilRepository : busca perfil e codigo_publico (próprio usuário)
 useEscolaDados ..> EscolaTurmaRepository : carrega escola/turmas
 useGerenciador ..> EscolaTurmaRepository : matrícula RN12
 useMural ..> MuralRepository : posts
