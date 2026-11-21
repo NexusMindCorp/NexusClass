@@ -46,8 +46,8 @@ export const metricasEngenharia: MetricaProjeto[] = [
       "linhas/funções (98.16% Stmts · 93.35% Branch) em src/lib e src/patterns (era 4.27%)",
   },
   {
-    valor: "140",
-    rotulo: "testes passando em 18 suítes (eram 3)",
+    valor: "144",
+    rotulo: "testes passando em 19 suítes (eram 3)",
   },
   {
     valor: "7 + 1",
@@ -415,7 +415,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, exclusão de conta atômica (14), código público da escola (15), hardening XSS com SanitizacaoStrategy OWASP (16 + vercel.json + Edge Functions), consolidação de 01_esquema.sql, idempotência da 09 e RLS ao vivo.",
     evidenciaTeste:
-      "18 suítes / 140 testes verdes. Instalação limpa no Docker com 16/16 casos SQL. Reenvio sem nota e avaliação docente confirmados na SPA e no banco. Fallback validado no cartão e no mural.",
+      "19 suítes / 144 testes verdes. Instalação limpa no Docker com 16/16 casos SQL. Reenvio sem nota e avaliação docente confirmados na SPA e no banco. Fallback validado no cartão e no mural. Edge Functions resend-email/resend-suport refatoradas e validadas ao vivo (HTTP 200).",
   },
 ];
 
@@ -542,9 +542,9 @@ export const evolucaoCobertura: SnapshotCoberturaItem[] = [
     lines: "100.00% (lib + patterns)",
   },
   {
-    etapa: "Fase 6 — Hardening XSS, Pentest & Config. Avançadas (21/11)",
+    etapa: "Fase 6 — Hardening XSS, Pentest, Config. Avançadas & Resend (21/11)",
     responsavel: "Gianlucca Paiva",
-    testes: "18 suítes (140 testes)",
+    testes: "19 suítes (144 testes)",
     statements: "98.16% (lib + patterns)",
     branches: "93.35% (lib + patterns)",
     functions: "100.00% (lib + patterns)",
