@@ -35,4 +35,4 @@ Aplicar **defesa em profundidade** reutilizando o padrão GoF **Strategy** (este
   - Proteção consistente na UI, Repositories, PostgreSQL, Edge Functions e camada HTTP.
 - **Trade-offs / Cuidados:**
   - Caso o projeto passe a renderizar HTML rico (ex.: Markdown compilado com `dangerouslySetInnerHTML`), será necessário abrir novo ADR avaliando sanitizador HTML específico (`DOMPurify`).
-  - As correções em `resend-email`/`resend-suport` e `vercel.json` requerem publicação nos ambientes ativos para surtir efeito em produção.
+  - `resend-email` (`v2`) e `resend-suport` (`v1`) já foram publicadas (`ACTIVE`, `verify_jwt: true`) e validadas ponta a ponta no Supabase de teste em 22/11/2026 (`HTTP 200` com anexo 1FN assinado); resta apenas confirmar a resposta HTTP de `vercel.json` (V-03) na hospedagem Vercel.

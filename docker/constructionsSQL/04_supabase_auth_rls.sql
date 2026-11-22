@@ -18,7 +18,7 @@ ALTER TABLE public.Escola ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Escola: leitura publica" ON public.Escola;
 CREATE POLICY "Escola: leitura publica"
     ON public.Escola FOR SELECT
-    TO anon, authenticated
+    TO authenticated
     USING (true);
 
 DROP POLICY IF EXISTS "Escola: insercao apenas master" ON public.Escola;
@@ -68,7 +68,7 @@ ALTER TABLE public.Turma ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Turma: leitura publica" ON public.Turma;
 CREATE POLICY "Turma: leitura publica"
     ON public.Turma FOR SELECT
-    TO anon, authenticated
+    TO authenticated
     USING (true);
 
 DROP POLICY IF EXISTS "Turma: insercao apenas master" ON public.Turma;
@@ -115,11 +115,54 @@ CREATE POLICY "Turma: exclusao apenas master"
 -- ----------------------------------------------------------------------------
 ALTER TABLE public.Perfil ENABLE ROW LEVEL SECURITY;
 
+CREATE SCHEMA IF NOT EXISTS nexusclass_private;
+REVOKE ALL ON SCHEMA nexusclass_private FROM PUBLIC;
+GRANT USAGE ON SCHEMA nexusclass_private TO authenticated;
+
+CREATE OR REPLACE FUNCTION nexusclass_private.perfil_visivel_para_atual(
+    p_id_alvo UUID,
+    p_id_escola_alvo INTEGER,
+    p_role_alvo VARCHAR
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+    SELECT
+        p_id_alvo = (SELECT auth.uid())
+        OR p_role_alvo = 'master'
+        OR EXISTS (
+            SELECT 1
+            FROM public.perfil AS eu
+            WHERE eu.id_perfil = (SELECT auth.uid())
+              AND (
+                  eu.role = 'master'
+                  OR (
+                      eu.id_escola IS NOT NULL
+                      AND eu.id_escola = p_id_escola_alvo
+                  )
+              )
+        );
+$$;
+
+REVOKE ALL ON FUNCTION nexusclass_private.perfil_visivel_para_atual(UUID, INTEGER, VARCHAR)
+    FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION nexusclass_private.perfil_visivel_para_atual(UUID, INTEGER, VARCHAR)
+    TO authenticated;
+
 DROP POLICY IF EXISTS "Perfil: leitura para autenticados" ON public.Perfil;
 CREATE POLICY "Perfil: leitura para autenticados"
     ON public.Perfil FOR SELECT
     TO authenticated
-    USING (true);
+    USING (
+        nexusclass_private.perfil_visivel_para_atual(
+            id_perfil,
+            id_escola,
+            role
+        )
+    );
 
 DROP POLICY IF EXISTS "Perfil: insercao proprio usuario ou master" ON public.Perfil;
 CREATE POLICY "Perfil: insercao proprio usuario ou master"

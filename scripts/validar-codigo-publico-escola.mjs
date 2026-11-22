@@ -30,13 +30,13 @@ async function executar() {
   assert.equal(erroRpcAnon?.code, '42501', `Esperado 42501 para RPC por anon, recebido ${erroRpcAnon?.code ?? erroRpcAnon?.message}`);
   console.log(`2. Bloqueio da RPC para anon PASSOU (${erroRpcAnon.code}).`);
 
-  // 2. anon ainda pode ler o catálogo básico sem codigo_publico
-  const { data: escolasBasicas, error: erroBasico } = await clienteAnon
+  // 2. anon NÃO pode listar catálogo de escolas (S-02 / migração 17)
+  const { data: escolasAnon, error: erroBasico } = await clienteAnon
     .from('escola')
     .select('id_escola, nome, ano_letivo')
     .order('id_escola');
-  assert.ok(!erroBasico && escolasBasicas?.length >= 3, 'Leitura básica do catálogo de escolas deve continuar funcionando');
-  console.log(`3. Leitura básica de escola (sem codigo_publico) PASSOU (${escolasBasicas.length} escolas).`);
+  assert.ok(!erroBasico && (escolasAnon?.length ?? 0) === 0, 'Leitura anônima de escolas deve retornar vazio após migração 17');
+  console.log(`3. Bloqueio de leitura anônima de escola PASSOU (${escolasAnon?.length ?? 0} escolas).`);
 
   // 3. Cadastro com código público inexistente deve ser recusado
   const { error: erroInvalido } = await clienteAnon.auth.signUp({
