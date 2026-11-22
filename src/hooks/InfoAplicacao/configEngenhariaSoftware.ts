@@ -33,8 +33,8 @@ import type {
 
 export const ultimaAtualizacaoEngenharia = {
   faseAtual:
-    "Fase 6 em andamento · Hardening XSS (Strategy OWASP), Código da Escola e Esquema consolidado",
-  ultimoAutor: "Gianlucca Paiva (GianluccaPaiva)",
+    "Fases 6 e 6-A validadas no Docker · apresentação da Fase 7 preparada",
+  ultimoAutor: "Gabriel Lineker (GabrielLineker)",
   data: "2026-11-21",
   branch: "DesiningTeste",
 };
@@ -43,11 +43,11 @@ export const metricasEngenharia: MetricaProjeto[] = [
   {
     valor: "100%",
     rotulo:
-      "linhas/funções (98.16% Stmts · 93.35% Branch) em src/lib e src/patterns (era 4.27%)",
+      "linhas e funções em src/lib e src/patterns · 98,16% de instruções e 93,35% de ramificações",
   },
   {
     valor: "144",
-    rotulo: "testes passando em 19 suítes (eram 3)",
+    rotulo: "testes em 19 suítes · linha de base: 3 testes em 1 suíte",
   },
   {
     valor: "7 + 1",
@@ -56,7 +56,7 @@ export const metricasEngenharia: MetricaProjeto[] = [
   {
     valor: "Fase 6",
     rotulo:
-      "Ordens 1, 2, Exclusão, Código da Escola e Hardening XSS (V-01..V-04) validados",
+      "validação local concluída · 16/16 no SQL e fluxo de entrega aprovado na SPA",
   },
 ];
 
@@ -363,7 +363,7 @@ export const roadmapFases: FaseRoadmapItem[] = [
     status: "Concluído",
     responsavel: "Gabriel Lineker (GabrielLineker)",
     entregas:
-      "EntregaAtividadeFacade unificando higienização de arquivo, Supabase Storage (upload + createSignedUrl) e PostgreSQL (UPSERT em entregas_atividades, listagem por papel e avaliação docente).",
+      "A EntregaAtividadeFacade concentra higienização, upload, URLs assinadas e persistência da entrega. A Fase 6-A adaptou a fachada para o esquema normalizado.",
     evidenciaTeste:
       "5 suítes / 66 testes passando · EntregaAtividadeFacade.ts com 100% de cobertura",
   },
@@ -405,17 +405,27 @@ export const roadmapFases: FaseRoadmapItem[] = [
     entregas:
       "05_supabase_funcoes_realtime.sql, database.types.ts, mappers.ts, permissoes.ts, AnexoStorageFacade, 6 Repositories, migração dos hooks/Observer/Edge Function e 6 novas suítes (RLS reais ao final em 9-B).",
     evidenciaTeste:
-      "13 suítes / 113 testes confirmados em 19/11 por Gabriel Lineker · 98% instruções / 92,87% ramificações / 100% funções e linhas em src/lib + src/patterns · Supabase ao vivo pendente",
+      "13 suítes / 113 testes no marco da Fase 6-A. O Passo 9-B foi confirmado posteriormente no Supabase local e na SPA.",
   },
   {
     fase: "Fase 6",
     titulo: "Testes de Componente + E2E (Playwright) + Hardening XSS + RLS reais (Passo 9-B)",
-    status: "Em Andamento",
+    status: "Concluído",
     responsavel: "Gabriel Lineker & Gianlucca Paiva",
     entregas:
       "Testes de ProtectedRoute/BoxRestrito, exclusão de conta atômica (14), código público da escola (15), hardening XSS com SanitizacaoStrategy OWASP (16 + vercel.json + Edge Functions), consolidação de 01_esquema.sql, idempotência da 09 e RLS ao vivo.",
     evidenciaTeste:
       "19 suítes / 144 testes verdes e 16/16 casos SQL em instalação limpa no Docker. Reenvio sem nota, avaliação docente e fallback de banner confirmados na SPA. Ensaio do Resend registrado com HTTP 200. Publicação e conferência no ambiente alvo encaminhadas a Gianlucca Paiva.",
+  },
+  {
+    fase: "Fase 7",
+    titulo: "Apresentação interativa e materiais da DCC061",
+    status: "Concluído",
+    responsavel: "Gabriel Lineker & Gianlucca Paiva",
+    entregas:
+      "A aba Informações reúne catálogo comparativo, técnicas de teste, resultados e roadmap. A dupla preparou documento-texto, slides e roteiro para a entrega acadêmica.",
+    evidenciaTeste:
+      "Materiais revisados com 10 páginas de texto, 14 slides e guia de apresentação de 18 minutos. A conferência da submissão e a limpeza final seguem no handoff.",
   },
 ];
 
@@ -455,7 +465,7 @@ export const matrizTestesRbt: CamadaTesteItem[] = [
       "Login, matrícula, primeira entrega, Realtime, exclusão atômica (14), código público (15), constraints XSS (16) e auditoria ofensiva (V-01..V-05)",
     tecnicas:
       "Automação de navegador, scripts SQL reversíveis (BEGIN...ROLLBACK) e instalação limpa no Docker com 16/16 casos aprovados",
-    status: "Em Andamento",
+    status: "Concluído",
   },
 ];
 

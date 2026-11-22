@@ -9,7 +9,7 @@
 |:---|:---|
 | **Última modificação por** | **Gabriel Lineker** (`GabrielLineker`) em 2026-11-21 |
 | **Última etapa concluída** | **Consolidação da Sessão de 21/11 (Fases 6 e 7 + Diagramas + `ConfiguracoesAvancadas` + `resend-email`/`resend-suport` + `.agents/`):** concluídos Exclusão atômica de conta (`14` + `deletar-conta`), `03_verificacao.sql` (16 testes) + `grupo24/`, Código público da escola (`ADR-010`/`15`, 10/10 ao vivo), Hardening XSS/OWASP (`ADR-011`, `V-01..V-05`: `SanitizacaoStrategy.ts` com 0 deps, `16`, `vercel.json`, `01_esquema.sql` consolidado, `09` idempotente, redação real de stream em `Testes de segurança.pdf`), atualização da aba `InfoAplicacao` (slide Pentest + correções visuais), liberação de `ConfiguracoesAvancadas` para `professor`/`master` mantendo *Deletar Conta* restrito a `aluno`, refatoração completa de `resend-email`/`resend-suport` (esquema 18 tabelas, anexos 1FN, HTML responsivo, disparo *best-effort* em `ComunicacaoRepository` e `scripts/validar-envio-resend.mjs` validado `HTTP 200`), sincronização dos diagramas e governança `.agents/` (**19 suítes / 144 testes**; **98.16% Stmts / 93.35% Branch / 100% Funcs / 100% Lines**). |
-| **Último relatório** | [Fechamento da sessão de Gabriel](../relatorios/2026-11/2026-11-21-fechamento-sessao-gabriel.md), por Gabriel Lineker. |
+| **Último relatório** | [Fechamento da revisão DCC061](../relatorios/2026-11/2026-11-21-fechamento-revisao-dcc061.md), por Gabriel Lineker. |
 | **Fase atual / Próximo passo** | **Fase 6 e Passo 9-B validados no ambiente local.** Instalação limpa com 16/16, migração 10 retestada no banco e na SPA e relatório do Grupo 24 reconciliado. Gianlucca decide a publicação e a inclusão do reenvio de confirmação. Exportação dos binários conforme exigência da entrega. Revisão da carga adiada. [Plano e resultados](PLANO_VALIDACAO_DOCKER_E_BANNERS.md) |
 | **Restrições/Contratos ativos** | Subir banco Docker com `docker compose --env-file .env -f docker/structure/docker-compose.yml up -d`; globais de build já estão mockadas em `setupTests.ts`; padrões devem residir em `src/patterns/<padrao>/` e repositórios em `src/repositories/` (ADR-009); IDs `SERIAL` são expostos como `string` no domínio; ordem Storage ↔ FK `CASCADE` obrigatória (ADR-009 §2.8); `01_esquema.sql` consolidado mantém compatibilidade idempotente com `06`–`16` (não quebrar `02`/`04`); rodar `npx vitest run` e `npx tsc -b --noEmit` ao final de cada alteração de código (nunca rodar `tsc` após edições exclusivas em `.md`). |
 
@@ -17,7 +17,13 @@
 
 **Encaminhamento final — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Todas as pendências passam a Gianlucca Paiva, incluindo DCC061, E4/DCC060, publicação e consolidação do repositório. Ver [plano de fechamento](../.agents/PLANO_FECHAMENTO_GIANLUCCA.md).
 
+**Contas de apresentação — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** As quatro contas indicadas para avaliação constam no Auth e em `perfil`, com e-mail confirmado e sem bloqueio vigente na consulta. Preservá-las nos testes e na limpeza. A lista e a regra de exclusão de escopo estão no [plano de fechamento](../.agents/PLANO_FECHAMENTO_GIANLUCCA.md#contas-reservadas-para-a-apresentação).
+
 ## Painel de Progresso
+
+**Revisão da DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Conferidos os três PDFs e a aba Informações. O roadmap distingue validação local e publicação, inclui a Fase 7 e passou na verificação em larguras móvel e desktop. O comparativo detalha os ajustes propostos para os PDFs. [Relatório da revisão](../relatorios/2026-11/2026-11-21-revisao-entrega-dcc061.md)
+
+**Materiais revisados da DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Os PDFs finais incorporam o antes/depois das fases, comparativos de código e um guia de estudo e apresentação. São dez páginas de documento, 14 slides e seis páginas de guia, com 18 minutos de fala previstos. Gabriel transferiu as versões finais para fora do repositório. Usar essas cópias na submissão.
 
 **Entrega DCC061 — Gabriel Lineker (`GabrielLineker`), 21/11/2026.** Gabriel guardou fora do repositório os três PDFs preparados com a identidade clara do NexusClass: documento-texto de sete páginas, 12 slides em formato 16:9 e roteiro de 17 min 30 s. A remoção dos PDFs versionados em `60517fa` foi intencional. Gianlucca deve usar as cópias externas no ensaio e na conferência da submissão.
 
@@ -128,6 +134,8 @@
 - **Lições / trade-offs:** Reconhecer padrões nativos da linguagem/framework (ES Module Singleton e React Router Protection Proxy) em vez de forçar classes redundantes reforça o princípio de simplicidade do trabalho.
 
 ## Diário de Sessões
+
+**21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Encerrada a revisão da DCC061 e encaminhada a preservação das contas de apresentação. Os PDFs finais foram transferidos para fora do repositório. [Relatório de fechamento](../relatorios/2026-11/2026-11-21-fechamento-revisao-dcc061.md)
 
 **21/11/2026 — Gabriel Lineker (`GabrielLineker`).** Sessão encerrada com as validações locais consolidadas, os PDFs da DCC061 guardados externamente e as pendências encaminhadas a Gianlucca no plano de fechamento.
 

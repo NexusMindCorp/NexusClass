@@ -12,6 +12,17 @@
 
 ## Ordem recomendada
 
+### Contas reservadas para a apresentação
+
+**Registro:** Gabriel Lineker (`GabrielLineker`), 21/11/2026. Preservar estas contas para o acesso do professor avaliador à aplicação:
+
+- `prof@nexusclass.edu.br`
+- `descarte@nexus.com`
+- `testador@aluno.nexuclass.com`
+- `jae@nexus.com`
+
+Excluir as quatro contas de qualquer limpeza, exclusão em lote, reset da base ou teste de exclusão. Preservar Auth, perfil, papel, escola, vínculos, anexos e credenciais durante a janela da apresentação. A conta `descarte@nexus.com` fica reservada para a apresentação apesar do nome. Antes de executar um roteiro com escrita ou remoção, conferir o projeto e a lista de alvos. Se alguma das quatro contas estiver no escopo, interromper a operação e alinhar com Gabriel. Para testes destrutivos, criar contas descartáveis próprias no Docker local. Conferir a disponibilidade das contas antes da entrega, mantendo senhas e tokens fora do Git.
+
 1. **Fechar DCC061.** Combinar com Gabriel o acesso às cópias externas, conferir autores e formato conforme o [enunciado](../.docs/DCC061_Trabalho.md) e confirmar a submissão do documento, slides e código pelo canal da disciplina. Ensaiar 15 a 20 minutos com a aba Informações e o PDF. Priorizar Adapter/Factory e Facade e demonstrar reenvio e avaliação com contas de teste. Ao atualizar material acadêmico, distinguir os testes com dublês, o ensaio do provedor e a validação do ambiente publicado.
 2. **Fechar E4/DCC060 com o Grupo 24.** Confirmar se a entrega histórica encerra a E4 ou se deve sair um pacote reconciliado. Se for reconciliado, exportar o relatório de [RELATORIO_ATUALIZADO.md](../grupo24/RELATORIO_ATUALIZADO.md) para PDF e o [modelo.drawio](../grupo24/modelo.drawio) para PNG. Marcar os PDFs, o DER e os SQL antigos como artefatos da E4. Indicar [docker/constructionsSQL](../docker/constructionsSQL/) e a ordem `01 → 04 → 02 → 05 → 06…16 → 03` como referência homologada em Docker. A pasta `grupo24/sql` ainda usa `entrega_url` e contém 11 casos. Manter a carga versionada.
 3. **Decidir e verificar a publicação.** Conferir destino, versões e segredos de `resend-email` e `resend-suport` e verificar as notificações disparadas pela aplicação com dados de teste. Conferir os cabeçalhos definidos em `vercel.json` no HTTP da hospedagem. Decidir separadamente se o reenvio de confirmação entra na entrega e identificar o serviço que envia mensagens do Auth. Se aprovado, confirmar recebimento, abertura do link e login. Registrar decisão, ambiente e resultado no handoff, omitindo credenciais. Antes de qualquer operação em produção, alinhar o destino e os efeitos com Gabriel.

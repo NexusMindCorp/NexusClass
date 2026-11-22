@@ -512,14 +512,14 @@ export function InfoAplicacao() {
           <section className="info-flow-card">
             <SectionHeader
               icone={GitBranch}
-              titulo="Roadmap de Fases & Handoff entre a Dupla (Fases 0 a 6)"
-              descricao="Registro vivo de cada etapa do planejamento. Conforme cada membro conclui uma fase, este painel é atualizado junto com a documentação."
+              titulo="Roadmap da refatoração e da entrega (Fases 0 a 7)"
+              descricao="Mudanças e evidências de cada fase. A validação local e o fechamento da publicação são registrados no handoff."
             />
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {roadmapFases.map((item) => (
                 <div key={item.fase} className="info-flow-step space-y-2">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="inline-flex items-center rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-primary-foreground">
                       {item.fase}
                     </div>
