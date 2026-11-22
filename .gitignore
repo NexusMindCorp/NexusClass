@@ -31,3 +31,7 @@ graphify-out
 
 # Cobertura de testes
 coverage
+
+# Material local e cache da CLI do Supabase
+/atualizacoes/
+/supabase/.temp/

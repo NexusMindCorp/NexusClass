@@ -193,12 +193,12 @@ describe('src/lib/utils.ts — Suíte de Testes Unitários Puros (Fase 0)', () =
   describe('4. Tabela de Decisão: Tradutor de Erros do Supabase (formatarErroSupabase)', () => {
     it('deve traduzir o código PGRST205 (schema cache do PostgREST)', () => {
       const msg = formatarErroSupabase({ code: 'PGRST205' }, 'buscar eventos');
-      expect(msg).toContain('PostgREST nao encontrou public.eventos_calendario');
+      expect(msg).toContain('PostgREST nao encontrou public.evento_calendario no cache de schema. Verifique se o ambiente usa o esquema vigente do NexusClass');
     });
 
     it('deve traduzir o código 42P01 (tabela inexistente)', () => {
       const msg = formatarErroSupabase({ code: '42P01' }, 'criar evento');
-      expect(msg).toContain('tabela eventos_calendario nao existe');
+      expect(msg).toContain('tabela evento_calendario nao existe. Verifique se o ambiente usa o esquema vigente do NexusClass.');
     });
 
     it('deve traduzir o código 42501 (violação de RLS / permissão negada)', () => {

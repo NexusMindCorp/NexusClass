@@ -35,27 +35,7 @@ O planejamento e a modelagem conceitual da aplicação antecederam sua implement
 
 ### Diagrama de Entidade-Relacionamento (ERD)
 
-O esquema relacional implementado no banco de dados Supabase reflete a seguinte estrutura de dados:
-
-```mermaid
-erDiagram
-    escolas ||--o{ turmas_escolares : "contem"
-    turmas_escolares ||--o{ turma_alunos : "lista"
-    perfis ||--o{ aluno_turma : "pertence"
-    turmas_escolares ||--o{ aluno_turma : "matriculado"
-    perfis ||--o{ professor_turma : "ministra"
-    turmas_escolares ||--o{ professor_turma : "associado"
-    turmas_escolares ||--o{ atividades : "possui"
-    atividades ||--o{ entregas_atividades : "recebe"
-    perfis ||--o{ entregas_atividades : "entrega"
-    perfis ||--o{ duvidasalunostoprofessor : "cria"
-    perfis ||--o{ duvidasalunostoprofessor : "responde"
-    turmas_escolares ||--o{ duvidasalunostoprofessor : "contextualiza"
-    eventos_calendario ||--o{ alertas_calendario : "gera"
-    perfis ||--o{ eventos_calendario : "agenda"
-    perfis ||--o{ mensagens : "conversa"
-    perfis ||--o{ mural_posts : "publica"
-```
+O [modelo ER](out/diagramas/modelo_er.puml) descreve o esquema normalizado do NexusClass. Os scripts vigentes estão em [docker/constructionsSQL](docker/constructionsSQL/), com a infraestrutura local em [docker/structure](docker/structure/).
 
 ---
 
@@ -65,12 +45,11 @@ erDiagram
 - **Tigreso (Assistente IA)**: Chatbot integrado com o SDK oficial do Google Gemini AI, atuando como um tutor virtual configurado para tirar dúvidas acadêmicas e sugerir roteiros de estudo.
 - **Central de Atividades & Notas**:
   - Alunos podem enviar tarefas anexando arquivos a um bucket privado do Supabase Storage.
-  - Validação inteligente de prazos via trigger no banco (`trigger_verificar_prazo`) comparando a data de envio à data limite da atividade.
-  - Professores e administradores contam com portal de avaliação para fornecer notas (0.00 a 10.00) e feedbacks em tempo real.
+  - O prazo é avaliado comparando a data de envio à data limite da atividade.
+  - Professores e administradores contam com portal de avaliação para fornecer notas de 0 a 100 e feedbacks em tempo real.
 - **Canal de Dúvidas (Fórum Aluno-Professor)**:
   - Canal direto com suporte a múltiplos anexos.
-  - Gatilho inteligente no banco (`trigger_deletar_anexos_duvida`) para remover anexos do storage automaticamente ao deletar uma dúvida.
-  - Rotina automatizada de limpeza que deleta dúvidas marcadas como resolvidas no primeiro dia de cada mês.
+  - A exclusão de uma dúvida remove seus anexos pelo fluxo de Storage da aplicação.
 - **Calendário Letivo & Alertas em Tempo Real**:
   - Agendamento de provas e reuniões com diferenciação visual entre eventos escolares e pessoais.
   - Sistema de cron job no banco de dados (`pg_cron`) disparado a cada minuto para calcular e enviar notificações 1 e 5 minutos antes do início de cada evento.
@@ -85,15 +64,9 @@ erDiagram
 O backend utiliza a infraestrutura de banco de dados relacional PostgreSQL do Supabase, equipada com os seguintes pilares operacionais:
 
 1. **Row Level Security (RLS)**: Tabelas protegidas com políticas granulares baseadas no ID do usuário autenticado (`auth.uid()`) e papéis do sistema (`aluno`, `professor` e `master`).
-2. **Automação por Triggers**:
-   - `trigger_verificar_prazo`: Compara a data de inserção ou edição na tabela `entregas_atividades` com o prazo da atividade, prevenindo fraudes de tempo no cliente.
-   - `trigger_deletar_anexos_duvida`: Exclui fisicamente do storage do Supabase os anexos relacionados quando uma linha na tabela `duvidasalunostoprofessor` é removida.
-3. **Processos em Segundo Plano (Cron Jobs)**:
-   - Execução rotineira com a extensão `pg_cron` integrada.
-   - Envio de alertas de antecedência (`processar_alertas_antecedencia`) a cada 1 minuto.
-   - Purga de dúvidas finalizadas no início de cada mês (`deletar-duvidas-resolvidas-mensal`).
-4. **Edge Functions de Segurança**:
-   - `deletar-conta`: Função escrita em Deno TypeScript executada em ambiente isolado (Edge) com a `service_role` administrativa do Supabase para apagar com segurança o registro de autenticação (`auth.users`) e dependências do Storage.
+2. **Integridade do esquema**: Restrições e gatilhos do PostgreSQL garantem regras como o vínculo de alunos e professores a turmas da mesma escola.
+3. **Alertas do calendário**: A função `fn_processar_alertas_calendario` é agendada pelo `pg_cron`.
+4. **Edge Functions**: O código em [supabase/functions](supabase/functions/) inclui `deletar-conta`, `resend-email` e `resend-suport`.
 
 ---
 

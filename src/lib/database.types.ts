@@ -4,7 +4,7 @@
  * padrão do Supabase CLI (`supabase gen types typescript`).
  *
  * Para regenerar contra um projeto autenticado:
- *   npx supabase gen types typescript --project-id qexobdhuwxcoeteqnlcn > src/lib/database.types.ts
+ *   npx supabase gen types typescript --project-id <PROJECT_ID> > src/lib/database.types.ts
  */
 
 export type Json =

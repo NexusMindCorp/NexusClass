@@ -139,15 +139,15 @@ export function hojeLocal() {
 
 export function formatarErroSupabase(erro: ErroSupabase, acao: string) {
   if (erro.code === "PGRST205") {
-    return `Falha ao ${acao}: PostgREST nao encontrou public.eventos_calendario no cache de schema. Rode o SQL em supabase/001_eventos_calendario.sql e recarregue o schema.`
+    return `Falha ao ${acao}: PostgREST nao encontrou public.evento_calendario no cache de schema. Verifique se o ambiente usa o esquema vigente do NexusClass e recarregue o cache de schema.`
   }
 
   if (erro.code === "42P01") {
-    return `Falha ao ${acao}: tabela eventos_calendario nao existe. Rode o SQL em supabase/001_eventos_calendario.sql.`
+    return `Falha ao ${acao}: tabela evento_calendario nao existe. Verifique se o ambiente usa o esquema vigente do NexusClass.`
   }
 
   if (erro.code === "42501") {
-    return `Falha ao ${acao}: permissao negada (RLS). Verifique as policies da tabela eventos_calendario.`
+    return `Falha ao ${acao}: permissao negada (RLS). Verifique as policies da tabela evento_calendario.`
   }
 
   const detalhes = erro.details ? ` (${erro.details})` : ""
