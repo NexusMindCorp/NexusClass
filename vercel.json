@@ -1,5 +1,13 @@
 {
   "cleanUrls": false,
+  "git": {
+    "deploymentEnabled": {
+      "DesiningTeste": false,
+      "main": false,
+      "frontComBack": false,
+      "deploy": true
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
