@@ -4,7 +4,7 @@
 
 # NexusClass
 
-Plataforma educacional interativa projetada para modernizar a comunicação e gestão escolar entre alunos, professores e administradores. Construída com React 19, TypeScript, Tailwind CSS v4 e Supabase.
+Plataforma educacional interativa projetada para modernizar a comunicação e gestão escolar entre alunos, professores e administradores. Construída com **React 19**, **TypeScript**, **Tailwind CSS v4**, **Supabase**, **Google Gemini AI** e refatorada sob práticas de **Engenharia de Software (DCC061 — Design Patterns, Testes Automatizados e Segurança OWASP)**.
 
 [![Node.js version](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-3c873a?style=flat-square&logo=node.js)](https://nodejs.org)
 [![React version](https://img.shields.io/badge/React-19.2.0-61dafb?style=flat-square&logo=react)](https://react.dev)
@@ -13,141 +13,177 @@ Plataforma educacional interativa projetada para modernizar a comunicação e ge
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Integrated-green?style=flat-square&logo=supabase)](https://supabase.com)
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-Enabled-purple?style=flat-square&logo=google-gemini)](https://ai.google.dev)
+[![Vitest](https://img.shields.io/badge/Vitest-144_Testes-6E9F18?style=flat-square&logo=vitest)](https://vitest.dev)
 
-[Visão Geral](#-visão-geral) • [Modelagem do Sistema](#-modelagem-do-sistema) • [Recursos Principais](#-recursos-principais) • [Arquitetura de Banco de Dados](#-arquitetura-de-banco-de-dados) • [Tecnologias](#-tecnologias-utilizadas) • [Pré-requisitos](#-pré-requisitos) • [Instalação](#-instalação) • [Configuração](#-configuração) • [Estrutura](#-estrutura-do-projeto)
+<!-- TODO: Substituir pela URL publicada da aplicação (Vercel) -->
+[![Acessar Aplicação](https://img.shields.io/badge/🌐_Acessar_NexusClass-ADICIONAR_URL_DO_SITE-111827?style=for-the-badge)](https://COLOCAR-URL-DO-SITE-AQUI)
+
+[Acesso](#-acesso-à-aplicação) • [Visão Geral](#-visão-geral) • [Engenharia de Software](#-engenharia-de-software-dcc061) • [Testes e Qualidade](#-testes-automatizados-e-cobertura) • [Segurança](#-segurança-e-hardening-owasp) • [Modelagem](#-modelagem-e-diagramas) • [Recursos](#-recursos-principais) • [Instalação](#-instalação-e-configuração) • [Estrutura](#-estrutura-do-projeto)
 
 </div>
 
 ---
 
-## 🌐 Visão Geral
+## 🔗 Acesso à Aplicação
 
-O **NexusClass** é uma solução escolar integrada de ponta a ponta. Ele conecta alunos e professores em um ecossistema digital composto por mural de avisos, chat em tempo real, assistente virtual inteligente alimentado por IA (tutor *Tigreso* via Gemini), portal de atividades com verificação automatizada de prazos e um canal estruturado para resolução de dúvidas com anexos. A segurança do sistema é regida por políticas RLS robustas e um processo automatizado de exclusão de dados em conformidade com as regulamentações de privacidade.
+> [!IMPORTANT]
+> <!-- TODO: Atualizar com o link final de produção após o deploy -->
+> **URL do site em produção:** `[INSERIR URL DO SITE AQUI]` *(ex.: `https://nexusclass.vercel.app`)*
+
+A aplicação também conta com uma aba interativa interna (**Informações → Engenharia de Software**) que apresenta os padrões aplicados (Antes vs. Depois), a evolução das métricas de testes e o resumo do hardening de segurança.
 
 ---
 
-## 🗺️ Modelagem do Sistema
+## 🌐 Visão Geral
 
-O planejamento e a modelagem conceitual da aplicação antecederam sua implementação e estão documentados em detalhes na pasta do projeto e na especificação oficial de requisitos:
+O **NexusClass** é uma solução escolar integrada de ponta a ponta. Conecta alunos, professores e administradores (`master`) em um ecossistema digital composto por mural de avisos, chat em tempo real, assistentes virtuais inteligentes alimentados por IA (**Tigreso** e **Falcão Peregrino** via Google Gemini), central de atividades com controle de prazos e avaliação docente, canal de dúvidas com anexos normalizados (1FN), calendário letivo com alertas automáticos e fluxo transacional de exclusão de conta.
+
+---
+
+## 🧩 Engenharia de Software (DCC061)
+
+O projeto passou por uma refatoração arquitetural estruturada para reduzir acoplamento entre interface, regras de negócio e infraestrutura (Supabase e Gemini), aplicando **7 padrões GoF**, **Repository Pattern** e **Data Mappers** apenas onde havia problema real no código (sem *overengineering*).
+
+### Catálogo de Padrões de Projeto (`src/patterns/` e `src/repositories/`)
+
+| Padrão | Categoria | Implementação | Problema real resolvido |
+| :--- | :--- | :--- | :--- |
+| **Adapter** | GoF Estrutural | [`GeminiAdapter.ts`](src/patterns/adapter/GeminiAdapter.ts) | Isola o SDK `@google/generative-ai`, *Function Calling* (4 ferramentas) e *retry* exponencial (`503`) por trás da interface `IAssistenteIA`. |
+| **Factory** | GoF Criacional | [`BotFactory.ts`](src/patterns/factory/BotFactory.ts) | Centraliza a instanciação determinística dos assistentes **Tigreso** e **Falcão Peregrino** e a composição de instruções por papel. |
+| **Facade** | GoF Estrutural | [`EntregaAtividadeFacade.ts`](src/patterns/facade/EntregaAtividadeFacade.ts)<br>[`AnexoStorageFacade.ts`](src/patterns/facade/AnexoStorageFacade.ts) | Orquestra operações coordenadas entre Supabase Storage (`upload`, `createSignedUrls`, compensação em erro) e PostgreSQL (`upsert`, avaliação e anexos 1FN). |
+| **Strategy** | GoF Comportamental | [`FiltroStrategy.ts`](src/patterns/strategy/FiltroStrategy.ts)<br>[`SanitizacaoStrategy.ts`](src/patterns/strategy/SanitizacaoStrategy.ts) | Elimina condicionais duplicados nos filtros de turmas/dúvidas e centraliza a sanitização contextual OWASP em 3 estratégias puras sem dependências externas. |
+| **Observer** | GoF Comportamental | [`NotificacaoSubject.ts`](src/patterns/observer/NotificacaoSubject.ts) | Desacopla os 5 canais Supabase Realtime (`mural`, `atividades`, `entregas`, `alertas`, `mensagens`) dos efeitos de Toast, atualização de estado e badges. |
+| **Singleton** | GoF Criacional | [`supabaseClient.ts`](src/lib/supabaseClient.ts) | Garante instância única tipada (`createClient<Database>`) do cliente Supabase via cache nativo de ES Modules ([doc](src/patterns/singleton/README.md)). |
+| **Protection Proxy** | GoF Estrutural | [`ProtectedRoute.tsx`](src/components/ProtectedRoute.tsx) · [`BoxRestrito.tsx`](src/components/BoxRestrito.tsx) · [`permissoes.ts`](src/lib/permissoes.ts) | Intercepta rotas autenticadas e ações restritas por papel na UI, em defesa em profundidade com as políticas RLS ([doc](src/patterns/proxy/README.md)). |
+| **Repository & Data Mapper** | Arquitetural | [`src/repositories/`](src/repositories/) · [`mappers.ts`](src/lib/db/mappers.ts) | Isola todas as consultas ao esquema normalizado de 18 tabelas em 6 repositórios de domínio (`Perfil`, `EscolaTurma`, `Atividade`, `Duvida`, `Mural`, `Comunicacao`). |
+
+> **Decisões de simplicidade registradas:** *Template Method* foi descartado por os formulários possuírem fluxos distintos (evitando herança artificial), e `DOMPurify` foi dispensado por não haver uso de `dangerouslySetInnerHTML`/`innerHTML` em `src/`. Consulte o catálogo completo em [`src/patterns/README.md`](src/patterns/README.md).
+
+---
+
+## 🧪 Testes Automatizados e Cobertura
+
+A estratégia de testes segue **Risk-Based Testing (RBT)** com foco em determinismo (uso de *Fake Timers*, dublês em memória, Particionamento de Equivalência, Análise de Valor Limite e Tabela de Decisão), executada com **Vitest** e cobertura **V8**:
+
+| Indicador | Antes (Baseline) | Estado Atual |
+| :--- | :--- | :--- |
+| **Suítes / Testes automatizados** | 1 arquivo (3 testes) | **19 arquivos (144 testes)** |
+| **Statements (`src/lib` + `src/patterns`)** | `4.27%` | **98.16%** |
+| **Branches (`src/lib` + `src/patterns`)** | `0%` | **93.35%** |
+| **Functions (`src/lib` + `src/patterns`)** | `4.00%` | **100%** |
+| **Lines (`src/lib` + `src/patterns`)** | `4.42%` | **100%** |
+| **Verificação SQL em Docker (`03_verificacao.sql`)** | — | **16/16 casos reversíveis (`ROLLBACK`)** |
+
+---
+
+## 🛡️ Segurança e Hardening (OWASP)
+
+As validações de segurança (Burp Suite, Wapiti, SQLmap e testes de XSS) foram consolidadas em defesa em profundidade nas camadas de interface, Edge Functions, hospedagem e banco de dados:
+
+- **Row Level Security (RLS):** 18 tabelas protegidas por políticas baseadas em `auth.uid()` e papéis (`aluno`, `professor`, `master`), impedindo escalada de privilégios no cadastro (`handle_new_user` fixa `role = 'aluno'`).
+- **Código Público da Escola (`ESC-XXXXXXXX`):** evita enumeração sequencial de escolas no cadastro, com restrição de privilégio de coluna e RPC controlada.
+- **Sanitização Contextual OWASP (`SanitizacaoStrategy`):** normalização de entradas nos repositórios (`TextoEntradaStrategy`), allowlist estrita `http:`/`https:` para URLs (`UrlHttpSeguraStrategy`), escape HTML em templates de e-mail (`EscapeHtmlStrategy`) e `CHECK` constraints no PostgreSQL (`16_protecao_urls_e_entradas.sql`).
+- **Cabeçalhos HTTP de Segurança ([`vercel.json`](vercel.json)):** `Content-Security-Policy` (CSP), `Strict-Transport-Security` (HSTS), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy` e `Permissions-Policy`.
+- **Edge Functions Autenticadas ([`supabase/functions/`](supabase/functions/)):** `deletar-conta`, `resend-email` e `resend-suport` executadas com verificação JWT (`verify_jwt: true`), checagem de titularidade e URLs assinadas temporárias.
+
+---
+
+## 🗺️ Modelagem e Diagramas
 
 > [!NOTE]
-> Acesse o [Documento de Planejamento e Modelagem do NexusClass](https://docs.google.com/document/d/1By-bhNEzCsuZFOqb4rJt2Wj1VXxE5OucCwXfb5eE5Fk/edit?usp=sharing) para visualizar o levantamento completo de requisitos funcionais e não-funcionais, especificações técnicas e diagramas conceituais da aplicação.
+> Acesse também o [Documento de Planejamento e Modelagem do NexusClass](https://docs.google.com/document/d/1By-bhNEzCsuZFOqb4rJt2Wj1VXxE5OucCwXfb5eE5Fk/edit?usp=sharing) para o levantamento de requisitos funcionais e não-funcionais.
 
-### Diagrama de Entidade-Relacionamento (ERD)
+Os diagramas PlantUML atualizados do sistema estão versionados em [`out/diagramas/`](out/diagramas/):
+- **Diagrama de Classes (com estereótipos GoF e Repositories):** [`out/diagramas/diagrama_classes_detalhado.puml`](out/diagramas/diagrama_classes_detalhado.puml)
+- **Modelo Entidade-Relacionamento (18 tabelas normalizadas):** [`out/diagramas/modelo_er.puml`](out/diagramas/modelo_er.puml)
+- **Diagrama de Estados — Entrega de Atividade:** [`out/diagramas/diagrama_estados_entrega.puml`](out/diagramas/diagrama_estados_entrega.puml)
+- **Diagrama de Estados — Central de Dúvidas:** [`out/diagramas/diagrama_estados_duvida.puml`](out/diagramas/diagrama_estados_duvida.puml)
 
-O [modelo ER](out/diagramas/modelo_er.puml) descreve o esquema normalizado do NexusClass. Os scripts vigentes estão em [docker/constructionsSQL](docker/constructionsSQL/), com a infraestrutura local em [docker/structure](docker/structure/).
+Os scripts SQL vigentes do banco e a infraestrutura Docker local ficam em [`docker/constructionsSQL/`](docker/constructionsSQL/) e [`docker/structure/`](docker/structure/).
 
 ---
 
 ## ✨ Recursos Principais
 
-- **Painel de Turmas & Mural**: Gestão escolar segmentada. O Mural unifica as novidades, avisos e posts da turma com suporte a arquivos anexos.
-- **Tigreso (Assistente IA)**: Chatbot integrado com o SDK oficial do Google Gemini AI, atuando como um tutor virtual configurado para tirar dúvidas acadêmicas e sugerir roteiros de estudo.
-- **Central de Atividades & Notas**:
-  - Alunos podem enviar tarefas anexando arquivos a um bucket privado do Supabase Storage.
-  - O prazo é avaliado comparando a data de envio à data limite da atividade.
-  - Professores e administradores contam com portal de avaliação para fornecer notas de 0 a 100 e feedbacks em tempo real.
-- **Canal de Dúvidas (Fórum Aluno-Professor)**:
-  - Canal direto com suporte a múltiplos anexos.
-  - A exclusão de uma dúvida remove seus anexos pelo fluxo de Storage da aplicação.
-- **Calendário Letivo & Alertas em Tempo Real**:
-  - Agendamento de provas e reuniões com diferenciação visual entre eventos escolares e pessoais.
-  - Sistema de cron job no banco de dados (`pg_cron`) disparado a cada minuto para calcular e enviar notificações 1 e 5 minutos antes do início de cada evento.
-- **Privacidade & Zona de Perigo (LGPD/GDPR)**:
-  - Protocolo transacional seguro de autoexclusão de conta via Edge Function (`deletar-conta`).
-  - Purga completamente perfis, entregas de arquivos, buckets de storage, conversas e matrículas vinculadas, com trava de segurança exclusiva para contas do tipo `aluno`.
-
----
-
-## 🗃️ Arquitetura do Banco de Dados (Supabase)
-
-O backend utiliza a infraestrutura de banco de dados relacional PostgreSQL do Supabase, equipada com os seguintes pilares operacionais:
-
-1. **Row Level Security (RLS)**: Tabelas protegidas com políticas granulares baseadas no ID do usuário autenticado (`auth.uid()`) e papéis do sistema (`aluno`, `professor` e `master`).
-2. **Integridade do esquema**: Restrições e gatilhos do PostgreSQL garantem regras como o vínculo de alunos e professores a turmas da mesma escola.
-3. **Alertas do calendário**: A função `fn_processar_alertas_calendario` é agendada pelo `pg_cron`.
-4. **Edge Functions**: O código em [supabase/functions](supabase/functions/) inclui `deletar-conta`, `resend-email` e `resend-suport`.
+- **Painel de Turmas & Mural:** gestão escolar por instituição e turma, com mural de avisos, comentários e suporte a anexos normalizados.
+- **Assistentes IA (Tigreso & Falcão Peregrino):** integração com Google Gemini AI com *Function Calling* para consultar agenda, atividades abertas, dúvidas e posts em tempo real.
+- **Central de Atividades & Avaliação:** envio de arquivos em bucket privado do Supabase Storage, validação automática de atraso e portal docente para notas (`0` a `100`) e feedback.
+- **Canal de Dúvidas (Fórum Aluno–Professor):** suporte a múltiplos anexos 1FN com limpeza sincronizada entre Storage e banco.
+- **Calendário Letivo & Alertas Realtime:** eventos pessoais e de turma com job `pg_cron` (`fn_processar_alertas_calendario`) disparando alertas antes do início dos compromissos.
+- **Privacidade & Exclusão de Conta (LGPD):** exclusão atômica via Edge Function `deletar-conta`, removendo perfil, vínculos e objetos de Storage (restrita ao papel `aluno`).
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-### Frontend
-- **React 19 & TypeScript**: Interface fluida declarativa e previsível.
-- **Vite 7**: Empacotador e servidor local com recarregamento ultra-rápido (HMR).
-- **Tailwind CSS v4**: Compilação rápida e design responsivo baseado em variáveis nativas.
-- **shadcn/ui & Radix UI**: Componentes focados em acessibilidade (padrão WCAG).
-- **next-themes**: Gerenciamento integrado e fluído de modo escuro/claro.
-- **Howler.js**: Experiência sonora dinâmica e imersiva.
+### Frontend & Qualidade
+- **React 19** + **TypeScript 5.9** + **Vite 7**
+- **Tailwind CSS v4**, **shadcn/ui**, **Radix UI**, **next-themes** e **Howler.js**
+- **Vitest 5**, **@vitest/coverage-v8**, **Testing Library** e **Playwright**
 
-### Backend & Serviços
-- **Supabase PostgreSQL**: Banco de dados relacional com extensões ativas (`pg_cron`, `pgcrypto`).
-- **Supabase Storage**: Buckets seguros para armazenamento de mídias e tarefas escolares.
-- **Supabase Edge Functions**: Código serverless Deno para operações administrativas restritas.
-- **Google Generative AI SDK**: Integração nativa com a API de modelagem Gemini AI.
+### Backend, Banco & Infraestrutura
+- **Supabase PostgreSQL** (18 tabelas, RLS, triggers, RPCs, `pg_cron`, `pgcrypto`)
+- **Supabase Auth, Storage, Realtime e Edge Functions (Deno)**
+- **Google Generative AI SDK (`@google/generative-ai`)**
+- **Docker Compose** (PostgreSQL 17 local para desenvolvimento e testes SQL)
 
 ---
 
-## 📋 Pré-requisitos
+## 🚀 Instalação e Configuração
 
-Certifique-se de que possui as seguintes ferramentas em seu sistema:
+### Pré-requisitos
+- **Node.js** `>= 18.0.0` e **npm**
+- **Docker** *(opcional, para subir o PostgreSQL local e validar os scripts SQL)*
 
-- **Node.js** (versão 18.0.0 ou superior)
-- Gerenciador de pacotes **npm** ou **pnpm**
+### Passo a passo
 
----
-
-## 🚀 Instalação
-
-1. Clone o repositório da aplicação:
+1. Clone o repositório e instale as dependências:
    ```bash
-   git clone https://github.com/GianluccaPaiva/ProjetoPilotoShadcn.git
-   cd ProjetoPilotoShadcn
-   ```
-
-2. Instale as dependências:
-   ```bash
+   git clone https://github.com/NexusMindCorp/NexusClass.git
+   cd NexusClass
    npm install
    ```
 
----
+2. Configure as variáveis de ambiente:
+   ```bash
+   cp .env.example .env
+   ```
+   Preencha o `.env` com as suas credenciais:
+   ```env
+   VITE_GEMINI_KEY=sua_chave_de_api_do_google_gemini
+   VITE_SUPABASE_URL=sua_url_do_projeto_supabase
+   VITE_SUPABASE_ANON_KEY=sua_chave_anonima_publica_do_supabase
+   ```
 
-## ⚙️ Configuração
+   > [!IMPORTANT]
+   > Sem as credenciais do Supabase e do Gemini configuradas no `.env`, autenticação, persistência e os assistentes de IA não funcionarão.
 
-Para habilitar as integrações externas, duplique o arquivo `.env.example` para `.env` e preencha as variáveis correspondentes:
-
-```bash
-cp .env.example .env
-```
-
-Edite o arquivo `.env` adicionando suas credenciais de desenvolvimento:
-
-```env
-VITE_GEMINI_KEY=sua_chave_de_api_do_google_gemini
-VITE_SUPABASE_URL=sua_url_do_projeto_supabase
-VITE_SUPABASE_ANON_KEY=sua_chave_anonima_publica_do_supabase
-```
-
-> [!IMPORTANT]
-> Sem as chaves de API e URLs do Supabase e do Gemini configuradas corretamente no `.env`, as funcionalidades de autenticação, atividades, dúvidas e o assistente de IA **Tigreso** não funcionarão.
+3. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-```
-src/
-├── components/          # Componentes reutilizáveis de interface
-│   ├── ui/              # Componentes base do shadcn/ui instalados
-│   └── provedores/      # Provedores de estado global (ex: ThemeProvider)
-├── Layout/              # Estruturas base de layout da interface
-├── dados/               # Dados simulados e locais
-├── hooks/               # Custom hooks divididos por módulos (Auth, Calendário, Dúvidas, etc)
-├── lib/                 # Inicialização dos clientes externos (Supabase Client, Helpers)
-├── referenciaGlobal/    # Arquivos de definição de tipos globais TypeScript
-├── App.tsx              # Roteamento e ponto central da interface
-├── main.tsx             # Arquivo de entrada da aplicação React
-└── index.css            # Configurações globais e importações do Tailwind v4
+```text
+NexusClass/
+├── src/
+│   ├── components/          # Componentes de interface (ui/ shadcn, provedores e telas)
+│   ├── hooks/               # Custom hooks por domínio (Auth, Mural, Entregas, Dúvidas, Bots, InfoAplicacao)
+│   ├── Layout/              # Estruturas base de layout
+│   ├── lib/                 # Cliente Supabase tipado, database.types.ts, mappers, permissões e utilitários
+│   ├── patterns/            # Catálogo GoF (adapter, factory, facade, strategy, observer, singleton, proxy)
+│   ├── repositories/        # Camada Repository de acesso ao esquema normalizado (6 repositórios)
+│   └── referenciaGlobal/    # Tipos globais TypeScript
+├── testes/                  # Suítes Vitest (lib, patterns, repositories e ui)
+├── docker/
+│   ├── constructionsSQL/    # Esquema consolidado, carga, verificação (16 casos) e migrações
+│   └── structure/           # docker-compose.yml (PostgreSQL 17)
+├── supabase/functions/      # Edge Functions Deno (deletar-conta, resend-email, resend-suport)
+├── out/diagramas/           # Diagramas PlantUML (Classes GoF, DER e Estados)
+└── vercel.json              # Cabeçalhos HTTP de segurança (OWASP) e rewrites da SPA
 ```
 
 ---
@@ -156,8 +192,13 @@ src/
 
 | Comando | Descrição |
 | :--- | :--- |
-| `npm run dev` | Inicia o servidor local de desenvolvimento na porta padrão do Vite. |
-| `npm run build` | Compila o TypeScript e empacota os arquivos de produção em `dist`. |
-| `npm run lint` | Executa o analisador estático de código para encontrar erros de estilo. |
-| `npm run preview` | Inicia um servidor local para visualizar a build de produção. |
-| `npm run deploy` | Compila e envia a versão estática atual para o GitHub Pages. |
+| `npm run dev` | Inicia o servidor local de desenvolvimento do Vite. |
+| `npm run build` | Valida tipos com TypeScript (`tsc -b`) e gera o bundle de produção em `dist/`. |
+| `npm run lint` | Executa o ESLint em todo o projeto. |
+| `npm run preview` | Pré-visualiza localmente a build de produção. |
+| `npm run test` | Executa o Vitest em modo interativo (*watch*). |
+| `npm run test:run` | Executa todas as 19 suítes de teste (144 testes) uma única vez. |
+| `npm run test:coverage` | Executa os testes com relatório de cobertura V8 (`src/lib` e `src/patterns`). |
+| `npm run test:patterns` | Executa exclusivamente as suítes dos padrões GoF em `testes/patterns/`. |
+| `npm run constructDocker` | Sobe/recria o banco PostgreSQL local via Docker Compose. |
+| `npm run deploy` | Compila e publica a build estática no GitHub Pages. |
