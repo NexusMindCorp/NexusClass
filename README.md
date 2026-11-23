@@ -15,8 +15,7 @@ Plataforma educacional interativa projetada para modernizar a comunicação e ge
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-Enabled-purple?style=flat-square&logo=google-gemini)](https://ai.google.dev)
 [![Vitest](https://img.shields.io/badge/Vitest-144_Testes-6E9F18?style=flat-square&logo=vitest)](https://vitest.dev)
 
-<!-- TODO: Substituir pela URL publicada da aplicação (Vercel) -->
-[![Acessar Aplicação](https://img.shields.io/badge/🌐_Acessar_NexusClass-ADICIONAR_URL_DO_SITE-111827?style=for-the-badge)](https://COLOCAR-URL-DO-SITE-AQUI)
+[![Acessar Aplicação](https://img.shields.io/badge/🌐_Acessar_NexusClass-Vercel-111827?style=for-the-badge&logo=vercel)](https://nexus-class-two.vercel.app/login)
 
 [Acesso](#-acesso-à-aplicação) • [Visão Geral](#-visão-geral) • [Engenharia de Software](#-engenharia-de-software-dcc061) • [Testes e Qualidade](#-testes-automatizados-e-cobertura) • [Segurança](#-segurança-e-hardening-owasp) • [Modelagem](#-modelagem-e-diagramas) • [Recursos](#-recursos-principais) • [Instalação](#-instalação-e-configuração) • [Estrutura](#-estrutura-do-projeto)
 
@@ -26,9 +25,8 @@ Plataforma educacional interativa projetada para modernizar a comunicação e ge
 
 ## 🔗 Acesso à Aplicação
 
-> [!IMPORTANT]
-> <!-- TODO: Atualizar com o link final de produção após o deploy -->
-> **URL do site em produção:** `[INSERIR URL DO SITE AQUI]` *(ex.: `https://nexusclass.vercel.app`)*
+> [!TIP]
+> **Acesse o NexusClass em produção:** [https://nexus-class-two.vercel.app/login](https://nexus-class-two.vercel.app/login)
 
 A aplicação também conta com uma aba interativa interna (**Informações → Engenharia de Software**) que apresenta os padrões aplicados (Antes vs. Depois), a evolução das métricas de testes e o resumo do hardening de segurança.
 
